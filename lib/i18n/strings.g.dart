@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 287
+/// Strings: 286
 ///
-/// Built on 2026-08-15 at 18:40 UTC
+/// Built on 2026-08-15 at 18:42 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -162,7 +162,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get creator => 'Creator';
 	String get share => 'Share';
 	String get resume_last_media => 'Resume Last Media';
-	String get change_source => 'Change Source';
 	String get launch_source => 'Launch Source';
 	String get card_creator => 'Card Creator';
 	String get target_language => 'Target language';
@@ -481,7 +480,6 @@ extension on Translations {
 			case 'creator': return 'Creator';
 			case 'share': return 'Share';
 			case 'resume_last_media': return 'Resume Last Media';
-			case 'change_source': return 'Change Source';
 			case 'launch_source': return 'Launch Source';
 			case 'card_creator': return 'Card Creator';
 			case 'target_language': return 'Target language';

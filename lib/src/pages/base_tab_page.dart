@@ -43,9 +43,10 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
   /// Each tab in the home page represents a media type.
   MediaType get mediaType;
 
-  /// Get the active media source for the current media type.
-  MediaSource get mediaSource =>
-      appModel.getCurrentSourceForMediaType(mediaType: mediaType);
+  /// The media source backing this tab. Only valid for a [mediaType] that
+  /// hosts one -- the dictionary tab has no source, and overrides every member
+  /// that reads this.
+  MediaSource get mediaSource => mediaType.source!;
 
   /// Whether or not the search bar is currently in focus.
   bool _isSearchBarFocused = false;
@@ -74,7 +75,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
           automaticallyImplyBackButton: false,
           onFocusChanged: (focused) => onFocusChanged(focused: focused),
           leadingActions: [
-            buildChangeSourceButton(),
+            buildSourceIcon(),
             buildBackButton(),
           ],
           actions: mediaSource.getActions(
@@ -115,23 +116,13 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
     return Container();
   }
 
-  /// Allows user to swap the current active [MediaSource].
-  Widget buildChangeSourceButton() {
+  /// Anchors the search bar with the icon of the [MediaSource] backing this
+  /// tab.
+  Widget buildSourceIcon() {
     return FloatingSearchBarAction(
-      child: JidoujishoIconButton(
+      child: Icon(
+        mediaSource.icon,
         size: textTheme.titleLarge?.fontSize,
-        tooltip: t.change_source,
-        icon: mediaSource.icon,
-        onTap: () async {
-          await showDialog(
-            barrierDismissible: true,
-            context: context,
-            builder: (context) => MediaSourcePickerDialogPage(
-              mediaType: mediaType,
-            ),
-          );
-          mediaType.refreshTab();
-        },
       ),
     );
   }

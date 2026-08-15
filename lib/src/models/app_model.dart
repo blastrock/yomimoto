@@ -557,15 +557,9 @@ class AppModel with ChangeNotifier {
       return _currentMediaSource!.currentSentence;
     } else {
       MediaType mediaType = mediaTypes.values.toList()[currentHomeTabIndex];
-      if (mediaType is DictionaryMediaType) {
-        return JidoujishoTextSelection(
-          text: '',
-        );
-      } else {
-        return (_currentMediaSource ??
-                (getCurrentSourceForMediaType(mediaType: mediaType)))
-            .currentSentence;
-      }
+      MediaSource? mediaSource = _currentMediaSource ?? mediaType.source;
+
+      return mediaSource?.currentSentence ?? JidoujishoTextSelection(text: '');
     }
   }
 
@@ -2966,27 +2960,6 @@ class AppModel with ChangeNotifier {
         gravity: ToastGravity.BOTTOM,
       );
     }
-  }
-
-  /// For a given [MediaType], return the selected media source. If there is
-  /// no persisted media source, use the first source in the list.
-  MediaSource getCurrentSourceForMediaType({
-    required MediaType mediaType,
-  }) {
-    MediaSource fallbackSource = mediaSources[mediaType]!.values.first;
-    String uniqueKey = _preferences.get('current_source/${mediaType.uniqueKey}',
-        defaultValue: fallbackSource.uniqueKey);
-
-    return mediaSources[mediaType]![uniqueKey] ?? fallbackSource;
-  }
-
-  /// For a given [MediaType], set the selected media source.
-  void setCurrentSourceForMediaType({
-    required MediaType mediaType,
-    required MediaSource mediaSource,
-  }) {
-    _preferences.put(
-        'current_source/${mediaType.uniqueKey}', mediaSource.uniqueKey);
   }
 
   /// Get the history of [MediaItem] for a particular [MediaType].

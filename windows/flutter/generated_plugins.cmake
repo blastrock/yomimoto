@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   isar_community_flutter_libs
   mecab_dart
   permission_handler_windows
+  restart_app
   share_plus
   url_launcher_windows
 )

@@ -160,16 +160,15 @@ class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
           debugPrint('[Dictionary Import] ${progressNotifier.value}');
         });
 
-        await FilePicker.platform.clearTemporaryFiles();
+        await FilePicker.clearTemporaryFiles();
 
         FileType type = appModel.lastSelectedDictionaryFormat.fileType;
-        FilePickerResult? result = await FilePicker.platform.pickFiles(
+        List<PlatformFile> pickedFiles = await FilePicker.pickFiles(
           /// Change when adding multiple dictionary formats.
           type: type,
           allowedExtensions: type == FileType.any
               ? null
               : appModel.lastSelectedDictionaryFormat.allowedExtensions,
-          allowMultiple: true,
           onFileLoading: (status) {
             if (status == FilePickerStatus.done) {
               showDialog(
@@ -184,18 +183,18 @@ class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
             }
           },
         );
-        if (result == null) {
+        if (pickedFiles.isEmpty) {
           if (mounted) {
             Navigator.pop(context);
           }
           return;
         }
 
-        totalNotifier.value = result.files.length;
-        for (int i = 0; i < result.files.length; i++) {
+        totalNotifier.value = pickedFiles.length;
+        for (int i = 0; i < pickedFiles.length; i++) {
           countNotifier.value = i + 1;
 
-          PlatformFile platformFile = result.files[i];
+          PlatformFile platformFile = pickedFiles[i];
           File file = File(platformFile.path!);
 
           await appModel.importDictionary(
@@ -208,7 +207,7 @@ class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
           );
         }
 
-        await FilePicker.platform.clearTemporaryFiles();
+        await FilePicker.clearTemporaryFiles();
 
         if (mounted) {
           Navigator.pop(context);

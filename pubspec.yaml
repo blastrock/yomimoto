@@ -66,7 +66,11 @@ dependencies:
   html: ^0.15.2
   http: ^1.0.0
   image_picker: ^1.2.3
-  infinite_scroll_pagination: ^5.1.1
+  # Held at 4.x: version 5 replaced PagingController wholesale
+  # (firstPageKey/addPageRequestListener/appendPage -> fetchPage/state), which
+  # is a UI rewrite across 4 files and no part of a toolchain migration. 4.1.0
+  # supports Dart 3.
+  infinite_scroll_pagination: ^4.1.0
   intl: ^0.20.3
   isar_community: ^3.3.2
   isar_community_flutter_libs: ^3.3.2
@@ -89,10 +93,15 @@ dependencies:
   package_info_plus: ^10.2.1
   path: ^1.8.2
   path_provider: ^2.0.13
-  permission_handler: ^13.0.1
+  # Held at 12.x: permission_handler 13 pulls permission_handler_android 14,
+  # which compiles against SDK 37. compileSdk here is 36 and targetSdk is
+  # deliberately 32, so buying into a preview platform for one plugin is not
+  # worth it.
+  permission_handler: ^12.0.3
   progress_indicators: ^1.0.0
   quiver: ^3.2.1
   recase: ^4.1.0
+  record_mp3_plus: ^1.5.0
   receive_intent:
     git:
       url: https://github.com/arianneorpilla/receive_intent

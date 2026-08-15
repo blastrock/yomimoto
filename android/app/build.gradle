@@ -9,7 +9,10 @@ plugins {
 android {
     namespace "app.arianneorpilla.yuuna"
     compileSdk 36
-    ndkVersion flutter.ndkVersion
+    // Higher than flutter.ndkVersion (28.2.x): record_mp3_plus asks for 29.0,
+    // and the NDK is backward compatible, so the whole plugin set builds
+    // against the highest anyone requests.
+    ndkVersion "29.0.14206865"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -98,9 +101,9 @@ android {
 }
 
 flutter {
-    // The app is the repository root since the yuuna flattening; this was
-    // '../..' when the app lived in a subdirectory.
-    source ".."
+    // Relative to this file's directory (android/app), so '../..' is the
+    // repository root -- the standard template value.
+    source "../.."
 }
 
 dependencies {

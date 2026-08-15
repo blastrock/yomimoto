@@ -32,7 +32,7 @@ class PickAudioEnhancement extends AudioEnhancement {
     required EnhancementTriggerCause cause,
   }) async {
     AudioExportField audioField = field as AudioExportField;
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.audio,
     );
 
@@ -40,7 +40,7 @@ class PickAudioEnhancement extends AudioEnhancement {
       return;
     }
 
-    File file = File(pickedFile.files.single.path!);
+    File file = File(pickedFile.path!);
 
     Directory appDirDoc = await getApplicationSupportDirectory();
     String pickAudioPath = '${appDirDoc.path}/audioRecorder';

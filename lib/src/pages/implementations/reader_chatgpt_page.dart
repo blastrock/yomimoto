@@ -248,7 +248,9 @@ class _ReaderChatgptPageState extends BaseSourcePageState<ReaderChatgptPage> {
 
     final chatComplete = _openAI.onChatCompletionSSE(
       request: ChatCompleteText(
-        model: ChatModel.gptTurbo0301,
+        // chat_gpt_sdk 3 turned ChatModel from an enum into a sealed class
+        // hierarchy. Same model string as before.
+        model: GptTurbo0301ChatModel(),
         messages: await getMessages(),
         maxToken: 1500,
       ),
@@ -256,12 +258,12 @@ class _ReaderChatgptPageState extends BaseSourcePageState<ReaderChatgptPage> {
 
     _streamSubscription = chatComplete.listen(
       (data) {
-        if (responseIndex != data.choices.lastOrNull?.index) {
-          responseIndex = data.choices.lastOrNull?.index;
+        if (responseIndex != data.choices?.lastOrNull?.index) {
+          responseIndex = data.choices?.lastOrNull?.index;
           _buffer.clear();
         }
 
-        _buffer.write(data.choices.lastOrNull?.message?.content);
+        _buffer.write(data.choices?.lastOrNull?.message?.content);
         _progressNotifier.value = _buffer.toString();
 
         _scrollController.animateTo(_scrollController.position.minScrollExtent,

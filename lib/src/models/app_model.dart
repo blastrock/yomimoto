@@ -464,7 +464,7 @@ class AppModel with ChangeNotifier {
           color: Colors.white,
           shape: RoundedRectangleBorder(),
         ),
-        dialogTheme: const DialogTheme(
+        dialogTheme: const DialogThemeData(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(),
         ),
@@ -546,7 +546,7 @@ class AppModel with ChangeNotifier {
           color: Color.fromARGB(255, 30, 30, 30),
           shape: RoundedRectangleBorder(),
         ),
-        dialogTheme: const DialogTheme(
+        dialogTheme: const DialogThemeData(
           backgroundColor: Color.fromARGB(255, 30, 30, 30),
           shape: RoundedRectangleBorder(),
         ),
@@ -3183,7 +3183,9 @@ class AppModel with ChangeNotifier {
       directories.add(lastPickedDirectory);
     }
 
-    List<String> paths = await ExternalPath.getExternalStorageDirectories();
+    // external_path 3 made this nullable.
+    List<String> paths =
+        await ExternalPath.getExternalStorageDirectories() ?? <String>[];
     for (String path in paths) {
       Directory directory = Directory(path);
       if (!directories.contains(directory)) {

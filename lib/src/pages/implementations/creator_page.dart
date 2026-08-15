@@ -65,9 +65,9 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   }
 
   Color get activeButtonColor =>
-      Theme.of(context).unselectedWidgetColor.withOpacity(0.1);
+      Theme.of(context).unselectedWidgetColor.withValues(alpha: 0.1);
   Color get inactiveButtonColor =>
-      Theme.of(context).unselectedWidgetColor.withOpacity(0.05);
+      Theme.of(context).unselectedWidgetColor.withValues(alpha: 0.05);
   Color get activeTextColor => Theme.of(context).appBarTheme.foregroundColor!;
   Color get inactiveTextColor => Theme.of(context).unselectedWidgetColor;
 
@@ -203,8 +203,18 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       initialiseCreator();
     }
 
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      // PopScope inverts WillPopScope: refuse the pop up front, run the
+      // same confirmation, and pop by hand if it is accepted.
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        if (await onWillPop() && context.mounted) {
+          Navigator.of(context).pop(result);
+        }
+      },
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: buildScaffold(),
@@ -449,7 +459,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
 
     return Scaffold(
       backgroundColor:
-          theme.colorScheme.background.withOpacity(isCardEditing ? 0.96 : 1),
+          theme.colorScheme.surface.withValues(alpha: isCardEditing ? 0.96 : 1),
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
       appBar: showPortrait ? buildAppBar() : null,

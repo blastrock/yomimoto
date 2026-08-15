@@ -1,5 +1,8 @@
+// This class implements the selection toolbar through the deprecated
+// TextSelectionControls.buildToolbar API rather than contextMenuBuilder.
+// The deprecated path still works; porting it is a rewrite of the
+// selection -> dictionary-lookup flow and belongs in its own change.
 // ignore_for_file: deprecated_member_use
-
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';

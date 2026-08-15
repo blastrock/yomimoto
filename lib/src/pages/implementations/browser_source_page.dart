@@ -89,12 +89,12 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.unselectedWidgetColor.withOpacity(0.1),
+                        color: theme.unselectedWidgetColor.withValues(alpha: 0.1),
                       ),
                       child: Icon(
                         Icons.arrow_back,
                         color:
-                            value ? null : theme.disabledColor.withOpacity(0.2),
+                            value ? null : theme.disabledColor.withValues(alpha: 0.2),
                         size: 20,
                       ),
                     ),
@@ -128,12 +128,12 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.unselectedWidgetColor.withOpacity(0.1),
+                        color: theme.unselectedWidgetColor.withValues(alpha: 0.1),
                       ),
                       child: Icon(
                         Icons.arrow_forward,
                         color:
-                            value ? null : theme.disabledColor.withOpacity(0.2),
+                            value ? null : theme.disabledColor.withValues(alpha: 0.2),
                         size: 20,
                       ),
                     ),
@@ -167,7 +167,7 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.unselectedWidgetColor.withOpacity(0.1),
+                        color: theme.unselectedWidgetColor.withValues(alpha: 0.1),
                       ),
                       child: const Icon(
                         Icons.language,
@@ -220,7 +220,7 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
                       height: 30,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.unselectedWidgetColor.withOpacity(0.1),
+                        color: theme.unselectedWidgetColor.withValues(alpha: 0.1),
                       ),
                       child: Icon(
                         Icons.bookmark_outline,
@@ -442,7 +442,7 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
 
   void shareMenuAction() async {
     String searchTerm = await getSelectedText();
-    Share.share(searchTerm);
+    SharePlus.instance.share(ShareParams(text: searchTerm));
     await unselectWebViewTextSelection(_controller);
   }
 
@@ -527,8 +527,18 @@ class _BrowserSourcePageState extends BaseSourcePageState<BrowserSourcePage> {
       lastOrientation = orientation;
     }
 
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      // PopScope inverts WillPopScope: refuse the pop up front, run the
+      // same confirmation, and pop by hand if it is accepted.
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        if (await onWillPop() && context.mounted) {
+          Navigator.of(context).pop(result);
+        }
+      },
       child: Scaffold(
         backgroundColor: Colors.black,
         resizeToAvoidBottomInset: false,

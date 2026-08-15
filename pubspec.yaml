@@ -109,11 +109,11 @@ dependencies:
   progress_indicators: ^1.0.0
   quiver: ^3.2.1
   recase: ^4.1.0
-  record_mp3_plus: ^1.5.0
   receive_intent:
     # Vendored upstream 0.2.7 with the fork's `setResult(action:)` patch
     # rebased on top. See vendor/receive_intent/UPSTREAM.md.
     path: vendor/receive_intent
+  record_mp3_plus: ^1.5.0
   remove_emoji: ^0.0.7
   reorderables: ^0.6.0
   restart_app: ^1.1.2

@@ -305,7 +305,7 @@ class _MokuroCatalogBrowsePageState
 
   void shareMenuAction() async {
     String searchTerm = await getSelectedText();
-    Share.share(searchTerm);
+    SharePlus.instance.share(ShareParams(text: searchTerm));
     await unselectWebViewTextSelection(_controller);
   }
 
@@ -457,7 +457,7 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
         }
       },
       canRequestFocus: true,
-      onKey: (data, event) {
+      onKeyEvent: (FocusNode node, KeyEvent event) {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           if (mediaSource.volumePageTurningEnabled) {
             if (isDictionaryShown) {
@@ -468,13 +468,21 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
               return KeyEventResult.handled;
             }
 
-            if (event.isKeyPressed(LogicalKeyboardKey.audioVolumeUp)) {
+            // RawKeyEvent.isKeyPressed was true on key-down and while the key
+            // was held, and false on key-up. KeyDownEvent + KeyRepeatEvent is
+            // that same set, so page turning still auto-repeats and the key-up
+            // is still passed through.
+            final bool isPress =
+                event is KeyDownEvent || event is KeyRepeatEvent;
+
+            if (isPress && event.logicalKey == LogicalKeyboardKey.audioVolumeUp) {
               unselectWebViewTextSelection(_controller);
               _controller.evaluateJavascript(source: leftArrowSimulateJs);
 
               return KeyEventResult.handled;
             }
-            if (event.isKeyPressed(LogicalKeyboardKey.audioVolumeDown)) {
+            if (isPress &&
+                event.logicalKey == LogicalKeyboardKey.audioVolumeDown) {
               unselectWebViewTextSelection(_controller);
               _controller.evaluateJavascript(source: rightArrowSimulateJs);
 
@@ -487,8 +495,18 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
           return KeyEventResult.ignored;
         }
       },
-      child: WillPopScope(
-        onWillPop: onWillPop,
+      child: PopScope(
+        // PopScope inverts WillPopScope: refuse the pop up front, run the
+        // same confirmation, and pop by hand if it is accepted.
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) async {
+          if (didPop) {
+            return;
+          }
+          if (await onWillPop() && context.mounted) {
+            Navigator.of(context).pop(result);
+          }
+        },
         child: Scaffold(
           appBar: _isMokuroPageFoundNotifier.value ? null : buildAppBar(),
           backgroundColor: Colors.black,

@@ -756,7 +756,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
       case TargetPlatform.iOS:
         final CupertinoThemeData cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = true;
-        // ignore: deprecated_member_use
         textSelectionControls ??= cupertinoTextSelectionHandleControls;
         paintCursorAboveText = true;
         cursorOpacityAnimates = true;
@@ -764,7 +763,7 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
         selectionColor = selectionStyle.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+            cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -773,7 +772,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
       case TargetPlatform.macOS:
         final CupertinoThemeData cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = false;
-        // ignore: deprecated_member_use
         textSelectionControls ??= cupertinoDesktopTextSelectionHandleControls;
         paintCursorAboveText = true;
         cursorOpacityAnimates = true;
@@ -781,7 +779,7 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
         selectionColor = selectionStyle.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+            cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -790,7 +788,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        // ignore: deprecated_member_use
         textSelectionControls ??= materialTextSelectionHandleControls;
         paintCursorAboveText = false;
         cursorOpacityAnimates = false;
@@ -798,14 +795,13 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+            theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
 
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         forcePressEnabled = false;
 
-        // ignore: deprecated_member_use
         textSelectionControls ??= desktopTextSelectionHandleControls;
         paintCursorAboveText = false;
         cursorOpacityAnimates = false;
@@ -813,7 +809,7 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+            theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
     }
 
@@ -832,7 +828,12 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
         key: editableTextKey,
         style: effectiveTextStyle,
         readOnly: true,
-        // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+        // Still on the deprecated toolbarOptions/TextSelectionControls
+        // path. Moving to contextMenuBuilder means rewriting
+        // JidoujishoTextSelectionControls, which is the selection ->
+        // dictionary-lookup flow this app is built around; that is a
+        // project of its own, not part of a toolchain migration.
+        // ignore: deprecated_member_use
         toolbarOptions: widget.toolbarOptions,
         textWidthBasis:
             widget.textWidthBasis ?? defaultTextStyle.textWidthBasis,
@@ -846,8 +847,9 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
         textAlign:
             widget.textAlign ?? defaultTextStyle.textAlign ?? TextAlign.start,
         textDirection: widget.textDirection,
-        // ignore: deprecated_member_use
-        textScaleFactor: widget.textScaleFactor,
+        textScaler: widget.textScaleFactor == null
+            ? null
+            : TextScaler.linear(widget.textScaleFactor!),
         autofocus: widget.autofocus,
         forceLine: false,
         minLines: widget.minLines,

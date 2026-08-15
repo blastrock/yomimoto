@@ -514,7 +514,7 @@ class _ReaderChatgptPageState extends BaseSourcePageState<ReaderChatgptPage> {
         right: Spacing.of(context).spaces.normal,
       ),
       child: Card(
-        color: isBot ? null : Colors.red.withOpacity(0.5),
+        color: isBot ? null : Colors.red.withValues(alpha: 0.5),
         shape: const RoundedRectangleBorder(),
         child: Padding(
           padding: Spacing.of(context).insets.all.normal,
@@ -599,7 +599,7 @@ class _ReaderChatgptPageState extends BaseSourcePageState<ReaderChatgptPage> {
         busy: true,
         shapeBorder: const RoundedRectangleBorder(),
         backgroundColor:
-            Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.1),
+            Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha: 0.1),
         size: Spacing.of(context).spaces.semiBig,
         tooltip: t.sentence_picker,
         icon: Icons.colorize,
@@ -639,7 +639,7 @@ class _ReaderChatgptPageState extends BaseSourcePageState<ReaderChatgptPage> {
         busy: true,
         shapeBorder: const RoundedRectangleBorder(),
         backgroundColor:
-            Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.1),
+            Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha: 0.1),
         size: Spacing.of(context).spaces.semiBig,
         tooltip: t.card_creator,
         icon: Icons.note_add,

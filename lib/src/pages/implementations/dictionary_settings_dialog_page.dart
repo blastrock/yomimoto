@@ -209,9 +209,9 @@ class _DictionaryDialogPageState extends BasePageState {
   }
 
   Color get activeButtonColor =>
-      Theme.of(context).unselectedWidgetColor.withOpacity(0.1);
+      Theme.of(context).unselectedWidgetColor.withValues(alpha: 0.1);
   Color get inactiveButtonColor =>
-      Theme.of(context).unselectedWidgetColor.withOpacity(0.05);
+      Theme.of(context).unselectedWidgetColor.withValues(alpha: 0.05);
   Color get activeTextColor => Theme.of(context).appBarTheme.foregroundColor!;
   Color get inactiveTextColor => Theme.of(context).unselectedWidgetColor;
 

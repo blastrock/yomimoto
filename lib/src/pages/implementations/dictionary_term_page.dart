@@ -86,7 +86,7 @@ class DictionaryTermPage extends ConsumerWidget {
       children: [
         SliverPositioned.fill(
           child: Card(
-            color: cardColor?.withOpacity(opacity) ??
+            color: cardColor?.withValues(alpha: opacity) ??
                 (appModel.isDarkMode
                     ? Color.fromRGBO(16, 16, 16, opacity)
                     : Color.fromRGBO(249, 249, 249, opacity)),
@@ -262,11 +262,11 @@ class _DictionaryTermActionsRowState
           child: JidoujishoIconButton(
             busy: true,
             enabledColor: enabledColor,
-            disabledColor: enabledColor.withOpacity(0.5),
+            disabledColor: enabledColor.withValues(alpha: 0.5),
             shapeBorder: const RoundedRectangleBorder(),
             backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
             size: Spacing.of(context).spaces.semiBig,
             tooltip: quickAction.getLocalisedLabel(appModel),
             icon: quickAction.icon,

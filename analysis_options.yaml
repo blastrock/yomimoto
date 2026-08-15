@@ -11,6 +11,8 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
+    # Third-party sources we only patch; see vendor/README.md.
+    - 'vendor/**'
     - '**.freezed.dart'
     - '**.g.dart'
     - '**/generated_plugin_registrant.dart'

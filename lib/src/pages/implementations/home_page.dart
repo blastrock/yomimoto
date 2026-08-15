@@ -294,7 +294,7 @@ class _HomePageState extends BasePageState<HomePage>
       MaterialPageRoute<void>(
         builder: (context) => Theme(
           data: theme.copyWith(
-            cardColor: theme.colorScheme.background,
+            cardColor: theme.colorScheme.surface,
           ),
           child: LicensePage(
             applicationName: appModel.packageInfo.appName,

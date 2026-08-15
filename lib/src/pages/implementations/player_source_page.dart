@@ -813,8 +813,18 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop,
+    return PopScope(
+      // PopScope inverts WillPopScope: refuse the pop up front, run the
+      // same confirmation, and pop by hand if it is accepted.
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        if (await onWillPop() && context.mounted) {
+          Navigator.of(context).pop(result);
+        }
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,
@@ -1200,7 +1210,7 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
       alignment: Alignment.bottomCenter,
       child: Container(
         height: _menuHeight,
-        color: theme.cardColor.withOpacity(0.8),
+        color: theme.cardColor.withValues(alpha: 0.8),
         child: GestureDetector(
           onTap: toggleMenuVisibility,
           child: AbsorbPointer(
@@ -1302,7 +1312,7 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
             child: GestureDetector(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor.withOpacity(0.9),
+                  color: Theme.of(context).cardColor.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(48),
                 ),
                 child: Padding(
@@ -2114,7 +2124,7 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
         label: t.player_option_share_subtitle,
         icon: Icons.share,
         action: () async {
-          await Share.share(getNearestSubtitle()?.data ?? '');
+          await SharePlus.instance.share(ShareParams(text: getNearestSubtitle()?.data ?? ''));
         },
       ),
       JidoujishoBottomSheetOption(
@@ -2224,7 +2234,7 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurRadius, sigmaY: blurRadius),
         child: Container(
-          color: Colors.black.withOpacity(
+          color: Colors.black.withValues(alpha: 
             _subtitleOptionsNotifier.value.subtitleBackgroundOpacity,
           ),
           padding: EdgeInsets.only(
@@ -2340,7 +2350,7 @@ class _PlayerSourcePageState extends BaseSourcePageState<PlayerSourcePage>
   Paint get subtitlePaintStyle => Paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = _subtitleOptionsNotifier.value.subtitleOutlineWidth
-    ..color = Colors.black.withOpacity(
+    ..color = Colors.black.withValues(alpha: 
         _subtitleOptionsNotifier.value.subtitleOutlineWidth == 0 ? 0 : 0.75);
 
   /// Subtitle outline text style.

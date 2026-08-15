@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:audio_service/audio_service.dart' as ag;
 import 'package:cancelable_compute/cancelable_compute.dart' as cancelable;
@@ -430,6 +428,7 @@ class AppModel with ChangeNotifier {
 
   /// Shows when the current mode is a light theme.
   ThemeData get theme => ThemeData(
+        useMaterial3: false,
         scaffoldBackgroundColor: Colors.white,
         unselectedWidgetColor: Colors.black54,
         textTheme: textTheme,
@@ -440,14 +439,14 @@ class AppModel with ChangeNotifier {
           foregroundColor: Colors.black,
         ),
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateColor.resolveWith((states) {
-            return states.contains(MaterialState.selected)
+          thumbColor: WidgetStateColor.resolveWith((states) {
+            return states.contains(WidgetState.selected)
                 ? Colors.red
                 : Colors.white;
           }),
-          trackColor: MaterialStateColor.resolveWith((states) {
-            return states.contains(MaterialState.selected)
-                ? Colors.red.withOpacity(0.5)
+          trackColor: WidgetStateColor.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? Colors.red.withValues(alpha: 0.5)
                 : Colors.grey;
           }),
         ),
@@ -491,8 +490,8 @@ class AppModel with ChangeNotifier {
           ),
         ),
         scrollbarTheme: ScrollbarThemeData(
-          thickness: MaterialStateProperty.all(3),
-          thumbVisibility: MaterialStateProperty.all(true),
+          thickness: WidgetStateProperty.all(3),
+          thumbVisibility: WidgetStateProperty.all(true),
         ),
         sliderTheme: const SliderThemeData(
           thumbColor: Colors.red,
@@ -508,22 +507,23 @@ class AppModel with ChangeNotifier {
               secondary: Colors.red,
               brightness: Brightness.light,
             )
-            .copyWith(background: Colors.white),
+            .copyWith(surface: Colors.white),
       );
 
   /// Shows when the current mode is a dark theme.
   ThemeData get darkTheme => ThemeData(
+        useMaterial3: false,
         scaffoldBackgroundColor: Colors.black,
         textTheme: textTheme,
         switchTheme: SwitchThemeData(
-          thumbColor: MaterialStateColor.resolveWith((states) {
-            return states.contains(MaterialState.selected)
+          thumbColor: WidgetStateColor.resolveWith((states) {
+            return states.contains(WidgetState.selected)
                 ? Colors.red
                 : Colors.grey;
           }),
-          trackColor: MaterialStateColor.resolveWith((states) {
-            return states.contains(MaterialState.selected)
-                ? Colors.red.withOpacity(0.5)
+          trackColor: WidgetStateColor.resolveWith((states) {
+            return states.contains(WidgetState.selected)
+                ? Colors.red.withValues(alpha: 0.5)
                 : Colors.grey;
           }),
         ),
@@ -573,7 +573,7 @@ class AppModel with ChangeNotifier {
           ),
         ),
         scrollbarTheme: ScrollbarThemeData(
-          thumbVisibility: MaterialStateProperty.all(true),
+          thumbVisibility: WidgetStateProperty.all(true),
         ),
         sliderTheme: const SliderThemeData(
           thumbColor: Colors.red,
@@ -589,7 +589,7 @@ class AppModel with ChangeNotifier {
               secondary: Colors.red,
               brightness: Brightness.dark,
             )
-            .copyWith(background: Colors.black),
+            .copyWith(surface: Colors.black),
       );
 
   /// Get the sentence to be used by the [SentenceField] upon card creation.
@@ -3203,14 +3203,10 @@ class AppModel with ChangeNotifier {
     double left = _preferences.get('blur_left', defaultValue: -1.0);
     double top = _preferences.get('blur_top', defaultValue: -1.0);
 
-    int red = _preferences.get('blur_red',
-        defaultValue: Colors.black.withOpacity(0).red);
-    int green = _preferences.get('blur_green',
-        defaultValue: Colors.black.withOpacity(0).green);
-    int blue = _preferences.get('blur_blue',
-        defaultValue: Colors.black.withOpacity(0).blue);
-    double opacity = _preferences.get('blur_opacity',
-        defaultValue: Colors.black.withOpacity(0).opacity);
+    int red = _preferences.get('blur_red', defaultValue: 0);
+    int green = _preferences.get('blur_green', defaultValue: 0);
+    int blue = _preferences.get('blur_blue', defaultValue: 0);
+    double opacity = _preferences.get('blur_opacity', defaultValue: 0.0);
 
     Color color = Color.fromRGBO(red, green, blue, opacity);
 
@@ -3235,10 +3231,14 @@ class AppModel with ChangeNotifier {
     _preferences.put('blur_left', options.left);
     _preferences.put('blur_top', options.top);
 
-    _preferences.put('blur_red', options.color.red);
-    _preferences.put('blur_green', options.color.green);
-    _preferences.put('blur_blue', options.color.blue);
-    _preferences.put('blur_opacity', options.color.opacity);
+    // Color.red/green/blue were removed in favour of the 0..1 doubles r/g/b,
+    // but these three keys are persisted as 0..255 ints and read back into
+    // Color.fromRGBO, so the stored format is converted back deliberately --
+    // writing the doubles would break every existing install's blur settings.
+    _preferences.put('blur_red', (options.color.r * 255).round());
+    _preferences.put('blur_green', (options.color.g * 255).round());
+    _preferences.put('blur_blue', (options.color.b * 255).round());
+    _preferences.put('blur_opacity', options.color.a);
 
     _preferences.put('blur_radius', options.blurRadius);
     _preferences.put('blur_visible', options.visible);

@@ -145,7 +145,7 @@ class _PlayerTranscriptPageState
       children: [
         Scaffold(
           appBar: buildAppBar(),
-          backgroundColor: Theme.of(context).cardColor.withOpacity(0.85),
+          backgroundColor: Theme.of(context).cardColor.withValues(alpha: 0.85),
           resizeToAvoidBottomInset: false,
           body: SafeArea(
             child: Stack(
@@ -756,7 +756,7 @@ class _PlayerTranscriptPageState
             builder: (context, currentSubtitle, child) {
               return ListTile(
                 selected: _selectedIndexNotifier.value == index,
-                selectedTileColor: Colors.red.withOpacity(0.15),
+                selectedTileColor: Colors.red.withValues(alpha: 0.15),
                 dense: true,
                 title: child,
                 onTap: () async {
@@ -906,7 +906,7 @@ class _PlayerTranscriptPageState
         busy: true,
         shapeBorder: const RoundedRectangleBorder(),
         backgroundColor:
-            Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.1),
+            Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha: 0.1),
         size: Spacing.of(context).spaces.semiBig,
         tooltip: t.seek,
         icon: Icons.play_circle_fill,
@@ -935,7 +935,7 @@ class _PlayerTranscriptPageState
         busy: true,
         shapeBorder: const RoundedRectangleBorder(),
         backgroundColor:
-            Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.1),
+            Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha: 0.1),
         size: Spacing.of(context).spaces.semiBig,
         tooltip: t.card_creator,
         icon: Icons.note_add,
@@ -975,7 +975,7 @@ class _PlayerTranscriptPageState
         busy: true,
         shapeBorder: const RoundedRectangleBorder(),
         backgroundColor:
-            Theme.of(context).appBarTheme.foregroundColor?.withOpacity(0.1),
+            Theme.of(context).appBarTheme.foregroundColor?.withValues(alpha: 0.1),
         size: Spacing.of(context).spaces.semiBig,
         tooltip: t.player_align_subtitle_transcript,
         icon: Icons.timer,

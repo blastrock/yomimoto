@@ -80,7 +80,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       ValueNotifier<JidoujishoPopupPosition?>(JidoujishoPopupPosition.topHalf);
 
   /// Standard warning dialog for leaving a source page. All sources should
-  /// use this and wrap their [build] function with a [WillPopScope].
+  /// use this and wrap their [build] function with a [PopScope].
   Future<bool> onWillPop() async {
     Widget alertDialog = AlertDialog(
       shape: const RoundedRectangleBorder(),
@@ -328,7 +328,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       child: Container(
         padding: Spacing.of(context).insets.all.semiSmall,
         margin: Spacing.of(context).insets.all.normal,
-        color: color.withOpacity(dictionaryBackgroundOpacity),
+        color: color.withValues(alpha: dictionaryBackgroundOpacity),
         child: Stack(
           children: [
             buildSearchResult(),
@@ -389,7 +389,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
             width: double.infinity,
             child: Card(
               color: appModel.overrideDictionaryColor
-                      ?.withOpacity(dictionaryEntryOpacity) ??
+                      ?.withValues(alpha: dictionaryEntryOpacity) ??
                   (Theme.of(context).brightness == Brightness.dark
                       ? Color.fromRGBO(16, 16, 16, dictionaryEntryOpacity)
                       : Color.fromRGBO(249, 249, 249, dictionaryEntryOpacity)),
@@ -446,8 +446,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
                   },
             child: Container(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.black.withOpacity(0.05),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
                 padding: Spacing.of(context).insets.all.normal,

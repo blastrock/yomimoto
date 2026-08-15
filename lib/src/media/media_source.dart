@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
-import 'package:subtitle/subtitle.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -440,8 +439,6 @@ abstract class MediaSource {
   Future<List<NetworkToFileImage>> generateImages({
     required AppModel appModel,
     required MediaItem item,
-    List<Subtitle>? subtitles,
-    SubtitleOptions? options,
     String? data,
   }) {
     throw UnimplementedError();
@@ -452,8 +449,6 @@ abstract class MediaSource {
   Future<File?>? generateAudio({
     required AppModel appModel,
     required MediaItem item,
-    List<Subtitle>? subtitles,
-    SubtitleOptions? options,
     String? data,
   }) {
     throw UnimplementedError();
@@ -473,11 +468,6 @@ abstract class MediaSource {
   /// empty list is returned, then search history will be shown instead.
   Future<List<String>> generateSearchSuggestions(String searchTerm) async {
     throw UnimplementedError();
-  }
-
-  /// Used to override the search bar if needed by a source that implements search.
-  BaseMediaSearchBar? buildBar() {
-    return null;
   }
 
   /// Aspect ratio of media items.

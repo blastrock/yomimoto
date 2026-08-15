@@ -10,6 +10,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import android.net.Uri;
 
+import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -28,10 +29,9 @@ import java.util.Set;
 import java.io.File;
 
 import com.ichi2.anki.api.NoteInfo;
-import com.ryanheise.audioservice.AudioServiceActivity;
 import android.content.res.Configuration;
 
-public class MainActivity extends AudioServiceActivity {
+public class MainActivity extends FlutterActivity {
     private static final String ANKIDROID_CHANNEL = "app.arianneorpilla.yuuna/anki";
     private static final int AD_PERM_REQUEST = 0;
 

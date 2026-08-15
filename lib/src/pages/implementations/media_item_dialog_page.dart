@@ -121,9 +121,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
 
   String get launchLabel {
     MediaType mediaType = widget.item.getMediaType(appModel: appModel);
-    if (mediaType == PlayerMediaType.instance) {
-      return t.dialog_play;
-    } else if (mediaType == ReaderMediaType.instance) {
+    if (mediaType == ReaderMediaType.instance) {
       return t.dialog_read;
     } else {
       throw UnimplementedError('Media type launch label unimplemented');

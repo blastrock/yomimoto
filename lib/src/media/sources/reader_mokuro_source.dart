@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:subtitle/subtitle.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
@@ -423,8 +422,6 @@ bgImage.substring(5, bgImage.length - 2);
   Future<List<NetworkToFileImage>> generateImages({
     required AppModel appModel,
     required MediaItem item,
-    List<Subtitle>? subtitles,
-    SubtitleOptions? options,
     String? data,
   }) async {
     List<NetworkToFileImage> imageFiles = [];

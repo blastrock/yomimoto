@@ -21,16 +21,9 @@ export 'src/utils/converters/quick_actions_converter.dart';
 export 'src/utils/converters/enhancements_converter.dart';
 export 'src/utils/converters/media_item_converter.dart';
 
-export 'src/utils/player/subtitle_utils.dart';
-export 'src/utils/player/player_payload.dart';
-export 'src/utils/player/blur_options.dart';
-export 'src/utils/player/subtitle_options.dart';
-export 'src/utils/player/youtube_quality.dart';
-export 'src/utils/player/playback_mode.dart';
 
 export 'src/utils/misc/jidoujisho_color.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';
-export 'src/utils/misc/jidoujisho_audio_handler.dart';
 export 'src/utils/misc/jidoujisho_text_selection.dart';
 export 'src/utils/misc/mokuro_catalog.dart';
 export 'src/utils/misc/mokuro_payload.dart';

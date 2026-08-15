@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:audio_service/audio_service.dart' as ag;
 import 'package:cancelable_compute/cancelable_compute.dart' as cancelable;
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -16,7 +15,6 @@ import 'package:flutter_charset_detector/flutter_charset_detector.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:isar_community/isar.dart';
@@ -27,7 +25,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:remove_emoji/remove_emoji.dart';
 import 'package:restart_app/restart_app.dart';
-import 'package:subtitle/subtitle.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
@@ -356,7 +353,8 @@ class AppModel with ChangeNotifier {
   MediaItem? get currentMediaItem => _currentMediaItem;
   MediaItem? _currentMediaItem;
 
-  /// Blocks creator from processing initial media while player controller is not ready.
+  /// Blocks creator from processing initial media while the source is not
+  /// ready.
   bool blockCreatorInitialMedia = false;
 
   /// Get the app-wide text style.
@@ -575,22 +573,6 @@ class AppModel with ChangeNotifier {
   /// reason to expose it here if not for card export functions. This is super
   /// cursed. Need to extract this to its own Provider at some point.
 
-  /// Current player controller.
-  VlcPlayerController? currentPlayerController;
-
-  /// Current subtitle.
-  ValueNotifier<Subtitle?> get currentSubtitle => _currentSubtitle;
-  final ValueNotifier<Subtitle?> _currentSubtitle =
-      ValueNotifier<Subtitle?>(null);
-
-  /// Current subtitle options.
-  ValueNotifier<SubtitleOptions>? get currentSubtitleOptions {
-    _currentSubtitleOptions ??= ValueNotifier<SubtitleOptions>(subtitleOptions);
-    return _currentSubtitleOptions;
-  }
-
-  ValueNotifier<SubtitleOptions>? _currentSubtitleOptions;
-
   /// Override color for the dictionary widget.
   Color? get overrideDictionaryColor => _overrideDictionaryColor;
   Color? _overrideDictionaryColor;
@@ -706,7 +688,6 @@ class AppModel with ChangeNotifier {
     /// A list of media types that the app will support at runtime.
     final List<MediaType> availableMediaTypes = List<MediaType>.unmodifiable(
       [
-        PlayerMediaType.instance,
         ReaderMediaType.instance,
         DictionaryMediaType.instance,
       ],
@@ -725,11 +706,6 @@ class AppModel with ChangeNotifier {
   void populateMediaSources() async {
     /// A list of media sources that the app will support at runtime.
     final Map<MediaType, List<MediaSource>> availableMediaSources = {
-      PlayerMediaType.instance: [
-        PlayerLocalMediaSource.instance,
-        PlayerYoutubeSource.instance,
-        PlayerNetworkStreamSource.instance
-      ],
       ReaderMediaType.instance: [
         ReaderTtuSource.instance,
         ReaderMokuroSource.instance,
@@ -1743,8 +1719,8 @@ class AppModel with ChangeNotifier {
     _shouldHideStatusBarWhenInMedia = true;
   }
 
-  /// Requests for full external storage permissions. Required to handle video
-  /// files and their subtitle files in the same directory.
+  /// Requests for full external storage permissions. Required to browse for
+  /// media anywhere on the device.
   Future<void> requestExternalStoragePermissions() async {
     if (isFirstTimeSetup) {
       Fluttertoast.showToast(
@@ -2310,7 +2286,6 @@ class AppModel with ChangeNotifier {
     required WidgetRef ref,
     required bool killOnPop,
     CreatorFieldValues? creatorFieldValues,
-    List<Subtitle>? subtitles,
   }) async {
     _currentMediaPauseController.add(null);
 
@@ -2337,7 +2312,6 @@ class AppModel with ChangeNotifier {
           editEnhancements: false,
           editFields: false,
           killOnPop: killOnPop,
-          subtitles: subtitles,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -2366,14 +2340,12 @@ class AppModel with ChangeNotifier {
 
     mediaSource.clearCurrentSentence();
     mediaSource.clearExtraData();
-    await initialiseAudioHandler();
 
     _currentMediaSource = mediaSource;
     if (item != null) {
       _currentMediaItem = item;
     }
 
-    _currentSubtitleOptions = ValueNotifier(subtitleOptions);
     _overrideDictionaryColor = null;
     _overrideDictionaryTheme = null;
 
@@ -2407,8 +2379,6 @@ class AppModel with ChangeNotifier {
     required MediaSource mediaSource,
     MediaItem? item,
   }) async {
-    _audioHandler?.mediaItem.add(null);
-
     mediaSource.setShouldGenerateImage(value: true);
     mediaSource.setShouldGenerateAudio(value: true);
     mediaSource.clearCurrentSentence();
@@ -2418,15 +2388,12 @@ class AppModel with ChangeNotifier {
     _overrideDictionaryColor = null;
     _overrideDictionaryTheme = null;
     blockCreatorInitialMedia = false;
-    isProcessingEmbeddedSubtitles = false;
     await WakelockPlus.disable();
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     await mediaSource.onSourceExit(
       appModel: this,
       ref: ref,
     );
-
-    await _audioHandler?.stop();
 
     mediaSource.mediaType.refreshTab();
     DictionaryMediaType.instance.refreshTab();
@@ -2449,7 +2416,6 @@ class AppModel with ChangeNotifier {
           editEnhancements: true,
           editFields: false,
           killOnPop: false,
-          subtitles: null,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -2470,7 +2436,6 @@ class AppModel with ChangeNotifier {
           editEnhancements: false,
           editFields: true,
           killOnPop: false,
-          subtitles: null,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -2972,7 +2937,7 @@ class AppModel with ChangeNotifier {
 
   /// Update a media item, without performing any deletion or mutation
   /// operations. This is useful when updating constantly, for example,
-  /// with the player where the position needs to be constantly updated.
+  /// when a reading position needs to be persisted as the user reads.
   void updateMediaItem(MediaItem item) {
     _database.writeTxnSync(() {
       _database.mediaItems.putSync(item);
@@ -3090,147 +3055,6 @@ class AppModel with ChangeNotifier {
     return directories;
   }
 
-  /// Get the blur options used in the player.
-  BlurOptions get blurOptions {
-    double width = _preferences.get('blur_width', defaultValue: 200.0);
-    double height = _preferences.get('blur_height', defaultValue: 200.0);
-    double left = _preferences.get('blur_left', defaultValue: -1.0);
-    double top = _preferences.get('blur_top', defaultValue: -1.0);
-
-    int red = _preferences.get('blur_red', defaultValue: 0);
-    int green = _preferences.get('blur_green', defaultValue: 0);
-    int blue = _preferences.get('blur_blue', defaultValue: 0);
-    double opacity = _preferences.get('blur_opacity', defaultValue: 0.0);
-
-    Color color = Color.fromRGBO(red, green, blue, opacity);
-
-    double blurRadius = _preferences.get('blur_radius', defaultValue: 5.0);
-    bool visible = _preferences.get('blur_visible', defaultValue: false);
-
-    return BlurOptions(
-      width: width,
-      height: height,
-      left: left,
-      top: top,
-      color: color,
-      blurRadius: blurRadius,
-      visible: visible,
-    );
-  }
-
-  /// Set the blur options used in the player.
-  void setBlurOptions(BlurOptions options) {
-    _preferences.put('blur_width', options.width);
-    _preferences.put('blur_height', options.height);
-    _preferences.put('blur_left', options.left);
-    _preferences.put('blur_top', options.top);
-
-    // Color.red/green/blue were removed in favour of the 0..1 doubles r/g/b,
-    // but these three keys are persisted as 0..255 ints and read back into
-    // Color.fromRGBO, so the stored format is converted back deliberately --
-    // writing the doubles would break every existing install's blur settings.
-    _preferences.put('blur_red', (options.color.r * 255).round());
-    _preferences.put('blur_green', (options.color.g * 255).round());
-    _preferences.put('blur_blue', (options.color.b * 255).round());
-    _preferences.put('blur_opacity', options.color.a);
-
-    _preferences.put('blur_radius', options.blurRadius);
-    _preferences.put('blur_visible', options.visible);
-  }
-
-  /// Get the subtitle options used in the player.
-  SubtitleOptions get subtitleOptions {
-    int audioAllowance = _preferences.get('audio_allowance', defaultValue: 0);
-    int subtitleDelay = _preferences.get('subtitle_delay', defaultValue: 0);
-    double fontSize = _preferences.get('font_size', defaultValue: 20.0);
-    String fontName = _preferences
-        .get('font_name/${targetLanguage.languageCode}', defaultValue: '');
-    String regexFilter = _preferences.get('regex_filter', defaultValue: '');
-    double subtitleBackgroundOpacity =
-        _preferences.get('subtitle_background_opacity', defaultValue: 0.0);
-    double subtitleOutlineWidth =
-        _preferences.get('subtitle_outline_width', defaultValue: 3.0);
-    double subtitleBackgroundBlurRadius =
-        _preferences.get('subtitle_background_blur_radius', defaultValue: 0.0);
-    bool alwaysAboveBottomBar =
-        _preferences.get('subtitle_above_bar', defaultValue: false);
-
-    return SubtitleOptions(
-      audioAllowance: audioAllowance,
-      subtitleDelay: subtitleDelay,
-      subtitleBackgroundOpacity: subtitleBackgroundOpacity,
-      subtitleBackgroundBlurRadius: subtitleBackgroundBlurRadius,
-      fontSize: fontSize,
-      fontName: fontName,
-      regexFilter: regexFilter,
-      subtitleOutlineWidth: subtitleOutlineWidth,
-      alwaysAboveBottomBar: alwaysAboveBottomBar,
-    );
-  }
-
-  /// Set the subtitle options used in the player.
-  void setSubtitleOptions(SubtitleOptions options) {
-    _preferences.put('audio_allowance', options.audioAllowance);
-    _preferences.put('subtitle_delay', options.subtitleDelay);
-    _preferences.put('font_size', options.fontSize);
-    _preferences.put(
-        'font_name/${targetLanguage.languageCode}', options.fontName);
-    _preferences.put('regex_filter', options.regexFilter);
-    _preferences.put(
-        'subtitle_background_opacity', options.subtitleBackgroundOpacity);
-    _preferences.put('subtitle_outline_width', options.subtitleOutlineWidth);
-    _preferences.put('subtitle_background_blur_radius',
-        options.subtitleBackgroundBlurRadius);
-    _preferences.put('subtitle_above_bar', options.alwaysAboveBottomBar);
-  }
-
-  /// Gets the last used audio index of a given media item.
-  int getMediaItemPreferredAudioIndex(MediaItem item) {
-    return _preferences.get('audio_index/${item.uniqueKey}', defaultValue: 0);
-  }
-
-  /// Sets the last used audio index of a given media item.
-  void setMediaItemPreferredAudioIndex(MediaItem item, int index) {
-    _preferences.put('audio_index/${item.uniqueKey}', index);
-  }
-
-  /// Get the playback mode for the player.
-  PlaybackMode get playbackMode {
-    int index = _preferences.get(
-      'player_playback_mode',
-      defaultValue: PlaybackMode.normalPlayback.index,
-    );
-    return PlaybackMode.values.elementAt(index);
-  }
-
-  /// Set the playback mode for the player.
-  void setPlaybackMode(PlaybackMode playbackMode) {
-    _preferences.put('player_playback_mode', playbackMode.index);
-  }
-
-  /// Get definition focus mode for player.
-  bool get isPlayerListeningComprehensionMode {
-    return _preferences.get('player_listening_comprehension_mode',
-        defaultValue: false);
-  }
-
-  /// Toggle definition focus mode for player.
-  void togglePlayerListeningComprehensionMode() async {
-    await _preferences.put('player_listening_comprehension_mode',
-        !isPlayerListeningComprehensionMode);
-  }
-
-  /// Get orientation for player.
-  bool get isPlayerOrientationPortrait {
-    return _preferences.get('player_orientation_portrait', defaultValue: false);
-  }
-
-  /// Toggle orientation for player.
-  void togglePlayerOrientationPortrait() async {
-    await _preferences.put(
-        'player_orientation_portrait', !isPlayerOrientationPortrait);
-  }
-
   /// Get whether or not to stretch to fill screen.
   bool get isStretchToFill {
     return _preferences.get('stretch_to_fill_screen', defaultValue: false);
@@ -3239,102 +3063,6 @@ class AppModel with ChangeNotifier {
   /// Toggle stretch to fill screen.
   void toggleStretchToFill() async {
     await _preferences.put('stretch_to_fill_screen', !isStretchToFill);
-  }
-
-  /// Whether or not the player should use hardware acceleration.
-  bool get playerHardwareAcceleration {
-    return _preferences.get('player_hardware_acceleration', defaultValue: true);
-  }
-
-  /// Set whether or not the player should use hardware acceleration.
-  void setPlayerHardwareAcceleration({required bool value}) async {
-    await _preferences.put('player_hardware_acceleration', value);
-  }
-
-  /// Whether or not the player should allow background play.
-  bool get playerBackgroundPlay {
-    return _preferences.get('player_background_play', defaultValue: true);
-  }
-
-  /// Set whether or not the player should allow background play.
-  void setPlayerBackgroundPlay({required bool value}) async {
-    await _preferences.put('player_background_play', value);
-  }
-
-  /// Whether or not the player should show subtitles in notifications.
-  bool get showSubtitlesInNotification {
-    return _preferences.get('player_subtitle_notification', defaultValue: true);
-  }
-
-  /// Set whether or not the player should show subtitles in notifications.
-  void setShowSubtitlesInNotification({required bool value}) async {
-    await _preferences.put('player_subtitle_notification', value);
-  }
-
-  /// Whether or not the player should use hardware acceleration.
-  bool get playerUseOpenSLES {
-    return _preferences.get('player_use_opensles', defaultValue: true);
-  }
-
-  /// Set whether or not the player should use hardware acceleration.
-  void setPlayerUseOpenSLES({required bool value}) async {
-    await _preferences.put('player_use_opensles', value);
-  }
-
-  /// Allows the player screen to listen to play/pause changes.
-  Stream<void> get playStream => _playStreamController.stream;
-  final StreamController<void> _playStreamController =
-      StreamController.broadcast();
-
-  /// Allows the player screen to listen to seek changes.
-  Stream<Duration> get seekStream => _seekStreamController.stream;
-  final StreamController<Duration> _seekStreamController =
-      StreamController.broadcast();
-
-  /// Allows the player screen to listen to seek backward changes.
-  Stream<void> get rewindStream => _rewindStreamController.stream;
-  final StreamController<void> _rewindStreamController =
-      StreamController.broadcast();
-
-  /// Allows the player screen to listen to seek forward changes.
-  Stream<void> get fastForwardStream => _fastForwardStreamController.stream;
-  final StreamController<void> _fastForwardStreamController =
-      StreamController.broadcast();
-
-  /// For managing audio session events.
-  JidoujishoAudioHandler? get audioHandler => _audioHandler;
-  JidoujishoAudioHandler? _audioHandler;
-
-  /// Initialises the audio service.
-  Future<void> initialiseAudioHandler() async {
-    if (_audioHandler != null) {
-      return;
-    }
-
-    _audioHandler = await ag.AudioService.init<JidoujishoAudioHandler>(
-      builder: () => JidoujishoAudioHandler(
-        onPlayPause: () {
-          _playStreamController.add(null);
-        },
-        onSeek: (position) {
-          _seekStreamController.add(position);
-        },
-        onRewind: () {
-          _rewindStreamController.add(null);
-        },
-        onFastForward: () {
-          _fastForwardStreamController.add(null);
-        },
-      ),
-      config: const ag.AudioServiceConfig(
-        androidNotificationChannelId: 'app.arianneorpilla.yuuna.channel.audio',
-        androidNotificationChannelName: 'jidoujisho',
-        androidNotificationIcon: 'drawable/splash',
-        notificationColor: Colors.black,
-        fastForwardInterval: Duration(seconds: 5),
-        rewindInterval: Duration(seconds: 5),
-      ),
-    );
   }
 
   /// Whether or not searching in the app is performed without hitting the
@@ -3384,22 +3112,6 @@ class AppModel with ChangeNotifier {
   /// Sets the debounce delay in milliseconds for searching in the app..
   void toggleCloseCreatorOnExport() async {
     await _preferences.put('close_on_export', !closeCreatorOnExport);
-  }
-
-  /// Default value of [doubleTapSeekDuration].
-  final int defaultDoubleTapSeekDuration = 5000;
-
-  /// The default duration that the video player will seek forward or backward
-  /// when double tapped by the user.
-  int get doubleTapSeekDuration {
-    return _preferences.get('double_tap_seek_duration',
-        defaultValue: defaultDoubleTapSeekDuration);
-  }
-
-  /// Sets the default duration that the video player will seek forward or
-  /// backward when double tapped by the user.
-  void setDoubleTapSeekDuration(int value) async {
-    await _preferences.put('double_tap_seek_duration', value);
   }
 
   /// Whether or not it is the app's first time setup to show the languages
@@ -3485,50 +3197,6 @@ class AppModel with ChangeNotifier {
     databaseCloseNotifier.notifyListeners();
     await _database.close();
     FlutterExitApp.exitApp();
-  }
-
-  /// Flag for when the player is currently busy processing subtitles. Image
-  /// and audio export cannot be done when this flag is on, so a toast is
-  /// shown.
-  bool isProcessingEmbeddedSubtitles = false;
-
-  /// Get whether or not the transcript should show play/pause.
-  bool get isTranscriptPlayerMode {
-    return _preferences.get('is_transcript_player_mode', defaultValue: false);
-  }
-
-  /// Toggle transcript player mode.
-  void toggleTranscriptPlayerMode() async {
-    await _preferences.put(
-      'is_transcript_player_mode',
-      !isTranscriptPlayerMode,
-    );
-  }
-
-  /// Get whether or not the transcript should have a background.
-  bool get isTranscriptOpaque {
-    return _preferences.get('is_transcript_opaque', defaultValue: false);
-  }
-
-  /// Toggle transcript background.
-  void toggleTranscriptOpaque() async {
-    await _preferences.put(
-      'is_transcript_opaque',
-      !isTranscriptOpaque,
-    );
-  }
-
-  /// Get whether or not subtitle timings are shown.
-  bool get subtitleTimingsShown {
-    return _preferences.get('subtitle_timings_shown', defaultValue: true);
-  }
-
-  /// Toggle subtitle timings shown.
-  void toggleSubtitleTimingsShown() async {
-    await _preferences.put(
-      'subtitle_timings_shown',
-      !subtitleTimingsShown,
-    );
   }
 
   /// Get the saved value that the user has set for the [TagsField].

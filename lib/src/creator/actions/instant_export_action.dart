@@ -71,7 +71,6 @@ class InstantExportAction extends QuickAction {
               return mediaSource.generateImages(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
-                options: appModel.currentSubtitleOptions!.value,
                 data: mediaSource.currentExtraData,
               );
             },
@@ -89,7 +88,6 @@ class InstantExportAction extends QuickAction {
               return mediaSource.generateAudio(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
-                options: appModel.currentSubtitleOptions!.value,
               );
             },
           );

@@ -13,7 +13,6 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:spaces/spaces.dart';
 import 'package:uri_to_file/uri_to_file.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -193,33 +192,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
         String data = intent.extra!['android.intent.extra.PROCESS_TEXT'];
         textContextMenuAction(data);
         return;
-      case 'android.intent.action.VIEW':
-        String? subtitleUrl = intent.extra?['subtitles_location'];
-
-        if (subtitleUrl == null) {
-          if (intent.extra?['subs.enable'] != null) {
-            try {
-              List<String> subtitles =
-                  List<String>.from(intent.extra?['subs.enable']);
-              if (subtitles.isNotEmpty) {
-                subtitleUrl = subtitles.first;
-              }
-            } finally {}
-          }
-        }
-        String? title = intent.extra?['title'];
-        int? position = intent.extra?['position'];
-        if (position != null) {
-          position = position ~/ 1000;
-        }
-
-        launchNetworkMediaAction(
-          videoUrl: intent.data ?? '',
-          extra: jsonEncode(intent.extra ?? {}),
-          position: position,
-          title: title,
-        );
-        return;
       case 'android.intent.action.WEB_SEARCH':
         String data = intent.extra!['query'];
         textContextMenuAction(data);
@@ -238,16 +210,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
 
   void textShareIntentAction(String data) {
     if (data.startsWith('https://') || data.startsWith('http://')) {
-      String? videoId = VideoId.parseVideoId(data);
-      if (videoId != null) {
-        try {
-          launchYoutubeMediaAction(data);
-          return;
-        } catch (e) {
-          debugPrint('Not a YouTube video');
-        }
-      }
-
       if (data.toLowerCase().endsWith('.jpg') ||
           data.toLowerCase().endsWith('.jpeg') ||
           data.toLowerCase().endsWith('.png')) {
@@ -307,45 +269,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
         },
       );
     });
-  }
-
-  void launchYoutubeMediaAction(String url) async {
-    MediaItem item =
-        await PlayerYoutubeSource.instance.getMediaItemFromUrl(url);
-
-    Navigator.popUntil(
-        appModel.navigatorKey.currentContext!, (route) => route.isFirst);
-    if (mounted) {
-      await appModel.openMedia(
-        ref: ref,
-        mediaSource: PlayerYoutubeSource.instance,
-        killOnPop: true,
-        item: item,
-      );
-    }
-  }
-
-  void launchNetworkMediaAction({
-    required String videoUrl,
-    required String extra,
-    int? position,
-    String? title,
-  }) async {
-    MediaItem item = PlayerNetworkStreamSource.instance.getMediaItemFromUrl(
-      videoUrl: videoUrl,
-      extra: extra,
-      position: position,
-      title: title,
-    );
-
-    Navigator.popUntil(
-        appModel.navigatorKey.currentContext!, (route) => route.isFirst);
-    await appModel.openMedia(
-      ref: ref,
-      mediaSource: PlayerNetworkStreamSource.instance,
-      killOnPop: true,
-      item: item,
-    );
   }
 
   @override

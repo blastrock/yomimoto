@@ -54,8 +54,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
   /// [buildSearchBarBody] will take the place of the remainder tab body, or
   /// the elements below the search bar when unselected.
   Widget buildFloatingSearchBar() {
-    return mediaSource.buildBar() ??
-        FloatingSearchBar(
+    return FloatingSearchBar(
           isScrollControlled: true,
           hint: mediaSource.getLocalisedSourceName(appModel),
           controller: mediaType.floatingSearchBarController,

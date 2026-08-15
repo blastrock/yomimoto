@@ -2,7 +2,6 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:spaces/spaces.dart';
-import 'package:subtitle/subtitle.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -18,7 +17,6 @@ class CreatorPage extends BasePage {
     required this.editEnhancements,
     required this.editFields,
     required this.killOnPop,
-    required this.subtitles,
     super.key,
   });
 
@@ -33,10 +31,6 @@ class CreatorPage extends BasePage {
 
   /// If true, popping will exit the application.
   final bool killOnPop;
-
-  /// Used to generate multiple images if required and invoked from a
-  /// media source. See [MediaSource.generateImages].
-  final List<Subtitle>? subtitles;
 
   @override
   BasePageState<CreatorPage> createState() => _CreatorPageState();
@@ -125,8 +119,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               return mediaSource.generateImages(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
-                subtitles: widget.subtitles,
-                options: appModel.currentSubtitleOptions!.value,
                 data: mediaSource.currentExtraData,
               );
             },
@@ -167,8 +159,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               return mediaSource.generateAudio(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
-                subtitles: widget.subtitles,
-                options: appModel.currentSubtitleOptions!.value,
                 data: mediaSource.currentExtraData,
               );
             },

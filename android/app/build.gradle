@@ -27,6 +27,14 @@ android {
         main.java.srcDirs += "src/main/kotlin"
     }
 
+    lint {
+        // ExpiredTargetSdkVersion is a Google Play distribution requirement and
+        // fails `lintVitalRelease` outright. This app is sideloaded, and
+        // targetSdk is held at 32 on purpose (see defaultConfig below), so the
+        // check does not apply. Drop this when targetSdk is raised.
+        disable "ExpiredTargetSdkVersion"
+    }
+
     buildFeatures {
         // AGP 8 stopped generating BuildConfig by default; MainActivity reads
         // BuildConfig.APPLICATION_ID for its FileProvider authority.

@@ -55,17 +55,16 @@ at the constraint itself:
 
 | Thing | Held at | Why | What it would take to move |
 |---|---|---|---|
-| `targetSdk` | 32 | Raising it changes runtime behaviour, not just the build | audio_service foreground-service manifest, granular media permissions, predictive back, edge-to-edge, 16 KB page-size audit |
+| `targetSdk` | 32 | Raising it changes runtime behaviour, not just the build | granular media permissions, predictive back, edge-to-edge, 16 KB page-size audit |
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
-| `infinite_scroll_pagination` | 4.x | 5.0 replaced `PagingController` wholesale (`firstPageKey`/`addPageRequestListener`/`appendPage` -> `fetchPage` + `state`) | A UI rewrite across 4 files |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
 | `dart_mappable_builder` | < 4.8 | Its analyzer range must overlap `isar_community_generator`'s (`>=8 <11`) | Whichever generator widens first |
 | `dependency_validator` | removed | Needs analyzer < 13, `dart_mappable_builder` needs ^13 | Same |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 
-`dependency_overrides` holds four entries, each documented in `pubspec.yaml`:
-`mecab_dart` and `path` break constraint collisions with dormant packages,
-`mime` reconciles `local_assets_server` with `share_plus` 13, and
+`dependency_overrides` holds three entries, each documented in `pubspec.yaml`:
+`mecab_dart` breaks a constraint collision with a dormant package, `mime`
+reconciles `local_assets_server` with `share_plus` 13, and
 `freezed_annotation`/`gap` exist only to satisfy the `spaces` fork.
 
 ## Known debt
@@ -75,30 +74,31 @@ at the constraint itself:
   reason for the `freezed_annotation` and `gap` overrides. Its API is thin
   (`SpacedColumn`, `Space.*`) and maps onto `Gap`/`SizedBox`. Biggest single
   cleanup available.
-- **Remaining third-party git refs**: `blurrycontainer`, `subtitle`, `ve_dart`,
-  `spaces`. Each is a build dependency on someone else's account staying alive —
+- **Remaining third-party git refs**: `ve_dart` and `spaces`. Each is a build
+  dependency on someone else's account staying alive —
   which is how `material_floating_search_bar` became a problem when its upstream
   was deleted. Mirror or vendor them.
 - **`change_notifier_builder`** is discontinued (-> `multi_listenable_builder`).
-- 144 `flutter_lints` 6 style infos on pre-existing code (`unnecessary_underscores`,
+- 95 `flutter_lints` 6 style infos on pre-existing code (`unnecessary_underscores`,
   `use_build_context_synchronously`, ...). No deprecations remain.
 
 ## Not verified on device
 
 The migration is verified only as far as *it builds*: `flutter analyze` is clean
-of errors and deprecations, and both debug and release APKs link. Nothing has
-been run on hardware. Before trusting a build, back up (Isar and Hive live in
-internal storage — take a full in-app export off-device) and check at minimum:
+of errors and warnings, and both debug and release APKs link. Nothing has been
+run on hardware. This fork ships under its own application id, so every install
+is a fresh one — there is no existing database to preserve. Check at minimum:
 
-- dictionary import and lookup (confirms `isar_community` reads the existing DB)
-- text selection -> dictionary lookup in reader and player
-- embedded-subtitle extraction and Anki MP3 clips (the ffmpeg-kit swap)
-- audio output during playback (VLC moved from a fork to upstream 7.4.4)
+- cold launch: first-time setup runs and the bottom bar shows exactly two tabs,
+  Reader and Dictionary
+- dictionary import and lookup (confirms `isar_community` opens the schema set)
+- text selection -> dictionary lookup in the TTU reader and in mokuro
 - volume-key page turning in the TTU reader and mokuro browse (the
   `onKey` -> `onKeyEvent` change)
-- back-button behaviour on player, reader, browser and creator pages
-  (`WillPopScope` -> `PopScope` inverts the control flow)
-- the playback-position hand-off to and from mpv/Jellyfin (`receive_intent`)
-- blur settings surviving an upgrade (the persisted colour format was preserved
-  by hand)
+- back-button behaviour on reader and creator pages (`WillPopScope` ->
+  `PopScope` inverts the control flow)
+- card creation end to end, including an image and an audio enhancement, then
+  export to AnkiDroid
+- sharing text in from another app, and the system PROCESS_TEXT lookup
+  (`receive_intent`)
 - both light and dark themes, to confirm `useMaterial3: false` held the look

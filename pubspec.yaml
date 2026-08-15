@@ -1,5 +1,5 @@
 name: yuuna
-description: A full-featured immersion language learning suite for mobile.
+description: A book reader, dictionary and card creation toolkit for e-ink Android devices.
 publish_to: 'none'
 version: 2.9.1+200
 environment:
@@ -19,7 +19,6 @@ dependencies:
   crop_image: ^1.0.4
   dart_mappable: ^4.7.0
   device_info_plus: ^13.2.0
-  dio: ^5.1.1
   document_file_save_plus: ^2.0.0
   expandable: ^5.0.1
   external_app_launcher: ^4.0.4
@@ -83,7 +82,6 @@ dependencies:
   # worth it.
   permission_handler: ^12.0.3
   progress_indicators: ^1.0.0
-  quiver: ^3.2.1
   recase: ^4.1.0
   receive_intent:
     # Vendored upstream 0.2.7 with the fork's `setResult(action:)` patch

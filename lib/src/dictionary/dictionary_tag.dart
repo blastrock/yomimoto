@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:yuuna/dictionary.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'dictionary_tag.g.dart';
 

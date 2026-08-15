@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'dictionary_heading.g.dart';
 

@@ -3,13 +3,20 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  isar_flutter_libs
+  clipboard
+  ffmpeg_kit_flutter_new
+  file_selector_windows
+  flutter_inappwebview_windows
+  isar_community_flutter_libs
+  mecab_dart
   permission_handler_windows
+  share_plus
   url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   flutter_gpt_tokenizer
+  jni
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

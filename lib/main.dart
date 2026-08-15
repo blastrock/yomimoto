@@ -1,20 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:receive_intent/receive_intent.dart' as intents;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:spaces/spaces.dart';
-import 'package:uri_to_file/uri_to_file.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -166,25 +162,10 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
           _isMainIntent = true;
         });
         return;
-      case 'android.intent.action.SEND_MULTIPLE':
-        List<String> contentUris =
-            List<String>.from(intent.extra!['android.intent.extra.STREAM']);
-        List<String> paths = [];
-        for (int i = 0; i < contentUris.length; i++) {
-          paths.add((await toFile(contentUris[i])).path);
-        }
-
-        imageShareIntentAction(paths);
-        break;
       case 'android.intent.action.SEND':
         String? data = intent.extra!['android.intent.extra.TEXT'];
         if (data != null) {
           textShareIntentAction(data);
-        } else {
-          String contentUri = intent.extra!['android.intent.extra.STREAM'];
-          String path = (await toFile(contentUri)).path;
-
-          imageShareIntentAction([path]);
         }
 
         break;
@@ -209,66 +190,17 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
   }
 
   void textShareIntentAction(String data) {
-    if (data.startsWith('https://') || data.startsWith('http://')) {
-      if (data.toLowerCase().endsWith('.jpg') ||
-          data.toLowerCase().endsWith('.jpeg') ||
-          data.toLowerCase().endsWith('.png')) {
-        appModel.openCreator(killOnPop: true, ref: ref);
-        List<NetworkToFileImage> images = [NetworkToFileImage(url: data)];
-
-        Future.delayed(const Duration(milliseconds: 100), () {
-          ImageField.instance.setImages(
-            appModel: appModel,
-            creatorModel: creatorModel,
-            cause: EnhancementTriggerCause.manual,
-            newAutoCannotOverride: true,
-            generateImages: () async {
-              return images;
-            },
-          );
-        });
-      }
-    } else {
-      if (data.trim().isNotEmpty) {
-        appModel.openCreator(
-          creatorFieldValues: CreatorFieldValues(
-            textValues: {
-              SentenceField.instance: data,
-            },
-          ),
-          killOnPop: true,
-          ref: ref,
-        );
-      }
-    }
-  }
-
-  void imageShareIntentAction(List<String> paths) {
-    if (paths.isEmpty) {
-      return;
-    }
-
-    appModel.openCreator(killOnPop: true, ref: ref);
-
-    List<NetworkToFileImage> images = paths.map(
-      (path) {
-        return NetworkToFileImage(
-          file: File(path),
-        );
-      },
-    ).toList();
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      ImageField.instance.setImages(
-        appModel: appModel,
-        creatorModel: creatorModel,
-        cause: EnhancementTriggerCause.manual,
-        newAutoCannotOverride: true,
-        generateImages: () async {
-          return images;
-        },
+    if (data.trim().isNotEmpty) {
+      appModel.openCreator(
+        creatorFieldValues: CreatorFieldValues(
+          textValues: {
+            SentenceField.instance: data,
+          },
+        ),
+        killOnPop: true,
+        ref: ref,
       );
-    });
+    }
   }
 
   @override

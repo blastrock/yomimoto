@@ -14,8 +14,7 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
-/// A page for [ReaderWebsocketSource] which shows lyrics of current playing
-/// media.
+/// A page which shows the comments of the current playing media.
 class PlayerCommentsPage extends BaseSourcePage {
   /// Create an instance of this tab page.
   const PlayerCommentsPage({

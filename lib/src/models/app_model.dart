@@ -776,7 +776,6 @@ class AppModel with ChangeNotifier {
         ReaderLyricsSource.instance,
         ReaderChatgptSource.instance,
         ReaderClipboardSource.instance,
-        ReaderWebsocketSource.instance,
       ],
       DictionaryMediaType.instance: [],
     };

@@ -194,7 +194,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get dialog_channel => 'CHANNEL';
 	String get dialog_directory => 'DIRECTORY';
 	String get dialog_crop => 'CROP';
-	String get dialog_connect => 'CONNECT';
 	String get dialog_append => 'APPEND';
 	String get dialog_record => 'RECORD';
 	String get dialog_manage => 'MANAGE';
@@ -418,10 +417,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get no_text_received => 'No text received';
 	String get text_segmentation => 'Text Segmentation';
 	String get connect_disconnect => 'Connect/Disconnect';
-	String get clear_text_title => 'Clear Text';
-	String get clear_text_description => 'This will clear all received text. Are you sure?';
-	String get close_connection_title => 'Close Connection';
-	String get close_connection_description => 'This will end the WebSocket connection and clear all received text. Are you sure?';
 	String get use_slow_import => 'Slow import (use if failing)';
 	String get settings => 'Settings';
 	String get manager => 'Manager';
@@ -621,7 +616,6 @@ extension on _StringsEn {
 			case 'dialog_channel': return 'CHANNEL';
 			case 'dialog_directory': return 'DIRECTORY';
 			case 'dialog_crop': return 'CROP';
-			case 'dialog_connect': return 'CONNECT';
 			case 'dialog_append': return 'APPEND';
 			case 'dialog_record': return 'RECORD';
 			case 'dialog_manage': return 'MANAGE';
@@ -845,10 +839,6 @@ extension on _StringsEn {
 			case 'no_text_received': return 'No text received';
 			case 'text_segmentation': return 'Text Segmentation';
 			case 'connect_disconnect': return 'Connect/Disconnect';
-			case 'clear_text_title': return 'Clear Text';
-			case 'clear_text_description': return 'This will clear all received text. Are you sure?';
-			case 'close_connection_title': return 'Close Connection';
-			case 'close_connection_description': return 'This will end the WebSocket connection and clear all received text. Are you sure?';
 			case 'use_slow_import': return 'Slow import (use if failing)';
 			case 'settings': return 'Settings';
 			case 'manager': return 'Manager';

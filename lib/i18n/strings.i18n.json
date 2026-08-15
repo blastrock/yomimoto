@@ -47,7 +47,6 @@
     "dialog_channel": "CHANNEL",
     "dialog_directory": "DIRECTORY",
     "dialog_crop": "CROP",
-    "dialog_connect": "CONNECT",
     "dialog_append": "APPEND",
     "dialog_record": "RECORD",
     "dialog_manage": "MANAGE",
@@ -290,12 +289,6 @@
     "no_text_received": "No text received",
     "text_segmentation": "Text Segmentation",
     "connect_disconnect": "Connect/Disconnect",
-    "clear_text_title": "Clear Text",
-    "clear_text_description":
-        "This will clear all received text. Are you sure?",
-    "close_connection_title": "Close Connection",
-    "close_connection_description":
-        "This will end the WebSocket connection and clear all received text. Are you sure?",
     "use_slow_import": "Slow import (use if failing)",
     "settings": "Settings",
     "manager": "Manager",

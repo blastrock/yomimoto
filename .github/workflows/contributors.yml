@@ -2,7 +2,6 @@ name: Update Contributors
 on:
   push:
     branches: ['main']
-    paths: ['yuuna/**']
   workflow_dispatch:
 jobs:
   contrib-readme-job:

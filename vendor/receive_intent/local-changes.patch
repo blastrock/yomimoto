@@ -1,0 +1,77 @@
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/receive_intent --label b/receive_intent a/receive_intent b/receive_intent
+--- a/receive_intent
++++ b/receive_intent
+@@ -57,13 +57,16 @@
+         eventSink?.success(latestIntentMap)
+     }
+ 
+-    private fun setResult(result: Result, resultCode: Int?, data: String?, shouldFinish: Boolean?) {
++    private fun setResult(result: Result, resultCode: Int?, action: String?, data: String?, shouldFinish: Boolean?) {
+         if (resultCode != null) {
+             if (data == null) {
+                 activity?.setResult(resultCode)
+             } else {
+                 val json = JSONObject(data)
+-                activity?.setResult(resultCode, jsonToIntent(json))
++                val intent = Intent(action).apply {
++                    putExtras(jsonToBundle(json))
++                }
++                activity?.setResult(resultCode, intent)
+             }
+             if (shouldFinish ?: false) {
+                 activity?.finish()
+@@ -90,7 +93,7 @@
+                 result.success(initialIntentMap)
+             }
+             "setResult" -> {
+-                setResult(result, call.argument("resultCode"), call.argument("data"), call.argument("shouldFinish"))
++                setResult(result, call.argument("resultCode"), call.argument("action"), call.argument("data"), call.argument("shouldFinish"))
+             }
+             else -> {
+                 result.notImplemented()
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/receive_intent --label b/receive_intent a/receive_intent b/receive_intent
+--- a/receive_intent
++++ b/receive_intent
+@@ -157,7 +157,11 @@
+     try {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+             // New signature
++            // `signingInfo` is @Nullable as of the current SDK. Returning
++            // empty matches what the surrounding try/catch already did when
++            // this dereference threw.
+             val sig = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES).signingInfo
++                    ?: return emptyList()
+             signatureList = if (sig.hasMultipleSigners()) {
+                 // Send all with apkContentsSigners
+                 sig.apkContentsSigners.map {
+@@ -174,7 +178,9 @@
+                 }
+             }
+         } else {
++            // `signatures` is likewise @Nullable now.
+             val sig = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
++                    ?: return emptyList()
+             signatureList = sig.map {
+                 val digest = MessageDigest.getInstance("SHA-256")
+                 digest.update(it.toByteArray())
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/receive_intent --label b/receive_intent a/receive_intent b/receive_intent
+--- a/receive_intent
++++ b/receive_intent
+@@ -87,10 +87,15 @@
+       .receiveBroadcastStream()
+       .map<Intent?>((event) => Intent.fromMap(event as Map?));
+ 
+-  static Future<void> setResult(int resultCode,
+-      {Map<String, Object?>? data, bool shouldFinish = false}) async {
++  static Future<void> setResult(
++    int resultCode, {
++    required String action,
++    Map<String, Object?>? data,
++    bool shouldFinish = false,
++  }) async {
+     await _methodChannel.invokeMethod('setResult', <String, dynamic>{
+       "resultCode": resultCode,
++      "action": action,
+       if (data != null) "data": json.encode(data),
+       "shouldFinish": shouldFinish,
+     });

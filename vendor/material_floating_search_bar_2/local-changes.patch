@@ -1,0 +1,12 @@
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/material_floating_search_bar_2 --label b/material_floating_search_bar_2 a/material_floating_search_bar_2 b/material_floating_search_bar_2
+--- a/material_floating_search_bar_2
++++ b/material_floating_search_bar_2
+@@ -687,7 +687,7 @@
+   @override
+   FloatingSearchAppBarStyle get newValue {
+     final ThemeData theme = Theme.of(context);
+-    final AppBarTheme appBar = theme.appBarTheme;
++    final AppBarThemeData appBar = theme.appBarTheme;
+     final TextDirection direction = Directionality.of(context);
+ 
+     return FloatingSearchAppBarStyle(

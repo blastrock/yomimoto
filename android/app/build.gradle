@@ -27,6 +27,12 @@ android {
         main.java.srcDirs += "src/main/kotlin"
     }
 
+    buildFeatures {
+        // AGP 8 stopped generating BuildConfig by default; MainActivity reads
+        // BuildConfig.APPLICATION_ID for its FileProvider authority.
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "app.arianneorpilla.yuuna"
         minSdk 24

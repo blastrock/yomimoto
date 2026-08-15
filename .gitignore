@@ -46,3 +46,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+# Native build output from vendored plugins (CMake/AGP write in-tree).
+vendor/**/.cxx/
+vendor/**/build/

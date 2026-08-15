@@ -629,11 +629,9 @@ packages:
   filesystem_picker:
     dependency: "direct main"
     description:
-      path: package
-      ref: jidoujisho
-      resolved-ref: aedba6189cd6e995c1ff0f8451d1d5e31c2ce7c1
-      url: "https://github.com/arianneorpilla/filesystem_picker"
-    source: git
+      path: "vendor/filesystem_picker"
+      relative: true
+    source: path
     version: "2.0.0-nullsafety.0"
   fixnum:
     dependency: transitive
@@ -1368,18 +1366,16 @@ packages:
   material_floating_search_bar_2:
     dependency: "direct main"
     description:
-      name: material_floating_search_bar_2
-      sha256: ab0c6d209d9491f98dd4c72f2641d0ba1dd35c87effca1f23d8679bece43add0
-      url: "https://pub.dev"
-    source: hosted
+      path: "vendor/material_floating_search_bar_2"
+      relative: true
+    source: path
     version: "0.5.0"
   mecab_dart:
     dependency: "direct main"
     description:
-      name: mecab_dart
-      sha256: "3a182791d5a21bbea3aeb7ad155718f4d26d0b99e0e656cadaca703d433cc0aa"
-      url: "https://pub.dev"
-    source: hosted
+      path: "vendor/mecab_dart"
+      relative: true
+    source: path
     version: "0.1.6"
   meta:
     dependency: transitive
@@ -1416,11 +1412,9 @@ packages:
   nowplaying:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "290ee1097d67cafc50f3aba1ba5bba01e758d877"
-      resolved-ref: "290ee1097d67cafc50f3aba1ba5bba01e758d877"
-      url: "https://github.com/arianneorpilla/nowplaying"
-    source: git
+      path: "vendor/nowplaying"
+      relative: true
+    source: path
     version: "2.0.6"
   objective_c:
     dependency: transitive
@@ -1446,14 +1440,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
-  package_info:
-    dependency: transitive
-    description:
-      name: package_info
-      sha256: "6c07d9d82c69e16afeeeeb6866fe43985a20b3b50df243091bfc4a4ad2b03b75"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.2"
   package_info_plus:
     dependency: "direct main"
     description:
@@ -1534,14 +1520,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      sha256: "67fc27ed9639506c856c840ccce7594d0bdcd91bc8d53d6e52359449a1d50602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.11.1"
   permission_handler:
     dependency: "direct main"
     description:
@@ -1681,12 +1659,10 @@ packages:
   receive_intent:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "3854d07f8f4e9d5a78589639b18b5d454ddf54a0"
-      resolved-ref: "3854d07f8f4e9d5a78589639b18b5d454ddf54a0"
-      url: "https://github.com/arianneorpilla/receive_intent"
-    source: git
-    version: "0.2.3"
+      path: "vendor/receive_intent"
+      relative: true
+    source: path
+    version: "0.2.7"
   record_mp3_plus:
     dependency: "direct main"
     description:
@@ -1738,11 +1714,9 @@ packages:
   ruby_text:
     dependency: "direct main"
     description:
-      path: "."
-      ref: cb723f87c9ac575aa735b40016c0ffb3242d921e
-      resolved-ref: cb723f87c9ac575aa735b40016c0ffb3242d921e
-      url: "https://github.com/arianneorpilla/RubyText"
-    source: git
+      path: "vendor/ruby_text"
+      relative: true
+    source: path
     version: "3.0.1"
   rxdart:
     dependency: transitive

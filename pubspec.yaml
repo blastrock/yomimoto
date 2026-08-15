@@ -36,10 +36,10 @@ dependencies:
   ffmpeg_kit_flutter_new: ^4.6.2
   file_picker: ^12.0.0
   filesystem_picker:
-    git:
-      url: https://github.com/arianneorpilla/filesystem_picker
-      ref: jidoujisho
-      path: package
+    # Vendored jidoujisho fork: multi-root browsing, usedFiles highlighting and
+    # marquee filenames, none of which upstream 4.1.0 has. See
+    # vendor/filesystem_picker/UPSTREAM.md.
+    path: vendor/filesystem_picker
   float_column: ^4.1.0
   flutter:
     sdk: flutter
@@ -82,14 +82,22 @@ dependencies:
   list_counter: ^1.0.2
   local_assets_server: ^2.0.2+12
   marquee: ^2.2.3
-  material_floating_search_bar_2: ^0.5.0
-  mecab_dart: ^0.1.6
+  material_floating_search_bar_2:
+    # Vendored for one line: ThemeData.appBarTheme changed type to
+    # AppBarThemeData after 0.5.0 was published. See
+    # vendor/material_floating_search_bar_2/UPSTREAM.md.
+    path: vendor/material_floating_search_bar_2
+  mecab_dart:
+    # Vendored: 0.1.6 still carries a `registerWith(Registrar)` companion from
+    # the removed v1 Android embedding. See vendor/mecab_dart/UPSTREAM.md.
+    path: vendor/mecab_dart
   multi_value_listenable_builder: ^0.0.2
   network_to_file_image: ^7.0.0
   nowplaying:
-    git: 
-      url: https://github.com/arianneorpilla/nowplaying
-      ref: 290ee1097d67cafc50f3aba1ba5bba01e758d877
+    # Vendored fork: carries an unupstreamed NPE fix in the notification
+    # listener, and hosted 3.x is an API rewrite. Also swaps the dead
+    # package_info for package_info_plus. See vendor/nowplaying/UPSTREAM.md.
+    path: vendor/nowplaying
   package_info_plus: ^10.2.1
   path: ^1.8.2
   path_provider: ^2.0.13
@@ -103,16 +111,17 @@ dependencies:
   recase: ^4.1.0
   record_mp3_plus: ^1.5.0
   receive_intent:
-    git:
-      url: https://github.com/arianneorpilla/receive_intent
-      ref: 3854d07f8f4e9d5a78589639b18b5d454ddf54a0
+    # Vendored upstream 0.2.7 with the fork's `setResult(action:)` patch
+    # rebased on top. See vendor/receive_intent/UPSTREAM.md.
+    path: vendor/receive_intent
   remove_emoji: ^0.0.7
   reorderables: ^0.6.0
   restart_app: ^1.1.2
   ruby_text:
-    git:
-      url: https://github.com/arianneorpilla/RubyText
-      ref: cb723f87c9ac575aa735b40016c0ffb3242d921e
+    # Vendored jidoujisho fork: per-character styles and tap targets inside
+    # furigana, which is what makes character-level lookup work. See
+    # vendor/ruby_text/UPSTREAM.md.
+    path: vendor/ruby_text
   scrollable_positioned_list: ^0.3.5
   share_plus: ^13.3.0
   slang: ^3.13.0
@@ -145,10 +154,11 @@ dependency_overrides:
   freezed_annotation: ^2.2.0 # Caused by spaces
   gap: ^3.0.1 # Caused by spaces
   # ve_dart's fork pins `mecab_dart: 0.1.3` exactly, which still wants ffi ^1
-  # and declares an sdk upper bound of <3.0.0. mecab_dart 0.1.6 is the same
-  # plugin on ffi ^2 with a Dart 3 bound, so force it rather than dragging the
-  # whole graph back to ffi 1.
-  mecab_dart: ^0.1.6
+  # and declares an sdk upper bound of <3.0.0. Override to the vendored 0.1.6,
+  # which is on ffi ^2 and has the removed v1-embedding code stripped out. See
+  # vendor/mecab_dart/UPSTREAM.md.
+  mecab_dart:
+    path: vendor/mecab_dart
   # local_assets_server 2.0.2+12 (dormant, latest) wants mime ^1 while
   # share_plus 13 wants ^2. The server's only mime call is `lookupMimeType`,
   # which is unchanged in mime 2, so forcing 2 is safe.

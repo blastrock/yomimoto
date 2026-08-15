@@ -1,0 +1,149 @@
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/filesystem_picker --label b/filesystem_picker a/filesystem_picker b/filesystem_picker
+--- a/filesystem_picker
++++ b/filesystem_picker
+@@ -312,11 +312,11 @@
+       child: Theme(
+         data: ThemeData(
+           textTheme: TextTheme(
+-            button: TextStyle(
+-              color: Theme.of(context).textTheme.headline6?.color ??
++            labelLarge: TextStyle(
++              color: Theme.of(context).textTheme.titleLarge?.color ??
+                   (widget.themeData ?? Theme.of(context))
+                       .primaryTextTheme
+-                      .headline6
++                      .titleLarge
+                       ?.color,
+             ),
+           ),
+@@ -383,7 +383,7 @@
+               color: (widget.themeData ?? Theme.of(context)).primaryColor,
+               child: ListTile(
+                 leading: Icon(Icons.library_add_check,
+-                    color: Theme.of(context).primaryTextTheme.headline6!.color),
++                    color: Theme.of(context).primaryTextTheme.titleLarge!.color),
+                 title: Text(
+                   'Selected ' +
+                       (widget.fsType == FilesystemType.all
+@@ -396,7 +396,7 @@
+                       ')',
+                   style: (widget.themeData ?? Theme.of(context))
+                       .primaryTextTheme
+-                      .headline6,
++                      .titleLarge,
+                 ),
+               ),
+             ),
+@@ -522,8 +522,8 @@
+             Expanded(
+                 child: TextButton.icon(
+               style: TextButton.styleFrom(
+-                primary: Theme.of(context).textTheme.headline6?.color ??
+-                    Theme.of(context).primaryTextTheme.headline6?.color,
++                foregroundColor: Theme.of(context).textTheme.titleLarge?.color ??
++                    Theme.of(context).primaryTextTheme.titleLarge?.color,
+               ),
+               icon: Icon(Icons.cancel),
+               label: (widget.cancelText != null)
+@@ -539,8 +539,8 @@
+             Expanded(
+                 child: TextButton.icon(
+               style: TextButton.styleFrom(
+-                primary: Theme.of(context).textTheme.headline6?.color ??
+-                    Theme.of(context).primaryTextTheme.headline6?.color,
++                foregroundColor: Theme.of(context).textTheme.titleLarge?.color ??
++                    Theme.of(context).primaryTextTheme.titleLarge?.color,
+               ),
+               icon: Icon(Icons.check_circle),
+               label: (widget.pickText != null)
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/filesystem_picker --label b/filesystem_picker a/filesystem_picker b/filesystem_picker
+--- a/filesystem_picker
++++ b/filesystem_picker
+@@ -70,7 +70,7 @@
+                   const EdgeInsets.symmetric(horizontal: 8),
+               child: TextButton(
+                 style: TextButton.styleFrom(
+-                    primary: (index == (items.length - 1))
++                    foregroundColor: (index == (items.length - 1))
+                         ? (themeData ?? Theme.of(context))
+                             .textTheme
+                             .bodyMedium!
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/filesystem_picker --label b/filesystem_picker a/filesystem_picker b/filesystem_picker
+--- a/filesystem_picker
++++ b/filesystem_picker
+@@ -21,7 +21,7 @@
+ 
+   @override
+   Widget build(BuildContext context) {
+-    final txTheme = textStyle ?? Theme.of(context).textTheme.bodyText1;
++    final txTheme = textStyle ?? Theme.of(context).textTheme.bodyLarge;
+     final fseName = path.basename(filename);
+     final extension = path.extension(fseName);
+     final hasExtension = extension.isNotEmpty;
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/filesystem_picker --label b/filesystem_picker a/filesystem_picker b/filesystem_picker
+--- a/filesystem_picker
++++ b/filesystem_picker
+@@ -113,8 +113,8 @@
+       isActive: isActive,
+       isDirectory: item is Directory,
+       textStyle: isSelected
+-          ? (themeData ?? Theme.of(context)).primaryTextTheme.bodyText1
+-          : (themeData ?? Theme.of(context)).textTheme.bodyText1,
++          ? (themeData ?? Theme.of(context)).primaryTextTheme.bodyLarge
++          : (themeData ?? Theme.of(context)).textTheme.bodyLarge,
+     );
+ 
+     return tx;
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/filesystem_picker --label b/filesystem_picker a/filesystem_picker b/filesystem_picker
+--- a/filesystem_picker
++++ b/filesystem_picker
+@@ -1,25 +1,24 @@
+-name: filesystem_picker
+-description: FileSystem file or folder picker dialog. Allows the user to browse the file system and pick a folder or file.
+-version: 2.0.0-nullsafety.0
+-# author: Andy Chentsov <chentsov@gmail.com>
+-homepage: https://github.com/andyduke/filesystem_picker/tree/master/package
+-repository: https://github.com/andyduke/filesystem_picker
+-issue_tracker: https://github.com/andyduke/filesystem_picker/issues
+-
+-environment:
+-  sdk: '>=2.12.0 <3.0.0'
+-
+-dependencies:
+-  flutter:
+-    sdk: flutter
+-  pedantic: ^1.11.0
+-
+-  path: ^1.8.0
+-  marquee: ^2.2.3
+-
+-dev_dependencies:
+-  flutter_test:
+-    sdk: flutter
+-
+-
+-flutter:
++name: filesystem_picker
++description: FileSystem file or folder picker dialog. Allows the user to browse the file system and pick a folder or file.
++version: 2.0.0-nullsafety.0
++# author: Andy Chentsov <chentsov@gmail.com>
++homepage: https://github.com/andyduke/filesystem_picker/tree/master/package
++repository: https://github.com/andyduke/filesystem_picker
++issue_tracker: https://github.com/andyduke/filesystem_picker/issues
++
++environment:
++  sdk: '>=2.12.0 <4.0.0'
++
++dependencies:
++  flutter:
++    sdk: flutter
++
++  path: ^1.8.0
++  marquee: ^2.2.3
++
++dev_dependencies:
++  flutter_test:
++    sdk: flutter
++
++
++flutter:

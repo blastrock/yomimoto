@@ -1,0 +1,24 @@
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/ruby_text --label b/ruby_text a/ruby_text b/ruby_text
+--- a/ruby_text
++++ b/ruby_text
+@@ -23,7 +23,7 @@
+   @override
+   Widget build(BuildContext context) {
+     final defaultTextStyle = DefaultTextStyle.of(context).style;
+-    final boldTextOverride = MediaQuery.boldTextOverride(context);
++    final boldTextOverride = MediaQuery.boldTextOf(context);
+ 
+     final result = useMemoized(
+       () {
+diff -ruN '--color=never' -x UPSTREAM.md -x local-changes.patch -x .cxx -x build --label a/ruby_text --label b/ruby_text a/ruby_text b/ruby_text
+--- a/ruby_text
++++ b/ruby_text
+@@ -4,7 +4,7 @@
+ homepage: https://github.com/YeungKC/RubyText
+ 
+ environment:
+-  sdk: ">=2.14.0 <3.0.0"
++  sdk: ">=2.14.0 <4.0.0"
+ 
+ dependencies:
+   collection: ^1.17.0

@@ -20,9 +20,16 @@ class DictionaryDialogPage extends BasePage {
   BasePageState createState() => _DictionaryDialogPageState();
 }
 
-class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
+class _DictionaryDialogPageState extends BasePageState {
   final ScrollController _scrollController = ScrollController();
   int? _selectedOrder;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _formatNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -524,7 +531,7 @@ class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
     ];
   }
 
-  final _formatNotifier = ChangeNotifier();
+  final _formatNotifier = ValueNotifier<DictionaryFormat?>(null);
 
   Widget buildImportDropdown() {
     return Column(
@@ -551,7 +558,7 @@ class _DictionaryDialogPageState extends BasePageState with ChangeNotifier {
                 generateLabel: (format) => format.name,
                 onChanged: (format) {
                   appModel.setLastSelectedDictionaryFormat(format!);
-                  _formatNotifier.notifyListeners();
+                  _formatNotifier.value = format;
                 },
               ),
             ),

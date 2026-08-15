@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 286
+/// Strings: 287
 ///
-/// Built on 2026-08-15 at 16:57 UTC
+/// Built on 2026-08-15 at 18:40 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -148,7 +148,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 
 	// Translations
 	String get dictionary_media_type => 'Dictionary';
-	String get reader_media_type => 'Reader';
+	String get novel_media_type => 'Novels';
+	String get manga_media_type => 'Manga';
 	String get back => 'Back';
 	String get search => 'Search';
 	String get search_ellipsis => 'Search...';
@@ -466,7 +467,8 @@ extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		switch (path) {
 			case 'dictionary_media_type': return 'Dictionary';
-			case 'reader_media_type': return 'Reader';
+			case 'novel_media_type': return 'Novels';
+			case 'manga_media_type': return 'Manga';
 			case 'back': return 'Back';
 			case 'search': return 'Search';
 			case 'search_ellipsis': return 'Search...';

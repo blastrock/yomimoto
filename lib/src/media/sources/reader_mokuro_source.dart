@@ -26,6 +26,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
           sourceName: 'Mokuro',
           description:
               'Read manga volumes pre-processed as a single HTML file via Mokuro.',
+          mediaType: MangaMediaType.instance,
           icon: Icons.dashboard_outlined,
           implementsSearch: false,
           implementsHistory: true,
@@ -221,7 +222,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
     String parentDirectory = path.dirname(directory);
 
     appModel.setLastPickedDirectory(
-      type: ReaderMediaType.instance,
+      type: mediaType,
       directory: Directory(path.dirname(filePath)),
     );
 
@@ -263,7 +264,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
     Uri url = (await controller.getUrl())!..removeFragment();
 
     MediaItem? item = appModel
-        .getMediaTypeHistory(mediaType: mediaType)
+        .getMediaSourceHistory(mediaSource: this)
         .firstWhereOrNull((item) => item.mediaIdentifier == url.toString());
     if (item != null) {
       return item;

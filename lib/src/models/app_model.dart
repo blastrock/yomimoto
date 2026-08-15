@@ -688,7 +688,8 @@ class AppModel with ChangeNotifier {
     /// A list of media types that the app will support at runtime.
     final List<MediaType> availableMediaTypes = List<MediaType>.unmodifiable(
       [
-        ReaderMediaType.instance,
+        NovelMediaType.instance,
+        MangaMediaType.instance,
         DictionaryMediaType.instance,
       ],
     );
@@ -706,10 +707,8 @@ class AppModel with ChangeNotifier {
   void populateMediaSources() async {
     /// A list of media sources that the app will support at runtime.
     final Map<MediaType, List<MediaSource>> availableMediaSources = {
-      ReaderMediaType.instance: [
-        ReaderTtuSource.instance,
-        ReaderMokuroSource.instance,
-      ],
+      NovelMediaType.instance: [ReaderTtuSource.instance],
+      MangaMediaType.instance: [ReaderMokuroSource.instance],
       DictionaryMediaType.instance: [],
     };
 

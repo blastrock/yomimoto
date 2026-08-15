@@ -39,6 +39,7 @@ class ReaderTtuSource extends ReaderMediaSource {
           sourceName: 'ッツ Ebook Reader',
           description: 'Read EPUBs and mine sentences via an embedded web'
               ' reader.',
+          mediaType: NovelMediaType.instance,
           icon: Icons.chrome_reader_mode_outlined,
           implementsSearch: false,
           implementsHistory: false,

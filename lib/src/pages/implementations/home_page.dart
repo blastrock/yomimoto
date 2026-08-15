@@ -124,6 +124,7 @@ class _HomePageState extends BasePageState<HomePage>
 
   Widget? buildBottomNavigationBar() {
     return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
       onTap: switchTab,
       currentIndex: currentHomeTabIndex,
       items: navBarItems,

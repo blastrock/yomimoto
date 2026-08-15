@@ -59,7 +59,6 @@ at the constraint itself:
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
 | `infinite_scroll_pagination` | 4.x | 5.0 replaced `PagingController` wholesale (`firstPageKey`/`addPageRequestListener`/`appendPage` -> `fetchPage` + `state`) | A UI rewrite across 4 files |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
-| `web_socket_channel` | 2.x | `flutter_gpt_tokenizer` -> `flutter_rust_bridge` 1.x pins it | Replacing `flutter_gpt_tokenizer` |
 | `dart_mappable_builder` | < 4.8 | Its analyzer range must overlap `isar_community_generator`'s (`>=8 <11`) | Whichever generator widens first |
 | `dependency_validator` | removed | Needs analyzer < 13, `dart_mappable_builder` needs ^13 | Same |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
@@ -81,8 +80,6 @@ at the constraint itself:
   which is how `material_floating_search_bar` became a problem when its upstream
   was deleted. Mirror or vendor them.
 - **`change_notifier_builder`** is discontinued (-> `multi_listenable_builder`).
-- **`flutter_gpt_tokenizer`** sits on `flutter_rust_bridge` 1.x, four majors
-  behind, and is what holds `web_socket_channel` back.
 - 144 `flutter_lints` 6 style infos on pre-existing code (`unnecessary_underscores`,
   `use_build_context_synchronously`, ...). No deprecations remain.
 

@@ -49,7 +49,6 @@ final List<CollectionSchema> globalSchemas = [
   MediaItemSchema,
   AnkiMappingSchema,
   SearchHistoryItemSchema,
-  MessageItemSchema,
   MokuroCatalogSchema,
   BrowserBookmarkSchema,
 ];
@@ -310,34 +309,6 @@ class AppModel with ChangeNotifier {
   /// Returns all Browser bookmarks.
   List<BrowserBookmark> get browserBookmarks =>
       _database.browserBookmarks.where().anyId().findAllSync();
-
-  /// Returns the message log for the [ReaderChatgptSource].
-  List<MessageItem> get messages =>
-      _database.messageItems.where().findAllSync();
-
-  /// Adds a message to the  log for the [ReaderChatgptSource].
-  int addMessage(MessageItem message) {
-    late int id;
-    _database.writeTxnSync(() {
-      id = _database.messageItems.putSync(message);
-    });
-
-    return id;
-  }
-
-  /// Removes the last message from the log for the [ReaderChatgptSource].
-  void removeMessage(int id) {
-    _database.writeTxnSync(() {
-      _database.messageItems.deleteSync(id);
-    });
-  }
-
-  /// Clears the message log for the [ReaderChatgptSource].
-  Future<void> clearMessages() async {
-    await _database.writeTxn(() async {
-      await _database.messageItems.clear();
-    });
-  }
 
   /// Returns all dictionary history results. Oldest is first.
   List<DictionarySearchResult> get dictionaryHistory =>
@@ -773,7 +744,6 @@ class AppModel with ChangeNotifier {
         ReaderMokuroSource.instance,
         ReaderBrowserSource.instance,
         ReaderLyricsSource.instance,
-        ReaderChatgptSource.instance,
       ],
       DictionaryMediaType.instance: [],
     };

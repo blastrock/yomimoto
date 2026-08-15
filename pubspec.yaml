@@ -20,7 +20,6 @@ dependencies:
   cancelable_compute: ^2.1.1
   carousel_slider: ^5.1.2
   change_notifier_builder: ^1.1.2
-  chat_gpt_sdk: ^3.1.6
   collection:
   copy_with_extension: ^17.0.0
   crop_image: ^1.0.4
@@ -47,7 +46,6 @@ dependencies:
   flutter_charset_detector: ^6.0.0
   flutter_colorpicker: ^1.0.3
   flutter_exit_app: ^2.1.2
-  flutter_gpt_tokenizer: ^0.1.0
   flutter_html: ^3.0.0
   flutter_html_table: ^3.0.0
   flutter_image_compress: ^2.5.1

@@ -462,7 +462,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get enter_message => 'Enter message...';
 	String get clear_message_title => 'Clear Messages';
 	String get clear_message_description => 'This will clear all messages and start a new chat. Are you sure?';
-	String get error_chatgpt_response => 'Request failed or rate-limited. Try again shortly or check your usage limits.';
 	String get pick_file => 'Pick File';
 	String get open_url => 'Open URL';
 	String get catalogs => 'Catalogs';
@@ -488,9 +487,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get saved_tags => 'Tags saved.';
 	String structured_content_first({required Object i}) => '${i} definitions are unsupported and were omitted.';
 	String get structured_content_second => 'Consider a non-structured content version of this dictionary.';
-	String get missing_api_key => 'API key not provided';
-	String get chatgpt_error => 'There was an error in getting a response from ChatGPT.';
-	String get api_key => 'API Key';
 	String subtitle_delay_set({required Object ms}) => 'Subtitle delay set to ${ms} ms.';
 	String get cancel => 'Cancel';
 	String get server_port_in_use => 'Local server port already in use';
@@ -883,7 +879,6 @@ extension on _StringsEn {
 			case 'enter_message': return 'Enter message...';
 			case 'clear_message_title': return 'Clear Messages';
 			case 'clear_message_description': return 'This will clear all messages and start a new chat. Are you sure?';
-			case 'error_chatgpt_response': return 'Request failed or rate-limited. Try again shortly or check your usage limits.';
 			case 'pick_file': return 'Pick File';
 			case 'open_url': return 'Open URL';
 			case 'catalogs': return 'Catalogs';
@@ -909,9 +904,6 @@ extension on _StringsEn {
 			case 'saved_tags': return 'Tags saved.';
 			case 'structured_content_first': return ({required Object i}) => '${i} definitions are unsupported and were omitted.';
 			case 'structured_content_second': return 'Consider a non-structured content version of this dictionary.';
-			case 'missing_api_key': return 'API key not provided';
-			case 'chatgpt_error': return 'There was an error in getting a response from ChatGPT.';
-			case 'api_key': return 'API Key';
 			case 'subtitle_delay_set': return ({required Object ms}) => 'Subtitle delay set to ${ms} ms.';
 			case 'cancel': return 'Cancel';
 			case 'server_port_in_use': return 'Local server port already in use';

@@ -62,14 +62,14 @@ at the constraint itself:
 | `dependency_validator` | removed | Needs analyzer < 13, `dart_mappable_builder` needs ^13 | Same |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 
-`dependency_overrides` holds three entries, each documented in `pubspec.yaml`:
-`mecab_dart` breaks a constraint collision with a dormant package, `mime`
-reconciles `local_assets_server` with `share_plus` 13, and
+`dependency_overrides` holds four entries for three reasons, each documented in
+`pubspec.yaml`: `mecab_dart` breaks a constraint collision with a dormant
+package, `mime` reconciles `local_assets_server` with `share_plus` 13, and
 `freezed_annotation`/`gap` exist only to satisfy the `spaces` fork.
 
 ## Known debt
 
-- **`spaces`** is imported in 69 files and is a dead package pinned to a
+- **`spaces`** is imported in 46 files and is a dead package pinned to a
   third-party git ref, declaring `flutter: ">=2.0.0 <3.0.0"`. It is the sole
   reason for the `freezed_annotation` and `gap` overrides. Its API is thin
   (`SpacedColumn`, `Space.*`) and maps onto `Gap`/`SizedBox`. Biggest single
@@ -79,8 +79,11 @@ reconciles `local_assets_server` with `share_plus` 13, and
   which is how `material_floating_search_bar` became a problem when its upstream
   was deleted. Mirror or vendor them.
 - **`change_notifier_builder`** is discontinued (-> `multi_listenable_builder`).
-- 95 `flutter_lints` 6 style infos on pre-existing code (`unnecessary_underscores`,
-  `use_build_context_synchronously`, ...). No deprecations remain.
+- 82 style infos on pre-existing code, from `flutter_lints` 6 and the analyzer's
+  own set: `unnecessary_underscores` (25), `avoid_redundant_argument_values`
+  (17), `strict_top_level_inference` (12), `avoid_types_on_closure_parameters`
+  (12), `use_null_aware_elements` (10), `use_build_context_synchronously` (3),
+  `unnecessary_to_list_in_spreads` (3). No errors, no warnings, no deprecations.
 
 ## Not verified on device
 

@@ -137,11 +137,6 @@ class ReaderTtuSource extends ReaderMediaSource {
     required AppModel appModel,
   }) {
     return [
-      buildTweaksButton(
-        context: context,
-        ref: ref,
-        appModel: appModel,
-      ),
       buildSettingsButton(
         context: context,
         ref: ref,
@@ -207,26 +202,6 @@ class ReaderTtuSource extends ReaderMediaSource {
               canDelete: false,
               canEdit: true,
             ),
-          );
-        },
-      ),
-    );
-  }
-
-  /// Tweaks bar action.
-  Widget buildTweaksButton(
-      {required BuildContext context,
-      required WidgetRef ref,
-      required AppModel appModel}) {
-    return FloatingSearchBarAction(
-      child: JidoujishoIconButton(
-        size: Theme.of(context).textTheme.titleLarge?.fontSize,
-        tooltip: t.tweaks,
-        icon: Icons.tune,
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => const TtuSettingsDialogPage(),
           );
         },
       ),

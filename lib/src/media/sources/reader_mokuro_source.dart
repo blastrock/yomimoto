@@ -92,31 +92,10 @@ class ReaderMokuroSource extends ReaderMediaSource {
     required AppModel appModel,
   }) {
     return [
-      buildTweaksButton(context: context, ref: ref, appModel: appModel),
       buildCatalogButton(context: context, ref: ref, appModel: appModel),
       buildOpenLinkButton(context: context, ref: ref, appModel: appModel),
       buildPickFileButton(context: context, ref: ref, appModel: appModel),
     ];
-  }
-
-  /// Tweaks bar action.
-  Widget buildTweaksButton(
-      {required BuildContext context,
-      required WidgetRef ref,
-      required AppModel appModel}) {
-    return FloatingSearchBarAction(
-      child: JidoujishoIconButton(
-        size: Theme.of(context).textTheme.titleLarge?.fontSize,
-        tooltip: t.tweaks,
-        icon: Icons.tune,
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => const MokuroSettingsDialogPage(),
-          );
-        },
-      ),
-    );
   }
 
   /// Menu bar action.

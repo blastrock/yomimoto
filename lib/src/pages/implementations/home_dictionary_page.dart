@@ -123,7 +123,6 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
         buildBackButton(),
       ],
       actions: [
-        buildDictionarySettingsButton(),
         buildClearButton(),
         buildSearchClearButton(),
         buildSearchButton(),
@@ -276,30 +275,6 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
         tooltip: t.clear_search_title,
         icon: Icons.manage_search,
         onTap: showDeleteSearchHistoryPrompt,
-      ),
-    );
-  }
-
-  /// Dictionary settings bar action.
-  Widget buildDictionarySettingsButton() {
-    return FloatingSearchBarAction(
-      showIfOpened: true,
-      child: JidoujishoIconButton(
-        size: Theme.of(context).textTheme.titleLarge?.fontSize,
-        tooltip: t.dictionary_settings,
-        icon: Icons.settings,
-        onTap: () async {
-          double oldFontSize = appModel.dictionaryFontSize;
-
-          await showDialog(
-            context: context,
-            builder: (context) => const DictionarySettingsDialogPage(),
-          );
-
-          if (appModel.dictionaryFontSize != oldFontSize) {
-            appModel.refresh();
-          }
-        },
       ),
     );
   }

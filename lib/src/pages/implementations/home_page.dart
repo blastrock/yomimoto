@@ -1,7 +1,6 @@
 import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:spaces/spaces.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -195,7 +194,7 @@ class _HomePageState extends BasePageState<HomePage>
   List<Widget> buildActions() {
     return [
       buildCreatorButton(),
-      buildShowMenuButton(),
+      buildSettingsButton(),
     ];
   }
 
@@ -219,146 +218,17 @@ class _HomePageState extends BasePageState<HomePage>
     );
   }
 
-  Widget buildShowMenuButton() {
-    return PopupMenuButton<VoidCallback>(
-      splashRadius: 20,
-      padding: EdgeInsets.zero,
-      tooltip: t.show_menu,
-      icon: Icon(
-        Icons.more_vert,
-        color: theme.iconTheme.color,
-        size: 24,
-      ),
-      color: Theme.of(context).popupMenuTheme.color,
-      onSelected: (value) => value(),
-      itemBuilder: (context) => getMenuItems(),
-    );
-  }
-
-  PopupMenuItem<VoidCallback> buildPopupItem({
-    required String label,
-    required Function() action,
-    IconData? icon,
-    Color? color,
-  }) {
-    return PopupMenuItem<VoidCallback>(
-      value: action,
-      child: Row(
-        children: [
-          if (icon != null)
-            Icon(
-              icon,
-              size: textTheme.bodyMedium?.fontSize,
-              color: color,
-            ),
-          if (icon != null) const Space.normal(),
-          Text(
-            label,
-            style: TextStyle(color: color),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void resumeAction() {}
-
-  void openMenu(TapDownDetails details) async {
-    RelativeRect position = RelativeRect.fromLTRB(
-        details.globalPosition.dx, details.globalPosition.dy, 0, 0);
-    Function()? selectedAction = await showMenu(
-      context: context,
-      position: position,
-      items: getMenuItems(),
-    );
-
-    selectedAction?.call();
-
-    if (selectedAction == null) {
-      Future.delayed(const Duration(milliseconds: 50), () {
-        FocusScope.of(context).unfocus();
-      });
-    }
-  }
-
-  void browseToGithub() async {
-    launchUrl(
-      Uri.parse('https://github.com/arianneorpilla/jidoujisho'),
-      mode: LaunchMode.externalApplication,
-    );
-  }
-
-  void navigateToLicensePage() async {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => Theme(
-          data: theme.copyWith(
-            cardColor: theme.colorScheme.surface,
-          ),
-          child: LicensePage(
-            applicationName: appModel.packageInfo.appName,
-            applicationVersion: appModel.packageInfo.version,
-            applicationLegalese: t.legalese,
-            applicationIcon: Padding(
-              padding: Spacing.of(context).insets.all.normal,
-              child: Image.asset(
-                'assets/meta/icon.png',
-                height: 128,
-                width: 128,
-              ),
-            ),
-          ),
+  Widget buildSettingsButton() {
+    return JidoujishoIconButton(
+      tooltip: t.settings,
+      icon: Icons.settings_outlined,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (context) => const SettingsPage(),
         ),
       ),
     );
   }
 
-  List<PopupMenuItem<VoidCallback>> getMenuItems() {
-    return [
-      buildPopupItem(
-        label:
-            appModel.isDarkMode ? t.options_theme_light : t.options_theme_dark,
-        icon: appModel.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-        action: appModel.toggleDarkMode,
-      ),
-      // if ((appModel.androidDeviceInfo.version.sdkInt ?? 0) >= 33)
-      //   buildPopupItem(
-      //     label: optionsPipMode,
-      //     icon: Icons.picture_in_picture,
-      //     action: () {
-      //       appModel.usePictureInPicture(ref: ref);
-      //     },
-      //   ),
-      buildPopupItem(
-        label: t.options_dictionaries,
-        icon: Icons.auto_stories_rounded,
-        action: appModel.showDictionaryMenu,
-      ),
-      buildPopupItem(
-        label: t.options_enhancements,
-        icon: Icons.auto_fix_high,
-        action: appModel.openCreatorEnhancementsEditor,
-      ),
-      buildPopupItem(
-        label: t.options_language,
-        icon: Icons.translate,
-        action: appModel.showLanguageMenu,
-      ),
-      buildPopupItem(
-        label: t.options_profiles,
-        icon: Icons.switch_account,
-        action: appModel.showProfilesMenu,
-      ),
-      buildPopupItem(
-        label: t.options_github,
-        icon: Icons.code,
-        action: browseToGithub,
-      ),
-      buildPopupItem(
-        label: t.options_attribution,
-        icon: Icons.info,
-        action: navigateToLicensePage,
-      ),
-    ];
-  }
+  void resumeAction() {}
 }

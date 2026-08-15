@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 288
+/// Strings: 286
 ///
-/// Built on 2026-08-15 at 11:29 UTC
+/// Built on 2026-08-15 at 16:57 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -153,7 +153,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get search => 'Search';
 	String get search_ellipsis => 'Search...';
 	String get show_more => 'Show More';
-	String get show_menu => 'Show Menu';
 	String get stash => 'Stash';
 	String get pick_image => 'Pick Image';
 	String get undo => 'Undo';
@@ -202,8 +201,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get catalog_delete_confirmation => 'This catalog will be deleted. Are you sure you want to do this?';
 	String get dictionaries_deleting_data => 'Deleting dictionary data...';
 	String get dictionaries_menu_empty => 'Import a dictionary for use';
-	String get options_theme_light => 'Use light theme';
-	String get options_theme_dark => 'Use dark theme';
 	String get options_incognito_on => 'Turn on incognito mode';
 	String get options_incognito_off => 'Turn off incognito mode';
 	String get options_dictionaries => 'Manage dictionaries';
@@ -360,15 +357,16 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get connect_disconnect => 'Connect/Disconnect';
 	String get use_slow_import => 'Slow import (use if failing)';
 	String get settings => 'Settings';
+	String get settings_appearance => 'Appearance';
+	String get settings_dark_theme => 'Dark theme';
+	String get settings_about => 'About';
 	String get manager => 'Manager';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
 	String get volume_button_turning_speed => 'Continuous scrolling speed';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
-	String get tweaks => 'Tweaks';
 	String get unit_milliseconds => 'ms';
 	String get unit_pixels => 'px';
-	String get dictionary_settings => 'Dictionary Settings';
 	String get auto_search => 'Auto search';
 	String get auto_search_debounce_delay => 'Auto search debounce delay';
 	String get dictionary_font_size => 'Dictionary font size';
@@ -473,7 +471,6 @@ extension on Translations {
 			case 'search': return 'Search';
 			case 'search_ellipsis': return 'Search...';
 			case 'show_more': return 'Show More';
-			case 'show_menu': return 'Show Menu';
 			case 'stash': return 'Stash';
 			case 'pick_image': return 'Pick Image';
 			case 'undo': return 'Undo';
@@ -522,8 +519,6 @@ extension on Translations {
 			case 'catalog_delete_confirmation': return 'This catalog will be deleted. Are you sure you want to do this?';
 			case 'dictionaries_deleting_data': return 'Deleting dictionary data...';
 			case 'dictionaries_menu_empty': return 'Import a dictionary for use';
-			case 'options_theme_light': return 'Use light theme';
-			case 'options_theme_dark': return 'Use dark theme';
 			case 'options_incognito_on': return 'Turn on incognito mode';
 			case 'options_incognito_off': return 'Turn off incognito mode';
 			case 'options_dictionaries': return 'Manage dictionaries';
@@ -680,15 +675,16 @@ extension on Translations {
 			case 'connect_disconnect': return 'Connect/Disconnect';
 			case 'use_slow_import': return 'Slow import (use if failing)';
 			case 'settings': return 'Settings';
+			case 'settings_appearance': return 'Appearance';
+			case 'settings_dark_theme': return 'Dark theme';
+			case 'settings_about': return 'About';
 			case 'manager': return 'Manager';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
 			case 'volume_button_turning_speed': return 'Continuous scrolling speed';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';
-			case 'tweaks': return 'Tweaks';
 			case 'unit_milliseconds': return 'ms';
 			case 'unit_pixels': return 'px';
-			case 'dictionary_settings': return 'Dictionary Settings';
 			case 'auto_search': return 'Auto search';
 			case 'auto_search_debounce_delay': return 'Auto search debounce delay';
 			case 'dictionary_font_size': return 'Dictionary font size';

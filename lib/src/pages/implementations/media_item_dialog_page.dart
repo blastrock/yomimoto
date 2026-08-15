@@ -125,8 +125,6 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
       return t.dialog_play;
     } else if (mediaType == ReaderMediaType.instance) {
       return t.dialog_read;
-    } else if (mediaType == ViewerMediaType.instance) {
-      return t.dialog_view;
     } else {
       throw UnimplementedError('Media type launch label unimplemented');
     }

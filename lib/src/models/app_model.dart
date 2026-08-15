@@ -778,9 +778,6 @@ class AppModel with ChangeNotifier {
         ReaderClipboardSource.instance,
         ReaderWebsocketSource.instance,
       ],
-      ViewerMediaType.instance: [
-        ViewerCameraSource.instance,
-      ],
       DictionaryMediaType.instance: [],
     };
 

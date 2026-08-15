@@ -149,7 +149,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get dictionary_media_type => 'Dictionary';
 	String get player_media_type => 'Player';
 	String get reader_media_type => 'Reader';
-	String get viewer_media_type => 'Viewer';
 	String get back => 'Back';
 	String get search => 'Search';
 	String get search_ellipsis => 'Search...';
@@ -175,7 +174,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get app_locale_warning => 'Community addons and enhancements are managed by their respective developers, and these may appear in their original language.';
 	String get dialog_play => 'PLAY';
 	String get dialog_read => 'READ';
-	String get dialog_view => 'VIEW';
 	String get dialog_edit => 'EDIT';
 	String get dialog_export => 'EXPORT';
 	String get dialog_import => 'IMPORT';
@@ -578,7 +576,6 @@ extension on _StringsEn {
 			case 'dictionary_media_type': return 'Dictionary';
 			case 'player_media_type': return 'Player';
 			case 'reader_media_type': return 'Reader';
-			case 'viewer_media_type': return 'Viewer';
 			case 'back': return 'Back';
 			case 'search': return 'Search';
 			case 'search_ellipsis': return 'Search...';
@@ -604,7 +601,6 @@ extension on _StringsEn {
 			case 'app_locale_warning': return 'Community addons and enhancements are managed by their respective developers, and these may appear in their original language.';
 			case 'dialog_play': return 'PLAY';
 			case 'dialog_read': return 'READ';
-			case 'dialog_view': return 'VIEW';
 			case 'dialog_edit': return 'EDIT';
 			case 'dialog_export': return 'EXPORT';
 			case 'dialog_import': return 'IMPORT';

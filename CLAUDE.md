@@ -102,8 +102,8 @@ freely, the `uniqueKey` cannot.
 
 | Abstraction | Registered in | Concrete implementations |
 |---|---|---|
-| `MediaType` | `AppModel.populateMediaTypes` | `NovelMediaType`, `MangaMediaType`, `DictionaryMediaType` — these three *are* the bottom nav tabs, in order |
-| `MediaSource` | `AppModel.populateMediaSources` | `ReaderTtuSource` (novels), `ReaderMokuroSource` (manga) — at most one per media type, reached via `MediaType.source` |
+| `HomeTab` | `AppModel.populateTabs` | `NovelTab`, `MangaTab`, `DictionaryTab` — these three *are* the bottom nav tabs, in order |
+| `MediaSource` | `AppModel.populateMediaSources` | `ReaderTtuSource` (novels), `ReaderMokuroSource` (manga) — at most one per home tab, reached via `HomeTab.source` |
 | `Language` | `AppModel.populateLanguages` | `JapaneseLanguage`, `EnglishLanguage` |
 | `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat`, `AbbyyLingvoFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |
@@ -112,7 +112,7 @@ freely, the `uniqueKey` cannot.
 
 To add or remove any of these, edit the corresponding `populate*` list in
 `lib/src/models/app_model.dart` — that is the single registry. Registration
-order is meaningful for media types (tab order) and for defaults elsewhere.
+order is meaningful for home tabs (tab order) and for defaults elsewhere.
 
 ### `AppModel`
 
@@ -166,7 +166,7 @@ Reusable widgets are `lib/src/utils/components/jidoujisho_*.dart`.
 `lib/i18n/strings.i18n.json`; `lib/i18n/strings.g.dart` is **generated — never
 edit it**. Regenerate with `dart run slang`. Access is the global `t` (exported
 via `utils.dart`), e.g. `t.options_attribution`, and `t[key]` for dynamic keys
-like a media type's `uniqueKey`. Only `en-US` exists; upstream's Crowdin
+like a home tab's `uniqueKey`. Only `en-US` exists; upstream's Crowdin
 translations are gone.
 
 ### Reader internals

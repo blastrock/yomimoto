@@ -63,7 +63,7 @@ class MediaItem {
   /// or a book.
   String title;
 
-  /// The media type where this item is from.
+  /// The home tab where this item is from.
   @Index(type: IndexType.hash)
   String mediaTypeIdentifier;
 
@@ -130,9 +130,9 @@ class MediaItem {
     return encoder.convert(this);
   }
 
-  /// Get the [MediaType] from a [MediaItem] from its serialised identifier.
-  MediaType getMediaType({required AppModel appModel}) {
-    return appModel.mediaTypes[mediaTypeIdentifier]!;
+  /// Get the [HomeTab] from a [MediaItem] from its serialised identifier.
+  HomeTab getHomeTab({required AppModel appModel}) {
+    return appModel.tabs[mediaTypeIdentifier]!;
   }
 
   /// Get the [MediaSource] from a [MediaItem] from its serialised identifier.

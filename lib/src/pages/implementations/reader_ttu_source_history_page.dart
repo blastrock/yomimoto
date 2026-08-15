@@ -27,7 +27,7 @@ class ReaderTtuSourceHistoryPage extends HistoryReaderPage {
 class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
     extends HistoryReaderPageState {
   @override
-  MediaType get mediaType => mediaSource.mediaType;
+  HomeTab get homeTab => mediaSource.homeTab;
 
   @override
   ReaderTtuSource get mediaSource => ReaderTtuSource.instance;

@@ -74,7 +74,7 @@ final List<Field> globalFields = List<Field>.unmodifiable(
   ],
 );
 
-/// A list of media types that the app will support at runtime.
+/// A list of home tabs that the app will support at runtime.
 final Map<String, Field> fieldsByKey = Map.unmodifiable(
   Map<String, Field>.fromEntries(
     globalFields.map(
@@ -237,9 +237,9 @@ class AppModel with ChangeNotifier {
   /// performance. Initialised with [populateDictionaryFormats] at startup.
   late final Map<String, DictionaryFormat> dictionaryFormats;
 
-  /// Used to fetch a media type by its unique key with constant time
-  /// performance. Initialised with [populateMediaTypes] at startup.
-  late final Map<String, MediaType> mediaTypes;
+  /// Used to fetch a home tab by its unique key with constant time
+  /// performance. Initialised with [populateTabs] at startup.
+  late final Map<String, HomeTab> tabs;
 
   /// Used to fetch initialised fields by their unique key with constant
   /// time performance. Initialised with [populateEnhancements] at startup.
@@ -556,8 +556,8 @@ class AppModel with ChangeNotifier {
     if (isMediaOpen) {
       return _currentMediaSource!.currentSentence;
     } else {
-      MediaType mediaType = mediaTypes.values.toList()[currentHomeTabIndex];
-      MediaSource? mediaSource = _currentMediaSource ?? mediaType.source;
+      HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
+      MediaSource? mediaSource = _currentMediaSource ?? homeTab.source;
 
       return mediaSource?.currentSentence ?? JidoujishoTextSelection(text: '');
     }
@@ -677,21 +677,21 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// Populate maps for media types at startup to optimise performance.
-  void populateMediaTypes() async {
-    /// A list of media types that the app will support at runtime.
-    final List<MediaType> availableMediaTypes = List<MediaType>.unmodifiable(
+  /// Populate maps for home tabs at startup to optimise performance.
+  void populateTabs() async {
+    /// A list of home tabs that the app will support at runtime.
+    final List<HomeTab> availableTabs = List<HomeTab>.unmodifiable(
       [
-        NovelMediaType.instance,
-        MangaMediaType.instance,
-        DictionaryMediaType.instance,
+        NovelTab.instance,
+        MangaTab.instance,
+        DictionaryTab.instance,
       ],
     );
 
-    mediaTypes = Map<String, MediaType>.unmodifiable(
-      Map<String, MediaType>.fromEntries(
-        availableMediaTypes.map(
-          (mediaType) => MapEntry(mediaType.uniqueKey, mediaType),
+    tabs = Map<String, HomeTab>.unmodifiable(
+      Map<String, HomeTab>.fromEntries(
+        availableTabs.map(
+          (homeTab) => MapEntry(homeTab.uniqueKey, homeTab),
         ),
       ),
     );
@@ -1071,7 +1071,7 @@ class AppModel with ChangeNotifier {
     /// This is not the initialisation step, which occurs below.
     populateLanguages();
     populateLocales();
-    populateMediaTypes();
+    populateTabs();
     populateMediaSources();
     populateDictionaryFormats();
     populateEnhancements();
@@ -1264,7 +1264,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Get the current home tab index. The order of the tab indexes are based on
-  /// the ordering in [mediaTypes].
+  /// the ordering in [tabs].
   int get currentHomeTabIndex =>
       _preferences.get('current_home_tab_index', defaultValue: 0);
 
@@ -2381,8 +2381,8 @@ class AppModel with ChangeNotifier {
       ref: ref,
     );
 
-    mediaSource.mediaType.refreshTab();
-    DictionaryMediaType.instance.refreshTab();
+    mediaSource.homeTab.refreshTab();
+    DictionaryTab.instance.refreshTab();
 
     if (_shouldKillMediaOnPop) {
       shutdown();
@@ -2955,11 +2955,11 @@ class AppModel with ChangeNotifier {
     }
   }
 
-  /// Get the history of [MediaItem] for a particular [MediaType].
-  List<MediaItem> getMediaTypeHistory({required MediaType mediaType}) {
+  /// Get the history of [MediaItem] for a particular [HomeTab].
+  List<MediaItem> getHomeTabHistory({required HomeTab homeTab}) {
     return _database.mediaItems
         .filter()
-        .mediaTypeIdentifierEqualTo(mediaType.uniqueKey)
+        .mediaTypeIdentifierEqualTo(homeTab.uniqueKey)
         .findAllSync();
   }
 
@@ -2972,8 +2972,8 @@ class AppModel with ChangeNotifier {
   }
 
   /// Returns the last navigated directory the user used for picking a file for a
-  /// certain media type.
-  Directory? getLastPickedDirectory(MediaType type) {
+  /// certain home tab.
+  Directory? getLastPickedDirectory(HomeTab type) {
     String path = _preferences.get('${type.uniqueKey}/last_picked_file',
         defaultValue: '');
     if (path.isEmpty) {
@@ -2988,19 +2988,19 @@ class AppModel with ChangeNotifier {
   }
 
   /// Returns the last navigated directory the user used for picking a file for a
-  /// certain media type.
+  /// certain home tab.
   void setLastPickedDirectory({
-    required MediaType type,
+    required HomeTab type,
     required Directory directory,
   }) {
     _preferences.put('${type.uniqueKey}/last_picked_file', directory.path);
   }
 
   /// Returns valid file picker directories. If there is a last picked directory for
-  /// a media type, this will be included as first on the list. Otherwise, external
+  /// a home tab, this will be included as first on the list. Otherwise, external
   /// root directories will be included.
-  Future<List<Directory>> getFilePickerDirectoriesForMediaType(
-      MediaType type) async {
+  Future<List<Directory>> getFilePickerDirectoriesForHomeTab(
+      HomeTab type) async {
     List<Directory> directories = [];
     Directory? lastPickedDirectory = getLastPickedDirectory(type);
     if (lastPickedDirectory != null) {
@@ -3104,11 +3104,11 @@ class AppModel with ChangeNotifier {
 
   /// Adds a [DictionarySearchResult] to dictionary history.
   void addToDictionaryHistory({required DictionarySearchResult result}) async {
-    MediaType mediaType = mediaTypes.values.toList()[currentHomeTabIndex];
-    if (mediaType != DictionaryMediaType.instance) {
+    HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
+    if (homeTab != DictionaryTab.instance) {
       shouldRefreshTabs = true;
       ScrollController scrollController =
-          DictionaryMediaType.instance.scrollController;
+          DictionaryTab.instance.scrollController;
       if (scrollController.hasClients) {
         scrollController.jumpTo(0);
       }

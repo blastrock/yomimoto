@@ -4,7 +4,7 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
-/// A template for a single media type's tab body content in the main menu.
+/// A template for a single home tab's body content in the main menu.
 /// Has a floating search bar which can be customised depending on the
 /// current selected media source.
 abstract class BaseTabPage extends BasePage {
@@ -24,7 +24,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
   @override
   void initState() {
     super.initState();
-    mediaType.tabRefreshNotifier.addListener(refresh);
+    homeTab.tabRefreshNotifier.addListener(refresh);
   }
 
   /// Refresh this tab.
@@ -40,13 +40,13 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
     ]);
   }
 
-  /// Each tab in the home page represents a media type.
-  MediaType get mediaType;
+  /// Each tab in the home page is a [HomeTab].
+  HomeTab get homeTab;
 
-  /// The media source backing this tab. Only valid for a [mediaType] that
+  /// The media source backing this tab. Only valid for a [homeTab] that
   /// hosts one -- the dictionary tab has no source, and overrides every member
   /// that reads this.
-  MediaSource get mediaSource => mediaType.source!;
+  MediaSource get mediaSource => homeTab.source!;
 
   /// Whether or not the search bar is currently in focus.
   bool _isSearchBarFocused = false;
@@ -58,7 +58,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
     return FloatingSearchBar(
           isScrollControlled: true,
           hint: mediaSource.getLocalisedSourceName(appModel),
-          controller: mediaType.floatingSearchBarController,
+          controller: homeTab.floatingSearchBarController,
           builder: (_, __) => const SizedBox.shrink(),
           borderRadius: BorderRadius.zero,
           elevation: 0,
@@ -92,7 +92,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
     _isSearchBarFocused = focused;
 
     if (!_isSearchBarFocused) {
-      mediaType.floatingSearchBarController.close();
+      homeTab.floatingSearchBarController.close();
       setState(() {});
     } else {
       if (!mediaSource.implementsSearch) {
@@ -102,8 +102,8 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
           ref: ref,
           appModel: appModel,
         );
-        mediaType.floatingSearchBarController.clear();
-        mediaType.floatingSearchBarController.close();
+        homeTab.floatingSearchBarController.clear();
+        homeTab.floatingSearchBarController.close();
         setState(() {});
         focusScope.unfocus();
       }
@@ -137,7 +137,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
         tooltip: t.back,
         icon: Icons.arrow_back,
         onTap: () {
-          mediaType.floatingSearchBarController.close();
+          homeTab.floatingSearchBarController.close();
         },
       ),
     );

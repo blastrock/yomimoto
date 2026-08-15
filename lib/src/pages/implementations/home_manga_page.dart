@@ -12,5 +12,5 @@ class HomeMangaPage extends BaseTabPage {
 
 class _HomeMangaPageState<T extends BaseTabPage> extends BaseTabPageState {
   @override
-  MediaType get mediaType => MangaMediaType.instance;
+  HomeTab get homeTab => MangaTab.instance;
 }

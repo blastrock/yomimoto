@@ -3,7 +3,7 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
-/// A template for a single media type's history body content in the main menu
+/// A template for a single home tab's history body content in the main menu
 /// given a selected media source.
 abstract class BaseHistoryPage extends BasePage {
   /// Create an instance of this tab page.
@@ -20,14 +20,14 @@ abstract class BaseHistoryPage extends BasePage {
 /// code.
 abstract class BaseHistoryPageState<T extends BaseHistoryPage>
     extends BasePageState<T> {
-  /// Each tab in the home page represents a media type.
-  MediaType get mediaType;
+  /// Each tab in the home page is a [HomeTab].
+  HomeTab get homeTab;
 
-  /// Get the active media source for the current media type.
+  /// Get the media source for the current home tab.
   MediaSource get mediaSource;
 
   /// This variable is true when the [buildPlaceholder] should be shown.
-  /// For example, if a certain media type does not have any media items to
+  /// For example, if a certain home tab does not have any media items to
   /// show in its history.
   bool get shouldPlaceholderBeShown => true;
 
@@ -46,7 +46,7 @@ abstract class BaseHistoryPageState<T extends BaseHistoryPage>
   Widget buildPlaceholder() {
     return Center(
       child: JidoujishoPlaceholderMessage(
-        icon: mediaType.outlinedIcon,
+        icon: homeTab.outlinedIcon,
         message: t.info_empty_home_tab,
       ),
     );

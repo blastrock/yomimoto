@@ -283,7 +283,7 @@ class _DictionaryDialogPageState extends BasePageState {
         bottom: Spacing.of(context).spaces.normal,
       ),
       child: JidoujishoPlaceholderMessage(
-        icon: DictionaryMediaType.instance.outlinedIcon,
+        icon: DictionaryTab.instance.outlinedIcon,
         message: t.dictionaries_menu_empty,
       ),
     );

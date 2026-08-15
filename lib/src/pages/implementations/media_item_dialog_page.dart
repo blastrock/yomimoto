@@ -120,11 +120,11 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
       ];
 
   String get launchLabel {
-    MediaType mediaType = widget.item.getMediaType(appModel: appModel);
-    if (mediaType is ReaderMediaType) {
+    HomeTab homeTab = widget.item.getHomeTab(appModel: appModel);
+    if (homeTab is ReaderTab) {
       return t.dialog_read;
     } else {
-      throw UnimplementedError('Media type launch label unimplemented');
+      throw UnimplementedError('Home tab launch label unimplemented');
     }
   }
 

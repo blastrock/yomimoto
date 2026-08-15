@@ -19,7 +19,7 @@ class HomeDictionaryPage extends BaseTabPage {
 
 class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   @override
-  MediaType get mediaType => DictionaryMediaType.instance;
+  HomeTab get homeTab => DictionaryTab.instance;
 
   DictionarySearchResult? _result;
 
@@ -31,10 +31,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     super.initState();
     appModelNoUpdate.dictionarySearchAgainNotifier.addListener(searchAgain);
     appModelNoUpdate.dictionaryEntriesNotifier.addListener(() {
-      if (mediaType.floatingSearchBarController.isClosed) {
+      if (homeTab.floatingSearchBarController.isClosed) {
         if (!appModel.isMediaOpen &&
-            DictionaryMediaType.instance ==
-                appModel.mediaTypes.values
+            DictionaryTab.instance ==
+                appModel.tabs.values
                     .toList()[appModel.currentHomeTabIndex]) {
           if (mounted) {
             setState(() {});
@@ -66,7 +66,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   Widget buildPlaceholder() {
     return Center(
       child: JidoujishoPlaceholderMessage(
-        icon: mediaType.outlinedIcon,
+        icon: homeTab.outlinedIcon,
         message: t.info_empty_home_tab,
       ),
     );
@@ -76,7 +76,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     return RawScrollbar(
       thumbVisibility: true,
       thickness: 3,
-      controller: DictionaryMediaType.instance.scrollController,
+      controller: DictionaryTab.instance.scrollController,
       child: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: Spacing.of(context).spaces.normal,
@@ -98,7 +98,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     return FloatingSearchBar(
       isScrollControlled: true,
       hint: t.search_ellipsis,
-      controller: mediaType.floatingSearchBarController,
+      controller: homeTab.floatingSearchBarController,
       builder: buildFloatingSearchBody,
       borderRadius: BorderRadius.zero,
       elevation: 0,
@@ -132,8 +132,8 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
 
   @override
   void onFocusChanged({required bool focused}) async {
-    if (mediaType.floatingSearchBarController.isOpen != _lastOpenedState) {
-      _lastOpenedState = mediaType.floatingSearchBarController.isOpen;
+    if (homeTab.floatingSearchBarController.isOpen != _lastOpenedState) {
+      _lastOpenedState = homeTab.floatingSearchBarController.isOpen;
       if (!_lastOpenedState) {
         setState(() {});
       }
@@ -142,7 +142,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
 
   void searchAgain() {
     _result = null;
-    search(mediaType.floatingSearchBarController.query);
+    search(homeTab.floatingSearchBarController.query);
   }
 
   Duration get historyDelay => const Duration(milliseconds: 500);
@@ -186,7 +186,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       );
     } finally {
       if (_result != null) {
-        if (query == mediaType.floatingSearchBarController.query) {
+        if (query == homeTab.floatingSearchBarController.query) {
           if (mounted) {
             setState(() {
               _isSearching = false;
@@ -194,10 +194,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
             });
           }
           Future.delayed(historyDelay, () async {
-            if (query == mediaType.floatingSearchBarController.query) {
+            if (query == homeTab.floatingSearchBarController.query) {
               appModel.addToSearchHistory(
-                historyKey: mediaType.uniqueKey,
-                searchTerm: mediaType.floatingSearchBarController.query,
+                historyKey: homeTab.uniqueKey,
+                searchTerm: homeTab.floatingSearchBarController.query,
               );
               if (_result!.headings.isNotEmpty) {
                 appModel.addToDictionaryHistory(result: _result!);
@@ -295,8 +295,8 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
           ),
           onPressed: () async {
             appModel.clearSearchHistory(
-                historyKey: DictionaryMediaType.instance.uniqueKey);
-            mediaType.floatingSearchBarController.clear();
+                historyKey: DictionaryTab.instance.uniqueKey);
+            homeTab.floatingSearchBarController.clear();
 
             setState(() {});
             Navigator.pop(context);
@@ -356,15 +356,15 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     if (appModel.dictionaries.isEmpty) {
       return buildImportDictionariesPlaceholderMessage();
     }
-    if (mediaType.floatingSearchBarController.query.isEmpty) {
-      if (appModel.getSearchHistory(historyKey: mediaType.uniqueKey).isEmpty) {
+    if (homeTab.floatingSearchBarController.query.isEmpty) {
+      if (appModel.getSearchHistory(historyKey: homeTab.uniqueKey).isEmpty) {
         return buildEnterSearchTermPlaceholderMessage();
       } else {
         return JidoujishoSearchHistory(
-          uniqueKey: mediaType.uniqueKey,
+          uniqueKey: homeTab.uniqueKey,
           onSearchTermSelect: (searchTerm) {
             setState(() {
-              mediaType.floatingSearchBarController.query = searchTerm;
+              homeTab.floatingSearchBarController.query = searchTerm;
               search(searchTerm);
               FocusManager.instance.primaryFocus?.unfocus();
             });
@@ -415,7 +415,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                 ? null
                 : () async {
                     search(
-                      mediaType.floatingSearchBarController.query,
+                      homeTab.floatingSearchBarController.query,
                       overrideMaximumTerms:
                           _result!.headingIds.length + appModel.maximumTerms,
                     );
@@ -455,7 +455,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   Widget buildImportDictionariesPlaceholderMessage() {
     return Center(
       child: JidoujishoPlaceholderMessage(
-        icon: mediaType.outlinedIcon,
+        icon: homeTab.outlinedIcon,
         message: t.dictionaries_menu_empty,
       ),
     );

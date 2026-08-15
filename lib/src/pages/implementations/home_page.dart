@@ -20,7 +20,7 @@ class HomePage extends BasePage {
 
 class _HomePageState extends BasePageState<HomePage>
     with WidgetsBindingObserver {
-  late final List<Widget> mediaTypeBodies;
+  late final List<Widget> tabBodies;
   late final List<BottomNavigationBarItem> navBarItems;
 
   String get appName => appModel.packageInfo.appName;
@@ -36,16 +36,16 @@ class _HomePageState extends BasePageState<HomePage>
     appModelNoUpdate.databaseCloseNotifier.addListener(refresh);
 
     /// Populate and define the tabs and their respective content bodies based
-    /// on the media types specified and ordered by [AppModel]. As [ref.watch]
+    /// on the home tabs specified and ordered by [AppModel]. As [ref.watch]
     /// cannot be used here, [ref.read] is used instead, via [appModelNoUpdate].
-    mediaTypeBodies = List.unmodifiable(
-        appModelNoUpdate.mediaTypes.values.map((mediaType) => mediaType.home));
+    tabBodies = List.unmodifiable(
+        appModelNoUpdate.tabs.values.map((homeTab) => homeTab.home));
     navBarItems = List.unmodifiable(
-      appModelNoUpdate.mediaTypes.values.map(
-        (mediaType) => BottomNavigationBarItem(
-          activeIcon: Icon(mediaType.icon),
-          icon: Icon(mediaType.outlinedIcon),
-          label: t[mediaType.uniqueKey],
+      appModelNoUpdate.tabs.values.map(
+        (homeTab) => BottomNavigationBarItem(
+          activeIcon: Icon(homeTab.icon),
+          icon: Icon(homeTab.outlinedIcon),
+          label: t[homeTab.uniqueKey],
         ),
       ),
     );
@@ -118,7 +118,7 @@ class _HomePageState extends BasePageState<HomePage>
   Widget buildBody() {
     return IndexedStack(
       index: currentHomeTabIndex,
-      children: mediaTypeBodies,
+      children: tabBodies,
     );
   }
 
@@ -134,15 +134,15 @@ class _HomePageState extends BasePageState<HomePage>
   }
 
   void switchTab(int index) async {
-    MediaType mediaType = appModelNoUpdate.mediaTypes.values.toList()[index];
+    HomeTab homeTab = appModelNoUpdate.tabs.values.toList()[index];
     if (index == currentHomeTabIndex) {
-      mediaType.floatingSearchBarController.close();
+      homeTab.floatingSearchBarController.close();
 
-      if (mediaType.scrollController.hasClients) {
-        if (mediaType.scrollController.offset > 5000) {
-          mediaType.scrollController.jumpTo(0);
+      if (homeTab.scrollController.hasClients) {
+        if (homeTab.scrollController.offset > 5000) {
+          homeTab.scrollController.jumpTo(0);
         } else {
-          mediaType.scrollController.animateTo(
+          homeTab.scrollController.animateTo(
             0,
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
@@ -153,9 +153,9 @@ class _HomePageState extends BasePageState<HomePage>
       await appModel.setCurrentHomeTabIndex(index);
       setState(() {});
 
-      if (mediaType is DictionaryMediaType && appModel.shouldRefreshTabs) {
+      if (homeTab is DictionaryTab && appModel.shouldRefreshTabs) {
         appModel.shouldRefreshTabs = false;
-        mediaType.refreshTab();
+        homeTab.refreshTab();
       }
     }
   }

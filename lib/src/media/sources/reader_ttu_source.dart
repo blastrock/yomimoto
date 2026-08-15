@@ -39,13 +39,13 @@ class ReaderTtuSource extends ReaderMediaSource {
           sourceName: 'ッツ Ebook Reader',
           description: 'Read EPUBs and mine sentences via an embedded web'
               ' reader.',
-          mediaType: NovelMediaType.instance,
+          homeTab: NovelTab.instance,
           icon: Icons.chrome_reader_mode_outlined,
           implementsSearch: false,
           implementsHistory: false,
         );
 
-  /// Get the singleton instance of this media type.
+  /// Get the singleton instance of this home tab.
   static ReaderTtuSource get instance => _instance;
 
   static final ReaderTtuSource _instance =
@@ -70,7 +70,7 @@ class ReaderTtuSource extends ReaderMediaSource {
     required String data,
   }) async {
     FlutterLogs.logInfo(
-      mediaType.uniqueKey,
+      homeTab.uniqueKey,
       uniqueKey,
       'Restored IndexedDB.',
     );
@@ -151,7 +151,7 @@ class ReaderTtuSource extends ReaderMediaSource {
     ];
   }
 
-  /// Allows user to close the floating search bar of a media type tab page
+  /// Allows user to close the floating search bar of a home tab page
   /// when open.
   Widget buildLaunchButton({
     required BuildContext context,
@@ -174,7 +174,7 @@ class ReaderTtuSource extends ReaderMediaSource {
     );
   }
 
-  /// Allows user to close the floating search bar of a media type tab page
+  /// Allows user to close the floating search bar of a home tab page
   /// when open.
   Widget buildSettingsButton({
     required BuildContext context,
@@ -196,7 +196,7 @@ class ReaderTtuSource extends ReaderMediaSource {
             item: MediaItem(
               mediaIdentifier: 'http://localhost:$port/settings.html',
               title: '',
-              mediaTypeIdentifier: ReaderTtuSource.instance.mediaType.uniqueKey,
+              mediaTypeIdentifier: ReaderTtuSource.instance.homeTab.uniqueKey,
               mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
               position: 0,
               duration: 1,
@@ -331,7 +331,7 @@ class ReaderTtuSource extends ReaderMediaSource {
           mediaIdentifier: 'http://localhost:$port/b.html?id=$id&?title=$title',
           title: title,
           base64Image: base64Image,
-          mediaTypeIdentifier: ReaderTtuSource.instance.mediaType.uniqueKey,
+          mediaTypeIdentifier: ReaderTtuSource.instance.homeTab.uniqueKey,
           mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
           position: position,
           duration: duration,

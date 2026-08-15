@@ -12,16 +12,16 @@ import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 import 'package:path/path.dart' as path;
 
-/// A source for a [MediaType] that will appear on the list of sources when
+/// A source for a [HomeTab] that will appear on the list of sources when
 /// set as active. Handles sourcing and delivery of arguments such that the
-/// [MediaType] is able to execute and launch with the proper arguments.
+/// [HomeTab] is able to execute and launch with the proper arguments.
 abstract class MediaSource {
   /// Initialise a media source.
   MediaSource({
     required this.uniqueKey,
     required this.sourceName,
     required this.description,
-    required this.mediaType,
+    required this.homeTab,
     required this.icon,
     required this.implementsSearch,
     required this.implementsHistory,
@@ -37,8 +37,8 @@ abstract class MediaSource {
   /// Name of the source that very shortly describes what it does.
   final String sourceName;
 
-  /// The media type that this source is for.
-  final MediaType mediaType;
+  /// The home tab that this source is for.
+  final HomeTab homeTab;
 
   /// A longer description of what the source can do, or details left by or
   /// regarding the developer.
@@ -140,7 +140,7 @@ abstract class MediaSource {
   }) async {}
 
   /// Get the floating search bar actions of this source when it is the active
-  /// source being displayed on its respective media type tab.
+  /// source being displayed on its respective home tab.
   List<Widget> getActions({
     required BuildContext context,
     required WidgetRef ref,
@@ -236,7 +236,7 @@ abstract class MediaSource {
   /// progress.
   MediaItem get currentMediaItem => throw UnimplementedError();
 
-  /// The body widget to show in the tab when this source's media type and this
+  /// The body widget to show in the tab when this source's home tab and this
   /// source is selected.
   BasePage buildHistoryPage();
 

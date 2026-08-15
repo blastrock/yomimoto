@@ -43,7 +43,7 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
 
     return CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.pixels(999999999999999),
-      controller: DictionaryMediaType.instance.scrollController,
+      controller: DictionaryTab.instance.scrollController,
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
@@ -209,7 +209,7 @@ class _DictionaryHistoryScrollableItemState
                 right: Spacing.of(context).spaces.small,
               ),
               child: Icon(
-                DictionaryMediaType.instance.icon,
+                DictionaryTab.instance.icon,
                 size: fontSize,
                 color: Theme.of(context).unselectedWidgetColor,
               ),

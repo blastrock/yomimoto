@@ -743,7 +743,6 @@ class AppModel with ChangeNotifier {
         ReaderTtuSource.instance,
         ReaderMokuroSource.instance,
         ReaderBrowserSource.instance,
-        ReaderLyricsSource.instance,
       ],
       DictionaryMediaType.instance: [],
     };

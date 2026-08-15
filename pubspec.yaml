@@ -90,11 +90,6 @@ dependencies:
     path: vendor/mecab_dart
   multi_value_listenable_builder: ^0.0.2
   network_to_file_image: ^7.0.0
-  nowplaying:
-    # Vendored fork: carries an unupstreamed NPE fix in the notification
-    # listener, and hosted 3.x is an API rewrite. Also swaps the dead
-    # package_info for package_info_plus. See vendor/nowplaying/UPSTREAM.md.
-    path: vendor/nowplaying
   package_info_plus: ^10.2.1
   path: ^1.8.2
   path_provider: ^2.0.13

@@ -382,9 +382,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get player_subtitles_transcript_empty => 'Transcript is empty.';
 	String get player_prepare_export => 'Preparing card...';
 	String get player_change_player_orientation => 'Change Player Orientation';
-	String get no_current_media => 'Play or refresh media for lyrics';
-	String get lyrics_permission_required => 'Required permission not granted';
-	String get no_lyrics_found => 'No lyrics found';
 	String get trending => 'Trending';
 	String get caption_filter => 'Filter Closed Captions';
 	String get captions_query => 'Querying for captions';
@@ -406,8 +403,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get default_option => 'Default';
 	String get paste => 'Paste';
 	String get select_all => 'Select all';
-	String get lyrics_title => 'Title';
-	String get lyrics_artist => 'Artist';
 	String get set_media => 'Set Media';
 	String get no_recordings_found => 'No recordings found';
 	String get wrap_image_audio => 'Include image/audio HTML tags on export';
@@ -799,9 +794,6 @@ extension on _StringsEn {
 			case 'player_subtitles_transcript_empty': return 'Transcript is empty.';
 			case 'player_prepare_export': return 'Preparing card...';
 			case 'player_change_player_orientation': return 'Change Player Orientation';
-			case 'no_current_media': return 'Play or refresh media for lyrics';
-			case 'lyrics_permission_required': return 'Required permission not granted';
-			case 'no_lyrics_found': return 'No lyrics found';
 			case 'trending': return 'Trending';
 			case 'caption_filter': return 'Filter Closed Captions';
 			case 'captions_query': return 'Querying for captions';
@@ -823,8 +815,6 @@ extension on _StringsEn {
 			case 'default_option': return 'Default';
 			case 'paste': return 'Paste';
 			case 'select_all': return 'Select all';
-			case 'lyrics_title': return 'Title';
-			case 'lyrics_artist': return 'Artist';
 			case 'set_media': return 'Set Media';
 			case 'no_recordings_found': return 'No recordings found';
 			case 'wrap_image_audio': return 'Include image/audio HTML tags on export';

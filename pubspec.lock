@@ -1337,13 +1337,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
-  nowplaying:
-    dependency: "direct main"
-    description:
-      path: "vendor/nowplaying"
-      relative: true
-    source: path
-    version: "2.0.6"
   objective_c:
     dependency: transitive
     description:

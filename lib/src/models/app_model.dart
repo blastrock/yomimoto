@@ -255,7 +255,7 @@ class AppModel with ChangeNotifier {
 
   /// Used to fetch initialised sources by their unique key with constant
   /// time performance. Initialised with [populateMediaSources] at startup.
-  late final Map<MediaType, Map<String, MediaSource>> mediaSources;
+  late final Map<String, MediaSource> mediaSources;
 
   /// Maximum number of manual enhancements in a field.
   final int maximumFieldEnhancements = 5;
@@ -700,23 +700,18 @@ class AppModel with ChangeNotifier {
   /// Populate maps for media sources at startup to optimise performance.
   void populateMediaSources() async {
     /// A list of media sources that the app will support at runtime.
-    final Map<MediaType, List<MediaSource>> availableMediaSources = {
-      NovelMediaType.instance: [ReaderTtuSource.instance],
-      MangaMediaType.instance: [ReaderMokuroSource.instance],
-      DictionaryMediaType.instance: [],
-    };
+    final List<MediaSource> availableMediaSources =
+        List<MediaSource>.unmodifiable(
+      [
+        ReaderTtuSource.instance,
+        ReaderMokuroSource.instance,
+      ],
+    );
 
-    mediaSources = Map<MediaType, Map<String, MediaSource>>.unmodifiable(
-      availableMediaSources.map(
-        (type, sources) => MapEntry(
-          type,
-          Map<String, MediaSource>.unmodifiable(
-            Map<String, MediaSource>.fromEntries(
-              sources.map(
-                (source) => MapEntry(source.uniqueKey, source),
-              ),
-            ),
-          ),
+    mediaSources = Map<String, MediaSource>.unmodifiable(
+      Map<String, MediaSource>.fromEntries(
+        availableMediaSources.map(
+          (mediaSource) => MapEntry(mediaSource.uniqueKey, mediaSource),
         ),
       ),
     );
@@ -1102,10 +1097,8 @@ class AppModel with ChangeNotifier {
     }
 
     /// Ready all media sources for use.
-    for (MediaType type in mediaTypes.values) {
-      for (MediaSource source in mediaSources[type]!.values) {
-        await source.initialise();
-      }
+    for (MediaSource source in mediaSources.values) {
+      await source.initialise();
     }
 
     /// Initialise persistent database.

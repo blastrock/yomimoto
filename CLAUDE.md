@@ -103,7 +103,7 @@ freely, the `uniqueKey` cannot.
 | Abstraction | Registered in | Concrete implementations |
 |---|---|---|
 | `MediaType` | `AppModel.populateMediaTypes` | `NovelMediaType`, `MangaMediaType`, `DictionaryMediaType` — these three *are* the bottom nav tabs, in order |
-| `MediaSource` | `AppModel.populateMediaSources` | `ReaderTtuSource` (novels), `ReaderMokuroSource` (manga) — one per media type |
+| `MediaSource` | `AppModel.populateMediaSources` | `ReaderTtuSource` (novels), `ReaderMokuroSource` (manga) — at most one per media type, reached via `MediaType.source` |
 | `Language` | `AppModel.populateLanguages` | `JapaneseLanguage`, `EnglishLanguage` |
 | `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat`, `AbbyyLingvoFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |

@@ -20,10 +20,8 @@ abstract class BaseHistoryPage extends BasePage {
 /// code.
 abstract class BaseHistoryPageState<T extends BaseHistoryPage>
     extends BasePageState<T> {
-  /// Each tab in the home page is a [HomeTab].
-  HomeTab get homeTab;
-
-  /// Get the media source for the current home tab.
+  /// The media source whose history this page shows, which is also the home
+  /// tab it is the body of.
   MediaSource get mediaSource;
 
   /// This variable is true when the [buildPlaceholder] should be shown.
@@ -46,7 +44,7 @@ abstract class BaseHistoryPageState<T extends BaseHistoryPage>
   Widget buildPlaceholder() {
     return Center(
       child: JidoujishoPlaceholderMessage(
-        icon: homeTab.outlinedIcon,
+        icon: mediaSource.outlinedIcon,
         message: t.info_empty_home_tab,
       ),
     );

@@ -12,41 +12,29 @@ import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 import 'package:path/path.dart' as path;
 
-/// A source for a [HomeTab] that will appear on the list of sources when
-/// set as active. Handles sourcing and delivery of arguments such that the
-/// [HomeTab] is able to execute and launch with the proper arguments.
-abstract class MediaSource {
+/// A [HomeTab] backed by a library of media items. Handles sourcing and
+/// delivery of arguments such that the media it holds is able to execute and
+/// launch with the proper arguments.
+abstract class MediaSource extends HomeTab {
   /// Initialise a media source.
   MediaSource({
-    required this.uniqueKey,
+    required super.uniqueKey,
     required this.sourceName,
     required this.description,
-    required this.homeTab,
-    required this.icon,
+    required super.icon,
+    required super.outlinedIcon,
     required this.implementsSearch,
     required this.implementsHistory,
     this.overridesAutoImage = false,
     this.overridesAutoAudio = false,
   });
 
-  /// A unique name that allows distinguishing this type from others,
-  /// particularly for the purposes of differentiating between persistent
-  /// settings keys.
-  final String uniqueKey;
-
   /// Name of the source that very shortly describes what it does.
   final String sourceName;
-
-  /// The home tab that this source is for.
-  final HomeTab homeTab;
 
   /// A longer description of what the source can do, or details left by or
   /// regarding the developer.
   final String description;
-
-  /// An icon that will show the enhancement if activated by the user in the
-  /// quick menu.
-  final IconData icon;
 
   /// Localisations for this source, where the key is a locale tag and
   /// the value is the [sourceName] of the source. If the value for the current

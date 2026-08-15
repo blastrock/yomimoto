@@ -1,10 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
-import 'package:yuuna/media.dart';
 
-/// A type of media that is significantly distinguishable from other media such
-/// that it is deserving of its own core functionality when viewing media items.
-/// A [HomeTab] has its own history and home tab.
+/// One tab of the bottom navigation bar on the main menu: an identity, a pair
+/// of icons and the body to show when it is selected. A tab backed by a
+/// library of media items is a media source, which extends this.
 abstract class HomeTab with ChangeNotifier {
   /// Initialise this home tab with the predetermined and hardset values.
   HomeTab({
@@ -27,10 +26,6 @@ abstract class HomeTab with ChangeNotifier {
   /// The body that will be shown when this is the current selected home
   /// tab.
   Widget get home;
-
-  /// The single media source this home tab hosts, if it has one. A tab that
-  /// is not backed by media at all, such as the dictionary, has none.
-  MediaSource? get source => null;
 
   /// The controller to be used for this home tab when it has
   /// enough media items to display that require the tab to be scrollable.

@@ -6,7 +6,7 @@
 /// Locales: 1
 /// Strings: 286
 ///
-/// Built on 2026-08-15 at 18:42 UTC
+/// Built on 2026-08-15 at 18:51 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -147,9 +147,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	late final Translations _root = this; // ignore: unused_field
 
 	// Translations
-	String get dictionary_media_type => 'Dictionary';
-	String get novel_media_type => 'Novels';
-	String get manga_media_type => 'Manga';
+	String get reader_ttu => 'Novels';
+	String get reader_mokuro => 'Manga';
+	String get dictionary => 'Dictionary';
 	String get back => 'Back';
 	String get search => 'Search';
 	String get search_ellipsis => 'Search...';
@@ -465,9 +465,9 @@ class _StringsViewRepliesEn {
 extension on Translations {
 	dynamic _flatMapFunction(String path) {
 		switch (path) {
-			case 'dictionary_media_type': return 'Dictionary';
-			case 'novel_media_type': return 'Novels';
-			case 'manga_media_type': return 'Manga';
+			case 'reader_ttu': return 'Novels';
+			case 'reader_mokuro': return 'Manga';
+			case 'dictionary': return 'Dictionary';
 			case 'back': return 'Back';
 			case 'search': return 'Search';
 			case 'search_ellipsis': return 'Search...';

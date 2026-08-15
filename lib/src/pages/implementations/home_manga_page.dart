@@ -12,5 +12,5 @@ class HomeMangaPage extends BaseTabPage {
 
 class _HomeMangaPageState<T extends BaseTabPage> extends BaseTabPageState {
   @override
-  HomeTab get homeTab => MangaTab.instance;
+  HomeTab get homeTab => ReaderMokuroSource.instance;
 }

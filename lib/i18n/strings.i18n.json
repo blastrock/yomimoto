@@ -1,7 +1,7 @@
 {
-    "dictionary_media_type": "Dictionary",
-    "novel_media_type": "Novels",
-    "manga_media_type": "Manga",
+    "reader_ttu": "Novels",
+    "reader_mokuro": "Manga",
+    "dictionary": "Dictionary",
     "back": "Back",
     "search": "Search",
     "search_ellipsis": "Search...",

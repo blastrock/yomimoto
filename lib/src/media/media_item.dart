@@ -20,7 +20,6 @@ class MediaItem {
   MediaItem({
     required this.mediaIdentifier,
     required this.title,
-    required this.mediaTypeIdentifier,
     required this.mediaSourceIdentifier,
     required this.position,
     required this.duration,
@@ -63,11 +62,7 @@ class MediaItem {
   /// or a book.
   String title;
 
-  /// The home tab where this item is from.
-  @Index(type: IndexType.hash)
-  String mediaTypeIdentifier;
-
-  /// The media source where this item is from.
+  /// The media source, and so the home tab, where this item is from.
   @Index(type: IndexType.hash)
   String mediaSourceIdentifier;
 
@@ -130,14 +125,9 @@ class MediaItem {
     return encoder.convert(this);
   }
 
-  /// Get the [HomeTab] from a [MediaItem] from its serialised identifier.
-  HomeTab getHomeTab({required AppModel appModel}) {
-    return appModel.tabs[mediaTypeIdentifier]!;
-  }
-
   /// Get the [MediaSource] from a [MediaItem] from its serialised identifier.
   MediaSource getMediaSource({required AppModel appModel}) {
-    return appModel.mediaSources[mediaSourceIdentifier]!;
+    return appModel.tabs[mediaSourceIdentifier]! as MediaSource;
   }
 
   /// Creates a deep copy of this mapping but with the given variables replaced
@@ -147,7 +137,6 @@ class MediaItem {
     String? mediaIdentifier,
     String? title,
     String? mediaSourceIdentifier,
-    String? mediaTypeIdentifier,
     String? base64Image,
     String? imageUrl,
     String? audioUrl,
@@ -164,7 +153,6 @@ class MediaItem {
       title: title ?? this.title,
       mediaSourceIdentifier:
           mediaSourceIdentifier ?? this.mediaSourceIdentifier,
-      mediaTypeIdentifier: mediaTypeIdentifier ?? this.mediaTypeIdentifier,
       base64Image: base64Image ?? this.base64Image,
       imageUrl: imageUrl ?? this.imageUrl,
       audioUrl: audioUrl ?? this.audioUrl,

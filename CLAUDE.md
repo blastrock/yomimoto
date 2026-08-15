@@ -41,7 +41,7 @@ flutter analyze                                            # must stay free of e
 flutter build apk --release --split-per-abi
 ```
 
-`flutter analyze` currently reports **82 infos, 0 errors, 0 warnings**, all on
+`flutter analyze` currently reports **81 infos, 0 errors, 0 warnings**, all on
 pre-existing code (`use_build_context_synchronously`, `unnecessary_underscores`,
 `strict_top_level_inference`). Do not let that number grow; new code should be
 clean.
@@ -102,8 +102,8 @@ freely, the `uniqueKey` cannot.
 
 | Abstraction | Registered in | Concrete implementations |
 |---|---|---|
-| `HomeTab` | `AppModel.populateTabs` | `NovelTab`, `MangaTab`, `DictionaryTab` — these three *are* the bottom nav tabs, in order |
-| `MediaSource` | `AppModel.populateMediaSources` | `ReaderTtuSource` (novels), `ReaderMokuroSource` (manga) — at most one per home tab, reached via `HomeTab.source` |
+| `HomeTab` | `AppModel.populateTabs` | `ReaderTtuSource` (Novels), `ReaderMokuroSource` (Manga), `DictionaryTab` — these three *are* the bottom nav tabs, in order |
+| `MediaSource` | — | a `HomeTab` backed by a library of media items; both readers are one, the dictionary tab is not |
 | `Language` | `AppModel.populateLanguages` | `JapaneseLanguage`, `EnglishLanguage` |
 | `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat`, `AbbyyLingvoFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |
@@ -138,7 +138,8 @@ its size — but splitting it is its own project, not a side effect of a feature
   headings, pitches, frequencies, tags, search-result cache, media items, Anki
   mappings, search history, mokuro catalogs. Schemas are listed in
   `globalSchemas` at the top of `app_model.dart`; the list must match the
-  `@Collection()` classes.
+  `@Collection()` classes. A `MediaItem` names its origin with a single
+  `mediaSourceIdentifier` — the source and the tab are the same object.
 
 Dictionary import, deletion and search run in **isolates** via `compute` /
 `cancelable_compute`. Isolate entry points must therefore be **top-level

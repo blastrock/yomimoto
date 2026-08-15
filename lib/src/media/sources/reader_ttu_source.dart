@@ -39,8 +39,8 @@ class ReaderTtuSource extends ReaderMediaSource {
           sourceName: 'ッツ Ebook Reader',
           description: 'Read EPUBs and mine sentences via an embedded web'
               ' reader.',
-          homeTab: NovelTab.instance,
-          icon: Icons.chrome_reader_mode_outlined,
+          icon: Icons.library_books,
+          outlinedIcon: Icons.library_books_outlined,
           implementsSearch: false,
           implementsHistory: false,
         );
@@ -50,6 +50,9 @@ class ReaderTtuSource extends ReaderMediaSource {
 
   static final ReaderTtuSource _instance =
       ReaderTtuSource._privateConstructor();
+
+  @override
+  Widget get home => const HomeNovelPage();
 
   /// Default scrolling speed when in continuous page turning mode.
   static int get defaultScrollingSpeed => 100;
@@ -70,8 +73,8 @@ class ReaderTtuSource extends ReaderMediaSource {
     required String data,
   }) async {
     FlutterLogs.logInfo(
-      homeTab.uniqueKey,
       uniqueKey,
+      'importBackup',
       'Restored IndexedDB.',
     );
   }
@@ -196,7 +199,6 @@ class ReaderTtuSource extends ReaderMediaSource {
             item: MediaItem(
               mediaIdentifier: 'http://localhost:$port/settings.html',
               title: '',
-              mediaTypeIdentifier: ReaderTtuSource.instance.homeTab.uniqueKey,
               mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
               position: 0,
               duration: 1,
@@ -331,7 +333,6 @@ class ReaderTtuSource extends ReaderMediaSource {
           mediaIdentifier: 'http://localhost:$port/b.html?id=$id&?title=$title',
           title: title,
           base64Image: base64Image,
-          mediaTypeIdentifier: ReaderTtuSource.instance.homeTab.uniqueKey,
           mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
           position: position,
           duration: duration,

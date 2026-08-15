@@ -253,10 +253,6 @@ class AppModel with ChangeNotifier {
   /// time performance. Initialised with [populateQuickActions] at startup.
   late final Map<String, QuickAction> quickActions;
 
-  /// Used to fetch initialised sources by their unique key with constant
-  /// time performance. Initialised with [populateMediaSources] at startup.
-  late final Map<String, MediaSource> mediaSources;
-
   /// Maximum number of manual enhancements in a field.
   final int maximumFieldEnhancements = 5;
 
@@ -557,7 +553,8 @@ class AppModel with ChangeNotifier {
       return _currentMediaSource!.currentSentence;
     } else {
       HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
-      MediaSource? mediaSource = _currentMediaSource ?? homeTab.source;
+      MediaSource? mediaSource = _currentMediaSource ??
+          (homeTab is MediaSource ? homeTab : null);
 
       return mediaSource?.currentSentence ?? JidoujishoTextSelection(text: '');
     }
@@ -682,8 +679,8 @@ class AppModel with ChangeNotifier {
     /// A list of home tabs that the app will support at runtime.
     final List<HomeTab> availableTabs = List<HomeTab>.unmodifiable(
       [
-        NovelTab.instance,
-        MangaTab.instance,
+        ReaderTtuSource.instance,
+        ReaderMokuroSource.instance,
         DictionaryTab.instance,
       ],
     );
@@ -692,26 +689,6 @@ class AppModel with ChangeNotifier {
       Map<String, HomeTab>.fromEntries(
         availableTabs.map(
           (homeTab) => MapEntry(homeTab.uniqueKey, homeTab),
-        ),
-      ),
-    );
-  }
-
-  /// Populate maps for media sources at startup to optimise performance.
-  void populateMediaSources() async {
-    /// A list of media sources that the app will support at runtime.
-    final List<MediaSource> availableMediaSources =
-        List<MediaSource>.unmodifiable(
-      [
-        ReaderTtuSource.instance,
-        ReaderMokuroSource.instance,
-      ],
-    );
-
-    mediaSources = Map<String, MediaSource>.unmodifiable(
-      Map<String, MediaSource>.fromEntries(
-        availableMediaSources.map(
-          (mediaSource) => MapEntry(mediaSource.uniqueKey, mediaSource),
         ),
       ),
     );
@@ -1072,7 +1049,6 @@ class AppModel with ChangeNotifier {
     populateLanguages();
     populateLocales();
     populateTabs();
-    populateMediaSources();
     populateDictionaryFormats();
     populateEnhancements();
     populateQuickActions();
@@ -1097,7 +1073,7 @@ class AppModel with ChangeNotifier {
     }
 
     /// Ready all media sources for use.
-    for (MediaSource source in mediaSources.values) {
+    for (MediaSource source in tabs.values.whereType<MediaSource>()) {
       await source.initialise();
     }
 
@@ -2381,7 +2357,7 @@ class AppModel with ChangeNotifier {
       ref: ref,
     );
 
-    mediaSource.homeTab.refreshTab();
+    mediaSource.refreshTab();
     DictionaryTab.instance.refreshTab();
 
     if (_shouldKillMediaOnPop) {
@@ -2906,14 +2882,14 @@ class AppModel with ChangeNotifier {
 
       int countInSameHistory = _database.mediaItems
           .filter()
-          .mediaTypeIdentifierEqualTo(item.mediaTypeIdentifier)
+          .mediaSourceIdentifierEqualTo(item.mediaSourceIdentifier)
           .countSync();
 
       if (maximumMediaHistoryItems < countInSameHistory) {
         int surplus = countInSameHistory - maximumSearchHistoryItems;
         _database.mediaItems
             .filter()
-            .mediaTypeIdentifierEqualTo(item.mediaTypeIdentifier)
+            .mediaSourceIdentifierEqualTo(item.mediaSourceIdentifier)
             .limit(surplus)
             .build()
             .deleteAllSync();
@@ -2955,14 +2931,6 @@ class AppModel with ChangeNotifier {
     }
   }
 
-  /// Get the history of [MediaItem] for a particular [HomeTab].
-  List<MediaItem> getHomeTabHistory({required HomeTab homeTab}) {
-    return _database.mediaItems
-        .filter()
-        .mediaTypeIdentifierEqualTo(homeTab.uniqueKey)
-        .findAllSync();
-  }
-
   /// Get the history of [MediaItem] for a particular [MediaSource].
   List<MediaItem> getMediaSourceHistory({required MediaSource mediaSource}) {
     return _database.mediaItems
@@ -2972,9 +2940,9 @@ class AppModel with ChangeNotifier {
   }
 
   /// Returns the last navigated directory the user used for picking a file for a
-  /// certain home tab.
-  Directory? getLastPickedDirectory(HomeTab type) {
-    String path = _preferences.get('${type.uniqueKey}/last_picked_file',
+  /// certain media source.
+  Directory? getLastPickedDirectory(MediaSource mediaSource) {
+    String path = _preferences.get('${mediaSource.uniqueKey}/last_picked_file',
         defaultValue: '');
     if (path.isEmpty) {
       return null;
@@ -2988,21 +2956,22 @@ class AppModel with ChangeNotifier {
   }
 
   /// Returns the last navigated directory the user used for picking a file for a
-  /// certain home tab.
+  /// certain media source.
   void setLastPickedDirectory({
-    required HomeTab type,
+    required MediaSource mediaSource,
     required Directory directory,
   }) {
-    _preferences.put('${type.uniqueKey}/last_picked_file', directory.path);
+    _preferences.put(
+        '${mediaSource.uniqueKey}/last_picked_file', directory.path);
   }
 
   /// Returns valid file picker directories. If there is a last picked directory for
-  /// a home tab, this will be included as first on the list. Otherwise, external
-  /// root directories will be included.
-  Future<List<Directory>> getFilePickerDirectoriesForHomeTab(
-      HomeTab type) async {
+  /// a media source, this will be included as first on the list. Otherwise,
+  /// external root directories will be included.
+  Future<List<Directory>> getFilePickerDirectoriesForMediaSource(
+      MediaSource mediaSource) async {
     List<Directory> directories = [];
-    Directory? lastPickedDirectory = getLastPickedDirectory(type);
+    Directory? lastPickedDirectory = getLastPickedDirectory(mediaSource);
     if (lastPickedDirectory != null) {
       directories.add(lastPickedDirectory);
     }

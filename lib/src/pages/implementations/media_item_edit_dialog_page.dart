@@ -194,7 +194,7 @@ class _MediaItemEditDialogPageState
 
       navigator.pop();
       navigator.pop();
-      mediaSource.homeTab.refreshTab();
+      mediaSource.refreshTab();
     }
   }
 }

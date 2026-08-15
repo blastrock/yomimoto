@@ -22,20 +22,17 @@ class ReaderMokuroHistoryPage extends HistoryReaderPage {
 class _ReaderMokuroHistoryPageState<T extends HistoryReaderPage>
     extends HistoryReaderPageState {
   @override
-  HomeTab get homeTab => mediaSource.homeTab;
-
-  @override
   ReaderMokuroSource get mediaSource => ReaderMokuroSource.instance;
 
   @override
   void initState() {
     super.initState();
-    homeTab.tabRefreshNotifier.addListener(refresh);
+    mediaSource.tabRefreshNotifier.addListener(refresh);
   }
 
   @override
   void dispose() {
-    homeTab.tabRefreshNotifier.removeListener(refresh);
+    mediaSource.tabRefreshNotifier.removeListener(refresh);
     super.dispose();
   }
 

@@ -27,9 +27,6 @@ class ReaderTtuSourceHistoryPage extends HistoryReaderPage {
 class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
     extends HistoryReaderPageState {
   @override
-  HomeTab get homeTab => mediaSource.homeTab;
-
-  @override
   ReaderTtuSource get mediaSource => ReaderTtuSource.instance;
 
   final ValueNotifier<int> _tryAgainCountdownNotifier = ValueNotifier(0);

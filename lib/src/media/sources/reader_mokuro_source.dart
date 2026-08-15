@@ -26,8 +26,8 @@ class ReaderMokuroSource extends ReaderMediaSource {
           sourceName: 'Mokuro',
           description:
               'Read manga volumes pre-processed as a single HTML file via Mokuro.',
-          homeTab: MangaTab.instance,
-          icon: Icons.dashboard_outlined,
+          icon: Icons.photo_album,
+          outlinedIcon: Icons.photo_album_outlined,
           implementsSearch: false,
           implementsHistory: true,
           overridesAutoImage: true,
@@ -38,6 +38,9 @@ class ReaderMokuroSource extends ReaderMediaSource {
 
   static final ReaderMokuroSource _instance =
       ReaderMokuroSource._privateConstructor();
+
+  @override
+  Widget get home => const HomeMangaPage();
 
   @override
   double get aspectRatio => 257 / 364;
@@ -55,7 +58,6 @@ class ReaderMokuroSource extends ReaderMediaSource {
       title: title,
       position: 0,
       duration: pageCount,
-      mediaTypeIdentifier: homeTab.uniqueKey,
       mediaSourceIdentifier: uniqueKey,
       canDelete: true,
       canEdit: true,
@@ -184,7 +186,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
       required WidgetRef ref,
       required AppModel appModel}) async {
     List<Directory> rootDirectories =
-        await appModel.getFilePickerDirectoriesForHomeTab(homeTab);
+        await appModel.getFilePickerDirectoriesForMediaSource(this);
 
     List<String> usedFiles = appModel
         .getMediaSourceHistory(mediaSource: this)
@@ -222,7 +224,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
     String parentDirectory = path.dirname(directory);
 
     appModel.setLastPickedDirectory(
-      type: homeTab,
+      mediaSource: this,
       directory: Directory(path.dirname(filePath)),
     );
 
@@ -303,7 +305,6 @@ bgImage.substring(5, bgImage.length - 2);
       position: 0,
       duration: pageCount,
       imageUrl: imageUrl,
-      mediaTypeIdentifier: homeTab.uniqueKey,
       mediaSourceIdentifier: uniqueKey,
     );
   }

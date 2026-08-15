@@ -43,10 +43,10 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
   /// Each tab in the home page is a [HomeTab].
   HomeTab get homeTab;
 
-  /// The media source backing this tab. Only valid for a [homeTab] that
-  /// hosts one -- the dictionary tab has no source, and overrides every member
+  /// This tab seen as the media source it is. Only valid for a [homeTab]
+  /// that is one -- the dictionary tab is not, and overrides every member
   /// that reads this.
-  MediaSource get mediaSource => homeTab.source!;
+  MediaSource get mediaSource => homeTab as MediaSource;
 
   /// Whether or not the search bar is currently in focus.
   bool _isSearchBarFocused = false;

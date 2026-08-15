@@ -24,7 +24,7 @@ abstract class HistoryReaderPageState<T extends HistoryReaderPage>
     return RawScrollbar(
       thumbVisibility: true,
       thickness: 3,
-      controller: homeTab.scrollController,
+      controller: mediaSource.scrollController,
       child: GridView.builder(
         padding: const EdgeInsets.only(top: 48),
         gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
@@ -34,7 +34,7 @@ abstract class HistoryReaderPageState<T extends HistoryReaderPage>
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        controller: homeTab.scrollController,
+        controller: mediaSource.scrollController,
         itemCount: items.length,
         itemBuilder: (context, index) => buildMediaItem(items[index]),
       ),

@@ -7,7 +7,7 @@ class DictionaryTab extends HomeTab {
   /// Initialise this home tab.
   DictionaryTab._privateConstructor()
       : super(
-          uniqueKey: 'dictionary_media_type',
+          uniqueKey: 'dictionary',
           icon: Icons.auto_stories_rounded,
           outlinedIcon: Icons.auto_stories_outlined,
         );

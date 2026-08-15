@@ -12,5 +12,5 @@ class HomeNovelPage extends BaseTabPage {
 
 class _HomeNovelPageState<T extends BaseTabPage> extends BaseTabPageState {
   @override
-  HomeTab get homeTab => NovelTab.instance;
+  HomeTab get homeTab => ReaderTtuSource.instance;
 }

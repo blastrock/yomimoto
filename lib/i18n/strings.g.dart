@@ -190,7 +190,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get dialog_pop => 'POP';
 	String get dialog_save => 'SAVE';
 	String get dialog_set => 'SET';
-	String get dialog_browse => 'BROWSE';
 	String get dialog_channel => 'CHANNEL';
 	String get dialog_directory => 'DIRECTORY';
 	String get dialog_crop => 'CROP';
@@ -334,8 +333,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get exit_media_title => 'Exit Media';
 	String get exit_media_description => 'This will return you to the main menu. Are you sure?';
 	String get unimplemented_source => 'Unimplemented source';
-	String get clear_browser_title => 'Clear Browser Data';
-	String get clear_browser_description => 'This will clear all browsing data used in media sources that use web content. Are you sure?';
 	String get ttu_no_books_added => 'No books added to ッツ Ebook Reader';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get pick_video_file => 'Pick Video File';
@@ -507,8 +504,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get player_use_opensles => 'OpenSL ES audio';
 	String get go_forward => 'Go Forward';
 	String get browse => 'Browse';
-	String get bookmark => 'Bookmark';
-	String get add_bookmark => 'Add Bookmark';
 	String get add_to_reading_list => 'Add To Reading List';
 	String get reading_list_empty => 'Reading list is empty';
 	String get reading_list_add_toast => 'Added to reading list.';
@@ -602,7 +597,6 @@ extension on _StringsEn {
 			case 'dialog_pop': return 'POP';
 			case 'dialog_save': return 'SAVE';
 			case 'dialog_set': return 'SET';
-			case 'dialog_browse': return 'BROWSE';
 			case 'dialog_channel': return 'CHANNEL';
 			case 'dialog_directory': return 'DIRECTORY';
 			case 'dialog_crop': return 'CROP';
@@ -746,8 +740,6 @@ extension on _StringsEn {
 			case 'exit_media_title': return 'Exit Media';
 			case 'exit_media_description': return 'This will return you to the main menu. Are you sure?';
 			case 'unimplemented_source': return 'Unimplemented source';
-			case 'clear_browser_title': return 'Clear Browser Data';
-			case 'clear_browser_description': return 'This will clear all browsing data used in media sources that use web content. Are you sure?';
 			case 'ttu_no_books_added': return 'No books added to ッツ Ebook Reader';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'pick_video_file': return 'Pick Video File';
@@ -925,8 +917,6 @@ extension on _StringsEn {
 			case 'player_use_opensles': return 'OpenSL ES audio';
 			case 'go_forward': return 'Go Forward';
 			case 'browse': return 'Browse';
-			case 'bookmark': return 'Bookmark';
-			case 'add_bookmark': return 'Add Bookmark';
 			case 'add_to_reading_list': return 'Add To Reading List';
 			case 'reading_list_empty': return 'Reading list is empty';
 			case 'reading_list_add_toast': return 'Added to reading list.';

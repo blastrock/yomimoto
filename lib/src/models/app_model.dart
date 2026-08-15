@@ -50,7 +50,6 @@ final List<CollectionSchema> globalSchemas = [
   AnkiMappingSchema,
   SearchHistoryItemSchema,
   MokuroCatalogSchema,
-  BrowserBookmarkSchema,
 ];
 
 /// A list of fields that the app will support at runtime.
@@ -197,7 +196,8 @@ class AppModel with ChangeNotifier {
   Directory get dictionaryResourceDirectory => _dictionaryResourceDirectory;
   late final Directory _dictionaryResourceDirectory;
 
-  /// Directory where browser cache data may be persisted.
+  /// Directory where webview cache data may be persisted. Used by the reader
+  /// sources that embed a webview.
   Directory get browserDirectory => _browserDirectory;
   late final Directory _browserDirectory;
 
@@ -217,11 +217,6 @@ class AppModel with ChangeNotifier {
   /// third-party APIs.
   Directory get exportDirectory => _exportDirectory;
   late final Directory _exportDirectory;
-
-  /// Directory where the browser media source saves web archives for offline
-  /// use.
-  Directory get webArchiveDirectory => _webArchiveDirectory;
-  late final Directory _webArchiveDirectory;
 
   /// Directory where media for export is stored for communication with
   /// third-party APIs. Fallback for failure.
@@ -305,10 +300,6 @@ class AppModel with ChangeNotifier {
   /// Returns all Mokuro catalogs.
   List<MokuroCatalog> get mokuroCatalogs =>
       _database.mokuroCatalogs.where().sortByOrder().findAllSync();
-
-  /// Returns all Browser bookmarks.
-  List<BrowserBookmark> get browserBookmarks =>
-      _database.browserBookmarks.where().anyId().findAllSync();
 
   /// Returns all dictionary history results. Oldest is first.
   List<DictionarySearchResult> get dictionaryHistory =>
@@ -742,7 +733,6 @@ class AppModel with ChangeNotifier {
       ReaderMediaType.instance: [
         ReaderTtuSource.instance,
         ReaderMokuroSource.instance,
-        ReaderBrowserSource.instance,
       ],
       DictionaryMediaType.instance: [],
     };
@@ -995,33 +985,6 @@ class AppModel with ChangeNotifier {
     }
   }
 
-  /// Populate list of bookmarks included with the app by default.
-  void populateBookmarks() {
-    if (populateBookmarksFlag) {
-      return;
-    }
-
-    List<BrowserBookmark> defaultBookmarks = [
-      BrowserBookmark(
-          name: 'jidoujisho',
-          url: 'https://github.com/arianneorpilla/jidoujisho'),
-      BrowserBookmark(name: 'Google', url: 'https://google.com/'),
-      BrowserBookmark(name: 'DuckDuckGo', url: 'https://duckduckgo.com/'),
-      BrowserBookmark(name: 'Wikipedia', url: 'https://wikipedia.org/'),
-      BrowserBookmark(name: 'Syosetu', url: 'https://syosetu.com/'),
-      BrowserBookmark(name: 'Kurashiru', url: 'https://kurashiru.com/'),
-      BrowserBookmark(name: 'Oricon', url: 'https://www.oricon.co.jp/'),
-      BrowserBookmark(name: 'NHK News', url: 'https://www3.nhk.or.jp/news/'),
-      BrowserBookmark(name: 'BBC News', url: 'https://www.bbc.com/news'),
-    ];
-
-    _database.writeTxnSync(() {
-      _database.browserBookmarks.putAllSync(defaultBookmarks);
-    });
-
-    setPopulateBookmarksFlag();
-  }
-
   /// Return the app external directory found in the public DCIM directory.
   /// This path also initialises the folder if it does not exist, and includes
   /// a .nomedia file within the folder.
@@ -1130,8 +1093,6 @@ class AppModel with ChangeNotifier {
         path.join(appDirectory.path, 'dictionaryImportWorkingDirectory'));
     _exportDirectory = await prepareJidoujishoDirectory();
     _alternateExportDirectory = await prepareFallbackJidoujishoDirectory();
-    _webArchiveDirectory =
-        Directory(path.join(appDirectory.path, 'webArchive'));
 
     thumbnailsDirectory.createSync();
     hiveDirectory.createSync();
@@ -1625,13 +1586,6 @@ class AppModel with ChangeNotifier {
     });
   }
 
-  /// Delete a selected catalog from the database.
-  void deleteBookmark(BrowserBookmark bookmark) async {
-    _database.writeTxnSync(() {
-      _database.browserBookmarks.deleteSync(bookmark.id!);
-    });
-  }
-
   /// Add a selected catalog to the database.
   Future<void> addCatalog(MokuroCatalog catalog) async {
     await _database.writeTxnSync(() async {
@@ -1640,17 +1594,6 @@ class AppModel with ChangeNotifier {
         _database.mokuroCatalogs.deleteSync(catalog.id!);
       }
       _database.mokuroCatalogs.putSync(catalog);
-    });
-  }
-
-  /// Add a selected bookmark to the database.
-  Future<void> addBookmark(BrowserBookmark bookmark) async {
-    await _database.writeTxnSync(() async {
-      if (bookmark.id != null &&
-          _database.browserBookmarks.getSync(bookmark.id!) != null) {
-        _database.browserBookmarks.deleteSync(bookmark.id!);
-      }
-      _database.browserBookmarks.putSync(bookmark);
     });
   }
 
@@ -3036,18 +2979,6 @@ class AppModel with ChangeNotifier {
     });
   }
 
-  /// Deletes a [MediaItem] from the reading list.
-  void removeFromReadingList(String mediaIdentifier) {
-    _database.writeTxnSync(() {
-      _database.mediaItems
-          .where()
-          .mediaSourceIdentifierEqualTo(ReaderBrowserSource.instance.uniqueKey)
-          .filter()
-          .mediaIdentifierEqualTo(mediaIdentifier)
-          .deleteAllSync();
-    });
-  }
-
   /// Deletes a [MediaItem] from history and also rids of override values.
   Future<void> deleteMediaItem(MediaItem item) async {
     MediaSource mediaSource = item.getMediaSource(appModel: this);
@@ -3620,15 +3551,5 @@ class AppModel with ChangeNotifier {
   /// Set the list of model names that will be checked for duplicates.
   void setDuplicateCheckModels(List<String> value) async {
     await _preferences.put('duplicate_check_models', value);
-  }
-
-  /// Get whether or not bookmarks have been populated.
-  bool get populateBookmarksFlag {
-    return _preferences.get('populate_bookmarks', defaultValue: false);
-  }
-
-  /// Sets the populate bookmarks flag so bookmarks don't get added again.
-  void setPopulateBookmarksFlag() async {
-    await _preferences.put('populate_bookmarks', true);
   }
 }

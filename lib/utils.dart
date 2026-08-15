@@ -35,4 +35,3 @@ export 'src/utils/misc/jidoujisho_text_selection.dart';
 export 'src/utils/misc/mokuro_catalog.dart';
 export 'src/utils/misc/mokuro_payload.dart';
 export 'src/utils/misc/dialog_content.dart';
-export 'src/utils/misc/browser_bookmark.dart';

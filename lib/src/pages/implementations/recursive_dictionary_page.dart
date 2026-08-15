@@ -360,7 +360,7 @@ class _RecursiveDictionaryPageState
   void showDeleteSearchHistoryPrompt() async {
     Widget alertDialog = AlertDialog(
       title: Text(t.clear_search_title),
-      content: Text(t.clear_browser_description),
+      content: Text(t.clear_search_description),
       actions: <Widget>[
         TextButton(
           child: Text(

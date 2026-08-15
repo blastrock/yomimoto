@@ -53,7 +53,6 @@ class _HomePageState extends BasePageState<HomePage>
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       appModel.populateDefaultMapping(appModel.targetLanguage);
-      appModel.populateBookmarks();
       if (appModel.isFirstTimeSetup) {
         await appModel.showLanguageMenu();
         appModel.setLastSelectedDictionaryFormat(

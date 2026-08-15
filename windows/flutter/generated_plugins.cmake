@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  clipboard
   ffmpeg_kit_flutter_new
   file_selector_windows
   flutter_inappwebview_windows

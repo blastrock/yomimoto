@@ -5,7 +5,6 @@ import 'dart:isolate';
 import 'package:audio_service/audio_service.dart' as ag;
 import 'package:cancelable_compute/cancelable_compute.dart' as cancelable;
 import 'package:collection/collection.dart';
-import 'package:clipboard/clipboard.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:external_path/external_path.dart';
@@ -775,7 +774,6 @@ class AppModel with ChangeNotifier {
         ReaderBrowserSource.instance,
         ReaderLyricsSource.instance,
         ReaderChatgptSource.instance,
-        ReaderClipboardSource.instance,
       ],
       DictionaryMediaType.instance: [],
     };
@@ -3094,7 +3092,7 @@ class AppModel with ChangeNotifier {
 
   /// Copies a [term] to clipboard and shows an appropriate toast.
   void copyToClipboard(String term) {
-    FlutterClipboard.copy(term);
+    Clipboard.setData(ClipboardData(text: term));
 
     /// Redundant to do this with the share notification on Android
     if (_androidDeviceInfo.version.sdkInt < 33) {

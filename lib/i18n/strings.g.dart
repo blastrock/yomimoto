@@ -454,7 +454,6 @@ class _StringsEn implements BaseTranslations<AppLocale, _StringsEn> {
 	String get comments => 'Comments';
 	String get replies => 'Replies';
 	String get no_comments_queried => 'No comments queried';
-	String get no_text_in_clipboard => 'No text to display';
 	String file_downloaded({required Object name}) => 'File downloaded: ${name}';
 	String get cfhange_sort_order => 'Change Sort Order';
 	String get login => 'Login';
@@ -876,7 +875,6 @@ extension on _StringsEn {
 			case 'comments': return 'Comments';
 			case 'replies': return 'Replies';
 			case 'no_comments_queried': return 'No comments queried';
-			case 'no_text_in_clipboard': return 'No text to display';
 			case 'file_downloaded': return ({required Object name}) => 'File downloaded: ${name}';
 			case 'cfhange_sort_order': return 'Change Sort Order';
 			case 'login': return 'Login';

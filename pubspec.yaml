@@ -21,7 +21,6 @@ dependencies:
   carousel_slider: ^5.1.2
   change_notifier_builder: ^1.1.2
   chat_gpt_sdk: ^3.1.6
-  clipboard: ^3.0.14
   collection:
   copy_with_extension: ^17.0.0
   crop_image: ^1.0.4

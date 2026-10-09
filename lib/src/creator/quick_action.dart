@@ -39,29 +39,6 @@ abstract class QuickAction {
   /// options.
   final bool showInSingleDictionary;
 
-  /// Localisations for this action, where the key is a locale tag and
-  /// the value is the [label] of the action. If the value for the current
-  /// locale is non-null, it will be used instead of [label].
-  final Map<String, String> labelLocalisation = const {};
-
-  /// Localisations for this action, where the key is a locale tag and
-  /// the value is the [description] of the action. If the value for the
-  /// current locale is non-null, it will be used instead of [description].
-  final Map<String, String> descriptionLocalisation = const {};
-
-  /// Get the best localisation for the label of this action. If there
-  /// is no localisation, the fallback is [label].
-  String getLocalisedLabel(AppModel appModel) {
-    return labelLocalisation[appModel.appLocale.toLanguageTag()] ?? label;
-  }
-
-  /// Get the best localisation for the description of this action. If
-  /// there is no localisation, the fallback is [description].
-  String getLocalisedDescription(AppModel appModel) {
-    return descriptionLocalisation[appModel.appLocale.toLanguageTag()] ??
-        description;
-  }
-
   /// Whether or not [initialise] has been called for this action.
   bool _initialised = false;
 

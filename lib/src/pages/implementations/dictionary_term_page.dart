@@ -268,7 +268,7 @@ class _DictionaryTermActionsRowState
                 ? Colors.white.withValues(alpha: 0.05)
                 : Colors.black.withValues(alpha: 0.05),
             size: Spacing.of(context).spaces.semiBig,
-            tooltip: quickAction.getLocalisedLabel(appModel),
+            tooltip: quickAction.label,
             icon: quickAction.icon,
             onTap: () async {
               await quickAction!.executeAction(

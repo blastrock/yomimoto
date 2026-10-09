@@ -891,7 +891,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         isWideTapArea: true,
         busy: true,
         size: textTheme.titleLarge?.fontSize,
-        tooltip: enhancement.getLocalisedLabel(appModel),
+        tooltip: enhancement.label,
         icon: enhancement.icon,
         onTap: () async {
           await enhancement!.enhanceCreatorParams(
@@ -1026,8 +1026,8 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                   ),
                 )
               : null,
-          labelText: field.getLocalisedLabel(appModel),
-          hintText: field.getLocalisedDescription(appModel),
+          labelText: field.label,
+          hintText: field.description,
         ),
       );
     } else {
@@ -1052,7 +1052,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                   ),
                 )
               : null,
-          labelText: field.getLocalisedLabel(appModel),
+          labelText: field.label,
         ),
         selectionControls: field is SentenceField
             ? sentenceSelectionControls
@@ -1075,8 +1075,8 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
 
               Fluttertoast.showToast(
                 msg: locked
-                    ? t.field_unlocked(field: field.getLocalisedLabel(appModel))
-                    : t.field_locked(field: field.getLocalisedLabel(appModel)),
+                    ? t.field_unlocked(field: field.label)
+                    : t.field_locked(field: field.label),
               );
             });
       },

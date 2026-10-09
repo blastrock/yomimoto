@@ -45,8 +45,8 @@ class SearchDictionaryEnhancement extends Enhancement {
       } else {
         Fluttertoast.showToast(
           msg: t.field_fallback_used(
-            field: field.getLocalisedLabel(appModel),
-            secondField: fallbackField.getLocalisedLabel(appModel),
+            field: field.label,
+            secondField: fallbackField.label,
           ),
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,

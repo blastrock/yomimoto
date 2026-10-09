@@ -226,7 +226,7 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
               ),
               const Space.normal(),
               Text(
-                quickAction.getLocalisedLabel(appModel),
+                quickAction.label,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],

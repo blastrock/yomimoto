@@ -1,6 +1,5 @@
 export 'i18n/strings.g.dart';
 
-export 'src/utils/jidoujisho_localisations.dart';
 
 export 'src/utils/components/cache_image_provider.dart';
 export 'src/utils/components/jidoujisho_icon_button.dart';

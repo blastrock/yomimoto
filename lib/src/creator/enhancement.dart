@@ -51,29 +51,6 @@ abstract class Enhancement {
   /// Which field this enhancement is for.
   final Field field;
 
-  /// Localisations for this enhancement, where the key is a locale tag and
-  /// the value is the [label] of the enhancement. If the value for the current
-  /// locale is non-null, it will be used instead of [label].
-  final Map<String, String> labelLocalisation = const {};
-
-  /// Localisations for this enhancement, where the key is a locale tag and
-  /// the value is the [description] of the enhancement. If the value for the
-  /// current locale is non-null, it will be used instead of [description].
-  final Map<String, String> descriptionLocalisation = const {};
-
-  /// Get the best localisation for the label of this enhancement. If there
-  /// is no localisation, the fallback is [label].
-  String getLocalisedLabel(AppModel appModel) {
-    return labelLocalisation[appModel.appLocale.toLanguageTag()] ?? label;
-  }
-
-  /// Get the best localisation for the description of this enhancement. If
-  /// there is no localisation, the fallback is [description].
-  String getLocalisedDescription(AppModel appModel) {
-    return descriptionLocalisation[appModel.appLocale.toLanguageTag()] ??
-        description;
-  }
-
   /// Whether or not [initialise] has been called for this enhancement.
   bool _initialised = false;
 

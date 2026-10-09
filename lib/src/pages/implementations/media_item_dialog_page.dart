@@ -67,7 +67,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
               ),
               const Space.small(),
               Text(
-                mediaSource.getLocalisedSourceName(appModel),
+                mediaSource.sourceName,
                 style: TextStyle(
                   color: Theme.of(context).unselectedWidgetColor,
                   fontWeight: FontWeight.w500,

@@ -36,16 +36,6 @@ abstract class MediaSource extends HomeTab {
   /// regarding the developer.
   final String description;
 
-  /// Localisations for this source, where the key is a locale tag and
-  /// the value is the [sourceName] of the source. If the value for the current
-  /// locale is non-null, it will be used instead of [sourceName].
-  final Map<String, String> sourceNameLocalisatiton = const {};
-
-  /// Localisations for this source, where the key is a locale tag and
-  /// the value is the [description] of the enhancement. If the value for the
-  /// current locale is non-null, it will be used instead of [description].
-  final Map<String, String> descriptionLocalisation = const {};
-
   /// Whether or not this media source has a search function. If false, this
   /// media source will have an action executed by [onSearchBarTap].
   final bool implementsSearch;
@@ -99,20 +89,6 @@ abstract class MediaSource extends HomeTab {
   /// Set the preference for a certain parameter [key] for this source.
   Future<void> deletePreference({required String key}) async {
     await _preferences.delete(key);
-  }
-
-  /// Get the best localisation for the label of this media source. If there
-  /// is no localisation, the fallback is [sourceName].
-  String getLocalisedSourceName(AppModel appModel) {
-    return sourceNameLocalisatiton[appModel.appLocale.toLanguageTag()] ??
-        sourceName;
-  }
-
-  /// Get the best localisation for the description of this media source. If
-  /// there is no localisation, the fallback is [description].
-  String getLocalisedDescription(AppModel appModel) {
-    return descriptionLocalisation[appModel.appLocale.toLanguageTag()] ??
-        description;
   }
 
   /// If a media source requires resources to function, they can be prepared

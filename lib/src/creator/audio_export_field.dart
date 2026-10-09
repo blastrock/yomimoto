@@ -92,8 +92,8 @@ abstract class AudioExportField extends Field {
         if (fallbackTerm.isNotEmpty) {
           Fluttertoast.showToast(
             msg: t.field_fallback_used(
-              field: getLocalisedLabel(appModel),
-              secondField: fallbackField.getLocalisedLabel(appModel),
+              field: label,
+              secondField: fallbackField.label,
             ),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,

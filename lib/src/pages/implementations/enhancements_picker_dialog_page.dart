@@ -123,11 +123,11 @@ class _EnhancementsPickerDialogPage
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    enhancement.getLocalisedLabel(appModel),
+                    enhancement.label,
                     style: TextStyle(fontSize: textTheme.bodyMedium?.fontSize),
                   ),
                   Text(
-                    enhancement.getLocalisedDescription(appModel),
+                    enhancement.description,
                     style: TextStyle(fontSize: textTheme.bodySmall?.fontSize),
                   ),
                 ],

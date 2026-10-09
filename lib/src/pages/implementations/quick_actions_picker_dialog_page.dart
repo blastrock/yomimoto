@@ -115,11 +115,11 @@ class _QuickActionsPickerDialogPageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    quickAction.getLocalisedLabel(appModel),
+                    quickAction.label,
                     style: TextStyle(fontSize: textTheme.bodyMedium?.fontSize),
                   ),
                   Text(
-                    quickAction.getLocalisedDescription(appModel),
+                    quickAction.description,
                     style: TextStyle(fontSize: textTheme.bodySmall?.fontSize),
                   ),
                 ],

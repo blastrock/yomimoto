@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 286
+/// Strings: 284
 ///
-/// Built on 2026-08-15 at 18:51 UTC
+/// Built on 2026-10-09 at 20:45 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -169,8 +169,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get switch_profiles => 'Switch Profiles';
 	String get dictionaries => 'Dictionaries';
 	String get enhancements => 'Enhancements';
-	String get app_locale => 'App locale';
-	String get app_locale_warning => 'Community addons and enhancements are managed by their respective developers, and these may appear in their original language.';
 	String get dialog_read => 'READ';
 	String get dialog_edit => 'EDIT';
 	String get dialog_export => 'EXPORT';
@@ -487,8 +485,6 @@ extension on Translations {
 			case 'switch_profiles': return 'Switch Profiles';
 			case 'dictionaries': return 'Dictionaries';
 			case 'enhancements': return 'Enhancements';
-			case 'app_locale': return 'App locale';
-			case 'app_locale_warning': return 'Community addons and enhancements are managed by their respective developers, and these may appear in their original language.';
 			case 'dialog_read': return 'READ';
 			case 'dialog_edit': return 'EDIT';
 			case 'dialog_export': return 'EXPORT';

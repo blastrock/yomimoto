@@ -57,7 +57,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
   Widget buildFloatingSearchBar() {
     return FloatingSearchBar(
           isScrollControlled: true,
-          hint: mediaSource.getLocalisedSourceName(appModel),
+          hint: mediaSource.sourceName,
           controller: homeTab.floatingSearchBarController,
           builder: (_, __) => const SizedBox.shrink(),
           borderRadius: BorderRadius.zero,

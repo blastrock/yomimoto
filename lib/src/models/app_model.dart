@@ -229,10 +229,6 @@ class AppModel with ChangeNotifier {
   /// Initialised with [populateLanguages] at startup.
   late final Map<String, Language> languages;
 
-  /// Used to fetch an app locale by its locale tag with constant time
-  /// performance. Initialised with [populateLocales] at startup.
-  late final Map<String, Locale> locales;
-
   /// Used to fetch a dictionary format by its unique key with constant time
   /// performance. Initialised with [populateDictionaryFormats] at startup.
   late final Map<String, DictionaryFormat> dictionaryFormats;
@@ -655,25 +651,6 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// Populate maps for locales at startup to optimise performance.
-  void populateLocales() async {
-    /// A list of locales that the app will support at runtime. This is not
-    /// related to supported target languages.
-    final List<Locale> availableLocales = List<Locale>.unmodifiable(
-      [
-        const Locale('en', 'US'),
-      ],
-    );
-
-    locales = Map<String, Locale>.unmodifiable(
-      Map<String, Locale>.fromEntries(
-        availableLocales.map(
-          (locale) => MapEntry(locale.toLanguageTag(), locale),
-        ),
-      ),
-    );
-  }
-
   /// Populate maps for home tabs at startup to optimise performance.
   void populateTabs() async {
     /// A list of home tabs that the app will support at runtime.
@@ -1046,7 +1023,6 @@ class AppModel with ChangeNotifier {
     /// Populate entities with key-value maps for constant time performance.
     /// This is not the initialisation step, which occurs below.
     populateLanguages();
-    populateLocales();
     populateTabs();
     populateDictionaryFormats();
     populateEnhancements();
@@ -1146,15 +1122,6 @@ class AppModel with ChangeNotifier {
     return dictionaryFormats[lastDictionaryFormatName]!;
   }
 
-  /// Get the current app locale from persisted preferences.
-  Locale get appLocale {
-    String defaultLocaleTag = locales.values.first.toLanguageTag();
-    String localeTag =
-        _preferences.get('app_locale', defaultValue: defaultLocaleTag);
-
-    return locales[localeTag]!;
-  }
-
   /// Get the last selected model from persisted preferences.
   String? get lastSelectedModel {
     String? modelName = _preferences.get('last_selected_model');
@@ -1197,12 +1164,6 @@ class AppModel with ChangeNotifier {
 
     language.initialise();
 
-    notifyListeners();
-  }
-
-  /// Persist a new app locale in preferences.
-  Future<void> setAppLocale(String localeTag) async {
-    await _preferences.put('appf_locale', localeTag);
     notifyListeners();
   }
 

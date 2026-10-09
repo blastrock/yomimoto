@@ -4,8 +4,7 @@ import 'package:yuuna/language.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
-/// The content of the dialog used for changing the target language or app
-/// locale.
+/// The content of the dialog used for changing the target language.
 class LanguageDialogPage extends BasePage {
   /// Create an instance of this page.
   const LanguageDialogPage({
@@ -94,54 +93,6 @@ class _LanguageDialogPageState extends BasePageState<LanguageDialogPage> {
                   appModel.clearDictionaryResultsCache();
                   setState(() {});
                 },
-              ),
-              const Space.small(),
-              Padding(
-                padding: Spacing.of(context).insets.onlyLeft.small,
-                child: Text(
-                  t.app_locale,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: theme.unselectedWidgetColor,
-                  ),
-                ),
-              ),
-              JidoujishoDropdown<String>(
-                options: JidoujishoLocalisations.localeNames.keys.toList(),
-                initialOption: appModel.appLocale.toLanguageTag(),
-                generateLabel: (languageTag) =>
-                    JidoujishoLocalisations.localeNames[languageTag]!,
-                onChanged: (languageTag) {
-                  appModel.setAppLocale(languageTag!);
-                  setState(() {});
-                },
-              ),
-              const Space.small(),
-              ListTile(
-                dense: true,
-                title: Text.rich(
-                  TextSpan(
-                    text: '',
-                    children: <InlineSpan>[
-                      WidgetSpan(
-                        child: Icon(
-                          Icons.info,
-                          size: textTheme.bodySmall?.fontSize,
-                        ),
-                      ),
-                      const WidgetSpan(
-                        child: SizedBox(width: 8),
-                      ),
-                      TextSpan(
-                        text: t.app_locale_warning,
-                        style: TextStyle(
-                          fontSize: textTheme.bodySmall?.fontSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.justify,
-                ),
               ),
             ],
           ),

@@ -114,11 +114,11 @@ class _FieldPickerDialogPageState extends BasePageState<FieldPickerDialogPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    field.getLocalisedLabel(appModel),
+                    field.label,
                     style: TextStyle(fontSize: textTheme.bodyMedium?.fontSize),
                   ),
                   Text(
-                    field.getLocalisedDescription(appModel),
+                    field.description,
                     style: TextStyle(fontSize: textTheme.bodySmall?.fontSize),
                   ),
                 ],

@@ -213,7 +213,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
       localizationsDelegates: const [
         JidoujishoLocalizationsDelegate(),
       ],
-      supportedLocales: appModel.locales.values,
       themeMode: themeMode,
       theme: appModel.theme,
       darkTheme: appModel.darkTheme,

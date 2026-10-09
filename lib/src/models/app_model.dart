@@ -702,7 +702,6 @@ class AppModel with ChangeNotifier {
       [
         YomichanFormat.instance,
         MigakuFormat.instance,
-        AbbyyLingvoFormat.instance,
       ],
     );
 

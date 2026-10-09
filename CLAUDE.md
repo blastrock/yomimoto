@@ -11,7 +11,7 @@ clipboard/websocket/lyrics readers, image share intents — has been deleted. Wh
 remains is deliberately three things:
 
 1. **Reading** — the embedded ッツ (ttu) EPUB reader and mokuro manga reader.
-2. **Dictionary** — Yomichan / Migaku / ABBYY Lingvo imports, searched from Isar.
+2. **Dictionary** — Yomichan / Migaku imports, searched from Isar.
 3. **Card creation** — the full Anki creator, with all its enhancements, exported
    to AnkiDroid.
 
@@ -105,7 +105,7 @@ freely, the `uniqueKey` cannot.
 | `HomeTab` | `AppModel.populateTabs` | `ReaderTtuSource` (Novels), `ReaderMokuroSource` (Manga), `DictionaryTab` — these three *are* the bottom nav tabs, in order |
 | `MediaSource` | — | a `HomeTab` backed by a library of media items; both readers are one, the dictionary tab is not |
 | `Language` | `AppModel.populateLanguages` | `JapaneseLanguage`, `EnglishLanguage` |
-| `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat`, `AbbyyLingvoFormat` |
+| `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |
 | `Enhancement` | `AppModel.populateEnhancements` | per-field: Forvo audio, Massif/Tatoeba/ImmersionKit sentences, image pickers, … |
 | `QuickAction` | `AppModel.populateQuickActions` | the icon buttons on a dictionary result |

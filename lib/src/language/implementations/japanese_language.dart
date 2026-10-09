@@ -11,30 +11,32 @@ import 'package:ve_dart/ve_dart.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/utils.dart';
 
-/// Language implementation of the Japanese language.
-class JapaneseLanguage extends Language {
-  JapaneseLanguage._privateConstructor()
-      : super(
-          languageName: '日本語',
-          languageCode: 'ja',
-          countryCode: 'JP',
-          threeLetterCode: 'jpn',
-          preferVerticalReading: true,
-          textDirection: TextDirection.ltr,
-          isSpaceDelimited: false,
-          textBaseline: TextBaseline.ideographic,
-          prepareSearchResults: prepareSearchResultsJapaneseLanguage,
-          helloWorld: 'こんにちは世界',
-          standardFormat: YomichanFormat.instance,
-          defaultFontFamily: 'NotoSansJP',
-        );
+/// Japanese-specific text handling: segmentation, sentence splitting,
+/// highlighting, furigana and pitch accent display. Japanese is the only
+/// language the app reads.
+class JapaneseLanguage {
+  JapaneseLanguage._privateConstructor();
 
   /// Get the singleton instance of this language.
   static JapaneseLanguage get instance => _instance;
 
   static final JapaneseLanguage _instance =
       JapaneseLanguage._privateConstructor();
+
+  /// Testing text for basic use. This is useful for pre-loading the database.
+  static const String helloWorld = 'こんにちは世界';
+
+  /// Default font for Japanese text.
+  static const String fontFamily = 'NotoSansJP';
+
+  /// Locale used to render Japanese text, so that Han characters get
+  /// Japanese glyphs.
+  static const Locale locale = Locale('ja', 'JP');
+
+  /// Text baseline used for Japanese text.
+  static const TextBaseline textBaseline = TextBaseline.ideographic;
 
   /// Used for text segmentation and deinflection.
   static Mecab mecab = Mecab();
@@ -46,15 +48,74 @@ class JapaneseLanguage extends Language {
   /// items.
   final Map<DictionaryHeading, List<RubyTextData>?> segmentsCache = {};
 
-  @override
-  Future<void> prepareResources() async {
+  /// Whether or not [initialise] has been called.
+  bool _initialised = false;
+
+  /// Prepare the text segmentation resources. This is run at startup and
+  /// does nothing if already run.
+  Future<void> initialise() async {
+    if (_initialised) {
+      return;
+    }
     await mecab.init('assets/language/japanese/ipadic', true);
+    _initialised = true;
   }
 
-  @override
+  /// Given paragraph text and an index, yield the sentence containing that
+  /// index.
+  JidoujishoTextSelection getSentenceFromParagraph({
+    required String paragraph,
+    required int index,
+    required int startOffset,
+    required int endOffset,
+  }) {
+    List<String> sentences = getSentences(paragraph);
+    int currentIndex = 0;
+    String sentenceToReturn = paragraph;
+
+    int sentenceLength = 0;
+
+    for (String sentence in sentences) {
+      sentenceToReturn = sentence;
+      sentenceLength = sentence.length;
+
+      currentIndex += sentenceLength;
+      if (currentIndex > index) {
+        break;
+      }
+    }
+
+    TextRange range = TextRange(
+      start: sentenceLength - currentIndex + startOffset,
+      end: sentenceLength - currentIndex + endOffset,
+    );
+    return JidoujishoTextSelection(
+      text: sentenceToReturn,
+      range: range,
+    );
+  }
+
+  /// Returns a list of sentences for a block of text.
+  List<String> getSentences(String text) {
+    RegExp regex = RegExp(r'.{1,}?([。.?？!！]+|\n)');
+
+    Iterable<Match> matches = regex.allMatches(text);
+
+    if (matches.isEmpty) {
+      return [text];
+    }
+
+    List<String> sentences = regex.allMatchesWithSep(text);
+
+    return sentences;
+  }
+
+  /// Given unsegmented [text], perform text segmentation and return a list of
+  /// parsed words. For example, '日本語は難しいです。' should ideally return a
+  /// list containing '日本語', 'は', '難しい', 'です', '。'.
   List<String> textToWords(String text) {
     String delimiterSanitisedText = text
-        .replaceAll('﻿', '␝')
+        .replaceAll('\uFEFF', '␝')
         .replaceAll('　', '␝')
         .replaceAll('\n', '␜')
         .replaceAll(' ', '␝');
@@ -77,11 +138,26 @@ class JapaneseLanguage extends Language {
     return terms;
   }
 
-  /// Some languages may want to display custom widgets rather than the built
-  /// in term and reading text that is there by default. For example, Japanese
-  /// may want to display a furigana widget instead.
-  @override
-  Widget getTermReadingOverrideWidget({
+  /// Get preliminary highlight length before a dictionary search.
+  int getGuessHighlightLength({
+    required String searchTerm,
+  }) {
+    return textToWords(searchTerm)
+        .firstWhere((e) => e.trim().isNotEmpty)
+        .trim()
+        .length;
+  }
+
+  /// Get final highlight length after a dictionary search.
+  int getFinalHighlightLength({
+    required DictionarySearchResult? result,
+  }) {
+    return max(1, result?.bestLength ?? 0);
+  }
+
+  /// Display a dictionary heading's term with its reading as furigana.
+  /// Tapping a kanji searches for it.
+  Widget getTermReadingWidget({
     required BuildContext context,
     required AppModel appModel,
     required DictionaryHeading heading,
@@ -150,7 +226,7 @@ class JapaneseLanguage extends Language {
     return furigana;
   }
 
-  @override
+  /// Draw a pitch accent diagram for a reading and its downstep.
   Widget getPitchWidget({
     required AppModel appModel,
     required BuildContext context,
@@ -276,9 +352,7 @@ class JapaneseLanguage extends Language {
   }
 }
 
-/// Top-level function for use in compute. See [Language] for details.
-/// Credits to Matthew Chan for their port of the Yomichan parser to Dart.
-/// Top-level function for use in compute. See [Language] for details.
+/// Top-level function for use in compute, running a dictionary search.
 /// Credits to Matthew Chan for their port of the Yomichan parser to Dart.
 Future<int?> prepareSearchResultsJapaneseLanguage(
     DictionarySearchParams params) async {

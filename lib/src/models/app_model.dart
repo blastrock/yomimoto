@@ -347,10 +347,10 @@ class AppModel with ChangeNotifier {
 
   /// Get the app-wide text style.
   TextStyle get textStyle => TextStyle(
-        fontFamily: JapaneseLanguage.instance.defaultFontFamily,
+        fontFamily: JapaneseLanguage.fontFamily,
         fontFeatures: const [FontFeature('liga', 0)],
-        locale: JapaneseLanguage.instance.locale,
-        textBaseline: JapaneseLanguage.instance.textBaseline,
+        locale: JapaneseLanguage.locale,
+        textBaseline: JapaneseLanguage.textBaseline,
       );
 
   /// This override is a workaround required to theme the app-wide [TextTheme]
@@ -1027,18 +1027,18 @@ class AppModel with ChangeNotifier {
 
     /// Preloads the search database in memory.
     searchDictionary(
-      searchTerm: JapaneseLanguage.instance.helloWorld,
+      searchTerm: JapaneseLanguage.helloWorld,
       searchWithWildcards: false,
       useCache: false,
     ).then((_) {
       /// Preloads for wildcard searches.
       searchDictionary(
-        searchTerm: '${JapaneseLanguage.instance.helloWorld.substring(0, 1)}?',
+        searchTerm: '${JapaneseLanguage.helloWorld.substring(0, 1)}?',
         searchWithWildcards: true,
         useCache: false,
       ).then((_) {
         searchDictionary(
-          searchTerm: '${JapaneseLanguage.instance.helloWorld.substring(0, 1)}*',
+          searchTerm: '${JapaneseLanguage.helloWorld.substring(0, 1)}*',
           searchWithWildcards: true,
           useCache: false,
         );
@@ -1473,7 +1473,7 @@ class AppModel with ChangeNotifier {
     /// to the actual data, rather than duplicating that data within the
     /// database, which is not ideal for storage purposes.
     _searchOperation =
-        cancelable.compute(JapaneseLanguage.instance.prepareSearchResults, params);
+        cancelable.compute(prepareSearchResultsJapaneseLanguage, params);
     int? id = await _searchOperation?.value;
 
     if (id == null) {

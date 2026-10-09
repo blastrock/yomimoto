@@ -543,12 +543,11 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
     required int offsetIndex,
     required int length,
     required int whitespaceOffset,
-    required bool isSpaceDelimited,
   }) async {
     await _controller.setContextMenu(emptyContextMenu);
     await _controller.evaluateJavascript(
       source:
-          'selectTextForTextLength($cursorX, $cursorY, $offsetIndex, $length, $whitespaceOffset, $isSpaceDelimited);',
+          'selectTextForTextLength($cursorX, $cursorY, $offsetIndex, $length, $whitespaceOffset);',
     );
     await _controller.setContextMenu(contextMenu);
   }
@@ -646,18 +645,13 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
           if (index != 0 && text.substring(index).startsWith(loneSurrogate)) {
             index = index - 1;
           }
-          bool isSpaceDelimited = JapaneseLanguage.instance.isSpaceDelimited;
 
-          String searchTerm = JapaneseLanguage.instance.getSearchTermFromIndex(
-            text: text.trimRight() + nextLine.trim(),
-            index: index,
-          );
+          String searchTerm =
+              (text.trimRight() + nextLine.trim()).substring(index);
           int whitespaceOffset =
               searchTerm.length - searchTerm.trimLeft().length;
 
-          int offsetIndex = JapaneseLanguage.instance
-                  .getStartingIndex(text: text, index: index) +
-              whitespaceOffset;
+          int offsetIndex = index + whitespaceOffset;
 
           int length = JapaneseLanguage.instance.getGuessHighlightLength(
             searchTerm: searchTerm,
@@ -670,7 +664,6 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
               offsetIndex: offsetIndex,
               length: length,
               whitespaceOffset: whitespaceOffset,
-              isSpaceDelimited: isSpaceDelimited,
             );
           }
 
@@ -680,7 +673,6 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
           ).then((_) {
             length = JapaneseLanguage.instance.getFinalHighlightLength(
               result: currentResult,
-              searchTerm: searchTerm,
             );
 
             if (mediaSource.highlightOnTap) {
@@ -690,7 +682,6 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
                 offsetIndex: offsetIndex,
                 length: length,
                 whitespaceOffset: whitespaceOffset,
-                isSpaceDelimited: isSpaceDelimited,
               );
 
               final range = TextRange(start: rawIndex, end: rawIndex + length);
@@ -1068,7 +1059,7 @@ rp {
 </style>
 `);
 
-function selectTextForTextLength(x, y, index, length, whitespaceOffset, isSpaceDelimited) {
+function selectTextForTextLength(x, y, index, length, whitespaceOffset) {
   var result = document.caretRangeFromPoint(x, y);
 
   var selectedElement = result.startContainer;
@@ -1077,18 +1068,6 @@ function selectTextForTextLength(x, y, index, length, whitespaceOffset, isSpaceD
   var offset = result.startOffset;
 
   var adjustIndex = false;
-
-  if (isSpaceDelimited) {
-    const range = new Range();
-    range.setStart(offsetNode, index);
-    range.setEnd(offsetNode, index);
-    range.expand("word")
-
-    var selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    return;
-  } 
 
   if (!!offsetNode && offsetNode.nodeType === Node.TEXT_NODE && offset) {
       const range = new Range();

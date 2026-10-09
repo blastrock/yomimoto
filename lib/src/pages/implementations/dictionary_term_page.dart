@@ -502,7 +502,7 @@ class _DictionaryTermTopRow extends ConsumerWidget {
         Floatable(
           float: FCFloat.start,
           child: GestureDetector(
-            child: JapaneseLanguage.instance.getTermReadingOverrideWidget(
+            child: JapaneseLanguage.instance.getTermReadingWidget(
               context: context,
               appModel: appModel,
               heading: heading,

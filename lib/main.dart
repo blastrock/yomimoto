@@ -11,7 +11,6 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:spaces/spaces.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -210,7 +209,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
       debugShowCheckedModeBanner: false,
       navigatorKey: appModel.navigatorKey,
       home: home,
-      locale: locale,
       localizationsDelegates: const [
         JidoujishoLocalizationsDelegate(),
       ],
@@ -241,9 +239,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
   /// and toggleable.
   ThemeMode get themeMode =>
       appModel.isDarkMode ? ThemeMode.dark : ThemeMode.light;
-
-  /// The current locale, dependent on the active target language.
-  Locale get locale => JapaneseLanguage.instance.locale;
 }
 
 /// Used to override certain strings.

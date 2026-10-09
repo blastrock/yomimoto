@@ -49,9 +49,7 @@ class SentencePickerEnhancement extends Enhancement {
       onSelect: (selection) {
         creatorModel.setSentenceAndCloze(
           JidoujishoTextSelection(
-            text: selection
-                .join(JapaneseLanguage.instance.isSpaceDelimited ? ' ' : '')
-                .trim(),
+            text: selection.join().trim(),
           ),
         );
       },

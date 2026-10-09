@@ -430,12 +430,11 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     required int offsetIndex,
     required int length,
     required int whitespaceOffset,
-    required bool isSpaceDelimited,
   }) async {
     await _controller.setContextMenu(emptyContextMenu);
     await _controller.evaluateJavascript(
       source:
-          'selectTextForTextLength($cursorX, $cursorY, $offsetIndex, $length, $whitespaceOffset, $isSpaceDelimited);',
+          'selectTextForTextLength($cursorX, $cursorY, $offsetIndex, $length, $whitespaceOffset);',
     );
     await _controller.setContextMenu(contextMenu);
   }
@@ -507,18 +506,12 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
             index = index - 1;
           }
 
-          bool isSpaceDelimited = JapaneseLanguage.instance.isSpaceDelimited;
 
-          String searchTerm = JapaneseLanguage.instance.getSearchTermFromIndex(
-            text: text,
-            index: index,
-          );
+          String searchTerm = text.substring(index);
           int whitespaceOffset =
               searchTerm.length - searchTerm.trimLeft().length;
 
-          int offsetIndex = JapaneseLanguage.instance
-                  .getStartingIndex(text: text, index: index) +
-              whitespaceOffset;
+          int offsetIndex = index + whitespaceOffset;
 
           int length = JapaneseLanguage.instance.getGuessHighlightLength(
             searchTerm: searchTerm,
@@ -531,7 +524,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
               offsetIndex: offsetIndex,
               length: length,
               whitespaceOffset: whitespaceOffset,
-              isSpaceDelimited: isSpaceDelimited,
             );
           }
 
@@ -541,7 +533,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           ).then((_) async {
             length = JapaneseLanguage.instance.getFinalHighlightLength(
               result: currentResult,
-              searchTerm: searchTerm,
             );
 
             if (mediaSource.highlightOnTap) {
@@ -551,7 +542,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
                 offsetIndex: offsetIndex,
                 length: length,
                 whitespaceOffset: whitespaceOffset,
-                isSpaceDelimited: isSpaceDelimited,
               );
 
               if (!dictionaryPopupShown) {
@@ -1054,7 +1044,7 @@ rp {
 `);
 
 
-function selectTextForTextLength(x, y, index, length, whitespaceOffset, isSpaceDelimited) {
+function selectTextForTextLength(x, y, index, length, whitespaceOffset) {
   var result = document.caretRangeFromPoint(x, y);
 
   var selectedElement = result.startContainer;
@@ -1164,11 +1154,7 @@ function selectTextForTextLength(x, y, index, length, whitespaceOffset, isSpaceD
 
   const range = new Range();
   range.setStart(offsetNode, result.startOffset - adjustIndex + whitespaceOffset);
-  if (isSpaceDelimited) {
-    range.expand("word");
-  } else {
-    range.setEnd(lastNode, endOffset);
-  }
+  range.setEnd(lastNode, endOffset);
   
   var selection = window.getSelection();
   selection.removeAllRanges();

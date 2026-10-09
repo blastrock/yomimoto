@@ -113,6 +113,13 @@ To add or remove any of these, edit the corresponding `populate*` list in
 `lib/src/models/app_model.dart` — that is the single registry. Registration
 order is meaningful for home tabs (tab order) and for defaults elsewhere.
 
+Language is **not** an extension point. The app reads Japanese only, and the UI
+is English only (via slang, see below). `JapaneseLanguage`
+(`lib/src/language/`) is a plain singleton for segmentation (MeCab), sentence
+splitting, highlight lengths, furigana and pitch display. The dictionary search
+isolate entry point `prepareSearchResultsJapaneseLanguage` lives in the same
+file.
+
 ### `AppModel`
 
 `lib/src/models/app_model.dart` (~3200 lines) is the god object: a

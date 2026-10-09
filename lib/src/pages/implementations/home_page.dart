@@ -77,7 +77,7 @@ class _HomePageState extends BasePageState<HomePage>
       /// Keep the search database ready.
       debugPrint('Lifecycle Resumed');
       appModel.searchDictionary(
-        searchTerm: JapaneseLanguage.instance.helloWorld,
+        searchTerm: JapaneseLanguage.helloWorld,
         searchWithWildcards: false,
         useCache: false,
       );

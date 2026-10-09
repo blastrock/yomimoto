@@ -35,7 +35,7 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
   @override
   Widget build(BuildContext context) {
     AsyncValue<LocalAssetsServer> server =
-        ref.watch(ttuServerProvider(appModel.targetLanguage));
+        ref.watch(ttuServerProvider);
 
     return server.when(
         data: buildData,
@@ -49,7 +49,7 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
             _timer ??= Timer.periodic(const Duration(seconds: 1), (_) {
               _tryAgainCountdownNotifier.value -= 1;
               if (_tryAgainCountdownNotifier.value <= 0) {
-                ref.invalidate(ttuServerProvider(appModel.targetLanguage));
+                ref.invalidate(ttuServerProvider);
                 _timer?.cancel();
                 _timer = null;
               }
@@ -72,7 +72,7 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
             error: error,
             stack: stack,
             refresh: () {
-              ref.invalidate(ttuServerProvider(appModel.targetLanguage));
+              ref.invalidate(ttuServerProvider);
             },
           );
         });
@@ -80,7 +80,7 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
 
   Widget buildData(LocalAssetsServer server) {
     AsyncValue<List<MediaItem>> books =
-        ref.watch(ttuBooksProvider(appModel.targetLanguage));
+        ref.watch(ttuBooksProvider);
 
     return books.when(
       data: buildBody,
@@ -88,7 +88,7 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
         error: error,
         stack: stack,
         refresh: () {
-          ref.invalidate(ttuBooksProvider(appModel.targetLanguage));
+          ref.invalidate(ttuBooksProvider);
         },
       ),
       loading: buildLoading,

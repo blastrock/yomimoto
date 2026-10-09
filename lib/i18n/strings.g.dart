@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 284
+/// Strings: 280
 ///
-/// Built on 2026-10-09 at 20:45 UTC
+/// Built on 2026-10-09 at 20:48 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -164,7 +164,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get resume_last_media => 'Resume Last Media';
 	String get launch_source => 'Launch Source';
 	String get card_creator => 'Card Creator';
-	String get target_language => 'Target language';
 	String get show_options => 'Show Options';
 	String get switch_profiles => 'Switch Profiles';
 	String get dictionaries => 'Dictionaries';
@@ -204,7 +203,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get options_dictionaries => 'Manage dictionaries';
 	String get options_profiles => 'Export profiles';
 	String get options_enhancements => 'User enhancements';
-	String get options_language => 'Language settings';
 	String get options_github => 'View repository on GitHub';
 	String get options_attribution => 'Licenses and attribution';
 	String get options_copy => 'Copy';
@@ -374,8 +372,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get export_profile_empty => 'Your export profile has no set fields and requires configuration.';
 	String get error_export_media_ankidroid => 'There was an error in exporting media to AnkiDroid.';
 	String get error_add_note => 'There was an error in adding a note to AnkiDroid.';
-	String get first_time_setup => 'First-Time Setup';
-	String get first_time_setup_description => 'Welcome to jidoujisho! Set your target language and a default profile will be tailored for you. You can change this later at anytime.';
 	String get maximum_entries => 'Maximum dictionary entry query limit';
 	String get maximum_terms => 'Maximum dictionary headwords in result';
 	String get use_br_tags => 'Use line break tag instead of newline on export';
@@ -480,7 +476,6 @@ extension on Translations {
 			case 'resume_last_media': return 'Resume Last Media';
 			case 'launch_source': return 'Launch Source';
 			case 'card_creator': return 'Card Creator';
-			case 'target_language': return 'Target language';
 			case 'show_options': return 'Show Options';
 			case 'switch_profiles': return 'Switch Profiles';
 			case 'dictionaries': return 'Dictionaries';
@@ -520,7 +515,6 @@ extension on Translations {
 			case 'options_dictionaries': return 'Manage dictionaries';
 			case 'options_profiles': return 'Export profiles';
 			case 'options_enhancements': return 'User enhancements';
-			case 'options_language': return 'Language settings';
 			case 'options_github': return 'View repository on GitHub';
 			case 'options_attribution': return 'Licenses and attribution';
 			case 'options_copy': return 'Copy';
@@ -690,8 +684,6 @@ extension on Translations {
 			case 'export_profile_empty': return 'Your export profile has no set fields and requires configuration.';
 			case 'error_export_media_ankidroid': return 'There was an error in exporting media to AnkiDroid.';
 			case 'error_add_note': return 'There was an error in adding a note to AnkiDroid.';
-			case 'first_time_setup': return 'First-Time Setup';
-			case 'first_time_setup_description': return 'Welcome to jidoujisho! Set your target language and a default profile will be tailored for you. You can change this later at anytime.';
 			case 'maximum_entries': return 'Maximum dictionary entry query limit';
 			case 'maximum_terms': return 'Maximum dictionary headwords in result';
 			case 'use_br_tags': return 'Use line break tag instead of newline on export';

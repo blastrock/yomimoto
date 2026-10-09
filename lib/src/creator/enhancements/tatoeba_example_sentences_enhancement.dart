@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:http/http.dart' as http;
 import 'package:yuuna/utils.dart';
@@ -25,7 +24,7 @@ class TatoebaExampleSentencesEnhancement extends Enhancement {
   static const String key = 'tatoeba_example_sentences';
 
   /// Used to store results that have already been found at runtime.
-  final Map<String, Map<String, List<String>>> _tatoebaCache = {};
+  final Map<String, List<String>> _tatoebaCache = {};
 
   /// Client used to communicate with Tatoeba.
   final http.Client _client = http.Client();
@@ -81,26 +80,21 @@ class TatoebaExampleSentencesEnhancement extends Enhancement {
       return [];
     }
 
-    Language language = appModel.targetLanguage;
-    String langCode = language.threeLetterCode;
-
-    _tatoebaCache[langCode] ??= {};
-
-    if (_tatoebaCache[langCode]![searchTerm] != null) {
-      return _tatoebaCache[langCode]![searchTerm]!;
+    if (_tatoebaCache[searchTerm] != null) {
+      return _tatoebaCache[searchTerm]!;
     }
 
     List<String> sentences = [];
 
     http.Response response = await _client.get(Uri.parse(
-        'https://tatoeba.org/en/api_v0/search?from=$langCode&has_audio=&native=&orphans=no&query=${Uri.encodeComponent(searchTerm)}&sort=relevance&sort_reverse=&tags=&to=none&trans_filter=limit&trans_has_audio=&trans_link=&trans_orphan=&trans_to=&trans_unapproved=&trans_user=&unapproved=no&user='));
+        'https://tatoeba.org/en/api_v0/search?from=jpn&has_audio=&native=&orphans=no&query=${Uri.encodeComponent(searchTerm)}&sort=relevance&sort_reverse=&tags=&to=none&trans_filter=limit&trans_has_audio=&trans_link=&trans_orphan=&trans_to=&trans_unapproved=&trans_user=&unapproved=no&user='));
 
     Map<String, dynamic> json = jsonDecode(response.body);
     List<Map<String, dynamic>> results =
         List<Map<String, dynamic>>.from(json['results']);
 
     sentences = results.map((result) => result['text'].toString()).toList();
-    _tatoebaCache[langCode]![searchTerm] = sentences;
+    _tatoebaCache[searchTerm] = sentences;
 
     return sentences;
   }

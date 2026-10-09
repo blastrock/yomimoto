@@ -11,6 +11,7 @@ import 'package:local_assets_server/local_assets_server.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -191,7 +192,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
   Widget buildBody() {
     AsyncValue<LocalAssetsServer> server =
-        ref.watch(ttuServerProvider(appModel.targetLanguage));
+        ref.watch(ttuServerProvider);
 
     return server.when(
       data: buildReaderArea,
@@ -200,7 +201,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         error: error,
         stack: stack,
         refresh: () {
-          ref.invalidate(ttuServerProvider(appModel.targetLanguage));
+          ref.invalidate(ttuServerProvider);
         },
       ),
     );
@@ -506,20 +507,20 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
             index = index - 1;
           }
 
-          bool isSpaceDelimited = appModel.targetLanguage.isSpaceDelimited;
+          bool isSpaceDelimited = JapaneseLanguage.instance.isSpaceDelimited;
 
-          String searchTerm = appModel.targetLanguage.getSearchTermFromIndex(
+          String searchTerm = JapaneseLanguage.instance.getSearchTermFromIndex(
             text: text,
             index: index,
           );
           int whitespaceOffset =
               searchTerm.length - searchTerm.trimLeft().length;
 
-          int offsetIndex = appModel.targetLanguage
+          int offsetIndex = JapaneseLanguage.instance
                   .getStartingIndex(text: text, index: index) +
               whitespaceOffset;
 
-          int length = appModel.targetLanguage.getGuessHighlightLength(
+          int length = JapaneseLanguage.instance.getGuessHighlightLength(
             searchTerm: searchTerm,
           );
 
@@ -538,7 +539,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
             searchTerm: searchTerm,
             position: position,
           ).then((_) async {
-            length = appModel.targetLanguage.getFinalHighlightLength(
+            length = JapaneseLanguage.instance.getFinalHighlightLength(
               result: currentResult,
               searchTerm: searchTerm,
             );
@@ -559,7 +560,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
             }
 
             JidoujishoTextSelection selection =
-                appModel.targetLanguage.getSentenceFromParagraph(
+                JapaneseLanguage.instance.getSentenceFromParagraph(
               paragraph: text,
               index: index,
               startOffset: offsetIndex,

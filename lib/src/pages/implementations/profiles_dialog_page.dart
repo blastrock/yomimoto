@@ -88,10 +88,8 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
               AnkiMapping.defaultCreatorCollapsedFieldKeys,
           tags: [],
           order: 0,
-          enhancements: AnkiMapping.defaultEnhancementsByLanguage[
-              appModel.targetLanguage.languageCountryCode],
-          actions: AnkiMapping.defaultActionsByLanguage[
-              appModel.targetLanguage.languageCountryCode],
+          enhancements: AnkiMapping.defaultEnhancements,
+          actions: AnkiMapping.defaultActions,
           exportMediaTags: true,
           useBrTags: true,
           prependDictionaryNames: true,

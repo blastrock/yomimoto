@@ -5,28 +5,23 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_assets_server/local_assets_server.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
 /// A global [Provider] for serving a local ッツ Ebook Reader.
-final ttuServerProvider =
-    FutureProvider.family<LocalAssetsServer, Language>((ref, language) {
-  return ReaderTtuSource.instance.serveLocalAssets(language);
+final ttuServerProvider = FutureProvider<LocalAssetsServer>((ref) {
+  return ReaderTtuSource.instance.serveLocalAssets();
 });
 
 /// A global [Provider] for getting ッツ Ebook Reader books from IndexedDB.
-final ttuBooksProvider =
-    FutureProvider.family<List<MediaItem>, Language>((ref, language) {
+final ttuBooksProvider = FutureProvider<List<MediaItem>>((ref) {
   return ReaderTtuSource.instance.getBooksHistory(
     appModel: ref.watch(appProvider),
-    language: language,
   );
 });
 
@@ -62,49 +57,21 @@ class ReaderTtuSource extends ReaderMediaSource {
     required AppModel appModel,
     required WidgetRef ref,
   }) async {
-    ref.invalidate(ttuBooksProvider(appModel.targetLanguage));
+    ref.invalidate(ttuBooksProvider);
     // await exportBackup(appModel: appModel);
   }
 
-  /// Import persisted backup data back to IndexedDB if it exists.
-  Future<void> importBackup({
-    required InAppWebViewController controller,
-    required Language language,
-    required String data,
-  }) async {
-    FlutterLogs.logInfo(
-      uniqueKey,
-      'importBackup',
-      'Restored IndexedDB.',
-    );
-  }
-
-  /// Get the IndexedDB backup key for a language
-  String getIndexedDBKey(Language language) {
-    return 'idb_${getPortForLanguage(language)}';
-  }
-
-  /// Get the port for the current language. This port should ideally not conflict but should remain the same for
-  /// caching purposes.
-  int getPortForLanguage(Language language) {
-    /// Language Customizable
-    if (language is JapaneseLanguage) {
-      return 52059;
-    } else if (language is EnglishLanguage) {
-      return 52060;
-    }
-
-    throw UnimplementedError();
-  }
+  /// The localhost port the reader assets are served on. It should not
+  /// conflict with anything, but must stay the same since the reader's
+  /// IndexedDB is tied to its origin.
+  static const int port = 52059;
 
   /// Used to delay the serve if the server failed to launch last time. Makes
   /// retry look better for port conflicts.
   bool _lastServeFailed = false;
 
   /// For serving the reader assets locally.
-  Future<LocalAssetsServer> serveLocalAssets(Language language) async {
-    int port = getPortForLanguage(language);
-
+  Future<LocalAssetsServer> serveLocalAssets() async {
     if (_lastServeFailed) {
       await Future.delayed(const Duration(seconds: 1));
     }
@@ -184,8 +151,6 @@ class ReaderTtuSource extends ReaderMediaSource {
     required WidgetRef ref,
     required AppModel appModel,
   }) {
-    int port = getPortForLanguage(appModel.targetLanguage);
-
     return FloatingSearchBarAction(
       showIfOpened: true,
       child: JidoujishoIconButton(
@@ -225,11 +190,8 @@ class ReaderTtuSource extends ReaderMediaSource {
   /// Fetch JSON for all books in IndexedDB.
   Future<List<MediaItem>> getBooksHistory({
     required AppModel appModel,
-    required Language language,
     bool recursive = false,
   }) async {
-    int port = getPortForLanguage(appModel.targetLanguage);
-
     List<MediaItem>? items;
 
     HeadlessInAppWebView webView = HeadlessInAppWebView(
@@ -255,18 +217,9 @@ class ReaderTtuSource extends ReaderMediaSource {
                 }
                 break;
               case 'empty':
-                if (!appModel.targetLanguage.preferVerticalReading) {
-                  await controller.evaluateJavascript(
-                      source:
-                          'javascript:window.localStorage.setItem("writingMode", "horizontal-tb")');
-                  await controller.evaluateJavascript(
-                      source:
-                          'javascript:window.localStorage.setItem("fontSize", 16)');
-                } else {
-                  await controller.evaluateJavascript(
-                      source:
-                          'javascript:window.localStorage.setItem("fontSize", 24)');
-                }
+                await controller.evaluateJavascript(
+                    source:
+                        'javascript:window.localStorage.setItem("fontSize", 24)');
 
                 items = [];
                 break;

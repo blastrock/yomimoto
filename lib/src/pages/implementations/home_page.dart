@@ -1,6 +1,7 @@
 import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:spaces/spaces.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -51,12 +52,8 @@ class _HomePageState extends BasePageState<HomePage>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      appModel.populateDefaultMapping(appModel.targetLanguage);
+      appModel.populateDefaultMapping();
       if (appModel.isFirstTimeSetup) {
-        await appModel.showLanguageMenu();
-        appModel.setLastSelectedDictionaryFormat(
-            appModel.targetLanguage.standardFormat);
-
         appModel.setFirstTimeSetupFlag();
       }
     });
@@ -80,7 +77,7 @@ class _HomePageState extends BasePageState<HomePage>
       /// Keep the search database ready.
       debugPrint('Lifecycle Resumed');
       appModel.searchDictionary(
-        searchTerm: appModel.targetLanguage.helloWorld,
+        searchTerm: JapaneseLanguage.instance.helloWorld,
         searchWithWildcards: false,
         useCache: false,
       );

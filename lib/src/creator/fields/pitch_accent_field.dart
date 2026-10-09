@@ -35,7 +35,7 @@ class PitchAccentField extends Field {
 
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
         dictionaries
-            .map((e) => MapEntry(e.name, e.isHidden(appModel.targetLanguage))));
+            .map((e) => MapEntry(e.name, e.isHidden(JapaneseLanguage.instance))));
     Map<String, int> dictionaryNamesByOrder = Map<String, int>.fromEntries(
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 
@@ -76,10 +76,6 @@ class PitchAccentField extends Field {
     required bool creatorJustLaunched,
     required String? dictionaryName,
   }) {
-    if (appModel.targetLanguage is! JapaneseLanguage) {
-      return null;
-    }
-
     return getAllHtmlPitch(
       appModel: appModel,
       heading: heading,

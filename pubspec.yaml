@@ -58,7 +58,6 @@ dependencies:
   json_serializable: ^6.6.1
   just_audio: ^0.10.6
   kana_kit: ^2.0.0
-  lemmatizerx: ^1.0.0
   list_counter: ^1.0.2
   local_assets_server: ^2.0.2+12
   marquee: ^2.2.3

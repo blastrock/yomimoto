@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:spaces/spaces.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -645,20 +646,20 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
           if (index != 0 && text.substring(index).startsWith(loneSurrogate)) {
             index = index - 1;
           }
-          bool isSpaceDelimited = appModel.targetLanguage.isSpaceDelimited;
+          bool isSpaceDelimited = JapaneseLanguage.instance.isSpaceDelimited;
 
-          String searchTerm = appModel.targetLanguage.getSearchTermFromIndex(
+          String searchTerm = JapaneseLanguage.instance.getSearchTermFromIndex(
             text: text.trimRight() + nextLine.trim(),
             index: index,
           );
           int whitespaceOffset =
               searchTerm.length - searchTerm.trimLeft().length;
 
-          int offsetIndex = appModel.targetLanguage
+          int offsetIndex = JapaneseLanguage.instance
                   .getStartingIndex(text: text, index: index) +
               whitespaceOffset;
 
-          int length = appModel.targetLanguage.getGuessHighlightLength(
+          int length = JapaneseLanguage.instance.getGuessHighlightLength(
             searchTerm: searchTerm,
           );
 
@@ -677,7 +678,7 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
             searchTerm: searchTerm,
             position: position,
           ).then((_) {
-            length = appModel.targetLanguage.getFinalHighlightLength(
+            length = JapaneseLanguage.instance.getFinalHighlightLength(
               result: currentResult,
               searchTerm: searchTerm,
             );

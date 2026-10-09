@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/utils.dart';
 
@@ -40,7 +41,7 @@ class SentencePickerEnhancement extends Enhancement {
     }
 
     appModel.openExampleSentenceDialog(
-      exampleSentences: appModel.targetLanguage
+      exampleSentences: JapaneseLanguage.instance
           .getSentences(sourceText)
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty)
@@ -49,7 +50,7 @@ class SentencePickerEnhancement extends Enhancement {
         creatorModel.setSentenceAndCloze(
           JidoujishoTextSelection(
             text: selection
-                .join(appModel.targetLanguage.isSpaceDelimited ? ' ' : '')
+                .join(JapaneseLanguage.instance.isSpaceDelimited ? ' ' : '')
                 .trim(),
           ),
         );

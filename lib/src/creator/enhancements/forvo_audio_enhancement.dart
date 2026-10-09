@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:html/parser.dart' as parser;
 import 'package:html/dom.dart' as dom;
@@ -181,29 +180,18 @@ class ForvoAudioEnhancement extends AudioEnhancement {
   Future<List<ForvoResult>> getForvoResults(
       {required AppModel appModel, required String searchTerm}) async {
     Codec<String, String> stringToBase64Url = utf8.fuse(base64Url);
-    Language language = appModel.targetLanguage;
-    String cacheKey = '${language.languageCode}/$searchTerm';
 
     List<ForvoResult> results = [];
-    if (_forvoCache[cacheKey] != null) {
-      results = _forvoCache[cacheKey]!;
+    if (_forvoCache[searchTerm] != null) {
+      results = _forvoCache[searchTerm]!;
     } else {
       http.Response response =
           await _client.get(Uri.parse('https://forvo.com/word/$searchTerm/'));
       var document = parser.parse(response.body);
 
       try {
-        String className = '';
-
-        // Language Customizable
-        if (appModel.targetLanguage is JapaneseLanguage) {
-          className = 'pronunciations-list-ja';
-        } else if (appModel.targetLanguage is EnglishLanguage) {
-          className = 'pronunciations-list-en_usa';
-        }
-
         List<dom.Element> liElements = document
-            .getElementsByClassName(className)
+            .getElementsByClassName('pronunciations-list-ja')
             .first
             .children
             .where((element) =>
@@ -241,7 +229,7 @@ class ForvoAudioEnhancement extends AudioEnhancement {
           );
         }).toList();
 
-        _forvoCache[cacheKey] = results;
+        _forvoCache[searchTerm] = results;
       } catch (error) {
         debugPrint('$error');
       }

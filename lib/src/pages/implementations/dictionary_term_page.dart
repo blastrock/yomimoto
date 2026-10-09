@@ -7,6 +7,7 @@ import 'package:spaces/spaces.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/src/models/app_model.dart';
 import 'package:yuuna/src/models/creator_model.dart';
@@ -312,7 +313,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
 
     List<DictionaryPitch> pitches = heading.pitches
         .where((pitch) =>
-            !pitch.dictionary.value!.isHidden(appModel.targetLanguage))
+            !pitch.dictionary.value!.isHidden(JapaneseLanguage.instance))
         .toList();
     if (pitches.isEmpty) {
       return const SliverPadding(padding: EdgeInsets.zero);
@@ -338,7 +339,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
               .map(
                 (pitch) => Padding(
                   padding: Spacing.of(context).insets.onlyLeft.normal,
-                  child: appModel.targetLanguage.getPitchWidget(
+                  child: JapaneseLanguage.instance.getPitchWidget(
                     appModel: appModel,
                     context: context,
                     reading: heading.reading,
@@ -366,7 +367,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
               .map(
                 (pitch) => Padding(
                   padding: Spacing.of(context).insets.onlyLeft.small,
-                  child: appModel.targetLanguage.getPitchWidget(
+                  child: JapaneseLanguage.instance.getPitchWidget(
                     appModel: appModel,
                     context: context,
                     reading: heading.reading,
@@ -501,7 +502,7 @@ class _DictionaryTermTopRow extends ConsumerWidget {
         Floatable(
           float: FCFloat.start,
           child: GestureDetector(
-            child: appModel.targetLanguage.getTermReadingOverrideWidget(
+            child: JapaneseLanguage.instance.getTermReadingOverrideWidget(
               context: context,
               appModel: appModel,
               heading: heading,

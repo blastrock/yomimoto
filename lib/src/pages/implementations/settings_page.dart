@@ -103,11 +103,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 onTap: appModel.showDictionaryMenu,
               ),
               buildAction(
-                icon: Icons.translate,
-                label: t.options_language,
-                onTap: appModel.showLanguageMenu,
-              ),
-              buildAction(
                 icon: Icons.checklist_sharp,
                 label: t.manage_duplicate_checks,
                 onTap: showDuplicateChecksPage,

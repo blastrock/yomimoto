@@ -104,7 +104,6 @@ freely, the `uniqueKey` cannot.
 |---|---|---|
 | `HomeTab` | `AppModel.populateTabs` | `ReaderTtuSource` (Novels), `ReaderMokuroSource` (Manga), `DictionaryTab` — these three *are* the bottom nav tabs, in order |
 | `MediaSource` | — | a `HomeTab` backed by a library of media items; both readers are one, the dictionary tab is not |
-| `Language` | `AppModel.populateLanguages` | `JapaneseLanguage`, `EnglishLanguage` |
 | `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |
 | `Enhancement` | `AppModel.populateEnhancements` | per-field: Forvo audio, Massif/Tatoeba/ImmersionKit sentences, image pickers, … |
@@ -133,7 +132,7 @@ its size — but splitting it is its own project, not a side effect of a feature
 
 - **Hive** — key-value preferences. `Box('appModel')` for app-wide settings
   (accessed through typed getter/setter pairs on `AppModel`, e.g. `isDarkMode`,
-  `targetLanguage`), plus a per-`MediaSource` box for source-specific settings.
+  `maximumTerms`), plus a per-`MediaSource` box for source-specific settings.
 - **Isar** (`isar_community` fork) — the real database: dictionary entries,
   headings, pitches, frequencies, tags, search-result cache, media items, Anki
   mappings, search history, mokuro catalogs. Schemas are listed in
@@ -175,7 +174,8 @@ translations are gone.
 - **ttu** — `assets/ttu-ebook-reader/` is a 57 MB prebuilt SvelteKit app,
   served over localhost by `local_assets_server` and displayed in
   `flutter_inappwebview`. Books live in the WebView's IndexedDB, not in Isar;
-  history is read back out of IndexedDB via injected JS. Ports are per-language.
+  history is read back out of IndexedDB via injected JS. The port
+  (`ReaderTtuSource.port`) must stay fixed: IndexedDB is tied to the origin.
 - **mokuro** — reads mokuro-processed manga (HTML + OCR text overlay), with a
   catalog of remote/local sources persisted in Isar (`MokuroCatalog`).
 

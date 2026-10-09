@@ -11,6 +11,7 @@ import 'package:stack_trace/stack_trace.dart';
 import 'package:spaces/spaces.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -242,7 +243,7 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
       appModel.isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
   /// The current locale, dependent on the active target language.
-  Locale get locale => appModel.targetLanguage.locale;
+  Locale get locale => JapaneseLanguage.instance.locale;
 }
 
 /// Used to override certain strings.

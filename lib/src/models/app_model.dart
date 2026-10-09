@@ -225,10 +225,6 @@ class AppModel with ChangeNotifier {
       _dictionaryImportWorkingDirectory;
   late final Directory _dictionaryImportWorkingDirectory;
 
-  /// Used to fetch a language by its locale tag with constant time performance.
-  /// Initialised with [populateLanguages] at startup.
-  late final Map<String, Language> languages;
-
   /// Used to fetch a dictionary format by its unique key with constant time
   /// performance. Initialised with [populateDictionaryFormats] at startup.
   late final Map<String, DictionaryFormat> dictionaryFormats;
@@ -351,10 +347,10 @@ class AppModel with ChangeNotifier {
 
   /// Get the app-wide text style.
   TextStyle get textStyle => TextStyle(
-        fontFamily: targetLanguage.defaultFontFamily,
+        fontFamily: JapaneseLanguage.instance.defaultFontFamily,
         fontFeatures: const [FontFeature('liga', 0)],
-        locale: targetLanguage.locale,
-        textBaseline: targetLanguage.textBaseline,
+        locale: JapaneseLanguage.instance.locale,
+        textBaseline: JapaneseLanguage.instance.textBaseline,
       );
 
   /// This override is a workaround required to theme the app-wide [TextTheme]
@@ -632,25 +628,6 @@ class AppModel with ChangeNotifier {
     });
   }
 
-  /// Populate maps for languages at startup to optimise performance.
-  void populateLanguages() async {
-    /// A list of languages that the app will support at runtime.
-    final List<Language> availableLanguages = List<Language>.unmodifiable(
-      [
-        JapaneseLanguage.instance,
-        EnglishLanguage.instance,
-      ],
-    );
-
-    languages = Map<String, Language>.unmodifiable(
-      Map<String, Language>.fromEntries(
-        availableLanguages.map(
-          (language) => MapEntry(language.locale.toLanguageTag(), language),
-        ),
-      ),
-    );
-  }
-
   /// Populate maps for home tabs at startup to optimise performance.
   void populateTabs() async {
     /// A list of home tabs that the app will support at runtime.
@@ -840,13 +817,10 @@ class AppModel with ChangeNotifier {
   }
 
   /// Populate default mapping if it does not exist in the database.
-  void populateDefaultMapping(Language language) async {
+  void populateDefaultMapping() async {
     if (_database.ankiMappings.where().findAllSync().isEmpty) {
       _database.writeTxnSync(() {
-        _database.ankiMappings.putSync(AnkiMapping.defaultMapping(
-          language: language,
-          order: 0,
-        ));
+        _database.ankiMappings.putSync(AnkiMapping.defaultMapping(order: 0));
       });
     } else {
       AnkiMapping standardProfile = _database.ankiMappings
@@ -874,10 +848,7 @@ class AppModel with ChangeNotifier {
           _database.ankiMappings.putAllSync(
             [
               legacyProfile,
-              AnkiMapping.defaultMapping(
-                language: language,
-                order: nextMappingOrder,
-              ),
+              AnkiMapping.defaultMapping(order: nextMappingOrder),
             ],
           );
         });
@@ -1022,18 +993,13 @@ class AppModel with ChangeNotifier {
 
     /// Populate entities with key-value maps for constant time performance.
     /// This is not the initialisation step, which occurs below.
-    populateLanguages();
     populateTabs();
     populateDictionaryFormats();
     populateEnhancements();
     populateQuickActions();
 
-    /// Get the current target language and prepare its resources for use. This
-    /// will not re-run if the target language is already initialised, as
-    /// a [Language] should always have a singleton instance and will not
-    /// re-prepare its resources if already initialised. See
-    /// [Language.initialise] for more details.
-    await targetLanguage.initialise();
+    /// Prepare the Japanese text segmentation resources for use.
+    await JapaneseLanguage.instance.initialise();
 
     /// Ready all enhancements sources for use.
     for (Field field in globalFields) {
@@ -1061,18 +1027,18 @@ class AppModel with ChangeNotifier {
 
     /// Preloads the search database in memory.
     searchDictionary(
-      searchTerm: targetLanguage.helloWorld,
+      searchTerm: JapaneseLanguage.instance.helloWorld,
       searchWithWildcards: false,
       useCache: false,
     ).then((_) {
       /// Preloads for wildcard searches.
       searchDictionary(
-        searchTerm: '${targetLanguage.helloWorld.substring(0, 1)}?',
+        searchTerm: '${JapaneseLanguage.instance.helloWorld.substring(0, 1)}?',
         searchWithWildcards: true,
         useCache: false,
       ).then((_) {
         searchDictionary(
-          searchTerm: '${targetLanguage.helloWorld.substring(0, 1)}*',
+          searchTerm: '${JapaneseLanguage.instance.helloWorld.substring(0, 1)}*',
           searchWithWildcards: true,
           useCache: false,
         );
@@ -1093,15 +1059,6 @@ class AppModel with ChangeNotifier {
   void toggleDarkMode() async {
     await _preferences.put('is_dark_mode', !isDarkMode);
     Restart.restartApp();
-  }
-
-  /// Get the target language from persisted preferences.
-  Language get targetLanguage {
-    String defaultLocaleTag = languages.values.first.locale.toLanguageTag();
-    String localeTag =
-        _preferences.get('target_language', defaultValue: defaultLocaleTag);
-
-    return languages[localeTag]!;
   }
 
   /// Get the last selected deck from persisted preferences.
@@ -1157,16 +1114,6 @@ class AppModel with ChangeNotifier {
     return mappingName;
   }
 
-  /// Persist a new target language in preferences.
-  Future<void> setTargetLanguage(Language language) async {
-    String localeTag = language.locale.toLanguageTag();
-    await _preferences.put('target_language', localeTag);
-
-    language.initialise();
-
-    notifyListeners();
-  }
-
   /// Persist a new last selected dictionary format. This is called when the
   /// user changes the import format in the dictionary menu.
   Future<void> setLastSelectedDictionaryFormat(
@@ -1220,18 +1167,6 @@ class AppModel with ChangeNotifier {
 
     notifyListeners();
     dictionaryMenuNotifier.notifyListeners();
-  }
-
-  /// Show the language menu. This should be callable from many parts of the
-  /// app, so it is appropriately handled by the model.
-  Future<void> showLanguageMenu() async {
-    await showDialog(
-      barrierDismissible: true,
-      context: navigatorKey.currentContext!,
-      builder: (context) => LanguageDialogPage(
-        isFirstTimeSetup: isFirstTimeSetup,
-      ),
-    );
   }
 
   /// Show the language menu. This should be callable from many parts of the
@@ -1377,13 +1312,13 @@ class AppModel with ChangeNotifier {
   /// affect how a dictionary's search results are shown by default.
   void toggleDictionaryCollapsed(Dictionary dictionary) {
     _database.writeTxnSync(() {
-      if (dictionary.isCollapsed(targetLanguage)) {
+      if (dictionary.isCollapsed(JapaneseLanguage.instance)) {
         dictionary.collapsedLanguages = [...dictionary.collapsedLanguages]
-          ..remove(targetLanguage.languageCode);
+          ..remove(JapaneseLanguage.instance.languageCode);
       } else {
         dictionary.collapsedLanguages = [
           ...dictionary.collapsedLanguages,
-          targetLanguage.languageCode
+          JapaneseLanguage.instance.languageCode
         ];
       }
       _database.dictionarys.putSync(dictionary);
@@ -1394,13 +1329,13 @@ class AppModel with ChangeNotifier {
   /// affect how a dictionary's search results are shown by default.
   void toggleDictionaryHidden(Dictionary dictionary) {
     _database.writeTxnSync(() {
-      if (dictionary.isHidden(targetLanguage)) {
+      if (dictionary.isHidden(JapaneseLanguage.instance)) {
         dictionary.hiddenLanguages = [...dictionary.hiddenLanguages]
-          ..remove(targetLanguage.languageCode);
+          ..remove(JapaneseLanguage.instance.languageCode);
       } else {
         dictionary.hiddenLanguages = [
           ...dictionary.hiddenLanguages,
-          targetLanguage.languageCode
+          JapaneseLanguage.instance.languageCode
         ];
       }
       _database.dictionarys.putSync(dictionary);
@@ -1554,7 +1489,7 @@ class AppModel with ChangeNotifier {
     /// to the actual data, rather than duplicating that data within the
     /// database, which is not ideal for storage purposes.
     _searchOperation =
-        cancelable.compute(targetLanguage.prepareSearchResults, params);
+        cancelable.compute(JapaneseLanguage.instance.prepareSearchResults, params);
     int? id = await _searchOperation?.value;
 
     if (id == null) {
@@ -2433,7 +2368,7 @@ class AppModel with ChangeNotifier {
       return;
     }
 
-    segmentedText ??= targetLanguage.textToWords(sourceText);
+    segmentedText ??= JapaneseLanguage.instance.textToWords(sourceText);
 
     await showDialog(
       context: _navigatorKey.currentContext!,
@@ -3008,8 +2943,8 @@ class AppModel with ChangeNotifier {
     await _preferences.put('close_on_export', !closeCreatorOnExport);
   }
 
-  /// Whether or not it is the app's first time setup to show the languages
-  /// dialog.
+  /// Whether or not it is the app's first time setup, used to explain the
+  /// permission requests at first launch.
   bool get isFirstTimeSetup {
     return _preferences.get('first_time_setup', defaultValue: true);
   }
@@ -3077,7 +3012,7 @@ class AppModel with ChangeNotifier {
             .getSync(DictionaryHeading.hash(term: heading.term, reading: ''))
             ?.frequencies
             .where((frequency) =>
-                !frequency.dictionary.value!.isHidden(targetLanguage))
+                !frequency.dictionary.value!.isHidden(JapaneseLanguage.instance))
             .toList() ??
         [];
   }

@@ -1,7 +1,6 @@
 import 'package:isar_community/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/utils.dart';
 
@@ -31,10 +30,8 @@ class AnkiMapping {
   });
 
   /// Get the default mapping that is included with the application at first
-  /// startup. Requires a language so that the appropriate default enhancements
-  /// are suggested.
+  /// startup.
   factory AnkiMapping.defaultMapping({
-    required Language language,
     required int order,
   }) {
     return AnkiMapping(
@@ -63,8 +60,8 @@ class AnkiMapping {
       creatorCollapsedFieldKeys: defaultCreatorCollapsedFieldKeys,
       order: order,
       tags: [standardModelName],
-      enhancements: defaultEnhancementsByLanguage[language.languageCountryCode],
-      actions: defaultActionsByLanguage[language.languageCountryCode],
+      enhancements: defaultEnhancements,
+      actions: defaultActions,
       exportMediaTags: true,
       useBrTags: true,
       prependDictionaryNames: true,
@@ -72,111 +69,58 @@ class AnkiMapping {
   }
 
   /// A default map of enhancements to use for new mappings.
-  static const Map<String, Map<String, Map<int, String>>>
-      defaultEnhancementsByLanguage = {
-    'ja-JP': {
-      SentenceField.key: {
-        0: ClearFieldEnhancement.key,
-        1: TextSegmentationEnhancement.key,
-        2: SentencePickerEnhancement.key,
-      },
-      TermField.key: {
-        0: ClearFieldEnhancement.key,
-        1: SearchDictionaryEnhancement.key,
-        2: MassifExampleSentencesEnhancement.key,
-        3: ImmersionKitEnhancement.key,
-        4: OpenStashEnhancement.key,
-      },
-      ReadingField.key: {0: ClearFieldEnhancement.key},
-      MeaningField.key: {
-        0: ClearFieldEnhancement.key,
-        1: TextSegmentationEnhancement.key,
-      },
-      NotesField.key: {0: ClearFieldEnhancement.key},
-      ImageField.key: {
-        -1: BingImagesSearchEnhancement.key,
-        0: ClearFieldEnhancement.key,
-        1: BingImagesSearchEnhancement.key,
-        2: CameraEnhancement.key,
-        3: PickImageEnhancement.key,
-        4: CropImageEnhancement.key,
-      },
-      AudioField.key: {
-        -1: JapanesePod101AudioEnhancement.key,
-        0: ClearFieldEnhancement.key,
-        1: JapanesePod101AudioEnhancement.key,
-        2: ForvoAudioEnhancement.key,
-        3: PickAudioEnhancement.key,
-        4: AudioRecorderEnhancement.key,
-      },
-      AudioSentenceField.key: {
-        0: ClearFieldEnhancement.key,
-      },
-      TagsField.key: {
-        0: ClearFieldEnhancement.key,
-        1: SaveTagsEnhancement.key,
-      },
-      ContextField.key: {0: ClearFieldEnhancement.key},
-      PitchAccentField.key: {0: ClearFieldEnhancement.key},
-      FuriganaField.key: {0: ClearFieldEnhancement.key},
-      FrequencyField.key: {0: ClearFieldEnhancement.key},
-      CollapsedMeaningField.key: {0: ClearFieldEnhancement.key},
-      ExpandedMeaningField.key: {0: ClearFieldEnhancement.key},
-      HiddenMeaningField.key: {0: ClearFieldEnhancement.key},
-      ClozeBeforeField.key: {0: ClearFieldEnhancement.key},
-      ClozeAfterField.key: {0: ClearFieldEnhancement.key},
-      ClozeInsideField.key: {0: ClearFieldEnhancement.key},
+  static const Map<String, Map<int, String>> defaultEnhancements = {
+    SentenceField.key: {
+      0: ClearFieldEnhancement.key,
+      1: TextSegmentationEnhancement.key,
+      2: SentencePickerEnhancement.key,
     },
-    'en-US': {
-      SentenceField.key: {
-        0: ClearFieldEnhancement.key,
-        1: TextSegmentationEnhancement.key
-      },
-      TermField.key: {
-        0: ClearFieldEnhancement.key,
-        1: SearchDictionaryEnhancement.key,
-        2: TatoebaExampleSentencesEnhancement.key,
-        3: OpenStashEnhancement.key,
-      },
-      ReadingField.key: {0: ClearFieldEnhancement.key},
-      MeaningField.key: {
-        0: ClearFieldEnhancement.key,
-        1: TextSegmentationEnhancement.key,
-      },
-      NotesField.key: {0: ClearFieldEnhancement.key},
-      ImageField.key: {
-        -1: BingImagesSearchEnhancement.key,
-        0: ClearFieldEnhancement.key,
-        1: BingImagesSearchEnhancement.key,
-        2: CameraEnhancement.key,
-        3: PickImageEnhancement.key,
-        4: CropImageEnhancement.key,
-      },
-      AudioField.key: {
-        -1: ForvoAudioEnhancement.key,
-        0: ClearFieldEnhancement.key,
-        1: ForvoAudioEnhancement.key,
-        2: PickAudioEnhancement.key,
-        3: AudioRecorderEnhancement.key,
-      },
-      AudioSentenceField.key: {
-        0: ClearFieldEnhancement.key,
-      },
-      TagsField.key: {
-        0: ClearFieldEnhancement.key,
-        1: SaveTagsEnhancement.key,
-      },
-      ContextField.key: {0: ClearFieldEnhancement.key},
-      PitchAccentField.key: {0: ClearFieldEnhancement.key},
-      FuriganaField.key: {0: ClearFieldEnhancement.key},
-      FrequencyField.key: {0: ClearFieldEnhancement.key},
-      CollapsedMeaningField.key: {0: ClearFieldEnhancement.key},
-      ExpandedMeaningField.key: {0: ClearFieldEnhancement.key},
-      HiddenMeaningField.key: {0: ClearFieldEnhancement.key},
-      ClozeBeforeField.key: {0: ClearFieldEnhancement.key},
-      ClozeAfterField.key: {0: ClearFieldEnhancement.key},
-      ClozeInsideField.key: {0: ClearFieldEnhancement.key},
+    TermField.key: {
+      0: ClearFieldEnhancement.key,
+      1: SearchDictionaryEnhancement.key,
+      2: MassifExampleSentencesEnhancement.key,
+      3: ImmersionKitEnhancement.key,
+      4: OpenStashEnhancement.key,
     },
+    ReadingField.key: {0: ClearFieldEnhancement.key},
+    MeaningField.key: {
+      0: ClearFieldEnhancement.key,
+      1: TextSegmentationEnhancement.key,
+    },
+    NotesField.key: {0: ClearFieldEnhancement.key},
+    ImageField.key: {
+      -1: BingImagesSearchEnhancement.key,
+      0: ClearFieldEnhancement.key,
+      1: BingImagesSearchEnhancement.key,
+      2: CameraEnhancement.key,
+      3: PickImageEnhancement.key,
+      4: CropImageEnhancement.key,
+    },
+    AudioField.key: {
+      -1: JapanesePod101AudioEnhancement.key,
+      0: ClearFieldEnhancement.key,
+      1: JapanesePod101AudioEnhancement.key,
+      2: ForvoAudioEnhancement.key,
+      3: PickAudioEnhancement.key,
+      4: AudioRecorderEnhancement.key,
+    },
+    AudioSentenceField.key: {
+      0: ClearFieldEnhancement.key,
+    },
+    TagsField.key: {
+      0: ClearFieldEnhancement.key,
+      1: SaveTagsEnhancement.key,
+    },
+    ContextField.key: {0: ClearFieldEnhancement.key},
+    PitchAccentField.key: {0: ClearFieldEnhancement.key},
+    FuriganaField.key: {0: ClearFieldEnhancement.key},
+    FrequencyField.key: {0: ClearFieldEnhancement.key},
+    CollapsedMeaningField.key: {0: ClearFieldEnhancement.key},
+    ExpandedMeaningField.key: {0: ClearFieldEnhancement.key},
+    HiddenMeaningField.key: {0: ClearFieldEnhancement.key},
+    ClozeBeforeField.key: {0: ClearFieldEnhancement.key},
+    ClozeAfterField.key: {0: ClearFieldEnhancement.key},
+    ClozeInsideField.key: {0: ClearFieldEnhancement.key},
   };
 
   /// Default fields to show upon opening the Card Creator.
@@ -203,24 +147,14 @@ class AnkiMapping {
     PitchAccentField.key,
   ];
 
-  /// A default map of enhancements to use for new mappings.
-  static const Map<String, Map<int, String>> defaultActionsByLanguage = {
-    'ja-JP': {
-      0: CardCreatorAction.key,
-      1: InstantExportAction.key,
-      2: AddToStashAction.key,
-      3: CopyToClipboardAction.key,
-      4: ShareAction.key,
-      5: PlayAudioAction.key,
-    },
-    'en-US': {
-      0: CardCreatorAction.key,
-      1: InstantExportAction.key,
-      2: AddToStashAction.key,
-      3: CopyToClipboardAction.key,
-      4: ShareAction.key,
-      5: PlayAudioAction.key,
-    }
+  /// A default map of quick actions to use for new mappings.
+  static const Map<int, String> defaultActions = {
+    0: CardCreatorAction.key,
+    1: InstantExportAction.key,
+    2: AddToStashAction.key,
+    3: CopyToClipboardAction.key,
+    4: ShareAction.key,
+    5: PlayAudioAction.key,
   };
 
   /// The default mapping name which cannot be deleted or reused.

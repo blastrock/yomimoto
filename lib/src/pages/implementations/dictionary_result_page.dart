@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/pages.dart';
 
 /// Returns the widget for a [DictionarySearchResult] which returns a
@@ -87,10 +88,10 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
         dictionaries
-            .map((e) => MapEntry(e.name, e.isHidden(appModel.targetLanguage))));
+            .map((e) => MapEntry(e.name, e.isHidden(JapaneseLanguage.instance))));
     Map<String, bool> dictionaryNamesByCollapsed =
         Map<String, bool>.fromEntries(dictionaries.map(
-            (e) => MapEntry(e.name, e.isCollapsed(appModel.targetLanguage))));
+            (e) => MapEntry(e.name, e.isCollapsed(JapaneseLanguage.instance))));
     Map<String, int> dictionaryNamesByOrder = Map<String, int>.fromEntries(
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 

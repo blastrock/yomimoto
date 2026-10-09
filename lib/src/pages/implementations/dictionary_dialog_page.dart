@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
+import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -338,13 +339,13 @@ class _DictionaryDialogPageState extends BasePageState {
     required Dictionary dictionary,
     required DictionaryFormat dictionaryFormat,
   }) {
-    if (dictionary.isHidden(appModel.targetLanguage)) {
+    if (dictionary.isHidden(JapaneseLanguage.instance)) {
       return Icon(
         Icons.visibility_off,
         size: textTheme.titleLarge?.fontSize,
         color: theme.unselectedWidgetColor,
       );
-    } else if (dictionary.isCollapsed(appModel.targetLanguage)) {
+    } else if (dictionary.isCollapsed(JapaneseLanguage.instance)) {
       return Icon(
         Icons.close_fullscreen,
         size: textTheme.titleLarge?.fontSize,
@@ -386,7 +387,7 @@ class _DictionaryDialogPageState extends BasePageState {
                         text: dictionary.name,
                         style: TextStyle(
                           fontSize: textTheme.bodyMedium?.fontSize,
-                          color: dictionary.isHidden(appModel.targetLanguage)
+                          color: dictionary.isHidden(JapaneseLanguage.instance)
                               ? theme.unselectedWidgetColor
                               : null,
                         ),
@@ -395,7 +396,7 @@ class _DictionaryDialogPageState extends BasePageState {
                         text: dictionaryFormat.name,
                         style: TextStyle(
                           fontSize: textTheme.bodySmall?.fontSize,
-                          color: dictionary.isHidden(appModel.targetLanguage)
+                          color: dictionary.isHidden(JapaneseLanguage.instance)
                               ? theme.unselectedWidgetColor
                               : null,
                         ),
@@ -491,10 +492,10 @@ class _DictionaryDialogPageState extends BasePageState {
   List<PopupMenuItem<VoidCallback>> getMenuItems(Dictionary dictionary) {
     return [
       buildPopupItem(
-        label: dictionary.isCollapsed(appModel.targetLanguage)
+        label: dictionary.isCollapsed(JapaneseLanguage.instance)
             ? t.options_expand
             : t.options_collapse,
-        icon: dictionary.isCollapsed(appModel.targetLanguage)
+        icon: dictionary.isCollapsed(JapaneseLanguage.instance)
             ? Icons.open_in_full
             : Icons.close_fullscreen,
         action: () {
@@ -506,10 +507,10 @@ class _DictionaryDialogPageState extends BasePageState {
         },
       ),
       buildPopupItem(
-        label: dictionary.isHidden(appModel.targetLanguage)
+        label: dictionary.isHidden(JapaneseLanguage.instance)
             ? t.options_show
             : t.options_hide,
-        icon: dictionary.isCollapsed(appModel.targetLanguage)
+        icon: dictionary.isCollapsed(JapaneseLanguage.instance)
             ? Icons.visibility
             : Icons.visibility_off,
         action: () {

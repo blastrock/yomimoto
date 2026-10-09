@@ -17,22 +17,18 @@ const DictionarySchema = CollectionSchema(
   name: r'Dictionary',
   id: 9038313064164341215,
   properties: {
-    r'collapsedLanguages': PropertySchema(
-      id: 0,
-      name: r'collapsedLanguages',
-      type: IsarType.stringList,
-    ),
     r'formatKey': PropertySchema(
-      id: 1,
+      id: 0,
       name: r'formatKey',
       type: IsarType.string,
     ),
-    r'hashCode': PropertySchema(id: 2, name: r'hashCode', type: IsarType.long),
-    r'hiddenLanguages': PropertySchema(
-      id: 3,
-      name: r'hiddenLanguages',
-      type: IsarType.stringList,
+    r'hashCode': PropertySchema(id: 1, name: r'hashCode', type: IsarType.long),
+    r'isCollapsed': PropertySchema(
+      id: 2,
+      name: r'isCollapsed',
+      type: IsarType.bool,
     ),
+    r'isHidden': PropertySchema(id: 3, name: r'isHidden', type: IsarType.bool),
     r'name': PropertySchema(id: 4, name: r'name', type: IsarType.string),
     r'order': PropertySchema(id: 5, name: r'order', type: IsarType.long),
   },
@@ -53,32 +49,6 @@ const DictionarySchema = CollectionSchema(
           name: r'order',
           type: IndexType.value,
           caseSensitive: false,
-        ),
-      ],
-    ),
-    r'hiddenLanguages': IndexSchema(
-      id: 7420903376471065299,
-      name: r'hiddenLanguages',
-      unique: false,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'hiddenLanguages',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-      ],
-    ),
-    r'collapsedLanguages': IndexSchema(
-      id: 2603546669418382826,
-      name: r'collapsedLanguages',
-      unique: false,
-      replace: false,
-      properties: [
-        IndexPropertySchema(
-          name: r'collapsedLanguages',
-          type: IndexType.hash,
-          caseSensitive: true,
         ),
       ],
     ),
@@ -140,21 +110,7 @@ int _dictionaryEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.collapsedLanguages.length * 3;
-  {
-    for (var i = 0; i < object.collapsedLanguages.length; i++) {
-      final value = object.collapsedLanguages[i];
-      bytesCount += value.length * 3;
-    }
-  }
   bytesCount += 3 + object.formatKey.length * 3;
-  bytesCount += 3 + object.hiddenLanguages.length * 3;
-  {
-    for (var i = 0; i < object.hiddenLanguages.length; i++) {
-      final value = object.hiddenLanguages[i];
-      bytesCount += value.length * 3;
-    }
-  }
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
 }
@@ -165,10 +121,10 @@ void _dictionarySerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeStringList(offsets[0], object.collapsedLanguages);
-  writer.writeString(offsets[1], object.formatKey);
-  writer.writeLong(offsets[2], object.hashCode);
-  writer.writeStringList(offsets[3], object.hiddenLanguages);
+  writer.writeString(offsets[0], object.formatKey);
+  writer.writeLong(offsets[1], object.hashCode);
+  writer.writeBool(offsets[2], object.isCollapsed);
+  writer.writeBool(offsets[3], object.isHidden);
   writer.writeString(offsets[4], object.name);
   writer.writeLong(offsets[5], object.order);
 }
@@ -180,10 +136,10 @@ Dictionary _dictionaryDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Dictionary(
-    collapsedLanguages: reader.readStringList(offsets[0]) ?? const [],
-    formatKey: reader.readString(offsets[1]),
-    hiddenLanguages: reader.readStringList(offsets[3]) ?? const [],
+    formatKey: reader.readString(offsets[0]),
     id: id,
+    isCollapsed: reader.readBoolOrNull(offsets[2]) ?? false,
+    isHidden: reader.readBoolOrNull(offsets[3]) ?? false,
     name: reader.readString(offsets[4]),
     order: reader.readLong(offsets[5]),
   );
@@ -198,13 +154,13 @@ P _dictionaryDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringList(offset) ?? const []) as P;
-    case 1:
       return (reader.readString(offset)) as P;
-    case 2:
+    case 1:
       return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 3:
-      return (reader.readStringList(offset) ?? const []) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
@@ -490,116 +446,6 @@ extension DictionaryQueryWhere
     });
   }
 
-  QueryBuilder<Dictionary, Dictionary, QAfterWhereClause>
-  hiddenLanguagesEqualTo(List<String> hiddenLanguages) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(
-          indexName: r'hiddenLanguages',
-          value: [hiddenLanguages],
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterWhereClause>
-  hiddenLanguagesNotEqualTo(List<String> hiddenLanguages) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'hiddenLanguages',
-                lower: [],
-                upper: [hiddenLanguages],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'hiddenLanguages',
-                lower: [hiddenLanguages],
-                includeLower: false,
-                upper: [],
-              ),
-            );
-      } else {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'hiddenLanguages',
-                lower: [hiddenLanguages],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'hiddenLanguages',
-                lower: [],
-                upper: [hiddenLanguages],
-                includeUpper: false,
-              ),
-            );
-      }
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterWhereClause>
-  collapsedLanguagesEqualTo(List<String> collapsedLanguages) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(
-          indexName: r'collapsedLanguages',
-          value: [collapsedLanguages],
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterWhereClause>
-  collapsedLanguagesNotEqualTo(List<String> collapsedLanguages) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'collapsedLanguages',
-                lower: [],
-                upper: [collapsedLanguages],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'collapsedLanguages',
-                lower: [collapsedLanguages],
-                includeLower: false,
-                upper: [],
-              ),
-            );
-      } else {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'collapsedLanguages',
-                lower: [collapsedLanguages],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'collapsedLanguages',
-                lower: [],
-                upper: [collapsedLanguages],
-                includeUpper: false,
-              ),
-            );
-      }
-    });
-  }
-
   QueryBuilder<Dictionary, Dictionary, QAfterWhereClause> nameEqualTo(
     String name,
   ) {
@@ -657,218 +503,6 @@ extension DictionaryQueryWhere
 
 extension DictionaryQueryFilter
     on QueryBuilder<Dictionary, Dictionary, QFilterCondition> {
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'collapsedLanguages',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementEndsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'collapsedLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'collapsedLanguages',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'collapsedLanguages', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesElementIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'collapsedLanguages', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'collapsedLanguages',
-        length,
-        true,
-        length,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'collapsedLanguages', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'collapsedLanguages', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesLengthLessThan(int length, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'collapsedLanguages', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesLengthGreaterThan(int length, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'collapsedLanguages',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  collapsedLanguagesLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'collapsedLanguages',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
-    });
-  }
-
   QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition> formatKeyEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1073,206 +707,6 @@ extension DictionaryQueryFilter
     });
   }
 
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'hiddenLanguages',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementStartsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementEndsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'hiddenLanguages',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'hiddenLanguages',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'hiddenLanguages', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesElementIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'hiddenLanguages', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesLengthEqualTo(int length) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'hiddenLanguages', length, true, length, true);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'hiddenLanguages', 0, true, 0, true);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'hiddenLanguages', 0, false, 999999, true);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesLengthLessThan(int length, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(r'hiddenLanguages', 0, true, length, include);
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesLengthGreaterThan(int length, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'hiddenLanguages',
-        length,
-        include,
-        999999,
-        true,
-      );
-    });
-  }
-
-  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
-  hiddenLanguagesLengthBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.listLength(
-        r'hiddenLanguages',
-        lower,
-        includeLower,
-        upper,
-        includeUpper,
-      );
-    });
-  }
-
   QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition> idEqualTo(
     Id value,
   ) {
@@ -1328,6 +762,25 @@ extension DictionaryQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition>
+  isCollapsedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'isCollapsed', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterFilterCondition> isHiddenEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'isHidden', value: value),
       );
     });
   }
@@ -1810,6 +1263,30 @@ extension DictionaryQuerySortBy
     });
   }
 
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> sortByIsCollapsed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isCollapsed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> sortByIsCollapsedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isCollapsed', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> sortByIsHidden() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHidden', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> sortByIsHiddenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHidden', Sort.desc);
+    });
+  }
+
   QueryBuilder<Dictionary, Dictionary, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1873,6 +1350,30 @@ extension DictionaryQuerySortThenBy
     });
   }
 
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> thenByIsCollapsed() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isCollapsed', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> thenByIsCollapsedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isCollapsed', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> thenByIsHidden() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHidden', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QAfterSortBy> thenByIsHiddenDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHidden', Sort.desc);
+    });
+  }
+
   QueryBuilder<Dictionary, Dictionary, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1900,13 +1401,6 @@ extension DictionaryQuerySortThenBy
 
 extension DictionaryQueryWhereDistinct
     on QueryBuilder<Dictionary, Dictionary, QDistinct> {
-  QueryBuilder<Dictionary, Dictionary, QDistinct>
-  distinctByCollapsedLanguages() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'collapsedLanguages');
-    });
-  }
-
   QueryBuilder<Dictionary, Dictionary, QDistinct> distinctByFormatKey({
     bool caseSensitive = true,
   }) {
@@ -1921,9 +1415,15 @@ extension DictionaryQueryWhereDistinct
     });
   }
 
-  QueryBuilder<Dictionary, Dictionary, QDistinct> distinctByHiddenLanguages() {
+  QueryBuilder<Dictionary, Dictionary, QDistinct> distinctByIsCollapsed() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'hiddenLanguages');
+      return query.addDistinctBy(r'isCollapsed');
+    });
+  }
+
+  QueryBuilder<Dictionary, Dictionary, QDistinct> distinctByIsHidden() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isHidden');
     });
   }
 
@@ -1950,13 +1450,6 @@ extension DictionaryQueryProperty
     });
   }
 
-  QueryBuilder<Dictionary, List<String>, QQueryOperations>
-  collapsedLanguagesProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'collapsedLanguages');
-    });
-  }
-
   QueryBuilder<Dictionary, String, QQueryOperations> formatKeyProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'formatKey');
@@ -1969,10 +1462,15 @@ extension DictionaryQueryProperty
     });
   }
 
-  QueryBuilder<Dictionary, List<String>, QQueryOperations>
-  hiddenLanguagesProperty() {
+  QueryBuilder<Dictionary, bool, QQueryOperations> isCollapsedProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'hiddenLanguages');
+      return query.addPropertyName(r'isCollapsed');
+    });
+  }
+
+  QueryBuilder<Dictionary, bool, QQueryOperations> isHiddenProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isHidden');
     });
   }
 

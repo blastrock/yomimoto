@@ -2,7 +2,6 @@ import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as path;
-import 'package:yuuna/language.dart';
 
 part 'dictionary.g.dart';
 
@@ -17,8 +16,8 @@ class Dictionary {
     required this.name,
     required this.formatKey,
     required this.order,
-    this.hiddenLanguages = const [],
-    this.collapsedLanguages = const [],
+    this.isHidden = false,
+    this.isCollapsed = false,
   });
 
   /// Identifier for database purposes.
@@ -62,25 +61,12 @@ class Dictionary {
     return path.join(appDirDocPath, name);
   }
 
-  /// Languages where this dictionary is hidden. If a language has set this
-  /// dictionary to hidden, then its language code will be here.
-  @Index()
-  List<String> hiddenLanguages;
+  /// Whether this dictionary's results are hidden from search results.
+  bool isHidden;
 
-  /// Languages where this dictionary is collapsed. If a language has set this
-  /// dictionary to hidden, then its language code will be here.
-  @Index()
-  List<String> collapsedLanguages;
-
-  /// Whether this dictionary is hidden for a given language.
-  bool isHidden(Language language) {
-    return hiddenLanguages.contains(language.languageCode);
-  }
-
-  /// Whether this dictionary is collapsed for a given language.
-  bool isCollapsed(Language language) {
-    return collapsedLanguages.contains(language.languageCode);
-  }
+  /// Whether this dictionary's results are collapsed by default in search
+  /// results.
+  bool isCollapsed;
 
   /// Given an asset name, returns an appropriate path to place the asset
   /// within this dictionary's resource path.

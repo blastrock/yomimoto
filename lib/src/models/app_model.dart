@@ -1312,15 +1312,7 @@ class AppModel with ChangeNotifier {
   /// affect how a dictionary's search results are shown by default.
   void toggleDictionaryCollapsed(Dictionary dictionary) {
     _database.writeTxnSync(() {
-      if (dictionary.isCollapsed(JapaneseLanguage.instance)) {
-        dictionary.collapsedLanguages = [...dictionary.collapsedLanguages]
-          ..remove(JapaneseLanguage.instance.languageCode);
-      } else {
-        dictionary.collapsedLanguages = [
-          ...dictionary.collapsedLanguages,
-          JapaneseLanguage.instance.languageCode
-        ];
-      }
+      dictionary.isCollapsed = !dictionary.isCollapsed;
       _database.dictionarys.putSync(dictionary);
     });
   }
@@ -1329,15 +1321,7 @@ class AppModel with ChangeNotifier {
   /// affect how a dictionary's search results are shown by default.
   void toggleDictionaryHidden(Dictionary dictionary) {
     _database.writeTxnSync(() {
-      if (dictionary.isHidden(JapaneseLanguage.instance)) {
-        dictionary.hiddenLanguages = [...dictionary.hiddenLanguages]
-          ..remove(JapaneseLanguage.instance.languageCode);
-      } else {
-        dictionary.hiddenLanguages = [
-          ...dictionary.hiddenLanguages,
-          JapaneseLanguage.instance.languageCode
-        ];
-      }
+      dictionary.isHidden = !dictionary.isHidden;
       _database.dictionarys.putSync(dictionary);
     });
   }
@@ -3012,7 +2996,7 @@ class AppModel with ChangeNotifier {
             .getSync(DictionaryHeading.hash(term: heading.term, reading: ''))
             ?.frequencies
             .where((frequency) =>
-                !frequency.dictionary.value!.isHidden(JapaneseLanguage.instance))
+                !frequency.dictionary.value!.isHidden)
             .toList() ??
         [];
   }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 
 /// Returns the frequency of a [DictionaryHeading] (uses harmonic mean for
@@ -39,7 +38,7 @@ class FrequencyField extends Field {
     List<Dictionary> dictionaries = appModel.dictionaries;
 
     List<String> unhiddenDictionaries = dictionaries
-        .where((d) => !d.isHidden(JapaneseLanguage.instance))
+        .where((d) => !d.isHidden)
         .map((d) => d.name)
         .toList();
 

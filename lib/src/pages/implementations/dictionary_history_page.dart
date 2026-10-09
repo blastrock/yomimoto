@@ -5,7 +5,6 @@ import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/i18n/strings.g.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 
@@ -118,10 +117,10 @@ class _DictionaryHistoryScrollableItemState
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
         dictionaries
-            .map((e) => MapEntry(e.name, e.isHidden(JapaneseLanguage.instance))));
+            .map((e) => MapEntry(e.name, e.isHidden)));
     Map<String, bool> dictionaryNamesByCollapsed =
         Map<String, bool>.fromEntries(dictionaries.map(
-            (e) => MapEntry(e.name, e.isCollapsed(JapaneseLanguage.instance))));
+            (e) => MapEntry(e.name, e.isCollapsed)));
     Map<String, int> dictionaryNamesByOrder = Map<String, int>.fromEntries(
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 

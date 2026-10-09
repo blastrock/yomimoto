@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 import 'package:collection/collection.dart';
 
@@ -35,7 +34,7 @@ class PitchAccentField extends Field {
 
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
         dictionaries
-            .map((e) => MapEntry(e.name, e.isHidden(JapaneseLanguage.instance))));
+            .map((e) => MapEntry(e.name, e.isHidden)));
     Map<String, int> dictionaryNamesByOrder = Map<String, int>.fromEntries(
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 

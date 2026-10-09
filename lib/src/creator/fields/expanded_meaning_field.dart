@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
 
 /// Used to return a formatted text from multiple dictionary entries from
@@ -38,10 +37,10 @@ class ExpandedMeaningField extends Field {
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
         dictionaries
-            .map((e) => MapEntry(e.name, e.isHidden(JapaneseLanguage.instance))));
+            .map((e) => MapEntry(e.name, e.isHidden)));
     Map<String, bool> dictionaryNamesByCollapsed =
         Map<String, bool>.fromEntries(dictionaries.map(
-            (e) => MapEntry(e.name, e.isCollapsed(JapaneseLanguage.instance))));
+            (e) => MapEntry(e.name, e.isCollapsed)));
     Map<String, int> dictionaryNamesByOrder = Map<String, int>.fromEntries(
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 

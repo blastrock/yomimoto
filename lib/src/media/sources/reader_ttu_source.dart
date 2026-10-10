@@ -62,6 +62,13 @@ class ReaderTtuSource extends ReaderMediaSource {
   /// IndexedDB is tied to its origin.
   static const int port = 52059;
 
+  /// Origin the reader is served from. IndexedDB is tied to it, so it must
+  /// never change between releases.
+  static const String origin = 'http://localhost:$port';
+
+  /// Absolute URL of a reader page, e.g. `url('b.html?id=3')`.
+  String url(String path) => '$origin/$path';
+
   /// Used to delay the serve if the server failed to launch last time. Makes
   /// retry look better for port conflicts.
   bool _lastServeFailed = false;
@@ -158,7 +165,7 @@ class ReaderTtuSource extends ReaderMediaSource {
             ref: ref,
             mediaSource: this,
             item: MediaItem(
-              mediaIdentifier: 'http://localhost:$port/settings.html',
+              mediaIdentifier: url('settings.html'),
               title: '',
               mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
               position: 0,
@@ -186,7 +193,7 @@ class ReaderTtuSource extends ReaderMediaSource {
 
     HeadlessInAppWebView webView = HeadlessInAppWebView(
       initialUrlRequest: URLRequest(
-        url: WebUri('http://localhost:$port/'),
+        url: WebUri(url('')),
       ),
       onLoadStop: (controller, url) async {
         controller.evaluateJavascript(source: getHistoryJs);
@@ -199,7 +206,7 @@ class ReaderTtuSource extends ReaderMediaSource {
             switch (messageJson['messageType']) {
               case 'history':
                 try {
-                  items = getItemsFromJson(messageJson, port);
+                  items = getItemsFromJson(messageJson);
                 } catch (error, stack) {
                   items = [];
                   debugPrint('$error');
@@ -231,7 +238,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Fetch the list of history items given JSON from IndexedDB.
-  List<MediaItem> getItemsFromJson(Map<String, dynamic> json, int port) {
+  List<MediaItem> getItemsFromJson(Map<String, dynamic> json) {
     List<Map<String, dynamic>> bookmarks =
         List<Map<String, dynamic>>.from(jsonDecode(json['bookmark']));
     List<Map<String, dynamic>> datas =
@@ -269,7 +276,7 @@ class ReaderTtuSource extends ReaderMediaSource {
       return MapEntry(
         index,
         MediaItem(
-          mediaIdentifier: 'http://localhost:$port/b.html?id=$id&?title=$title',
+          mediaIdentifier: url('b.html?id=$id&?title=$title'),
           title: title,
           base64Image: base64Image,
           mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,

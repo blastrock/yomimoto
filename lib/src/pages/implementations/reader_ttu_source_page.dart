@@ -212,7 +212,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
       initialUrlRequest: URLRequest(
         url: WebUri(
           widget.item?.mediaIdentifier ??
-              'http://localhost:${server.boundPort}/manage.html',
+              mediaSource.url('manage.html'),
         ),
       ),
       onPermissionRequest: (controller, origin) async {

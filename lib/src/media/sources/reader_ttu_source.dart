@@ -272,6 +272,56 @@ class ReaderTtuSource extends ReaderMediaSource {
     }
   }
 
+  /// Ask for confirmation, then delete [item]'s book from ttu and the
+  /// library. Returns whether it was deleted.
+  Future<bool> deleteBook({
+    required BuildContext context,
+    required AppModel appModel,
+    required MediaItem item,
+  }) async {
+    int? id = bookIdOf(item);
+    if (id == null) {
+      return false;
+    }
+
+    bool confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(item.title),
+            content: Text(t.ttu_delete_book_confirm),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(
+                  t.dialog_delete,
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(t.dialog_cancel),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+    if (!confirmed || !context.mounted) {
+      return false;
+    }
+
+    return await runWithProgress(
+          context: context,
+          message: t.ttu_deleting,
+          task: () => TtuHostOperations.run((bridge) async {
+            await bridge.deleteBook(id);
+            await syncLibrary(appModel: appModel, bridge: bridge);
+            return true;
+          }),
+        ) ??
+        false;
+  }
+
   /// Picks book files and imports them into the library.
   Widget buildImportButton({
     required BuildContext context,

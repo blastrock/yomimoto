@@ -42,6 +42,29 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
   }
 
   @override
+  List<Widget> extraActions(MediaItem item) {
+    return [
+      TextButton(
+        onPressed: () async {
+          NavigatorState navigator = Navigator.of(context);
+          bool deleted = await mediaSource.deleteBook(
+            context: context,
+            appModel: appModel,
+            item: item,
+          );
+          if (deleted) {
+            navigator.pop();
+          }
+        },
+        child: Text(
+          t.dialog_delete,
+          style: TextStyle(color: theme.colorScheme.primary),
+        ),
+      ),
+    ];
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<MediaItem> items = appModel
         .getMediaSourceHistory(mediaSource: mediaSource)

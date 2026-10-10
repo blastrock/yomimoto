@@ -91,7 +91,7 @@ void main() {
 
     /// Log the error.
     FlutterLogs.logError(
-      'jidoujisho',
+      'yomimoto',
       details.exceptionAsString(),
       stack.toString(),
     );

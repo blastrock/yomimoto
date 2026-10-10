@@ -42,7 +42,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.arianneorpilla.yuuna"
+        applicationId "org.kaqui.yomimoto"
         minSdk 24
         // Deliberately left at 32. Raising it pulls in granular media
         // permissions, the audio_service foreground-service manifest work,
@@ -72,7 +72,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            def appName = "jidoujisho_yuuna"
+            def appName = "yomimoto"
             def buildType = variant.buildType.name
             def architecture = output.getFilter(com.android.build.OutputFile.ABI)
             def newName

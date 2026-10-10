@@ -1,6 +1,6 @@
 # ttu native library — phase 2 implementation plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (recommended: the tasks share one small protocol and most verification needs the emulator/CDP setup of the executing session) or superpowers:subagent-driven-development to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** The Novels tab becomes a Flutter library backed by Isar: it shows instantly without any WebView, and books are imported, refreshed and deleted from Flutter. ttu's own manager is no longer reachable.
 

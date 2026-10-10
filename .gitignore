@@ -49,3 +49,6 @@ app.*.map.json
 # Native build output from vendored plugins (CMake/AGP write in-tree).
 vendor/**/.cxx/
 vendor/**/build/
+
+# ebook-reader-lite build, populated by tool/fetch_ttu.sh
+/assets/ttu-ebook-reader/

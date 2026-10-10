@@ -34,6 +34,7 @@ remains is deliberately three things:
 ## Commands
 
 ```sh
+tool/fetch_ttu.sh                                          # ebook-reader-lite build → assets/ttu-ebook-reader/ (--local <path> to build a checkout)
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Isar, json, dart_mappable
 dart run slang                                             # regenerate lib/i18n/strings.g.dart
@@ -178,7 +179,9 @@ translations are gone.
 
 ### Reader internals
 
-- **ttu** — `assets/ttu-ebook-reader/` is a 57 MB prebuilt SvelteKit app,
+- **ttu** — `assets/ttu-ebook-reader/` is the build of the `ebook-reader-lite`
+  fork (github.com/blastrock/ebook-reader-lite), not committed:
+  `tool/fetch_ttu.sh` downloads the release pinned in `tool/ttu.lock`. It is
   served over localhost by `local_assets_server` and displayed in
   `flutter_inappwebview`. Books live in the WebView's IndexedDB, not in Isar;
   history is read back out of IndexedDB via injected JS. The port

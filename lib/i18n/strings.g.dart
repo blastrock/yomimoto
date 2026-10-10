@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 284
+/// Strings: 283
 ///
-/// Built on 2026-10-10 at 13:18 UTC
+/// Built on 2026-10-10 at 13:21 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -365,7 +365,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get settings_appearance => 'Appearance';
 	String get settings_dark_theme => 'Dark theme';
 	String get settings_about => 'About';
-	String get manager => 'Manager';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
@@ -669,7 +668,6 @@ extension on Translations {
 			case 'settings_appearance': return 'Appearance';
 			case 'settings_dark_theme': return 'Dark theme';
 			case 'settings_about': return 'About';
-			case 'manager': return 'Manager';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';

@@ -184,11 +184,19 @@ translations are gone.
   `tool/fetch_ttu.sh` downloads the release pinned in `tool/ttu.lock`. It is
   served by a `WebViewAssetLoader` (`TtuAssetPathHandler`) on
   `https://appassets.androidplatform.net` and displayed in
-  `flutter_inappwebview`. Books live in the WebView's IndexedDB, not in Isar;
-  history is read back out of IndexedDB via injected JS. The origin
-  (`ReaderTtuSource.origin`) must stay fixed: IndexedDB is tied to it. The
-  reader page talks to ttu only through `TtuBridge` (the fork's
-  `apps/web/src/lib/host/`), never by injecting JS.
+  `flutter_inappwebview`. Books live in the WebView's IndexedDB, which stays
+  the source of truth. The origin (`ReaderTtuSource.origin`) must stay fixed:
+  IndexedDB is tied to it. The app talks to ttu only through `TtuBridge` (the
+  fork's `apps/web/src/lib/host/`), never by injecting JS.
+
+  The Novels tab is an Isar mirror of that library: `MediaItem` rows whose
+  `mediaIdentifier` is the relative reader path `b.html?id=<ttu id>`, with
+  covers stored in `ttuCovers/`. Rows are written with
+  `AppModel.putMediaItem`, which unlike `addMediaItem` has no 100-item cap;
+  `implementsHistory` stays `false` so `openMedia` never caps them. Import,
+  delete and Refresh run ttu's own code through `TtuHostOperations` (a
+  headless WebView on the fork's `host` route), then `syncLibrary`
+  reconciles the mirror. ttu's manager page is not reachable from the app.
 
   Working on the ttu side:
 
@@ -229,6 +237,9 @@ load-bearing.
 
 ## Conventions
 
+- The code predates the current `dart format` style: running it on an
+  existing file rewrites unrelated lines. Format new code by hand to match the
+  surrounding file instead.
 - `analysis_options.yaml` enables a large strict rule set on top of
   `flutter_lints` 6. Notably **`public_member_api_docs`**: every public class,
   member and getter needs a `///` doc comment. Also `prefer_single_quotes`,

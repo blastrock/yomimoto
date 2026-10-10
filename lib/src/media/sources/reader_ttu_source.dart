@@ -381,35 +381,7 @@ class ReaderTtuSource extends ReaderMediaSource {
         ref: ref,
         appModel: appModel,
       ),
-      buildLaunchButton(
-        context: context,
-        ref: ref,
-        appModel: appModel,
-      ),
     ];
-  }
-
-  /// Allows user to close the floating search bar of a home tab page
-  /// when open.
-  Widget buildLaunchButton({
-    required BuildContext context,
-    required WidgetRef ref,
-    required AppModel appModel,
-  }) {
-    return FloatingSearchBarAction(
-      showIfOpened: true,
-      child: JidoujishoIconButton(
-        size: Theme.of(context).textTheme.titleLarge?.fontSize,
-        tooltip: t.manager,
-        icon: Icons.local_library_outlined,
-        onTap: () {
-          appModel.openMedia(
-            ref: ref,
-            mediaSource: this,
-          );
-        },
-      ),
-    );
   }
 
   /// Allows user to close the floating search bar of a home tab page

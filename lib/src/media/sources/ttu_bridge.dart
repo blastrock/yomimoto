@@ -69,6 +69,20 @@ class TtuThemeEvent {
   }
 }
 
+/// A book in ttu's IndexedDB.
+class TtuBook {
+  /// Create the book from its wire form.
+  TtuBook.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as int,
+        title = json['title'] as String? ?? '';
+
+  /// ttu's id for the book (IndexedDB key of the `data` store).
+  final int id;
+
+  /// The book's title.
+  final String title;
+}
+
 /// A bridge command failed on the web side or timed out.
 class TtuBridgeException implements Exception {
   /// Create the exception.
@@ -106,7 +120,7 @@ class TtuBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in ebook-reader-lite's `host-bridge.ts`.
-  static const int protocolVersion = 1;
+  static const int protocolVersion = 2;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);
@@ -153,15 +167,16 @@ class TtuBridge {
   }
 
   Future<dynamic> _call(
-    String command, [
+    String command, {
     Map<String, dynamic> args = const {},
-  ]) async {
+    Duration timeout = commandTimeout,
+  }) async {
     CallAsyncJavaScriptResult? result;
     try {
       result = await controller.callAsyncJavaScript(
         functionBody: 'return await window.ttuHost[command](args);',
         arguments: {'command': command, 'args': args},
-      ).timeout(commandTimeout);
+      ).timeout(timeout);
     } on TimeoutException {
       throw TtuBridgeException(command, 'timed out');
     }
@@ -184,7 +199,7 @@ class TtuBridge {
 
   /// Select [length] characters from [start] in the last tapped paragraph.
   Future<void> highlight({required int start, required int length}) =>
-      _call('highlight', {'start': start, 'length': length});
+      _call('highlight', args: {'start': start, 'length': length});
 
   /// Remove any selection in the reader.
   Future<void> clearSelection() => _call('clearSelection');
@@ -192,4 +207,23 @@ class TtuBridge {
   /// The current selection with furigana removed, trimmed.
   Future<String> getSelectedText() async =>
       (await _call('getSelectedText') as String?) ?? '';
+
+  /// Every book in ttu's library.
+  Future<List<TtuBook>> listBooks() async {
+    List<dynamic> raw = (await _call('listBooks') as List<dynamic>?) ?? [];
+    return raw
+        .map((e) => TtuBook.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
+
+  /// The cover of book [id] as a data URL, or null if it has none.
+  Future<String?> getCover(int id) async =>
+      await _call('getCover', args: {'id': id}) as String?;
+
+  /// Import the files at [urls] (served to the WebView) with ttu's importer.
+  Future<void> importBooks(List<String> urls, {required Duration timeout}) =>
+      _call('importBooks', args: {'urls': urls}, timeout: timeout);
+
+  /// Delete book [id] and its bookmark from ttu's library.
+  Future<void> deleteBook(int id) => _call('deleteBook', args: {'id': id});
 }

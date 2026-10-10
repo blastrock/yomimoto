@@ -182,10 +182,13 @@ translations are gone.
 - **ttu** — `assets/ttu-ebook-reader/` is the build of the `ebook-reader-lite`
   fork (github.com/blastrock/ebook-reader-lite), not committed:
   `tool/fetch_ttu.sh` downloads the release pinned in `tool/ttu.lock`. It is
-  served over localhost by `local_assets_server` and displayed in
+  served by a `WebViewAssetLoader` (`TtuAssetPathHandler`) on
+  `https://appassets.androidplatform.net` and displayed in
   `flutter_inappwebview`. Books live in the WebView's IndexedDB, not in Isar;
-  history is read back out of IndexedDB via injected JS. The port
-  (`ReaderTtuSource.port`) must stay fixed: IndexedDB is tied to the origin.
+  history is read back out of IndexedDB via injected JS. The origin
+  (`ReaderTtuSource.origin`) must stay fixed: IndexedDB is tied to it. The
+  reader page talks to ttu only through `TtuBridge` (the fork's
+  `apps/web/src/lib/host/`), never by injecting JS.
 - **mokuro** — reads mokuro-processed manga (HTML + OCR text overlay), with a
   catalog of remote/local sources persisted in Isar (`MokuroCatalog`).
 

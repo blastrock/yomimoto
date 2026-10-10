@@ -1,22 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_assets_server/local_assets_server.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
-
-/// A global [Provider] for serving a local ッツ Ebook Reader.
-final ttuServerProvider = FutureProvider<LocalAssetsServer>((ref) {
-  return ReaderTtuSource.instance.serveLocalAssets();
-});
 
 /// A global [Provider] for getting ッツ Ebook Reader books from IndexedDB.
 final ttuBooksProvider = FutureProvider<List<MediaItem>>((ref) {
@@ -57,45 +50,20 @@ class ReaderTtuSource extends ReaderMediaSource {
     ref.invalidate(ttuBooksProvider);
   }
 
-  /// The localhost port the reader assets are served on. It should not
-  /// conflict with anything, but must stay the same since the reader's
-  /// IndexedDB is tied to its origin.
-  static const int port = 52059;
-
-  /// Origin the reader is served from. IndexedDB is tied to it, so it must
+  /// Origin the reader is served from: [TtuAssetPathHandler] answers it
+  /// through the WebView asset loader. IndexedDB is tied to it, so it must
   /// never change between releases.
-  static const String origin = 'http://localhost:$port';
+  static const String origin = 'https://appassets.androidplatform.net';
 
   /// Absolute URL of a reader page, e.g. `url('b.html?id=3')`.
   String url(String path) => '$origin/$path';
 
-  /// Used to delay the serve if the server failed to launch last time. Makes
-  /// retry look better for port conflicts.
-  bool _lastServeFailed = false;
-
-  /// For serving the reader assets locally.
-  Future<LocalAssetsServer> serveLocalAssets() async {
-    if (_lastServeFailed) {
-      await Future.delayed(const Duration(seconds: 1));
-    }
-
-    try {
-      _lastServeFailed = false;
-      final server = LocalAssetsServer(
-        address: InternetAddress.loopbackIPv4,
-        port: port,
-        assetsBasePath: 'assets/ttu-ebook-reader',
-        logger: const DebugLogger(),
+  /// Settings shared by every WebView that loads the reader.
+  InAppWebViewSettings get webViewSettings => InAppWebViewSettings(
+        webViewAssetLoader: WebViewAssetLoader(
+          pathHandlers: [TtuAssetPathHandler()],
+        ),
       );
-
-      await server.serve();
-
-      return server;
-    } catch (e) {
-      _lastServeFailed = true;
-      rethrow;
-    }
-  }
 
   @override
   BaseSourcePage buildLaunchPage({
@@ -192,6 +160,7 @@ class ReaderTtuSource extends ReaderMediaSource {
     List<MediaItem>? items;
 
     HeadlessInAppWebView webView = HeadlessInAppWebView(
+      initialSettings: webViewSettings,
       initialUrlRequest: URLRequest(
         url: WebUri(url('')),
       ),
@@ -476,24 +445,4 @@ indexedDB.databases().then((databases) => {
   }
 });
 ''';
-
-  /// This ensures that the internal version included with the app always uses
-  /// the cache and is consistent. If this version changes and the current stored
-  /// last version mismatches, a load from network is forced. The app will then
-  /// update its new last version, and all new loads will be from the cache
-  /// unless there is a new app version loaded with a different internal version.
-  static const ttuInternalVersion = 2;
-
-  /// Used to check for the current version.
-  int? get currentTtuInternalVersion {
-    return getPreference<int?>(key: 'ttu_internal_version', defaultValue: null);
-  }
-
-  /// Sets the new version.
-  void setTtuInternalVersion() async {
-    await setPreference<int?>(
-      key: 'ttu_internal_version',
-      value: ttuInternalVersion,
-    );
-  }
 }

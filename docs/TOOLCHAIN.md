@@ -62,10 +62,10 @@ at the constraint itself:
 | `dependency_validator` | removed | Needs analyzer < 13, `dart_mappable_builder` needs ^13 | Same |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 
-`dependency_overrides` holds four entries for three reasons, each documented in
+`dependency_overrides` holds three entries for two reasons, each documented in
 `pubspec.yaml`: `mecab_dart` breaks a constraint collision with a dormant
-package, `mime` reconciles `local_assets_server` with `share_plus` 13, and
-`freezed_annotation`/`gap` exist only to satisfy the `spaces` fork.
+package, and `freezed_annotation`/`gap` exist only to satisfy the `spaces`
+fork.
 
 ## Known debt
 

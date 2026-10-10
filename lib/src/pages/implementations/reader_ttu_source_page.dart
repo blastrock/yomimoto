@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_assets_server/local_assets_server.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/language.dart';
@@ -170,7 +168,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
               fit: StackFit.expand,
               alignment: Alignment.center,
               children: <Widget>[
-                buildBody(),
+                buildReaderArea(),
                 buildDictionary(),
               ],
             ),
@@ -180,34 +178,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     );
   }
 
-  Widget buildBody() {
-    AsyncValue<LocalAssetsServer> server =
-        ref.watch(ttuServerProvider);
-
-    return server.when(
-      data: buildReaderArea,
-      loading: buildLoading,
-      error: (error, stack) => buildError(
-        error: error,
-        stack: stack,
-        refresh: () {
-          ref.invalidate(ttuServerProvider);
-        },
-      ),
-    );
-  }
-
-  CacheMode get cacheMode {
-    if (mediaSource.currentTtuInternalVersion ==
-        ReaderTtuSource.ttuInternalVersion) {
-      return CacheMode.LOAD_CACHE_ELSE_NETWORK;
-    } else {
-      mediaSource.setTtuInternalVersion();
-      return CacheMode.LOAD_NO_CACHE;
-    }
-  }
-
-  Widget buildReaderArea(LocalAssetsServer server) {
+  Widget buildReaderArea() {
     return InAppWebView(
       initialUrlRequest: URLRequest(
         url: WebUri(
@@ -220,20 +191,17 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           action: PermissionResponseAction.GRANT,
         );
       },
-      initialSettings: InAppWebViewSettings(
-        allowFileAccessFromFileURLs: true,
-        allowUniversalAccessFromFileURLs: true,
-        mediaPlaybackRequiresUserGesture: false,
-        verticalScrollBarEnabled: false,
-        horizontalScrollBarEnabled: false,
-        verticalScrollbarThumbColor: Colors.transparent,
-        verticalScrollbarTrackColor: Colors.transparent,
-        horizontalScrollbarThumbColor: Colors.transparent,
-        horizontalScrollbarTrackColor: Colors.transparent,
-        scrollbarFadingEnabled: false,
-        appCachePath: appModel.browserDirectory.path,
-        cacheMode: cacheMode,
-      ),
+      initialSettings: mediaSource.webViewSettings
+        ..allowFileAccessFromFileURLs = true
+        ..allowUniversalAccessFromFileURLs = true
+        ..mediaPlaybackRequiresUserGesture = false
+        ..verticalScrollBarEnabled = false
+        ..horizontalScrollBarEnabled = false
+        ..verticalScrollbarThumbColor = Colors.transparent
+        ..verticalScrollbarTrackColor = Colors.transparent
+        ..horizontalScrollbarThumbColor = Colors.transparent
+        ..horizontalScrollbarTrackColor = Colors.transparent
+        ..scrollbarFadingEnabled = false,
       contextMenu: contextMenu,
       onConsoleMessage: onConsoleMessage,
       onWebViewCreated: (controller) {
@@ -245,11 +213,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           onTap: _onTap,
           onTheme: _onTheme,
           onExit: _onBridgeExit,
-        );
-      },
-      onReceivedServerTrustAuthRequest: (controller, challenge) async {
-        return ServerTrustAuthResponse(
-          action: ServerTrustAuthResponseAction.PROCEED,
         );
       },
       onLoadStop: (controller, uri) async {

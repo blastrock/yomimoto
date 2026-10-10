@@ -282,17 +282,10 @@
     "structured_content_first": "$i definitions are unsupported and were omitted.",
     "structured_content_second": "Consider a non-structured content version of this dictionary.",
     "cancel": "Cancel",
-    "server_port_in_use": "Local server port already in use",
     "cloze": "Cloze",
     "info_standard_update": "New standard profile card type",
     "info_standard_update_content":
         "The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.",
-    "retrying_in": {
-        "seconds": {
-          "one": "Retrying in $n second...",
-          "other": "Retrying in $n seconds..."
-        }
-      },
     "view_replies": {
         "reply": {
           "one": "SHOW $n REPLY",

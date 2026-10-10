@@ -58,7 +58,6 @@ dependencies:
   just_audio: ^0.10.6
   kana_kit: ^2.0.0
   list_counter: ^1.0.2
-  local_assets_server: ^2.0.2+12
   marquee: ^2.2.3
   material_floating_search_bar_2:
     # Vendored for one line: ThemeData.appBarTheme changed type to
@@ -69,6 +68,8 @@ dependencies:
     # Vendored: 0.1.6 still carries a `registerWith(Registrar)` companion from
     # the removed v1 Android embedding. See vendor/mecab_dart/UPSTREAM.md.
     path: vendor/mecab_dart
+  # lookupMimeType for TtuAssetPathHandler.
+  mime: ^2.0.0
   multi_value_listenable_builder: ^0.0.2
   network_to_file_image: ^7.0.0
   package_info_plus: ^10.2.1
@@ -121,10 +122,6 @@ dependency_overrides:
   # vendor/mecab_dart/UPSTREAM.md.
   mecab_dart:
     path: vendor/mecab_dart
-  # local_assets_server 2.0.2+12 (dormant, latest) wants mime ^1 while
-  # share_plus 13 wants ^2. The server's only mime call is `lookupMimeType`,
-  # which is unchanged in mime 2, so forcing 2 is safe.
-  mime: ^2.0.0
 
 dev_dependencies:
   build_runner: ^2.3.3

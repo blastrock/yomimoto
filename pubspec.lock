@@ -1098,14 +1098,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  local_assets_server:
-    dependency: "direct main"
-    description:
-      name: local_assets_server
-      sha256: "1fdbd0bd48870556da0f03254c5d5b4be72cafab15c0367c5fec7a5c80f5eb08"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.2+12"
   logging:
     dependency: transitive
     description:
@@ -1161,7 +1153,7 @@ packages:
     source: hosted
     version: "1.18.0"
   mime:
-    dependency: "direct overridden"
+    dependency: "direct main"
     description:
       name: mime
       sha256: "41a20518f0cb1256669420fdba0cd90d21561e560ac240f26ef8322e45bb7ed6"

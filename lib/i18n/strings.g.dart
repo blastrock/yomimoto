@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 279
+/// Strings: 276
 ///
-/// Built on 2026-10-10 at 08:35 UTC
+/// Built on 2026-10-10 at 08:44 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -408,11 +408,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String structured_content_first({required Object i}) => '${i} definitions are unsupported and were omitted.';
 	String get structured_content_second => 'Consider a non-structured content version of this dictionary.';
 	String get cancel => 'Cancel';
-	String get server_port_in_use => 'Local server port already in use';
 	String get cloze => 'Cloze';
 	String get info_standard_update => 'New standard profile card type';
 	String get info_standard_update_content => 'The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
-	late final _StringsRetryingInEn retrying_in = _StringsRetryingInEn._(_root);
 	late final _StringsViewRepliesEn view_replies = _StringsViewRepliesEn._(_root);
 	String get manage_duplicate_checks => 'Manage Duplicate Checks';
 	String get go_forward => 'Go Forward';
@@ -424,19 +422,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get ad_block_hosts => 'Ad-block hosts';
 	String get error_parsing_hosts_file => 'Error parsing hosts file.';
 	String get loaded_from_cache => 'Loaded from web archive cache.';
-}
-
-// Path: retrying_in
-class _StringsRetryingInEn {
-	_StringsRetryingInEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	String seconds({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-		one: 'Retrying in ${n} second...',
-		other: 'Retrying in ${n} seconds...',
-	);
 }
 
 // Path: view_replies
@@ -719,14 +704,9 @@ extension on Translations {
 			case 'structured_content_first': return ({required Object i}) => '${i} definitions are unsupported and were omitted.';
 			case 'structured_content_second': return 'Consider a non-structured content version of this dictionary.';
 			case 'cancel': return 'Cancel';
-			case 'server_port_in_use': return 'Local server port already in use';
 			case 'cloze': return 'Cloze';
 			case 'info_standard_update': return 'New standard profile card type';
 			case 'info_standard_update_content': return 'The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
-			case 'retrying_in.seconds': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-				one: 'Retrying in ${n} second...',
-				other: 'Retrying in ${n} seconds...',
-			);
 			case 'view_replies.reply': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				one: 'SHOW ${n} REPLY',
 				other: 'SHOW ${n} REPLIES',

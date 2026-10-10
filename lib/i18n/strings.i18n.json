@@ -111,7 +111,7 @@
         "There was an issue communicating with AnkiDroid.\n\nEnsure that the AnkiDroid background service is active and all relevant app permissions are granted in order to continue.",
     "info_standard_model": "Standard card type added",
     "info_standard_model_content":
-        "『jidoujisho Kinomoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.",
+        "『Yomimoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.",
     "error_model_missing": "Missing card type",
     "error_model_missing_content":
         "The corresponding card type of the currently selected profile is missing.\n\nThe profile will be deleted, and the standard profile has now been selected in its place.",
@@ -292,7 +292,7 @@
     "cloze": "Cloze",
     "info_standard_update": "New standard profile card type",
     "info_standard_update_content":
-        "The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.",
+        "The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.",
     "view_replies": {
         "reply": {
           "one": "SHOW $n REPLY",

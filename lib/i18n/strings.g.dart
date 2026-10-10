@@ -6,7 +6,7 @@
 /// Locales: 1
 /// Strings: 283
 ///
-/// Built on 2026-10-10 at 13:21 UTC
+/// Built on 2026-10-10 at 18:33 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -253,7 +253,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get error_ankidroid_api => 'AnkiDroid error';
 	String get error_ankidroid_api_content => 'There was an issue communicating with AnkiDroid.\n\nEnsure that the AnkiDroid background service is active and all relevant app permissions are granted in order to continue.';
 	String get info_standard_model => 'Standard card type added';
-	String get info_standard_model_content => '『jidoujisho Kinomoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.';
+	String get info_standard_model_content => '『Yomimoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.';
 	String get error_model_missing => 'Missing card type';
 	String get error_model_missing_content => 'The corresponding card type of the currently selected profile is missing.\n\nThe profile will be deleted, and the standard profile has now been selected in its place.';
 	String get error_model_changed => 'Card type changed';
@@ -417,7 +417,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get cancel => 'Cancel';
 	String get cloze => 'Cloze';
 	String get info_standard_update => 'New standard profile card type';
-	String get info_standard_update_content => 'The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
+	String get info_standard_update_content => 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
 	late final _StringsViewRepliesEn view_replies = _StringsViewRepliesEn._(_root);
 	String get manage_duplicate_checks => 'Manage Duplicate Checks';
 	String get go_forward => 'Go Forward';
@@ -556,7 +556,7 @@ extension on Translations {
 			case 'error_ankidroid_api': return 'AnkiDroid error';
 			case 'error_ankidroid_api_content': return 'There was an issue communicating with AnkiDroid.\n\nEnsure that the AnkiDroid background service is active and all relevant app permissions are granted in order to continue.';
 			case 'info_standard_model': return 'Standard card type added';
-			case 'info_standard_model_content': return '『jidoujisho Kinomoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.';
+			case 'info_standard_model_content': return '『Yomimoto』 has been added to AnkiDroid as a new card type.\n\nSetups making use of a different card type or field order may be used by adding a new export profile.';
 			case 'error_model_missing': return 'Missing card type';
 			case 'error_model_missing_content': return 'The corresponding card type of the currently selected profile is missing.\n\nThe profile will be deleted, and the standard profile has now been selected in its place.';
 			case 'error_model_changed': return 'Card type changed';
@@ -720,7 +720,7 @@ extension on Translations {
 			case 'cancel': return 'Cancel';
 			case 'cloze': return 'Cloze';
 			case 'info_standard_update': return 'New standard profile card type';
-			case 'info_standard_update_content': return 'The standard profile now uses the『jidoujisho Kinomoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
+			case 'info_standard_update_content': return 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
 			case 'view_replies.reply': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
 				one: 'SHOW ${n} REPLY',
 				other: 'SHOW ${n} REPLIES',

@@ -881,9 +881,9 @@ class AppModel with ChangeNotifier {
         await ExternalPath.getExternalStoragePublicDirectory(
             ExternalPath.DIRECTORY_DCIM);
     try {
-      String directoryPath = path.join(publicDirectory, 'jidoujisho');
+      String directoryPath = path.join(publicDirectory, 'yomimoto');
       String noMediaFilePath =
-          path.join(publicDirectory, 'jidoujisho', '.nomedia');
+          path.join(publicDirectory, 'yomimoto', '.nomedia');
 
       Directory jidoujishoDirectory = Directory(directoryPath);
       File noMediaFile = File(noMediaFilePath);
@@ -906,9 +906,9 @@ class AppModel with ChangeNotifier {
   /// This path also initialises the folder if it does not exist, and includes
   /// a .nomedia file within the folder.
   Future<Directory> prepareFallbackJidoujishoDirectory() async {
-    String directoryPath = path.join(appDirectory.path, 'jidoujishoExport');
+    String directoryPath = path.join(appDirectory.path, 'yomimotoExport');
     String noMediaFilePath =
-        path.join(appDirectory.path, 'jidoujishoExport', '.nomedia');
+        path.join(appDirectory.path, 'yomimotoExport', '.nomedia');
 
     Directory jidoujishoDirectory = Directory(directoryPath);
     File noMediaFile = File(noMediaFilePath);
@@ -1634,7 +1634,7 @@ class AppModel with ChangeNotifier {
     await methodChannel.invokeMethod('requestAnkidroidPermissions');
   }
 
-  /// Adds the default 'jidoujisho Kinomoto' model to the list of Anki card types.
+  /// Adds the default 'Yomimoto' model to the list of Anki card types.
   Future<void> addDefaultModelIfMissing() async {
     List<String> models = await getModelList();
     if (!models.contains(AnkiMapping.standardModelName)) {
@@ -1802,7 +1802,7 @@ class AppModel with ChangeNotifier {
 
       String timestamp =
           intl.DateFormat('yyyyMMddTkkmmss').format(DateTime.now());
-      String preferredName = 'jidoujisho-$timestamp';
+      String preferredName = 'yomimoto-$timestamp';
 
       String? imageFileName;
       if (exportFile.existsSync()) {
@@ -1823,7 +1823,7 @@ class AppModel with ChangeNotifier {
 
       String timestamp =
           intl.DateFormat('yyyyMMddTkkmmss').format(DateTime.now());
-      String preferredName = 'jidoujisho-$timestamp';
+      String preferredName = 'yomimoto-$timestamp';
 
       String? audioFileName;
       if (exportFile.existsSync()) {

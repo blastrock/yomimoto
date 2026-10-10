@@ -69,10 +69,10 @@ public class MainActivity extends FlutterActivity {
         final AddContentApi api = new AddContentApi(context);
 
         long modelId;
-        if (modelExists("jidoujisho Kinomoto")) {
-            modelId = mAnkiDroid.findModelIdByName("jidoujisho Kinomoto", 17);
+        if (modelExists("Yomimoto")) {
+            modelId = mAnkiDroid.findModelIdByName("Yomimoto", 17);
         } else {
-            modelId = api.addNewCustomModel("jidoujisho Kinomoto",
+            modelId = api.addNewCustomModel("Yomimoto",
                 new String[] {
                     "Term", 
                     "Reading",
@@ -93,7 +93,7 @@ public class MainActivity extends FlutterActivity {
                     "Sentence Audio",
                 },
                 new String[] {
-                    "jidoujisho Kinomoto"
+                    "Yomimoto"
                 },
                 new String[] {
                     "<div id=\"word\">{{Term}}</div>"
@@ -137,7 +137,7 @@ public class MainActivity extends FlutterActivity {
 
         long modelId = mAnkiDroid.findModelIdByName(model, fields.size());
        
-        Set<String> allTags = new HashSet<>(Arrays.asList("Yuuna"));
+        Set<String> allTags = new HashSet<>(Arrays.asList("Yomimoto"));
         allTags.addAll(tags);
 
         api.addNote(modelId, deckId, fields.toArray(new String[fields.size()]), allTags);

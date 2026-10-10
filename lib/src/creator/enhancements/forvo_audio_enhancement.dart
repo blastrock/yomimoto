@@ -162,7 +162,7 @@ class ForvoAudioEnhancement extends AudioEnhancement {
 
     String temporaryDirectoryPath = (await getTemporaryDirectory()).path;
     String temporaryFileName =
-        'jidoujisho-${DateFormat('yyyyMMddTkkmmss').format(DateTime.now())}';
+        'yomimoto-${DateFormat('yyyyMMddTkkmmss').format(DateTime.now())}';
 
     File file = File('$temporaryDirectoryPath/$temporaryFileName');
     if (results.isEmpty) {

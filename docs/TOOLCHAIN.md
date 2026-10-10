@@ -13,7 +13,7 @@ Migrated from Flutter 3.13.5 / Dart 3.0 / JDK 11 / AGP 7.1.2 in August 2026.
 | NDK | 29.0.14206865 |
 
 Build: `flutter build apk --release --split-per-abi`. Outputs land in
-`build/app/outputs/apk/release/` as `jidoujisho_yuuna_<version>-<abi>.apk`, with
+`build/app/outputs/apk/release/` as `yomimoto_<version>-<abi>.apk`, with
 version codes `100 * pubspecBuildNumber + {armeabi 1, arm64 2, x86_64 3}`.
 
 ## Why AGP 8, not AGP 9

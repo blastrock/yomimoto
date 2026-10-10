@@ -1,1 +1,1 @@
-A full-featured immersion language learning suite for mobile.
+A Japanese book reader with dictionary lookup and Anki cards, for e-ink.

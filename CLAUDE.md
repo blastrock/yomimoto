@@ -2,9 +2,10 @@
 
 ## What this is
 
-A Flutter/Android app for reading foreign-language text with instant dictionary
-lookup and Anki card creation. It is a **fork of jidoujisho (`yuuna`) 2.9.1**,
-being repurposed into a **book reader with first-class e-ink support**.
+**Yomimoto (読本)**, by Philippe Daouadi: a Flutter/Android app for reading
+Japanese text with instant dictionary lookup and Anki card creation. It is a
+**fork of jidoujisho (`yuuna`) 2.9.1**, being repurposed into a **book reader
+with first-class e-ink support**. Repository: github.com/blastrock/yomimoto.
 
 Everything else upstream had — YouTube, ChatGPT, the video player, the browser,
 clipboard/websocket/lyrics readers, image share intents — has been deleted. What
@@ -17,14 +18,19 @@ remains is deliberately three things:
 
 ### Fork ground rules
 
-- **No backward compatibility is owed.** The fork will ship under its own
+- **No backward compatibility is owed.** The fork ships under its own
   Android `applicationId`, so every install is fresh: Isar and Hive start empty.
   Do not write migration code, orphan cleanup, index clamping, or defensive
   nullable-ing for things that were removed. Deleting a schema from
   `globalSchemas` is free.
-- **The rename has not happened yet.** The package is still `yuuna`, the
-  `applicationId` is still `app.arianneorpilla.yuuna`, and the label is still
-  `jidoujisho`. The new name is undecided.
+- **The rename is external only.** The `applicationId` is
+  `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
+  DCIM folder and exported file names say Yomimoto too. Internal identifiers
+  deliberately keep the upstream names: the Dart package `yuuna`, the Android
+  `namespace`/Java package `app.arianneorpilla.yuuna` (and the
+  `app.arianneorpilla.yuuna/anki` method channel), `Jidoujisho*` classes and
+  `jidoujisho_*.dart` files, and internal protocol strings (`jidoujisho://`,
+  `jidoujisho-message-type`). Do not rename these as a side effect.
 - **An older fork lineage exists in this repo's history** (`cc7e4925..8189e2fa`,
   "白い熊 辞書"). It did similar removals against the pre-migration tree. It is
   considered diverged — ignore it, do not cherry-pick from it.

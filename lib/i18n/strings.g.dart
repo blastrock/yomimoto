@@ -6,7 +6,7 @@
 /// Locales: 1
 /// Strings: 283
 ///
-/// Built on 2026-10-10 at 18:33 UTC
+/// Built on 2026-10-10 at 18:34 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -239,7 +239,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_content_dictionary_delete => 'Deleting a single dictionary may take longer than clearing the entire dictionary database. This will also clear all search results in history.';
 	String get delete_dictionary_data => 'Clearing all dictionary data...';
 	String dictionary_tag({required Object name}) => 'Imported from ${name}';
-	String get legalese => 'A full-featured immersion language learning suite for mobile.\n\nOriginally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\njidoujisho is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices. Enjoying the application? Help out by providing feedback, making a donation, reporting issues or contributing improvements on GitHub.';
+	String get legalese => '読本 — a Japanese book reader, dictionary and card creation toolkit for e-ink devices, by Philippe Daouadi.\n\nYomimoto is a fork of jidoujisho, originally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\nYomimoto is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices.';
 	String get same_name_dictionary_found => 'Dictionary with same name found.';
 	String import_file_extension_invalid({required Object extensions}) => 'This format expects files with the following extensions: ${extensions}';
 	String get field_label_empty => 'Empty';
@@ -542,7 +542,7 @@ extension on Translations {
 			case 'dialog_content_dictionary_delete': return 'Deleting a single dictionary may take longer than clearing the entire dictionary database. This will also clear all search results in history.';
 			case 'delete_dictionary_data': return 'Clearing all dictionary data...';
 			case 'dictionary_tag': return ({required Object name}) => 'Imported from ${name}';
-			case 'legalese': return 'A full-featured immersion language learning suite for mobile.\n\nOriginally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\njidoujisho is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices. Enjoying the application? Help out by providing feedback, making a donation, reporting issues or contributing improvements on GitHub.';
+			case 'legalese': return '読本 — a Japanese book reader, dictionary and card creation toolkit for e-ink devices, by Philippe Daouadi.\n\nYomimoto is a fork of jidoujisho, originally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\nYomimoto is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices.';
 			case 'same_name_dictionary_found': return 'Dictionary with same name found.';
 			case 'import_file_extension_invalid': return ({required Object extensions}) => 'This format expects files with the following extensions: ${extensions}';
 			case 'field_label_empty': return 'Empty';

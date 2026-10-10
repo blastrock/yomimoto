@@ -354,7 +354,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
 
   void browseToGithub() {
     launchUrl(
-      Uri.parse('https://github.com/arianneorpilla/jidoujisho'),
+      Uri.parse('https://github.com/blastrock/yomimoto'),
       mode: LaunchMode.externalApplication,
     );
   }

@@ -42,7 +42,7 @@ flutter analyze                                            # must stay free of e
 flutter build apk --release --split-per-abi
 ```
 
-`flutter analyze` currently reports **81 infos, 0 errors, 0 warnings**, all on
+`flutter analyze` currently reports **77 infos, 0 errors, 0 warnings**, all on
 pre-existing code (`use_build_context_synchronously`, `unnecessary_underscores`,
 `strict_top_level_inference`). Do not let that number grow; new code should be
 clean.
@@ -189,6 +189,37 @@ translations are gone.
   (`ReaderTtuSource.origin`) must stay fixed: IndexedDB is tied to it. The
   reader page talks to ttu only through `TtuBridge` (the fork's
   `apps/web/src/lib/host/`), never by injecting JS.
+
+  Working on the ttu side:
+
+  - The fork's overlay lives in new files under `apps/web/src/lib/host/`, with
+    only small hooks in upstream files, so it can be rebased onto upstream.
+    It is inert outside the app (gated on `window.flutter_inappwebview`).
+    `localStorage.ttuHostDebug = '1'` installs a fake host in a desktop
+    browser: events are logged to the console and commands can be called as
+    `window.ttuHost.<command>({...})`.
+  - The protocol version is `PROTOCOL_VERSION` in `host-bridge.ts` and
+    `TtuBridge.protocolVersion`; bump both when an event or command changes
+    shape. A mismatch shows a snackbar in the reader.
+  - Iterate with `tool/fetch_ttu.sh --local ../ebook-reader-lite` (needs
+    `pnpm install` done in the fork once). Releases are `vX.Y.Z` tags on the
+    fork, built by its `release.yml`; pin one with
+    `tool/fetch_ttu.sh --update <tag>` and commit `tool/ttu.lock`.
+  - Upstream's `pnpm check` already fails (42 errors); only CI's
+    `pnpm eslint .` and `pnpm build` are expected to pass.
+
+  Known quirks, all harmless:
+
+  - The SvelteKit service worker fails to register under the asset loader
+    (requests made by a service worker bypass `WebViewAssetLoader`), which
+    logs an `Uncaught (in promise) TypeError` in the console. ttu works
+    without it; do not chase it.
+  - Volume keys only reach Flutter once the WebView has been touched: before
+    that no native view has focus, so keys sent with `adb shell input
+    keyevent` right after opening a book change the system volume instead.
+    Tap the page first when testing on an emulator.
+  - Tapping another word while one is highlighted starts a new lookup: the
+    tap's mousedown clears the selection before `click` fires.
 - **mokuro** — reads mokuro-processed manga (HTML + OCR text overlay), with a
   catalog of remote/local sources persisted in Isar (`MokuroCatalog`).
 

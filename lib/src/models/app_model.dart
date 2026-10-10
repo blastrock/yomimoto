@@ -2750,6 +2750,17 @@ class AppModel with ChangeNotifier {
     dictionaryEntriesNotifier.notifyListeners();
   }
 
+  /// Insert or replace [item] as the most recent entry of its source's
+  /// history, without the history size limit of [addMediaItem]. For
+  /// sources whose history is a library that must not lose entries.
+  void putMediaItem(MediaItem item) {
+    _database.writeTxnSync(() {
+      _database.mediaItems.deleteByUniqueKeySync(item.uniqueKey);
+      item.id = null;
+      _database.mediaItems.putSync(item);
+    });
+  }
+
   /// Add a [MediaItem] to history. This should be called at startup
   /// when the media item is launched.
   void addMediaItem(MediaItem item) {

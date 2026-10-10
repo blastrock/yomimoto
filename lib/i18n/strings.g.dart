@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 280
+/// Strings: 279
 ///
-/// Built on 2026-10-10 at 08:21 UTC
+/// Built on 2026-10-10 at 08:35 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -380,7 +380,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get no_audio_file => 'No audio file to save.';
 	String get storage_permissions => 'Please grant the following permissions for exporting to AnkiDroid.';
 	String get accessibility => 'Permission is required to capture text from accessibility events.';
-	String file_downloaded({required Object name}) => 'File downloaded: ${name}';
 	String get cfhange_sort_order => 'Change Sort Order';
 	String get login => 'Login';
 	String get send => 'Send';
@@ -692,7 +691,6 @@ extension on Translations {
 			case 'no_audio_file': return 'No audio file to save.';
 			case 'storage_permissions': return 'Please grant the following permissions for exporting to AnkiDroid.';
 			case 'accessibility': return 'Permission is required to capture text from accessibility events.';
-			case 'file_downloaded': return ({required Object name}) => 'File downloaded: ${name}';
 			case 'cfhange_sort_order': return 'Change Sort Order';
 			case 'login': return 'Login';
 			case 'send': return 'Send';

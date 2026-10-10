@@ -55,7 +55,6 @@ class ReaderTtuSource extends ReaderMediaSource {
     required WidgetRef ref,
   }) async {
     ref.invalidate(ttuBooksProvider);
-    // await exportBackup(appModel: appModel);
   }
 
   /// The localhost port the reader assets are served on. It should not
@@ -173,12 +172,6 @@ class ReaderTtuSource extends ReaderMediaSource {
     );
   }
 
-  /// Shows when the clear button is pressed.
-  void showClearPrompt(
-      {required BuildContext context,
-      required WidgetRef ref,
-      required AppModel appModel}) async {}
-
   @override
   BasePage buildHistoryPage({MediaItem? item}) {
     return const ReaderTtuSourceHistoryPage();
@@ -214,10 +207,6 @@ class ReaderTtuSource extends ReaderMediaSource {
                 }
                 break;
               case 'empty':
-                await controller.evaluateJavascript(
-                    source:
-                        'javascript:window.localStorage.setItem("fontSize", 24)');
-
                 items = [];
                 break;
               case 'error':
@@ -378,111 +367,6 @@ class ReaderTtuSource extends ReaderMediaSource {
 
   /// Used to fetch JSON for all books in IndexedDB.
   static const String getHistoryJs = '''
-indexedDB.databases().then((databases) => {
-  if (databases.length > 0) {
-    var bookmarkJson = JSON.stringify([]);
-    var dataJson = JSON.stringify([]);
-    var lastItemJson = JSON.stringify([]);
-
-    var blobToBase64 = function(blob) {
-      return new Promise(resolve => {
-        let reader = new FileReader();
-        reader.onload = function() {
-          let dataUrl = reader.result;
-          resolve(dataUrl);
-        };
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    function getAllFromIDBStore(storeName) {
-      return new Promise(
-        function(resolve, reject) {
-          var dbRequest = indexedDB.open("books");
-
-          dbRequest.onerror = function(event) {
-            reject(Error("Error opening DB"));
-          };
-
-          dbRequest.onupgradeneeded = function(event) {
-            reject(Error('Not found'));
-          };
-
-          dbRequest.onsuccess = function(event) {
-            var database = event.target.result;
-
-            try {
-              var transaction = database.transaction([storeName], 'readwrite');
-              var objectStore;
-              try {
-                objectStore = transaction.objectStore(storeName);
-              } catch (e) {
-                reject(Error('Error getting objects'));
-              }
-
-              var objectRequest = objectStore.getAll();
-
-              objectRequest.onerror = function(event) {
-                reject(Error('Error getting objects'));
-              };
-
-              objectRequest.onsuccess = function(event) {
-                if (objectRequest.result) resolve(objectRequest.result);
-                else reject(Error('Objects not found'));
-              }; 
-            } catch (e) {
-              console.log(JSON.stringify({messageType: "error", error: e.name}));
-              reject(Error('Error getting objects'));
-            }
-          };
-        }
-      );
-    }
-
-    async function getTtuData() {
-      try {
-        items = await getAllFromIDBStore("data");
-        await Promise.all(items.map(async (item) => {
-          try {
-            item["coverImage"] = await blobToBase64(item["coverImage"]);
-          } catch (e) {}
-        }));
-        
-        dataJson = JSON.stringify(items);
-      } catch (e) {
-        dataJson = JSON.stringify([]);
-      }
-
-      try {
-        bookmarkJson = JSON.stringify(await getAllFromIDBStore("bookmark"));
-      } catch (e) {
-        bookmarkJson = JSON.stringify([]);
-      }
-      
-      try {
-        lastItemJson = JSON.stringify(await getAllFromIDBStore("lastItem"));
-      } catch (e) {
-        lastItemJson = JSON.stringify([]);
-      }
-
-      console.log(JSON.stringify({messageType: "history", lastItem: lastItemJson, bookmark: bookmarkJson, data: dataJson}));
-    }
-
-    try {
-      getTtuData();
-    } catch (e) {
-      console.log(JSON.stringify({messageType: "history", lastItem: lastItemJson, bookmark: bookmarkJson, data: dataJson}));
-    }
-  } else {
-  
-    console.log(JSON.stringify({messageType: "empty"}));
-    
-  }
-});
-''';
-
-  /// Used to fetch JSON for all books in IndexedDB.
-  static const String get = '''
 indexedDB.databases().then((databases) => {
   if (databases.length > 0) {
     var bookmarkJson = JSON.stringify([]);

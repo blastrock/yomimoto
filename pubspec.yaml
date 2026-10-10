@@ -19,7 +19,6 @@ dependencies:
   crop_image: ^1.0.4
   dart_mappable: ^4.7.0
   device_info_plus: ^13.2.0
-  document_file_save_plus: ^2.0.0
   expandable: ^5.0.1
   external_app_launcher: ^4.0.4
   external_path: ^3.0.0

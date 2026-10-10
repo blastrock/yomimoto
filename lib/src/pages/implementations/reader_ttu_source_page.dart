@@ -202,56 +202,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     );
   }
 
-  void setDictionaryColors() async {
-    String currentTheme = (await _controller.evaluateJavascript(
-            source: 'window.localStorage.getItem("theme")'))
-        .toString();
-    switch (currentTheme) {
-      case 'light-theme':
-        appModel.setOverrideDictionaryTheme(appModel.theme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(249, 249, 249, dictionaryEntryOpacity),
-        );
-        break;
-      case 'ecru-theme':
-        appModel.setOverrideDictionaryTheme(appModel.theme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(247, 246, 235, dictionaryEntryOpacity),
-        );
-        break;
-      case 'water-theme':
-        appModel.setOverrideDictionaryTheme(appModel.theme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(223, 236, 244, dictionaryEntryOpacity),
-        );
-        break;
-      case 'gray-theme':
-        appModel.setOverrideDictionaryTheme(appModel.darkTheme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(35, 39, 42, dictionaryEntryOpacity),
-        );
-        break;
-      case 'dark-theme':
-        appModel.setOverrideDictionaryTheme(appModel.darkTheme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(18, 18, 18, dictionaryEntryOpacity),
-        );
-        break;
-      case 'black-theme':
-        appModel.setOverrideDictionaryTheme(appModel.darkTheme);
-        appModel.setOverrideDictionaryColor(
-          Color.fromRGBO(16, 16, 16, dictionaryEntryOpacity),
-        );
-        break;
-    }
-
-    if (mounted) {
-      clearDictionaryResult();
-      setState(() {});
-    }
-  }
-
-
   CacheMode get cacheMode {
     if (mediaSource.currentTtuInternalVersion ==
         ReaderTtuSource.ttuInternalVersion) {
@@ -311,6 +261,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           controller: controller,
           onReady: _onBridgeReady,
           onTap: _onTap,
+          onTheme: _onTheme,
           onExit: _onBridgeExit,
         );
 
@@ -375,16 +326,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         );
       },
       onLoadStop: (controller, uri) async {
-        if (mediaSource.adaptTtuTheme) {
-          setDictionaryColors();
-        }
-
         Future.delayed(const Duration(seconds: 1), _focusNode.requestFocus);
-      },
-      onTitleChanged: (controller, title) async {
-        if (mediaSource.adaptTtuTheme) {
-          setDictionaryColors();
-        }
       },
       onDownloadStartRequest: onDownloadStartRequest,
     );
@@ -500,6 +442,33 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     await _controller.setContextMenu(emptyContextMenu);
     await bridge.highlight(start: start, length: length);
     await _controller.setContextMenu(contextMenu);
+  }
+
+  /// Match the dictionary popup to the reader's page colour.
+  void _onTheme(TtuThemeEvent event) {
+    if (!mediaSource.adaptTtuTheme) {
+      return;
+    }
+
+    Color background = event.backgroundColor;
+    bool isDark = background.computeLuminance() < 0.5;
+
+    appModel.setOverrideDictionaryTheme(
+      isDark ? appModel.darkTheme : appModel.theme,
+    );
+    appModel.setOverrideDictionaryColor(
+      Color.fromRGBO(
+        (background.r * 255).round(),
+        (background.g * 255).round(),
+        (background.b * 255).round(),
+        dictionaryEntryOpacity,
+      ),
+    );
+
+    if (mounted) {
+      clearDictionaryResult();
+      setState(() {});
+    }
   }
 
   void _onBridgeReady(TtuReadyEvent event) {

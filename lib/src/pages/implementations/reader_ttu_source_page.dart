@@ -36,10 +36,8 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   late InAppWebViewController _controller;
   TtuBridge? _bridge;
 
-  DateTime? lastMessageTime;
   Orientation? lastOrientation;
 
-  Duration get consoleMessageDebounce => const Duration(milliseconds: 50);
 
   final FocusNode _focusNode = FocusNode();
   bool _isRecursiveSearching = false;
@@ -253,22 +251,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     }
   }
 
-  String sanitizeWebViewTextSelection(String? text) {
-    if (text == null) {
-      return '';
-    }
-
-    text = text.replaceAll('\\n', '\n');
-    text = text.trim();
-    return text;
-  }
-
-  Future<String> getWebViewTextSelection(
-      InAppWebViewController webViewController) async {
-    String? selectedText = await webViewController.getSelectedText();
-    selectedText = sanitizeWebViewTextSelection(selectedText);
-    return selectedText;
-  }
 
   CacheMode get cacheMode {
     if (mediaSource.currentTtuInternalVersion ==
@@ -328,6 +310,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         _bridge = TtuBridge(
           controller: controller,
           onReady: _onBridgeReady,
+          onTap: _onTap,
           onExit: _onBridgeExit,
         );
 
@@ -396,12 +379,9 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           setDictionaryColors();
         }
 
-        await controller.evaluateJavascript(source: javascriptToExecute);
         Future.delayed(const Duration(seconds: 1), _focusNode.requestFocus);
       },
       onTitleChanged: (controller, title) async {
-        await controller.evaluateJavascript(source: javascriptToExecute);
-
         if (mediaSource.adaptTtuTheme) {
           setDictionaryColors();
         }
@@ -424,149 +404,102 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
             'blobUrlPlaceholder', request.url.toString()));
   }
 
-  Future<void> selectTextOnwards({
-    required int cursorX,
-    required int cursorY,
-    required int offsetIndex,
-    required int length,
-    required int whitespaceOffset,
-  }) async {
-    await _controller.setContextMenu(emptyContextMenu);
-    await _controller.evaluateJavascript(
-      source:
-          'selectTextForTextLength($cursorX, $cursorY, $offsetIndex, $length, $whitespaceOffset);',
-    );
-    await _controller.setContextMenu(contextMenu);
-  }
 
   void onConsoleMessage(
     InAppWebViewController controller,
     ConsoleMessage message,
-  ) async {
-    DateTime now = DateTime.now();
-    if (lastMessageTime != null &&
-        now.difference(lastMessageTime!) < consoleMessageDebounce) {
+  ) {
+    debugPrint('ttu: ${message.message}');
+  }
+
+  Future<void> _onTap(TtuTapEvent event) async {
+    FocusScope.of(context).unfocus();
+    _focusNode.requestFocus();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+    if (event.isDismiss) {
+      clearDictionaryResult();
+      mediaSource.clearCurrentSentence();
       return;
     }
 
-    lastMessageTime = now;
+    late JidoujishoPopupPosition position;
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      position = event.y < MediaQuery.of(context).size.height / 2
+          ? JidoujishoPopupPosition.bottomHalf
+          : JidoujishoPopupPosition.topHalf;
+    } else {
+      position = event.x < MediaQuery.of(context).size.width / 2
+          ? JidoujishoPopupPosition.rightHalf
+          : JidoujishoPopupPosition.leftHalf;
+    }
 
-    late Map<String, dynamic> messageJson;
+    String text = event.text;
+    int index = event.offset;
+
     try {
-      messageJson = jsonDecode(message.message);
-    } catch (e) {
-      JsonEncoder encoder = const JsonEncoder.withIndent('  ');
-      debugPrint(encoder.convert(message.toJson()));
+      /// If we cut off at a lone surrogate, offset the index back by 1. The
+      /// selection meant to select the index before.
+      RegExp loneSurrogate = RegExp(
+        '[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]',
+      );
+      if (index != 0 && text.substring(index).startsWith(loneSurrogate)) {
+        index = index - 1;
+      }
 
+      String searchTerm = text.substring(index);
+      int whitespaceOffset = searchTerm.length - searchTerm.trimLeft().length;
+      int start = index + whitespaceOffset;
+
+      int length = JapaneseLanguage.instance.getGuessHighlightLength(
+        searchTerm: searchTerm,
+      );
+
+      if (mediaSource.highlightOnTap) {
+        await _highlight(start: start, length: length);
+      }
+
+      await searchDictionaryResult(
+        searchTerm: searchTerm,
+        position: position,
+      );
+
+      length = JapaneseLanguage.instance.getFinalHighlightLength(
+        result: currentResult,
+      );
+
+      if (mediaSource.highlightOnTap) {
+        await _highlight(start: start, length: length);
+
+        if (!dictionaryPopupShown) {
+          await unselectWebViewTextSelection(_controller);
+        }
+      }
+
+      JidoujishoTextSelection selection =
+          JapaneseLanguage.instance.getSentenceFromParagraph(
+        paragraph: text,
+        index: index,
+        startOffset: start,
+        endOffset: start + length,
+      );
+
+      mediaSource.setCurrentSentence(selection: selection);
+    } catch (e) {
+      clearDictionaryResult();
+    }
+  }
+
+  /// Select text without the native selection menu flashing up.
+  Future<void> _highlight({required int start, required int length}) async {
+    TtuBridge? bridge = _bridge;
+    if (bridge == null) {
       return;
     }
 
-    switch (messageJson['jidoujisho-message-type']) {
-      case 'lookup':
-        FocusScope.of(context).unfocus();
-        _focusNode.requestFocus();
-
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-        int index = messageJson['index'];
-        String text = messageJson['text'];
-        int x = messageJson['x'];
-        int y = messageJson['y'];
-
-        late JidoujishoPopupPosition position;
-        if (MediaQuery.of(context).orientation == Orientation.portrait) {
-          if (y < MediaQuery.of(context).size.height / 2) {
-            position = JidoujishoPopupPosition.bottomHalf;
-          } else {
-            position = JidoujishoPopupPosition.topHalf;
-          }
-        } else {
-          if (x < MediaQuery.of(context).size.width / 2) {
-            position = JidoujishoPopupPosition.rightHalf;
-          } else {
-            position = JidoujishoPopupPosition.leftHalf;
-          }
-        }
-
-        text = text.replaceAll('\\n', '\n');
-
-        if (text.isEmpty || index == -1) {
-          clearDictionaryResult();
-          mediaSource.clearCurrentSentence();
-          return;
-        }
-
-        try {
-          /// If we cut off at a lone surrogate, offset the index back by 1. The
-          /// selection meant to select the index before
-          RegExp loneSurrogate = RegExp(
-            '[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]',
-          );
-          if (index != 0 && text.substring(index).startsWith(loneSurrogate)) {
-            index = index - 1;
-          }
-
-
-          String searchTerm = text.substring(index);
-          int whitespaceOffset =
-              searchTerm.length - searchTerm.trimLeft().length;
-
-          int offsetIndex = index + whitespaceOffset;
-
-          int length = JapaneseLanguage.instance.getGuessHighlightLength(
-            searchTerm: searchTerm,
-          );
-
-          if (mediaSource.highlightOnTap) {
-            await selectTextOnwards(
-              cursorX: x,
-              cursorY: y,
-              offsetIndex: offsetIndex,
-              length: length,
-              whitespaceOffset: whitespaceOffset,
-            );
-          }
-
-          searchDictionaryResult(
-            searchTerm: searchTerm,
-            position: position,
-          ).then((_) async {
-            length = JapaneseLanguage.instance.getFinalHighlightLength(
-              result: currentResult,
-            );
-
-            if (mediaSource.highlightOnTap) {
-              await selectTextOnwards(
-                cursorX: x,
-                cursorY: y,
-                offsetIndex: offsetIndex,
-                length: length,
-                whitespaceOffset: whitespaceOffset,
-              );
-
-              if (!dictionaryPopupShown) {
-                unselectWebViewTextSelection(_controller);
-              }
-            }
-
-            JidoujishoTextSelection selection =
-                JapaneseLanguage.instance.getSentenceFromParagraph(
-              paragraph: text,
-              index: index,
-              startOffset: offsetIndex,
-              endOffset: offsetIndex + length,
-            );
-
-            mediaSource.setCurrentSentence(
-              selection: selection,
-            );
-          });
-        } catch (e) {
-          clearDictionaryResult();
-        }
-
-        break;
-    }
+    await _controller.setContextMenu(emptyContextMenu);
+    await bridge.highlight(start: start, length: length);
+    await _controller.setContextMenu(contextMenu);
   }
 
   void _onBridgeReady(TtuReadyEvent event) {
@@ -611,12 +544,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
   Future<void> unselectWebViewTextSelection(
       InAppWebViewController webViewController) async {
-    String source = '''
-if (!window.getSelection().isCollapsed) {
-  window.getSelection().removeAllRanges();
-}
-''';
-    await webViewController.evaluateJavascript(source: source);
+    await _bridge?.clearSelection();
   }
 
   /// Get the default context menu for sources that make use of embedded web
@@ -708,7 +636,7 @@ if (!window.getSelection().isCollapsed) {
   }
 
   void creatorMenuAction() async {
-    String text = (await getSelectedText()).replaceAll('\\n', '\n');
+    String text = await getSelectedText();
 
     await unselectWebViewTextSelection(_controller);
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -747,9 +675,7 @@ if (!window.getSelection().isCollapsed) {
   }
 
   Future<String> getSelectedText() async {
-    return (await _controller.getSelectedText() ?? '')
-        .replaceAll('\\n', '\n')
-        .trim();
+    return await _bridge?.getSelectedText() ?? '';
   }
 
   String downloadFileJs = '''
@@ -775,351 +701,4 @@ xhr.onload = function(e) {
 };
 xhr.send();
 ''';
-
-  /// This is executed upon page load and change.
-  /// More accurate readability courtesy of
-  /// https://github.com/birchill/10ten-ja-reader/blob/fbbbde5c429f1467a7b5a938e9d67597d7bd5ffa/src/content/get-text.ts#L314
-  String javascriptToExecute = """
-/*jshint esversion: 6 */
-
-function tapToSelect(e) {
-  if (getSelectionText()) {
-    console.log(JSON.stringify({
-				"index": -1,
-				"text": getSelectionText(),
-				"jidoujisho-message-type": "lookup",
-        "x": e.clientX,
-        "y": e.clientY,
-        "isCreator": "no",
-			}));
-  }
-
-  var result = document.caretRangeFromPoint(e.clientX, e.clientY);
-
-  if (e.target.classList.contains('book-content')) {
-    console.log(JSON.stringify({
-      "index": -1,
-      "text": getSelectionText(),
-      "jidoujisho-message-type": "lookup",
-      "x": e.clientX,
-      "y": e.clientY,
-      "isCreator": "no",
-    }));
-    return;
-  }
-
-  var selectedElement = result.startContainer;
-  var paragraph = result.startContainer;
-  var offsetNode = result.startContainer;
-  var offset = result.startOffset;
-
-  var adjustIndex = false;
-
-  if (!!offsetNode && offsetNode.nodeType === Node.TEXT_NODE && offset) {
-      const range = new Range();
-      range.setStart(offsetNode, offset - 1);
-      range.setEnd(offsetNode, offset);
-
-      const bbox = range.getBoundingClientRect();
-      if (bbox.left <= e.x && bbox.right >= e.x &&
-          bbox.top <= e.y && bbox.bottom >= e.y) {
-          
-          result.startOffset = result.startOffset - 1;
-          adjustIndex = true;
-      }
-    }
-  
-  
-  while (paragraph && paragraph.nodeName !== 'P') {
-    paragraph = paragraph.parentNode;
-  }
-  if (paragraph === null) {
-    paragraph = result.startContainer.parentNode;
-  }
-  var noFuriganaText = [];
-  var noFuriganaNodes = [];
-  var selectedFound = false;
-  var index = 0;
-  for (var value of paragraph.childNodes.values()) {
-    if (value.nodeName === "#text") {
-      noFuriganaText.push(value.textContent);
-      noFuriganaNodes.push(value);
-      if (selectedFound === false) {
-        if (selectedElement !== value) {
-          index = index + value.textContent.length;
-        } else {
-          index = index + result.startOffset;
-          selectedFound = true;
-        }
-      }
-    } else {
-      for (var node of value.childNodes.values()) {
-        if (node.nodeName === "#text") {
-          noFuriganaText.push(node.textContent);
-          noFuriganaNodes.push(node);
-          if (selectedFound === false) {
-            if (selectedElement !== node) {
-              index = index + node.textContent.length;
-            } else {
-              index = index + result.startOffset;
-              selectedFound = true;
-            }
-          }
-        } else if (node.firstChild.nodeName === "#text" && node.nodeName !== "RT" && node.nodeName !== "RP") {
-          noFuriganaText.push(node.firstChild.textContent);
-          noFuriganaNodes.push(node.firstChild);
-          if (selectedFound === false) {
-            if (selectedElement !== node.firstChild) {
-              index = index + node.firstChild.textContent.length;
-            } else {
-              index = index + result.startOffset;
-              selectedFound = true;
-            }
-          }
-        }
-      }
-    }
-  }
-  var text = noFuriganaText.join("");
-  var offset = index;
-  if (adjustIndex) {
-    index = index - 1;
-  }
-  
-
-  var character = text[index];
-  if (character) {
-    console.log(JSON.stringify({
-      "index": index,
-      "text": text,
-      "jidoujisho-message-type": "lookup",
-      "x": e.clientX,
-      "y": e.clientY,
-    }));
-    console.log(character);
-  } else {
-    console.log(JSON.stringify({
-      "index": -1,
-      "text": getSelectionText(),
-      "jidoujisho-message-type": "lookup",
-      "x": e.clientX,
-      "y": e.clientY,
-      "isCreator": "no",
-    }));
-  }
-}
-function getSelectionText() {
-    function getRangeSelectedNodes(range) {
-      var node = range.startContainer;
-      var endNode = range.endContainer;
-      if (node == endNode) return [node];
-      var rangeNodes = [];
-      while (node && node != endNode) rangeNodes.push(node = nextNode(node));
-      node = range.startContainer;
-      while (node && node != range.commonAncestorContainer) {
-        rangeNodes.unshift(node);
-        node = node.parentNode;
-      }
-      return rangeNodes;
-      function nextNode(node) {
-        if (node.hasChildNodes()) return node.firstChild;
-        else {
-          while (node && !node.nextSibling) node = node.parentNode;
-          if (!node) return null;
-          return node.nextSibling;
-        }
-      }
-    }
-    var txt = "";
-    var nodesInRange;
-    var selection;
-    if (window.getSelection) {
-      selection = window.getSelection();
-      nodesInRange = getRangeSelectedNodes(selection.getRangeAt(0));
-      nodes = nodesInRange.filter((node) => node.nodeName == "#text" && node.parentElement.nodeName !== "RT" && node.parentElement.nodeName !== "RP" && node.parentElement.parentElement.nodeName !== "RT" && node.parentElement.parentElement.nodeName !== "RP");
-      if (selection.anchorNode === selection.focusNode) {
-          txt = txt.concat(selection.anchorNode.textContent.substring(selection.baseOffset, selection.extentOffset));
-      } else {
-          for (var i = 0; i < nodes.length; i++) {
-              var node = nodes[i];
-              if (i === 0) {
-                  txt = txt.concat(node.textContent.substring(selection.getRangeAt(0).startOffset));
-              } else if (i === nodes.length - 1) {
-                  txt = txt.concat(node.textContent.substring(0, selection.getRangeAt(0).endOffset));
-              } else {
-                  txt = txt.concat(node.textContent);
-              }
-          }
-      }
-    } else if (window.document.getSelection) {
-      selection = window.document.getSelection();
-      nodesInRange = getRangeSelectedNodes(selection.getRangeAt(0));
-      nodes = nodesInRange.filter((node) => node.nodeName == "#text" && node.parentElement.nodeName !== "RT" && node.parentElement.nodeName !== "RP" && node.parentElement.parentElement.nodeName !== "RT" && node.parentElement.parentElement.nodeName !== "RP");
-      if (selection.anchorNode === selection.focusNode) {
-          txt = txt.concat(selection.anchorNode.textContent.substring(selection.baseOffset, selection.extentOffset));
-      } else {
-          for (var i = 0; i < nodes.length; i++) {
-              var node = nodes[i];
-              if (i === 0) {
-                  txt = txt.concat(node.textContent.substring(selection.getRangeAt(0).startOffset));
-              } else if (i === nodes.length - 1) {
-                  txt = txt.concat(node.textContent.substring(0, selection.getRangeAt(0).endOffset));
-              } else {
-                  txt = txt.concat(node.textContent);
-              }
-          }
-      }
-    } else if (window.document.selection) {
-      txt = window.document.selection.createRange().text;
-    }
-    return txt;
-};
-var reader = document.getElementsByClassName('book-content');
-if (reader.length != 0) {
-  reader[0].addEventListener('click', tapToSelect, true);
-}
-document.head.insertAdjacentHTML('beforebegin', `
-<style>
-rt {
-  -webkit-touch-callout:none; /* iOS Safari */
-  -webkit-user-select:none;   /* Chrome/Safari/Opera */
-  -khtml-user-select:none;    /* Konqueror */
-  -moz-user-select:none;      /* Firefox */
-  -ms-user-select:none;       /* Internet Explorer/Edge */
-  user-select:none;           /* Non-prefixed version */
-}
-rp {
-  -webkit-touch-callout:none; /* iOS Safari */
-  -webkit-user-select:none;   /* Chrome/Safari/Opera */
-  -khtml-user-select:none;    /* Konqueror */
-  -moz-user-select:none;      /* Firefox */
-  -ms-user-select:none;       /* Internet Explorer/Edge */
-  user-select:none;           /* Non-prefixed version */
-}
-
-::selection {
-  color: white;
-  background: rgba(255, 0, 0, 0.6);
-}
-</style>
-`);
-
-
-function selectTextForTextLength(x, y, index, length, whitespaceOffset) {
-  var result = document.caretRangeFromPoint(x, y);
-
-  var selectedElement = result.startContainer;
-  var paragraph = result.startContainer;
-  var offsetNode = result.startContainer;
-  var offset = result.startOffset;
-
-  var adjustIndex = false;
-
-  if (!!offsetNode && offsetNode.nodeType === Node.TEXT_NODE && offset) {
-      const range = new Range();
-      range.setStart(offsetNode, offset - 1);
-      range.setEnd(offsetNode, offset);
-
-      const bbox = range.getBoundingClientRect();
-      if (bbox.left <= x && bbox.right >= x &&
-          bbox.top <= y && bbox.bottom >= y) {
-          if (length == 1) {
-            const range = new Range();
-            range.setStart(offsetNode, result.startOffset - 1);
-            range.setEnd(offsetNode, result.startOffset);
-
-            var selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-            return;
-          }
-
-          result.startOffset = result.startOffset - 1;
-          adjustIndex = true;
-      }
-  }
-
-  if (length == 1) {
-    const range = new Range();
-    range.setStart(offsetNode, result.startOffset);
-    range.setEnd(offsetNode, result.startOffset + 1);
-
-    var selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-    return;
-  }
-
-  while (paragraph && paragraph.nodeName !== 'P') {
-    paragraph = paragraph.parentNode;
-  }
-  if (paragraph === null) {
-    paragraph = result.startContainer.parentNode;
-  }
-  var noFuriganaText = [];
-  var lastNode;
-
-  var endOffset = 0;
-  var done = false;
-
-  for (var value of paragraph.childNodes.values()) {
-    if (done) {
-      console.log(noFuriganaText.join());
-      break;
-    }
-    
-    if (value.nodeName === "#text") {
-      endOffset = 0;
-      lastNode = value;
-      for (var i = 0; i < value.textContent.length; i++) {
-        noFuriganaText.push(value.textContent[i]);
-        endOffset = endOffset + 1;
-        if (noFuriganaText.length >= length + index) {
-          done = true;
-          break;
-        }
-      }
-    } else {
-      for (var node of value.childNodes.values()) {
-        if (done) {
-          break;
-        }
-
-        if (node.nodeName === "#text") {
-          endOffset = 0;
-          lastNode = node;
-
-          for (var i = 0; i < node.textContent.length; i++) {
-            noFuriganaText.push(node.textContent[i]);
-            endOffset = endOffset + 1;
-            if (noFuriganaText.length >= length + index) {
-              done = true;
-              break;
-            }
-          }
-        } else if (node.firstChild.nodeName === "#text" && node.nodeName !== "RT" && node.nodeName !== "RP") {
-          endOffset = 0;
-          lastNode = node.firstChild;
-          for (var i = 0; i < node.firstChild.textContent.length; i++) {
-            noFuriganaText.push(node.firstChild.textContent[i]);
-            endOffset = endOffset + 1;
-            if (noFuriganaText.length >= length + index) {
-              done = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  const range = new Range();
-  range.setStart(offsetNode, result.startOffset - adjustIndex + whitespaceOffset);
-  range.setEnd(lastNode, endOffset);
-  
-  var selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-}
-""";
 }

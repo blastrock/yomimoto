@@ -6,7 +6,7 @@
 /// Locales: 1
 /// Strings: 280
 ///
-/// Built on 2026-10-09 at 20:48 UTC
+/// Built on 2026-10-10 at 08:21 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -323,6 +323,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get exit_media_description => 'This will return you to the main menu. Are you sure?';
 	String get unimplemented_source => 'Unimplemented source';
 	String get ttu_no_books_added => 'No books added to ッツ Ebook Reader';
+	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
 	String get record => 'Record';
@@ -359,7 +360,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get manager => 'Manager';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
-	String get volume_button_turning_speed => 'Continuous scrolling speed';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
 	String get unit_milliseconds => 'ms';
 	String get unit_pixels => 'px';
@@ -635,6 +635,7 @@ extension on Translations {
 			case 'exit_media_description': return 'This will return you to the main menu. Are you sure?';
 			case 'unimplemented_source': return 'Unimplemented source';
 			case 'ttu_no_books_added': return 'No books added to ッツ Ebook Reader';
+			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';
 			case 'record': return 'Record';
@@ -671,7 +672,6 @@ extension on Translations {
 			case 'manager': return 'Manager';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
-			case 'volume_button_turning_speed': return 'Continuous scrolling speed';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';
 			case 'unit_milliseconds': return 'ms';
 			case 'unit_pixels': return 'px';

@@ -28,7 +28,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
   late final TextEditingController _debounceDelayController;
   late final TextEditingController _fontSizeController;
   late final TextEditingController _maximumTermsController;
-  late final TextEditingController _speedController;
 
   /// Captured in [initState] so [dispose] does not have to reach for a
   /// provider, which is no longer legal at that point.
@@ -54,9 +53,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _maximumTermsController = TextEditingController(
       text: _appModel.maximumTerms.toString(),
     );
-    _speedController = TextEditingController(
-      text: ttuSource.volumePageTurningSpeed.toString(),
-    );
   }
 
   @override
@@ -65,7 +61,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _debounceDelayController.dispose();
     _fontSizeController.dispose();
     _maximumTermsController.dispose();
-    _speedController.dispose();
 
     if (_appModel.dictionaryFontSize != _initialFontSize) {
       _appModel.refresh();
@@ -197,22 +192,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 label: t.adapt_ttu_theme,
                 value: ttuSource.adaptTtuTheme,
                 toggle: ttuSource.toggleAdaptTtuTheme,
-              ),
-              buildNumberField(
-                controller: _speedController,
-                label: t.volume_button_turning_speed,
-                defaultValue:
-                    ReaderTtuSource.defaultScrollingSpeed.toString(),
-                onChanged: (value) {
-                  double speed = double.tryParse(value) ??
-                      ReaderTtuSource.defaultScrollingSpeed.toDouble();
-                  if (speed.isNegative) {
-                    speed = ReaderTtuSource.defaultScrollingSpeed.toDouble();
-                    _speedController.text = speed.toString();
-                  }
-
-                  ttuSource.setVolumePageTurningSpeed(speed.toInt());
-                },
               ),
               buildHeader(mokuroSource.sourceName),
               buildSwitch(

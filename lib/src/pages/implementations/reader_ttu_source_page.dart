@@ -34,6 +34,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   ReaderTtuSource get mediaSource => ReaderTtuSource.instance;
   bool _controllerInitialised = false;
   late InAppWebViewController _controller;
+  TtuBridge? _bridge;
 
   DateTime? lastMessageTime;
   Orientation? lastOrientation;
@@ -139,16 +140,12 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
                 event is KeyDownEvent || event is KeyRepeatEvent;
 
             if (isPress && event.logicalKey == LogicalKeyboardKey.audioVolumeUp) {
-              unselectWebViewTextSelection(_controller);
-              _controller.evaluateJavascript(source: leftArrowSimulateJs);
-
+              _turnPage(forward: !mediaSource.volumePageTurningInverted);
               return KeyEventResult.handled;
             }
             if (isPress &&
                 event.logicalKey == LogicalKeyboardKey.audioVolumeDown) {
-              unselectWebViewTextSelection(_controller);
-              _controller.evaluateJavascript(source: rightArrowSimulateJs);
-
+              _turnPage(forward: mediaSource.volumePageTurningInverted);
               return KeyEventResult.handled;
             }
           }
@@ -328,6 +325,11 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
       onWebViewCreated: (controller) {
         _controller = controller;
         _controllerInitialised = true;
+        _bridge = TtuBridge(
+          controller: controller,
+          onReady: _onBridgeReady,
+          onExit: _onBridgeExit,
+        );
 
         controller.addJavaScriptHandler(
           handlerName: 'blobToBase64Handler',
@@ -395,12 +397,10 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         }
 
         await controller.evaluateJavascript(source: javascriptToExecute);
-        await _injectExitMenuItem(controller);
         Future.delayed(const Duration(seconds: 1), _focusNode.requestFocus);
       },
       onTitleChanged: (controller, title) async {
         await controller.evaluateJavascript(source: javascriptToExecute);
-        await _injectExitMenuItem(controller);
 
         if (mediaSource.adaptTtuTheme) {
           setDictionaryColors();
@@ -566,15 +566,46 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         }
 
         break;
-      case 'exit':
-        // Posted by the "Exit" row injected into TTU's header menu
-        // (see [_exitMenuItemJs]). maybePop goes through the page's
-        // PopScope, so onWillPop still runs and the exit confirmation
-        // is shown.
-        if (mounted) {
-          Navigator.maybePop(context);
-        }
-        break;
+    }
+  }
+
+  void _onBridgeReady(TtuReadyEvent event) {
+    if (event.isCompatible) {
+      return;
+    }
+
+    debugPrint(
+      'ttuHost: protocol ${event.protocolVersion}, app expects '
+      '${TtuBridge.protocolVersion}. Run tool/fetch_ttu.sh.',
+    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(t.ttu_bridge_mismatch)),
+      );
+    }
+  }
+
+  /// Exit goes through [PopScope], so the exit confirmation and
+  /// [MediaSource.onSourceExit] run exactly as for the back button.
+  void _onBridgeExit() {
+    if (mounted) {
+      Navigator.maybePop(context);
+    }
+  }
+
+  /// Volume up is "next page" unless inverted, as with the old wheel-event
+  /// implementation (a positive wheel delta flipped forward).
+  Future<void> _turnPage({required bool forward}) async {
+    TtuBridge? bridge = _bridge;
+    if (bridge == null) {
+      return;
+    }
+
+    await unselectWebViewTextSelection(_controller);
+    if (forward) {
+      await bridge.nextPage();
+    } else {
+      await bridge.prevPage();
     }
   }
 
@@ -719,76 +750,6 @@ if (!window.getSelection().isCollapsed) {
     return (await _controller.getSelectedText() ?? '')
         .replaceAll('\\n', '\n')
         .trim();
-  }
-
-  /// Adds an "Exit" entry to TTU's own header popover — the one the
-  /// merged header icon opens, listing "Manager" / "Settings".
-  ///
-  /// E-ink devices such as the Boox Palma 2 Pro have neither a physical
-  /// back button nor an on-screen navigation bar, and TTU's reading view
-  /// takes the whole screen, so there is otherwise no way to leave the
-  /// book from inside the WebView. The entry posts an `exit` console
-  /// message that [onConsoleMessage] turns into a `Navigator.maybePop`,
-  /// which routes through [PopScope] → [onWillPop] and therefore takes
-  /// exactly the same path as pressing back — the exit confirmation and
-  /// [MediaSource.onSourceExit] both still run.
-  ///
-  /// The popover is created by Svelte only while it is open and thrown
-  /// away on close, so a one-shot injection is not enough — a
-  /// `MutationObserver` re-injects on every open. The installer itself is
-  /// guarded by a window flag because it is re-run on each load/title
-  /// change.
-  ///
-  /// The menu is matched by TTU's compiled markup: a
-  /// `div[slot="content"]` carrying `bg-gray-700` whose children are the
-  /// `div[role="button"]` label rows. The only other popover in TTU (the
-  /// book-info one) uses a different content class, and requiring at
-  /// least one label row keeps the match tight. The new row is cloned
-  /// from an existing row's classes so it picks up TTU's own styling and
-  /// whatever theme is active.
-  static const String _exitMenuItemJs = '''
-    (function() {
-      if (window.__jidoujishoExitMenuInstalled) return;
-      window.__jidoujishoExitMenuInstalled = true;
-
-      var EXIT_ID = 'jidoujisho-exit-menu-item';
-
-      function injectInto(menu) {
-        if (menu.querySelector('#' + EXIT_ID)) return;
-        var template = menu.querySelector('div[role="button"]');
-        if (!template) return;
-
-        var item = document.createElement('div');
-        item.id = EXIT_ID;
-        item.setAttribute('role', 'button');
-        item.className = template.className;
-        item.textContent = 'Exit';
-        item.addEventListener('click', function(e) {
-          e.stopPropagation();
-          console.log(JSON.stringify({"jidoujisho-message-type": "exit"}));
-        });
-        menu.appendChild(item);
-      }
-
-      function scan() {
-        var menus = document.querySelectorAll(
-            '[data-popover] div[slot="content"].bg-gray-700');
-        for (var i = 0; i < menus.length; i++) {
-          injectInto(menus[i]);
-        }
-      }
-
-      scan();
-      // Appending our row mutates the menu and re-enters scan(), but the
-      // id check makes the second pass a no-op, so this cannot loop.
-      new MutationObserver(scan).observe(
-          document.body, { childList: true, subtree: true });
-    })();
-  ''';
-
-  /// Inject the "Exit" header-menu entry into a WebView controller.
-  Future<void> _injectExitMenuItem(InAppWebViewController controller) async {
-    await controller.evaluateJavascript(source: _exitMenuItemJs);
   }
 
   String downloadFileJs = '''
@@ -1161,18 +1122,4 @@ function selectTextForTextLength(x, y, index, length, whitespaceOffset) {
   selection.addRange(range);
 }
 """;
-
-  String get leftArrowSimulateJs => '''
-    var evt = document.createEvent('MouseEvents');
-    evt.initEvent('wheel', true, true); 
-    evt.deltaY = +0.001 * ${mediaSource.volumePageTurningSpeed * (mediaSource.volumePageTurningInverted ? -1 : 1)};
-    document.body.dispatchEvent(evt); 
-    ''';
-
-  String get rightArrowSimulateJs => '''
-    var evt = document.createEvent('MouseEvents');
-    evt.initEvent('wheel', true, true); 
-    evt.deltaY = -0.001 * ${mediaSource.volumePageTurningSpeed * (mediaSource.volumePageTurningInverted ? -1 : 1)};
-    document.body.dispatchEvent(evt); 
-    ''';
 }

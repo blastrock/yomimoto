@@ -49,9 +49,6 @@ class ReaderTtuSource extends ReaderMediaSource {
   @override
   Widget get home => const HomeNovelPage();
 
-  /// Default scrolling speed when in continuous page turning mode.
-  static int get defaultScrollingSpeed => 100;
-
   @override
   Future<void> onSourceExit({
     required AppModel appModel,
@@ -360,20 +357,6 @@ class ReaderTtuSource extends ReaderMediaSource {
     await setPreference<bool>(
       key: 'adapt_ttu_theme',
       value: !adaptTtuTheme,
-    );
-  }
-
-  /// Controls the speed for volume button page turning.
-  int get volumePageTurningSpeed {
-    return getPreference<int>(
-        key: 'volume_page_turning_speed', defaultValue: defaultScrollingSpeed);
-  }
-
-  /// Sets the speed for volume button page turning.
-  void setVolumePageTurningSpeed(int speed) async {
-    await setPreference<int>(
-      key: 'volume_page_turning_speed',
-      value: speed,
     );
   }
 

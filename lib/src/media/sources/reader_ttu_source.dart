@@ -1,22 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as path;
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
-
-/// A global [Provider] for getting ッツ Ebook Reader books from IndexedDB.
-final ttuBooksProvider = FutureProvider<List<MediaItem>>((ref) {
-  return ReaderTtuSource.instance.getBooksHistory(
-    appModel: ref.watch(appProvider),
-  );
-});
 
 /// A media source that allows the user to read from ッツ Ebook Reader.
 class ReaderTtuSource extends ReaderMediaSource {
@@ -42,14 +36,6 @@ class ReaderTtuSource extends ReaderMediaSource {
   @override
   Widget get home => const HomeNovelPage();
 
-  @override
-  Future<void> onSourceExit({
-    required AppModel appModel,
-    required WidgetRef ref,
-  }) async {
-    ref.invalidate(ttuBooksProvider);
-  }
-
   /// Origin the reader is served from: [TtuAssetPathHandler] answers it
   /// through the WebView asset loader. IndexedDB is tied to it, so it must
   /// never change between releases.
@@ -65,6 +51,172 @@ class ReaderTtuSource extends ReaderMediaSource {
         ),
       );
 
+  static const String _bookPathPrefix = 'b.html?id=';
+
+  /// The library entry for ttu book [id].
+  MediaItem bookItem({
+    required int id,
+    required String title,
+    String? coverPath,
+  }) {
+    return MediaItem(
+      mediaIdentifier: '$_bookPathPrefix$id',
+      title: title,
+      imageUrl: coverPath == null ? null : 'file://$coverPath',
+      mediaSourceIdentifier: uniqueKey,
+      position: 0,
+      duration: 1,
+      canDelete: false,
+      canEdit: true,
+    );
+  }
+
+  /// ttu's id for a library entry, or null if [item] is not a book (e.g.
+  /// the settings page).
+  int? bookIdOf(MediaItem item) {
+    if (!item.mediaIdentifier.startsWith(_bookPathPrefix)) {
+      return null;
+    }
+    return int.tryParse(
+        item.mediaIdentifier.substring(_bookPathPrefix.length));
+  }
+
+  /// Where library covers are stored, one file per book id.
+  Directory coversDirectory(AppModel appModel) =>
+      Directory(path.join(appModel.appDirectory.path, 'ttuCovers'));
+
+  /// Make the Isar library match ttu's IndexedDB: add missing books (with
+  /// their covers) and drop entries whose book is gone.
+  Future<void> syncLibrary({
+    required AppModel appModel,
+    required TtuBridge bridge,
+  }) async {
+    List<TtuBook> books = await bridge.listBooks();
+    Map<int, MediaItem> mirrored = {};
+    for (MediaItem item in appModel.getMediaSourceHistory(mediaSource: this)) {
+      int? id = bookIdOf(item);
+      if (id != null) {
+        mirrored[id] = item;
+      }
+    }
+    Directory covers = coversDirectory(appModel)..createSync(recursive: true);
+
+    for (TtuBook book in books) {
+      if (mirrored.containsKey(book.id)) {
+        continue;
+      }
+      String? coverPath;
+      String? dataUrl = await bridge.getCover(book.id);
+      UriData? data = dataUrl == null ? null : Uri.parse(dataUrl).data;
+      if (data != null) {
+        String extension = extensionFromMime(data.mimeType) ?? 'img';
+        File file = File(path.join(covers.path, '${book.id}.$extension'));
+        file.writeAsBytesSync(data.contentAsBytes());
+        coverPath = file.path;
+      }
+      appModel.putMediaItem(
+        bookItem(id: book.id, title: book.title, coverPath: coverPath),
+      );
+    }
+
+    Set<int> ids = books.map((book) => book.id).toSet();
+    for (MapEntry<int, MediaItem> entry in mirrored.entries) {
+      if (ids.contains(entry.key)) {
+        continue;
+      }
+      for (FileSystemEntity file in covers.listSync()) {
+        if (path.basenameWithoutExtension(file.path) == '${entry.key}') {
+          file.deleteSync();
+        }
+      }
+      await appModel.deleteMediaItem(entry.value);
+    }
+
+    refreshTab();
+  }
+
+  /// Run [task] behind a blocking progress dialog; on failure show the error
+  /// and return null.
+  Future<T?> runWithProgress<T>({
+    required BuildContext context,
+    required String message,
+    required Future<T> Function() task,
+  }) async {
+    NavigatorState navigator = Navigator.of(context);
+    bool progressShown = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        content: Row(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(width: 24),
+            Expanded(child: Text(message)),
+          ],
+        ),
+      ),
+    ).then((_) => progressShown = false);
+
+    try {
+      return await task();
+    } catch (error) {
+      if (progressShown) {
+        progressShown = false;
+        navigator.pop();
+      }
+      await showDialog(
+        context: navigator.context,
+        builder: (context) => AlertDialog(
+          title: Text(t.ttu_operation_failed),
+          content: Text(error is TtuBridgeException ? error.message : '$error'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(t.dialog_close),
+            ),
+          ],
+        ),
+      );
+      return null;
+    } finally {
+      if (progressShown) {
+        progressShown = false;
+        navigator.pop();
+      }
+    }
+  }
+
+  /// Reconcile the library with ttu's IndexedDB.
+  Future<void> refreshLibrary({
+    required BuildContext context,
+    required AppModel appModel,
+  }) async {
+    await runWithProgress(
+      context: context,
+      message: t.ttu_refreshing,
+      task: () => TtuHostOperations.run(
+        (bridge) => syncLibrary(appModel: appModel, bridge: bridge),
+      ),
+    );
+  }
+
+  /// Reconciles the library with ttu's IndexedDB.
+  Widget buildRefreshButton({
+    required BuildContext context,
+    required AppModel appModel,
+  }) {
+    return FloatingSearchBarAction(
+      showIfOpened: true,
+      child: JidoujishoIconButton(
+        size: Theme.of(context).textTheme.titleLarge?.fontSize,
+        tooltip: t.ttu_refresh_library,
+        icon: Icons.refresh,
+        onTap: () => refreshLibrary(context: context, appModel: appModel),
+      ),
+    );
+  }
+
   @override
   BaseSourcePage buildLaunchPage({
     MediaItem? item,
@@ -79,6 +231,10 @@ class ReaderTtuSource extends ReaderMediaSource {
     required AppModel appModel,
   }) {
     return [
+      buildRefreshButton(
+        context: context,
+        appModel: appModel,
+      ),
       buildSettingsButton(
         context: context,
         ref: ref,
@@ -133,7 +289,7 @@ class ReaderTtuSource extends ReaderMediaSource {
             ref: ref,
             mediaSource: this,
             item: MediaItem(
-              mediaIdentifier: url('settings.html'),
+              mediaIdentifier: 'settings.html',
               title: '',
               mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
               position: 0,
@@ -150,121 +306,6 @@ class ReaderTtuSource extends ReaderMediaSource {
   @override
   BasePage buildHistoryPage({MediaItem? item}) {
     return const ReaderTtuSourceHistoryPage();
-  }
-
-  /// Fetch JSON for all books in IndexedDB.
-  Future<List<MediaItem>> getBooksHistory({
-    required AppModel appModel,
-    bool recursive = false,
-  }) async {
-    List<MediaItem>? items;
-
-    HeadlessInAppWebView webView = HeadlessInAppWebView(
-      initialSettings: webViewSettings,
-      initialUrlRequest: URLRequest(
-        url: WebUri(url('')),
-      ),
-      onLoadStop: (controller, url) async {
-        controller.evaluateJavascript(source: getHistoryJs);
-      },
-      onConsoleMessage: (controller, message) async {
-        try {
-          Map<String, dynamic> messageJson = jsonDecode(message.message);
-
-          if (messageJson['messageType'] != null) {
-            switch (messageJson['messageType']) {
-              case 'history':
-                try {
-                  items = getItemsFromJson(messageJson);
-                } catch (error, stack) {
-                  items = [];
-                  debugPrint('$error');
-                  debugPrint('$stack');
-                }
-                break;
-              case 'empty':
-                items = [];
-                break;
-              case 'error':
-                items = [];
-                break;
-            }
-          }
-        } on FormatException catch (_) {}
-      },
-    );
-
-    try {
-      await webView.run();
-      while (items == null) {
-        await Future.delayed(const Duration(milliseconds: 500));
-      }
-    } finally {
-      await webView.dispose();
-    }
-
-    return items!;
-  }
-
-  /// Fetch the list of history items given JSON from IndexedDB.
-  List<MediaItem> getItemsFromJson(Map<String, dynamic> json) {
-    List<Map<String, dynamic>> bookmarks =
-        List<Map<String, dynamic>>.from(jsonDecode(json['bookmark']));
-    List<Map<String, dynamic>> datas =
-        List<Map<String, dynamic>>.from(jsonDecode(json['data']));
-    Map<int, Map<String, dynamic>> bookmarksById =
-        Map<int, Map<String, dynamic>>.fromEntries(
-            bookmarks.map((e) => MapEntry(e['dataId'] as int, e)));
-
-    List<MapEntry<int, MediaItem>> itemsById = datas.mapIndexed((index, data) {
-      int position = 0;
-      int duration = 1;
-
-      Map<String, dynamic>? bookmark = bookmarksById[data['id']];
-
-      if (bookmark != null) {
-        position = bookmark['exploredCharCount'] as int;
-        double progress = double.parse(bookmark['progress'].toString());
-        if (progress == 0) {
-          duration = 1;
-        } else {
-          duration = position ~/ progress;
-        }
-      }
-
-      String id = data['id'].toString();
-      String title = data['title'] as String? ?? ' ';
-      String? base64Image;
-      try {
-        Uri.parse(data['coverImage']);
-        base64Image = data['coverImage'];
-      } catch (e) {
-        base64Image = null;
-      }
-
-      return MapEntry(
-        index,
-        MediaItem(
-          mediaIdentifier: url('b.html?id=$id&?title=$title'),
-          title: title,
-          base64Image: base64Image,
-          mediaSourceIdentifier: ReaderTtuSource.instance.uniqueKey,
-          position: position,
-          duration: duration,
-          canDelete: false,
-          canEdit: true,
-        ),
-      );
-    }).toList();
-
-    List<int> lastOpens = datas.mapIndexed((index, data) {
-      return data['lastBookOpen'] as int? ?? 0;
-    }).toList();
-
-    itemsById.sort((a, b) => lastOpens[b.key].compareTo(lastOpens[a.key]));
-    List<MediaItem> itemsByLastOpened = itemsById.map((e) => e.value).toList();
-
-    return itemsByLastOpened;
   }
 
   /// Whether or not using the volume buttons in the Reader should turn the
@@ -340,109 +381,4 @@ class ReaderTtuSource extends ReaderMediaSource {
       value: !highlightOnTap,
     );
   }
-
-  /// Used to fetch JSON for all books in IndexedDB.
-  static const String getHistoryJs = '''
-indexedDB.databases().then((databases) => {
-  if (databases.length > 0) {
-    var bookmarkJson = JSON.stringify([]);
-    var dataJson = JSON.stringify([]);
-    var lastItemJson = JSON.stringify([]);
-
-    var blobToBase64 = function(blob) {
-      return new Promise(resolve => {
-        let reader = new FileReader();
-        reader.onload = function() {
-          let dataUrl = reader.result;
-          resolve(dataUrl);
-        };
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    function getAllFromIDBStore(storeName) {
-      return new Promise(
-        function(resolve, reject) {
-          var dbRequest = indexedDB.open("books");
-
-          dbRequest.onerror = function(event) {
-            reject(Error("Error opening DB"));
-          };
-
-          dbRequest.onupgradeneeded = function(event) {
-            reject(Error('Not found'));
-          };
-
-          dbRequest.onsuccess = function(event) {
-            var database = event.target.result;
-
-            try {
-              var transaction = database.transaction([storeName], 'readwrite');
-              var objectStore;
-              try {
-                objectStore = transaction.objectStore(storeName);
-              } catch (e) {
-                reject(Error('Error getting objects'));
-              }
-
-              var objectRequest = objectStore.getAll();
-
-              objectRequest.onerror = function(event) {
-                reject(Error('Error getting objects'));
-              };
-
-              objectRequest.onsuccess = function(event) {
-                if (objectRequest.result) resolve(objectRequest.result);
-                else reject(Error('Objects not found'));
-              }; 
-            } catch (e) {
-              console.log(JSON.stringify({messageType: "error", error: e.name}));
-              reject(Error('Error getting objects'));
-            }
-          };
-        }
-      );
-    }
-
-    async function getTtuData() {
-      try {
-        items = await getAllFromIDBStore("data");
-        await Promise.all(items.map(async (item) => {
-          try {
-            item["coverImage"] = await blobToBase64(item["coverImage"]);
-          } catch (e) {}
-        }));
-        
-        dataJson = JSON.stringify(items);
-      } catch (e) {
-        dataJson = JSON.stringify([]);
-      }
-
-      try {
-        bookmarkJson = JSON.stringify(await getAllFromIDBStore("bookmark"));
-      } catch (e) {
-        bookmarkJson = JSON.stringify([]);
-      }
-      
-      try {
-        lastItemJson = JSON.stringify(await getAllFromIDBStore("lastItem"));
-      } catch (e) {
-        lastItemJson = JSON.stringify([]);
-      }
-
-      console.log(JSON.stringify({messageType: "history", lastItem: lastItemJson, bookmark: bookmarkJson, data: dataJson}));
-    }
-
-    try {
-      getTtuData();
-    } catch (e) {
-      console.log(JSON.stringify({messageType: "history", lastItem: lastItemJson, bookmark: bookmarkJson, data: dataJson}));
-    }
-  } else {
-  
-    console.log(JSON.stringify({messageType: "empty"}));
-    
-  }
-});
-''';
 }

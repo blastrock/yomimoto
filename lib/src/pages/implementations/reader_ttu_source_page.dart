@@ -39,6 +39,11 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    MediaItem? item = widget.item;
+    if (item != null && mediaSource.bookIdOf(item) != null) {
+      appModelNoUpdate.putMediaItem(item);
+    }
   }
 
   @override
@@ -182,8 +187,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     return InAppWebView(
       initialUrlRequest: URLRequest(
         url: WebUri(
-          widget.item?.mediaIdentifier ??
-              mediaSource.url('manage.html'),
+          mediaSource.url(widget.item?.mediaIdentifier ?? 'manage.html'),
         ),
       ),
       onPermissionRequest: (controller, origin) async {

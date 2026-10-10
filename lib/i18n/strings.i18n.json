@@ -192,7 +192,10 @@
     "exit_media_description":
         "This will return you to the main menu. Are you sure?",
     "unimplemented_source": "Unimplemented source",
-    "ttu_no_books_added": "No books added to ッツ Ebook Reader",
+    "ttu_no_books_added": "No books yet: import EPUB, HTMLZ or TXT files",
+    "ttu_refresh_library": "Refresh library",
+    "ttu_refreshing": "Refreshing library…",
+    "ttu_operation_failed": "Library operation failed",
     "ttu_bridge_mismatch": "The reader build does not match this app version",
     "local_media_directory_empty": "Directory has no folders or video",
     "navigate_up_one_directory_level": "Navigate Up One Directory Level",

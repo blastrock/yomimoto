@@ -18,6 +18,9 @@ abstract class HistoryReaderPage extends BaseHistoryPage {
 /// code.
 abstract class HistoryReaderPageState<T extends HistoryReaderPage>
     extends BaseHistoryPageState {
+  /// Whether tiles show a reading-progress bar.
+  bool get showProgress => true;
+
   /// This is shown as the body when [shouldPlaceholderBeShown] is false.
   @override
   Widget buildHistory(List<MediaItem> items) {
@@ -85,18 +88,19 @@ abstract class HistoryReaderPageState<T extends HistoryReaderPage>
               ),
             );
           }),
-          LinearProgressIndicator(
-            value: (item.position / item.duration).isNaN ||
-                    (item.position / item.duration) == double.infinity ||
-                    (item.position == 0 && item.duration == 0)
-                ? 0
-                : ((item.position / item.duration) > 0.97)
-                    ? 1
-                    : (item.position / item.duration),
-            backgroundColor: Colors.white.withValues(alpha: 0.6),
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
-            minHeight: 2,
-          ),
+          if (showProgress)
+            LinearProgressIndicator(
+              value: (item.position / item.duration).isNaN ||
+                      (item.position / item.duration) == double.infinity ||
+                      (item.position == 0 && item.duration == 0)
+                  ? 0
+                  : ((item.position / item.duration) > 0.97)
+                      ? 1
+                      : (item.position / item.duration),
+              backgroundColor: Colors.white.withValues(alpha: 0.6),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
+              minHeight: 2,
+            ),
         ],
       ),
     );

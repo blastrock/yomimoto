@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 276
+/// Strings: 279
 ///
-/// Built on 2026-10-10 at 08:44 UTC
+/// Built on 2026-10-10 at 13:11 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -322,7 +322,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get exit_media_title => 'Exit Media';
 	String get exit_media_description => 'This will return you to the main menu. Are you sure?';
 	String get unimplemented_source => 'Unimplemented source';
-	String get ttu_no_books_added => 'No books added to ッツ Ebook Reader';
+	String get ttu_no_books_added => 'No books yet: import EPUB, HTMLZ or TXT files';
+	String get ttu_refresh_library => 'Refresh library';
+	String get ttu_refreshing => 'Refreshing library…';
+	String get ttu_operation_failed => 'Library operation failed';
 	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
@@ -618,7 +621,10 @@ extension on Translations {
 			case 'exit_media_title': return 'Exit Media';
 			case 'exit_media_description': return 'This will return you to the main menu. Are you sure?';
 			case 'unimplemented_source': return 'Unimplemented source';
-			case 'ttu_no_books_added': return 'No books added to ッツ Ebook Reader';
+			case 'ttu_no_books_added': return 'No books yet: import EPUB, HTMLZ or TXT files';
+			case 'ttu_refresh_library': return 'Refresh library';
+			case 'ttu_refreshing': return 'Refreshing library…';
+			case 'ttu_operation_failed': return 'Library operation failed';
 			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';

@@ -185,7 +185,11 @@ class TtuBridge {
       throw TtuBridgeException(command, 'no result');
     }
     if (result.error != null) {
-      throw TtuBridgeException(command, result.error!);
+      // JavaScript errors arrive as `Error: <message>`.
+      throw TtuBridgeException(
+        command,
+        result.error!.replaceFirst(RegExp('^Error: '), ''),
+      );
     }
 
     return result.value;

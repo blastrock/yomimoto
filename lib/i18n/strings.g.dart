@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 279
+/// Strings: 282
 ///
-/// Built on 2026-10-10 at 13:11 UTC
+/// Built on 2026-10-10 at 13:15 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -326,6 +326,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get ttu_refresh_library => 'Refresh library';
 	String get ttu_refreshing => 'Refreshing library…';
 	String get ttu_operation_failed => 'Library operation failed';
+	String get ttu_import_books => 'Import books';
+	String get ttu_importing => 'Importing books…';
+	String get ttu_unsupported_files => 'Only EPUB, HTMLZ and TXT files can be imported';
 	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
@@ -625,6 +628,9 @@ extension on Translations {
 			case 'ttu_refresh_library': return 'Refresh library';
 			case 'ttu_refreshing': return 'Refreshing library…';
 			case 'ttu_operation_failed': return 'Library operation failed';
+			case 'ttu_import_books': return 'Import books';
+			case 'ttu_importing': return 'Importing books…';
+			case 'ttu_unsupported_files': return 'Only EPUB, HTMLZ and TXT files can be imported';
 			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';

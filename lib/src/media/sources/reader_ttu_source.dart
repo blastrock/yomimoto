@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
@@ -201,6 +203,91 @@ class ReaderTtuSource extends ReaderMediaSource {
     );
   }
 
+  static const List<String> _importExtensions = ['epub', 'htmlz', 'txt'];
+
+  /// Let the user pick book files, import them with ttu's importer and add
+  /// them to the library.
+  Future<void> importBooks({
+    required BuildContext context,
+    required AppModel appModel,
+  }) async {
+    List<PlatformFile> picked = await FilePicker.pickFiles();
+    if (picked.isEmpty || !context.mounted) {
+      return;
+    }
+
+    List<PlatformFile> books = picked
+        .where((file) => _importExtensions.contains(
+            path.extension(file.name).replaceFirst('.', '').toLowerCase()))
+        .toList();
+    if (books.length != picked.length) {
+      Fluttertoast.showToast(msg: t.ttu_unsupported_files);
+    }
+    if (books.isEmpty) {
+      return;
+    }
+
+    Directory staging =
+        Directory(path.join(appModel.temporaryDirectory.path, 'ttu-import'));
+    if (staging.existsSync()) {
+      staging.deleteSync(recursive: true);
+    }
+    staging.createSync(recursive: true);
+
+    try {
+      int totalBytes = 0;
+      List<String> urls = [];
+      for (int i = 0; i < books.length; i++) {
+        // One directory per file keeps original names (ttu takes TXT titles
+        // and the format from them) even when two picked files share a name.
+        Directory slot = Directory(path.join(staging.path, '$i'))
+          ..createSync();
+        String name = books[i].name;
+        File staged =
+            File(books[i].path!).copySync(path.join(slot.path, name));
+        totalBytes += staged.lengthSync();
+        urls.add(url('import/$i/${Uri.encodeComponent(name)}'));
+      }
+
+      if (!context.mounted) {
+        return;
+      }
+      await runWithProgress(
+        context: context,
+        message: t.ttu_importing,
+        task: () => TtuHostOperations.run(
+          (bridge) async {
+            await bridge.importBooks(
+              urls,
+              timeout: Duration(seconds: 60 + totalBytes ~/ (256 * 1024)),
+            );
+            await syncLibrary(appModel: appModel, bridge: bridge);
+          },
+          importDirectory: staging,
+        ),
+      );
+    } finally {
+      staging.deleteSync(recursive: true);
+      await FilePicker.clearTemporaryFiles();
+    }
+  }
+
+  /// Picks book files and imports them into the library.
+  Widget buildImportButton({
+    required BuildContext context,
+    required AppModel appModel,
+  }) {
+    return FloatingSearchBarAction(
+      showIfOpened: true,
+      child: JidoujishoIconButton(
+        size: Theme.of(context).textTheme.titleLarge?.fontSize,
+        tooltip: t.ttu_import_books,
+        icon: Icons.add,
+        onTap: () => importBooks(context: context, appModel: appModel),
+      ),
+    );
+  }
+
   /// Reconciles the library with ttu's IndexedDB.
   Widget buildRefreshButton({
     required BuildContext context,
@@ -231,6 +318,10 @@ class ReaderTtuSource extends ReaderMediaSource {
     required AppModel appModel,
   }) {
     return [
+      buildImportButton(
+        context: context,
+        appModel: appModel,
+      ),
       buildRefreshButton(
         context: context,
         appModel: appModel,

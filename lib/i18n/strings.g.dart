@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 282
+/// Strings: 286
 ///
-/// Built on 2026-10-11 at 19:23 UTC
+/// Built on 2026-10-11 at 19:24 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -331,6 +331,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get stash_all_dictionaries => 'All dictionaries';
 	String get stash_entry_missing => 'This dictionary entry is no longer installed';
 	String get stash_delete_one => 'Delete this stashed word?';
+	String get stash_empty => 'No stashed words yet: use the stash button in the dictionary popup';
+	String stash_selected({required Object n}) => '${n} selected';
+	String get stash_select_all => 'Select all';
+	String stash_delete_confirm({required Object n}) => 'Delete ${n} stashed word(s)?';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
 	String get record => 'Record';
@@ -633,6 +637,10 @@ extension on Translations {
 			case 'stash_all_dictionaries': return 'All dictionaries';
 			case 'stash_entry_missing': return 'This dictionary entry is no longer installed';
 			case 'stash_delete_one': return 'Delete this stashed word?';
+			case 'stash_empty': return 'No stashed words yet: use the stash button in the dictionary popup';
+			case 'stash_selected': return ({required Object n}) => '${n} selected';
+			case 'stash_select_all': return 'Select all';
+			case 'stash_delete_confirm': return ({required Object n}) => 'Delete ${n} stashed word(s)?';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';
 			case 'record': return 'Record';

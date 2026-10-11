@@ -47,6 +47,18 @@ class _ReaderTtuSourceHistoryPageState<T extends HistoryReaderPage>
       TextButton(
         onPressed: () async {
           NavigatorState navigator = Navigator.of(context);
+          navigator.pop();
+          await navigator.push(
+            MaterialPageRoute(
+              builder: (context) => StashPage(item: item),
+            ),
+          );
+        },
+        child: Text(t.stash.toUpperCase()),
+      ),
+      TextButton(
+        onPressed: () async {
+          NavigatorState navigator = Navigator.of(context);
           bool deleted = await mediaSource.deleteBook(
             context: context,
             appModel: appModel,

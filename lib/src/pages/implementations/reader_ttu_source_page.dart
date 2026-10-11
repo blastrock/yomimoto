@@ -15,8 +15,12 @@ class ReaderTtuSourcePage extends BaseSourcePage {
   /// Create an instance of this page.
   const ReaderTtuSourcePage({
     super.item,
+    this.peekPosition,
     super.key,
   });
+
+  /// If set, open the book at this position without saving its bookmark.
+  final int? peekPosition;
 
   @override
   BaseSourcePageState createState() => _ReaderTtuSourcePageState();
@@ -183,11 +187,24 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     );
   }
 
+  /// The reader page to load: the book, at the peek position if any.
+  String get initialPath {
+    MediaItem? item = widget.item;
+    if (item == null) {
+      return 'manage.html';
+    }
+
+    int? peekPosition = widget.peekPosition;
+    return peekPosition == null
+        ? item.mediaIdentifier
+        : '${item.mediaIdentifier}&peek=$peekPosition';
+  }
+
   Widget buildReaderArea() {
     return InAppWebView(
       initialUrlRequest: URLRequest(
         url: WebUri(
-          mediaSource.url(widget.item?.mediaIdentifier ?? 'manage.html'),
+          mediaSource.url(initialPath),
         ),
       ),
       onPermissionRequest: (controller, origin) async {

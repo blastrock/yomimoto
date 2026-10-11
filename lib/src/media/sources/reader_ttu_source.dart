@@ -355,11 +355,29 @@ class ReaderTtuSource extends ReaderMediaSource {
     );
   }
 
+  int? _peekPosition;
+
+  /// Open [item] at [position] to see the word in context. The book's
+  /// bookmark is left untouched for the whole session.
+  Future<void> peekBook({
+    required WidgetRef ref,
+    required AppModel appModel,
+    required MediaItem item,
+    required int position,
+  }) async {
+    _peekPosition = position;
+    try {
+      await appModel.openMedia(ref: ref, mediaSource: this, item: item);
+    } finally {
+      _peekPosition = null;
+    }
+  }
+
   @override
   BaseSourcePage buildLaunchPage({
     MediaItem? item,
   }) {
-    return ReaderTtuSourcePage(item: item);
+    return ReaderTtuSourcePage(item: item, peekPosition: _peekPosition);
   }
 
   @override

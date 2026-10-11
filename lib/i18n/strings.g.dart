@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 274
+/// Strings: 278
 ///
-/// Built on 2026-10-11 at 16:00 UTC
+/// Built on 2026-10-11 at 19:21 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -323,6 +323,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get ttu_delete_book_confirm => 'Delete this book and its reading position?';
 	String get ttu_deleting => 'Deleting book…';
 	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
+	String get stash => 'Stash';
+	String get stash_added => 'Added to stash';
+	String get stash_already => 'Already stashed';
+	String get stash_unavailable => 'Open a book to stash words';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
 	String get record => 'Record';
@@ -617,6 +621,10 @@ extension on Translations {
 			case 'ttu_delete_book_confirm': return 'Delete this book and its reading position?';
 			case 'ttu_deleting': return 'Deleting book…';
 			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
+			case 'stash': return 'Stash';
+			case 'stash_added': return 'Added to stash';
+			case 'stash_already': return 'Already stashed';
+			case 'stash_unavailable': return 'Open a book to stash words';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';
 			case 'record': return 'Record';

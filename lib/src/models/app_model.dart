@@ -794,6 +794,7 @@ class AppModel with ChangeNotifier {
       CopyToClipboardAction(),
       ShareAction(),
       PlayAudioAction(),
+      AddToStashAction(),
     ];
 
     quickActions = Map<String, QuickAction>.unmodifiable(

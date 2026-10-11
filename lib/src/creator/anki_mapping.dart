@@ -153,6 +153,7 @@ class AnkiMapping {
     2: CopyToClipboardAction.key,
     3: ShareAction.key,
     4: PlayAudioAction.key,
+    5: AddToStashAction.key,
   };
 
   /// The default mapping name which cannot be deleted or reused.

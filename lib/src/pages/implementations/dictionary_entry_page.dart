@@ -15,7 +15,6 @@ class DictionaryEntryPage extends ConsumerStatefulWidget {
   const DictionaryEntryPage({
     required this.entry,
     required this.onSearch,
-    required this.onStash,
     required this.onShare,
     required this.expandableController,
     super.key,
@@ -27,10 +26,7 @@ class DictionaryEntryPage extends ConsumerStatefulWidget {
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
 
-  /// Action to be done upon selecting the stash option.
-  final Function(String) onStash;
-
-  /// Action to be done upon selecting the stash option.
+  /// Action to be done upon selecting the share option.
   final Function(String) onShare;
 
   /// Controller specific to a dictionary name.
@@ -87,13 +83,6 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
                       state.hideToolbar();
                     },
                     label: t.search,
-                  ),
-                  ContextMenuButtonItem(
-                    onPressed: () {
-                      widget.onStash(selectedText);
-                      state.hideToolbar();
-                    },
-                    label: t.stash,
                   ),
                   ...AdaptiveTextSelectionToolbar.selectableRegion(
                               selectableRegionState: state)

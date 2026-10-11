@@ -13,7 +13,6 @@ export 'src/creator/audio_export_field.dart';
 
 export 'src/creator/actions/card_creator_action.dart';
 export 'src/creator/actions/instant_export_action.dart';
-export 'src/creator/actions/add_to_stash_action.dart';
 export 'src/creator/actions/share_action.dart';
 export 'src/creator/actions/play_audio_action.dart';
 export 'src/creator/actions/copy_to_clipboard_action.dart';
@@ -23,8 +22,6 @@ export 'src/creator/enhancements/massif_example_sentences_enhancement.dart';
 export 'src/creator/enhancements/tatoeba_example_sentences_enhancement.dart';
 export 'src/creator/enhancements/search_dictionary_enhancement.dart';
 export 'src/creator/enhancements/sentence_picker_enhancement.dart';
-export 'src/creator/enhancements/pick_from_stash_enhancement.dart';
-export 'src/creator/enhancements/pop_from_stash_enhancement.dart';
 export 'src/creator/enhancements/crop_image_enhancement.dart';
 export 'src/creator/enhancements/pick_image_enhancement.dart';
 export 'src/creator/enhancements/camera_enhancement.dart';

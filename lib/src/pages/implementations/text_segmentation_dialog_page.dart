@@ -151,15 +151,7 @@ class _TextSegmentationDialogPage
     return widgets;
   }
 
-  Widget buildStashButton() {
-    return TextButton(
-      onPressed: executeStash,
-      child: Text(t.dialog_stash),
-    );
-  }
-
   List<Widget> get actions => [
-        buildStashButton(),
         if (widget.onSearch != null) buildSearchButton(),
         if (widget.onSelect != null) buildSelectButton(),
       ];
@@ -200,17 +192,6 @@ class _TextSegmentationDialogPage
       text: widget.sourceText,
       range: range,
     );
-  }
-
-  void executeStash() {
-    List<String> terms = [];
-    widget.segmentedText.forEachIndexed((index, segment) {
-      if (_valuesSelected[index]!.value) {
-        terms.add(segment);
-      }
-    });
-
-    appModel.addToStash(terms: terms);
   }
 
   void executeSearch() {

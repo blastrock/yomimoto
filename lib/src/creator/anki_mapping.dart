@@ -80,7 +80,6 @@ class AnkiMapping {
       1: SearchDictionaryEnhancement.key,
       2: MassifExampleSentencesEnhancement.key,
       3: ImmersionKitEnhancement.key,
-      4: OpenStashEnhancement.key,
     },
     ReadingField.key: {0: ClearFieldEnhancement.key},
     MeaningField.key: {
@@ -151,10 +150,9 @@ class AnkiMapping {
   static const Map<int, String> defaultActions = {
     0: CardCreatorAction.key,
     1: InstantExportAction.key,
-    2: AddToStashAction.key,
-    3: CopyToClipboardAction.key,
-    4: ShareAction.key,
-    5: PlayAudioAction.key,
+    2: CopyToClipboardAction.key,
+    3: ShareAction.key,
+    4: PlayAudioAction.key,
   };
 
   /// The default mapping name which cannot be deleted or reused.

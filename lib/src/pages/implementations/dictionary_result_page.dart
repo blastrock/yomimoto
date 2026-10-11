@@ -13,7 +13,6 @@ class DictionaryResultPage extends BasePage {
   const DictionaryResultPage({
     required this.result,
     required this.onSearch,
-    required this.onStash,
     required this.onShare,
     this.cardColor,
     this.scrollController,
@@ -29,9 +28,6 @@ class DictionaryResultPage extends BasePage {
 
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
-
-  /// Action to be done upon selecting the stash option.
-  final Function(String) onStash;
 
   /// Action to be done upon selecting the share option.
   final Function(String) onShare;
@@ -138,7 +134,6 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
                         cardColor: widget.cardColor,
                         heading: heading,
                         onSearch: widget.onSearch,
-                        onStash: widget.onStash,
                         onShare: widget.onShare,
                         expandableControllers:
                             expandableControllersByHeading[heading]!,

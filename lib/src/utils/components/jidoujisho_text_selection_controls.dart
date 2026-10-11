@@ -18,7 +18,6 @@ typedef OffsetValue = void Function(int start, int end);
 class JidoujishoTextSelectionControls extends MaterialTextSelectionControls {
   /// Define text selection controls with custom behaviour.
   JidoujishoTextSelectionControls({
-    required this.stashAction,
     required this.shareAction,
     required this.allowCopy,
     required this.allowCut,
@@ -48,9 +47,6 @@ class JidoujishoTextSelectionControls extends MaterialTextSelectionControls {
 
   /// Behaviour for the share action.
   final Function(String) shareAction;
-
-  /// Behaviour for the stash action.
-  final Function(String) stashAction;
 
   /// Whether or not to allow copying.
   final bool allowCopy;
@@ -164,14 +160,6 @@ class JidoujishoTextSelectionControls extends MaterialTextSelectionControls {
               delegate.hideToolbar();
             }
           : null,
-      stashAction: () {
-        stashAction(
-          delegate.textEditingValue.selection
-              .textInside(delegate.textEditingValue.text),
-        );
-
-        delegate.hideToolbar();
-      },
       shareAction: () {
         shareAction(
           delegate.textEditingValue.selection
@@ -203,7 +191,6 @@ class JidoujishoSelectionToolbar extends StatefulWidget {
     required this.creatorAction,
     required this.searchAction,
     required this.sentenceAction,
-    required this.stashAction,
     required this.shareAction,
     required this.handleCopy,
     required this.handleCut,
@@ -226,9 +213,6 @@ class JidoujishoSelectionToolbar extends StatefulWidget {
 
   /// Behaviour for the custom action.
   final Function()? sentenceAction;
-
-  /// Behaviour for the stash action.
-  final Function() stashAction;
 
   /// Behaviour for the share action.
   final Function() shareAction;
@@ -300,10 +284,6 @@ class _JidoujishoSelectionToolbarState
           onPressed: widget.searchAction,
           label: t.search,
         ),
-      _TextSelectionToolbarItemData(
-        onPressed: widget.stashAction,
-        label: t.stash,
-      ),
       if (widget.handleCut != null)
         _TextSelectionToolbarItemData(
           label: localizations.cutButtonLabel,

@@ -189,7 +189,6 @@ class _MokuroCatalogBrowsePageState
         ),
         menuItems: [
           searchMenuItem(),
-          stashMenuItem(),
           copyMenuItem(),
           shareMenuItem(),
           creatorMenuItem(),
@@ -210,14 +209,6 @@ class _MokuroCatalogBrowsePageState
       id: 1,
       title: t.search,
       action: searchMenuAction,
-    );
-  }
-
-  ContextMenuItem stashMenuItem() {
-    return ContextMenuItem(
-      id: 2,
-      title: t.stash,
-      action: stashMenuAction,
     );
   }
 
@@ -261,12 +252,6 @@ class _MokuroCatalogBrowsePageState
 
     _isRecursiveSearching = false;
     _focusNode.requestFocus();
-  }
-
-  void stashMenuAction() async {
-    String searchTerm = await getSelectedText();
-    appModel.addToStash(terms: [searchTerm]);
-    await unselectWebViewTextSelection(_controller);
   }
 
   void creatorMenuAction() async {

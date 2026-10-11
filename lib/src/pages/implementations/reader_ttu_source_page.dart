@@ -402,7 +402,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         ),
         menuItems: [
           searchMenuItem(),
-          stashMenuItem(),
           copyMenuItem(),
           shareMenuItem(),
           creatorMenuItem(),
@@ -423,14 +422,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
       id: 1,
       title: t.search,
       action: searchMenuAction,
-    );
-  }
-
-  ContextMenuItem stashMenuItem() {
-    return ContextMenuItem(
-      id: 2,
-      title: t.stash,
-      action: stashMenuAction,
     );
   }
 
@@ -474,12 +465,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
     _isRecursiveSearching = false;
     _focusNode.requestFocus();
-  }
-
-  void stashMenuAction() async {
-    String searchTerm = await getSelectedText();
-    appModel.addToStash(terms: [searchTerm]);
-    await unselectWebViewTextSelection(_controller);
   }
 
   void creatorMenuAction() async {

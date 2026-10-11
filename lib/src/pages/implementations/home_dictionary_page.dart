@@ -83,7 +83,6 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
         ),
         child: DictionaryHistoryPage(
           onSearch: onSearch,
-          onStash: onStash,
           onShare: onShare,
         ),
       ),
@@ -393,7 +392,6 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   Widget buildSearchResult() {
     return DictionaryResultPage(
       onSearch: onSearch,
-      onStash: onStash,
       onShare: onShare,
       result: _result!,
       footerWidget: footerWidget,

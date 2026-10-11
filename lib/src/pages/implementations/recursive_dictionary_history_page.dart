@@ -31,7 +31,6 @@ class _RecursiveDictionaryHistoryPageState
         child: DictionaryResultPage(
           result: widget.result,
           onSearch: onSearch,
-          onStash: onStash,
           onShare: onShare,
           updateHistory: false,
         ),

@@ -43,7 +43,6 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   MaterialTextSelectionControls get selectionControls =>
       JidoujishoTextSelectionControls(
         searchAction: onSearch,
-        stashAction: onStash,
         shareAction: onShare,
         allowCopy: true,
         allowSelectAll: true,
@@ -62,11 +61,6 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   /// Action to perform upon using the Share context option.
   void onShare(String searchTerm, {String? sentence = ''}) async {
     SharePlus.instance.share(ShareParams(text: searchTerm));
-  }
-
-  /// Action to perform upon using the Stash context option.
-  void onStash(String searchTerm) {
-    appModel.addToStash(terms: [searchTerm]);
   }
 
   @override

@@ -14,7 +14,6 @@ export 'src/pages/implementations/dictionary_dialog_import_page.dart';
 export 'src/pages/implementations/dictionary_structured_content_page.dart';
 export 'src/pages/implementations/massif_sentences_dialog_page.dart';
 export 'src/pages/implementations/media_item_dialog_page.dart';
-export 'src/pages/implementations/open_stash_dialog_page.dart';
 export 'src/pages/implementations/profiles_dialog_page.dart';
 export 'src/pages/implementations/home_dictionary_page.dart';
 export 'src/pages/implementations/history_reader_page.dart';

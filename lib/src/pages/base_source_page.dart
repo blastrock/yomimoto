@@ -411,7 +411,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
           cardColor: appModel.overrideDictionaryColor,
           opacity: dictionaryEntryOpacity,
           onSearch: onSearch,
-          onStash: onStash,
           onShare: onShare,
           result: _dictionaryResultNotifier.value!,
           spaceBeforeFirstResult: false,
@@ -495,12 +494,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       await Future.delayed(const Duration(milliseconds: 5), () {});
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     }
-  }
-
-  /// Action upon selecting the Stash option.
-  @override
-  void onStash(String searchTerm) {
-    appModel.addToStash(terms: [searchTerm]);
   }
 
   /// Performs an action before opening the Card Creator.

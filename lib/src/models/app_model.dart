@@ -267,9 +267,6 @@ class AppModel with ChangeNotifier {
   /// performance purposes.
   final int defaultMaximumDictionaryTermsInResult = 10;
 
-  /// Used as the history key used for the Stash.
-  final String stashKey = 'stash';
-
   /// Used to check if the dictionary tab should be refreshed on switching tabs.
   bool shouldRefreshTabs = false;
 
@@ -700,8 +697,6 @@ class AppModel with ChangeNotifier {
       ],
       NotesField.instance: [
         ClearFieldEnhancement(field: NotesField.instance),
-        OpenStashEnhancement(field: NotesField.instance),
-        PopFromStashEnhancement(field: NotesField.instance),
         TextSegmentationEnhancement(field: NotesField.instance),
       ],
       ImageField.instance: [
@@ -723,8 +718,6 @@ class AppModel with ChangeNotifier {
         ClearFieldEnhancement(field: SentenceField.instance),
         TextSegmentationEnhancement(field: SentenceField.instance),
         SentencePickerEnhancement(field: SentenceField.instance),
-        OpenStashEnhancement(field: SentenceField.instance),
-        PopFromStashEnhancement(field: SentenceField.instance),
       ],
       TermField.instance: [
         ClearFieldEnhancement(field: TermField.instance),
@@ -732,13 +725,9 @@ class AppModel with ChangeNotifier {
         MassifExampleSentencesEnhancement(),
         TatoebaExampleSentencesEnhancement(),
         ImmersionKitEnhancement(),
-        OpenStashEnhancement(field: TermField.instance),
-        PopFromStashEnhancement(field: TermField.instance),
       ],
       ContextField.instance: [
         ClearFieldEnhancement(field: ContextField.instance),
-        OpenStashEnhancement(field: ContextField.instance),
-        PopFromStashEnhancement(field: ContextField.instance),
       ],
       PitchAccentField.instance: [
         ClearFieldEnhancement(field: PitchAccentField.instance),
@@ -801,7 +790,6 @@ class AppModel with ChangeNotifier {
     final List<QuickAction> availableQuickActions = [
       CardCreatorAction(),
       InstantExportAction(),
-      AddToStashAction(),
       CopyToClipboardAction(),
       ShareAction(),
       PlayAudioAction(),
@@ -2284,21 +2272,6 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// A helper function for opening the creator from any page in the
-  /// application for editing purposes.
-  Future<void> openStash({
-    required Function(String) onSelect,
-    required Function(String) onSearch,
-  }) async {
-    await showDialog(
-      context: _navigatorKey.currentContext!,
-      builder: (context) => OpenStashDialogPage(
-        onSelect: onSelect,
-        onSearch: onSearch,
-      ),
-    );
-  }
-
   /// A helper function for doing a recursive dictionary search.
   Future<void> openRecursiveDictionarySearch({
     required String searchTerm,
@@ -2642,77 +2615,6 @@ class AppModel with ChangeNotifier {
         .getByUniqueKeySync(searchHistoryItem.uniqueKey);
 
     return duplicateItem != null;
-  }
-
-  /// Adds the [terms] to the Stash and shows a message indicating the addition.
-  void addToStash({
-    required List<String> terms,
-  }) async {
-    if (terms.isEmpty) {
-      return;
-    }
-
-    bool hasNonEmpty = false;
-    for (String term in terms) {
-      if (term.trim().isNotEmpty) {
-        hasNonEmpty = true;
-      }
-    }
-    if (!hasNonEmpty) {
-      return;
-    }
-
-    for (String term in terms) {
-      addToSearchHistory(
-        historyKey: stashKey,
-        searchTerm: term,
-      );
-    }
-
-    if (terms.length == 1) {
-      Fluttertoast.showToast(
-        msg: t.stash_added_single(term: terms.first),
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: t.stash_added_multiple,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-  }
-
-  /// Remove a certain [term] from the Stash.
-  Future<void> removeFromStash({
-    required String term,
-  }) async {
-    removeFromSearchHistory(
-      historyKey: stashKey,
-      searchTerm: term,
-    );
-
-    Fluttertoast.showToast(
-      msg: t.stash_clear_single(term: term),
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
-  }
-
-  /// Clear the contents of the Stash.
-  void clearStash() {
-    clearSearchHistory(historyKey: stashKey);
-  }
-
-  /// Get the contents of the Stash.
-  List<String> getStash() {
-    return getSearchHistory(historyKey: stashKey);
-  }
-
-  /// Get the contents of the Stash.
-  bool isTermInStash(String searchTerm) {
-    return isTermInSearchHistory(historyKey: stashKey, searchTerm: searchTerm);
   }
 
   /// Shown when a query fails to be made to an online service. For example,

@@ -982,7 +982,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   MaterialTextSelectionControls get sentenceSelectionControls =>
       JidoujishoTextSelectionControls(
         sentenceAction: onSentenceSearch,
-        stashAction: onStash,
         shareAction: onShare,
         allowCopy: true,
         allowSelectAll: true,

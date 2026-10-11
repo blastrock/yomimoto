@@ -447,7 +447,6 @@ class _RecursiveDictionaryPageState
     return DictionaryResultPage(
       cardColor: cardColor,
       onSearch: onSearch,
-      onStash: onStash,
       onShare: onShare,
       result: _result!,
       footerWidget: footerWidget,

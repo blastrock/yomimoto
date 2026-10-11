@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 283
+/// Strings: 274
 ///
-/// Built on 2026-10-10 at 18:34 UTC
+/// Built on 2026-10-11 at 16:00 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -154,7 +154,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get search => 'Search';
 	String get search_ellipsis => 'Search...';
 	String get show_more => 'Show More';
-	String get stash => 'Stash';
 	String get pick_image => 'Pick Image';
 	String get undo => 'Undo';
 	String get copy => 'Copy';
@@ -178,7 +177,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_delete => 'DELETE';
 	String get dialog_cancel => 'CANCEL';
 	String get dialog_select => 'SELECT';
-	String get dialog_stash => 'STASH';
 	String get dialog_search => 'SEARCH';
 	String get dialog_exit => 'EXIT';
 	String get dialog_share => 'SHARE';
@@ -277,13 +275,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get remove_action => 'Remove Action';
 	String get assign_action => 'Assign Action';
 	String dictionary_import_tag({required Object name}) => 'Imported from ${name}';
-	String stash_added_single({required Object term}) => '『${term}』has been added to the Stash.';
-	String get stash_added_multiple => 'Multiple items have been added to the Stash.';
-	String stash_clear_single({required Object term}) => '『${term}』has been removed from the Stash.';
-	String get stash_clear_title => 'Clear Stash';
-	String get stash_clear_description => 'All contents will be cleared. Are you sure?';
-	String get stash_placeholder => 'No items in the Stash';
-	String get stash_nothing_to_pop => 'No items to be popped from the Stash.';
 	String get no_sentences_found => 'No sentences found';
 	String get failed_online_service => 'Failed to communicate with online service';
 	String get search_label_before => 'Show all ';
@@ -457,7 +448,6 @@ extension on Translations {
 			case 'search': return 'Search';
 			case 'search_ellipsis': return 'Search...';
 			case 'show_more': return 'Show More';
-			case 'stash': return 'Stash';
 			case 'pick_image': return 'Pick Image';
 			case 'undo': return 'Undo';
 			case 'copy': return 'Copy';
@@ -481,7 +471,6 @@ extension on Translations {
 			case 'dialog_delete': return 'DELETE';
 			case 'dialog_cancel': return 'CANCEL';
 			case 'dialog_select': return 'SELECT';
-			case 'dialog_stash': return 'STASH';
 			case 'dialog_search': return 'SEARCH';
 			case 'dialog_exit': return 'EXIT';
 			case 'dialog_share': return 'SHARE';
@@ -580,13 +569,6 @@ extension on Translations {
 			case 'remove_action': return 'Remove Action';
 			case 'assign_action': return 'Assign Action';
 			case 'dictionary_import_tag': return ({required Object name}) => 'Imported from ${name}';
-			case 'stash_added_single': return ({required Object term}) => '『${term}』has been added to the Stash.';
-			case 'stash_added_multiple': return 'Multiple items have been added to the Stash.';
-			case 'stash_clear_single': return ({required Object term}) => '『${term}』has been removed from the Stash.';
-			case 'stash_clear_title': return 'Clear Stash';
-			case 'stash_clear_description': return 'All contents will be cleared. Are you sure?';
-			case 'stash_placeholder': return 'No items in the Stash';
-			case 'stash_nothing_to_pop': return 'No items to be popped from the Stash.';
 			case 'no_sentences_found': return 'No sentences found';
 			case 'failed_online_service': return 'Failed to communicate with online service';
 			case 'search_label_before': return 'Show all ';

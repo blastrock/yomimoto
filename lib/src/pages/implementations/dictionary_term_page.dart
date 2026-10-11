@@ -20,7 +20,6 @@ class DictionaryTermPage extends ConsumerWidget {
   const DictionaryTermPage({
     required this.heading,
     required this.onSearch,
-    required this.onStash,
     required this.onShare,
     required this.expandableControllers,
     required this.dictionaryNamesByHidden,
@@ -37,9 +36,6 @@ class DictionaryTermPage extends ConsumerWidget {
 
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
-
-  /// Action to be done upon selecting the stash option.
-  final Function(String) onStash;
 
   /// Action to be done upon selecting the share option.
   final Function(String) onShare;
@@ -141,7 +137,6 @@ class DictionaryTermPage extends ConsumerWidget {
                     return DictionaryEntryPage(
                       entry: entry,
                       onSearch: onSearch,
-                      onStash: onStash,
                       onShare: onShare,
                       expandableController:
                           expandableControllers[entry.dictionary.value!]!,

@@ -26,6 +26,7 @@ class TtuTapEvent {
   TtuTapEvent.fromJson(Map<String, dynamic> json)
       : text = json['text'] as String? ?? '',
         offset = json['offset'] as int? ?? -1,
+        position = json['position'] as int? ?? -1,
         x = (json['x'] as num).round(),
         y = (json['y'] as num).round();
 
@@ -34,6 +35,10 @@ class TtuTapEvent {
 
   /// UTF-16 index of the tapped character in [text], or -1.
   final int offset;
+
+  /// The tapped character's position in the book, in ttu bookmark units
+  /// (Japanese characters from the start), or -1.
+  final int position;
 
   /// Tap position in logical pixels from the left of the WebView.
   final int x;
@@ -120,7 +125,7 @@ class TtuBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in ebook-reader-lite's `host-bridge.ts`.
-  static const int protocolVersion = 2;
+  static const int protocolVersion = 3;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);

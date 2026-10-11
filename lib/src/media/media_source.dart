@@ -143,11 +143,18 @@ abstract class MediaSource extends HomeTab {
     text: '',
   );
 
-  /// Update the current sentence.
+  /// Position of the word behind [currentSentence] in the media, in the
+  /// source's own units (characters for novels), or -1 when unknown.
+  int get currentPosition => _currentPosition;
+  int _currentPosition = -1;
+
+  /// Update the current sentence and the position of its word.
   void setCurrentSentence({
     required JidoujishoTextSelection selection,
+    int position = -1,
   }) {
     _currentSentence = selection;
+    _currentPosition = position;
   }
 
   /// Clear the current sentence.
@@ -155,6 +162,7 @@ abstract class MediaSource extends HomeTab {
     _currentSentence = JidoujishoTextSelection(
       text: '',
     );
+    _currentPosition = -1;
   }
 
   /// This is used to hold data for generating images and audio.

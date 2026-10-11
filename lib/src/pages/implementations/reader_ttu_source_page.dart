@@ -304,7 +304,10 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         endOffset: start + length,
       );
 
-      mediaSource.setCurrentSentence(selection: selection);
+      mediaSource.setCurrentSentence(
+        selection: selection,
+        position: event.position,
+      );
     } catch (e) {
       clearDictionaryResult();
     }

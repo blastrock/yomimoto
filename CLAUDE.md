@@ -48,7 +48,7 @@ flutter analyze                                            # must stay free of e
 flutter build apk --release --split-per-abi
 ```
 
-`flutter analyze` currently reports **77 infos, 0 errors, 0 warnings**, all on
+`flutter analyze` currently reports **76 infos, 0 errors, 0 warnings**, all on
 pre-existing code (`use_build_context_synchronously`, `unnecessary_underscores`,
 `strict_top_level_inference`). Do not let that number grow; new code should be
 clean.
@@ -149,8 +149,8 @@ its size — but splitting it is its own project, not a side effect of a feature
   `maximumTerms`), plus a per-`MediaSource` box for source-specific settings.
 - **Isar** (`isar_community` fork) — the real database: dictionary entries,
   headings, pitches, frequencies, tags, search-result cache, media items, Anki
-  mappings, search history, mokuro catalogs. Schemas are listed in
-  `globalSchemas` at the top of `app_model.dart`; the list must match the
+  mappings, search history, mokuro catalogs, stash items. Schemas are listed
+  in `globalSchemas` at the top of `app_model.dart`; the list must match the
   `@Collection()` classes. A `MediaItem` names its origin with a single
   `mediaSourceIdentifier` — the source and the tab are the same object.
 
@@ -203,6 +203,16 @@ translations are gone.
   delete and Refresh run ttu's own code through `TtuHostOperations` (a
   headless WebView on the fork's `host` route), then `syncLibrary`
   reconciles the mirror. ttu's manager page is not reachable from the app.
+
+  The **stash** is a per-book list of saved words (`StashItem`, keyed by the
+  book's `mediaIdentifier`), filled by the `AddToStashAction` quick action and
+  shown by `StashPage` / `StashItemPage` from the library's long-press dialog.
+  A `tap` event carries the tapped character's `position` in ttu bookmark
+  units; `ReaderTtuSource.peekBook` opens `b.html?id=N&peek=<position>`,
+  which starts at that position and saves no bookmark for the session.
+  Card fields take their sentence and book from a `CreatorContext`, never
+  from the reader's live state, so cards can be made from a stash item.
+  Deleting a book (through `syncLibrary`) deletes its stash.
 
   Working on the ttu side:
 

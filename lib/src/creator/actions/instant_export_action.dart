@@ -29,7 +29,7 @@ class InstantExportAction extends QuickAction {
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) async {
     await appModel.getModelList();
     CreatorModel creatorModel = ref.read(instantExportProvider);
@@ -42,7 +42,7 @@ class InstantExportAction extends QuickAction {
         creatorModel: creatorModel,
         heading: heading,
         creatorJustLaunched: true,
-        dictionaryName: dictionaryName,
+        selectedEntry: selectedEntry,
       );
 
       if (newTextField != null) {

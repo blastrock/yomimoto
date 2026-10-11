@@ -94,7 +94,7 @@ class MeaningField extends Field {
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) {
     List<Dictionary> dictionaries = appModel.dictionaries;
 
@@ -108,10 +108,8 @@ class MeaningField extends Field {
         .where(
             (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
         .toList();
-    if (dictionaryName != null) {
-      entries = [
-        ...entries.where((e) => dictionaryName == e.dictionary.value!.name)
-      ];
+    if (selectedEntry != null) {
+      entries = [selectedEntry];
     }
     entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
         .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));

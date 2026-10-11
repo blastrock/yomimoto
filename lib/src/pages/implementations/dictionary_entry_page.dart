@@ -163,7 +163,6 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
               onSelected: (value) => value(),
               itemBuilder: (context) => getMenuItems(
                 context: context,
-                dictionary: dictionary,
                 ref: ref,
                 heading: entry.heading.value!,
               ),
@@ -180,7 +179,6 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
 
   List<PopupMenuEntry<VoidCallback>> getMenuItems({
     required BuildContext context,
-    required Dictionary dictionary,
     required WidgetRef ref,
     required DictionaryHeading heading,
   }) {
@@ -202,7 +200,7 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
               appModel: appModel,
               creatorModel: creatorModel,
               heading: heading,
-              dictionaryName: dictionary.name,
+              selectedEntry: entry,
             );
 
             ref.invalidate(quickActionColorProvider(heading));

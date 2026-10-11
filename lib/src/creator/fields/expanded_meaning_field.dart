@@ -32,7 +32,7 @@ class ExpandedMeaningField extends Field {
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) {
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
@@ -45,12 +45,8 @@ class ExpandedMeaningField extends Field {
         dictionaries.map((e) => MapEntry(e.name, e.order)));
 
     late List<DictionaryEntry> expandedEntries;
-    if (dictionaryName != null) {
-      expandedEntries = heading.entries
-          .where((entry) =>
-              !dictionaryNamesByHidden[entry.dictionary.value!.name]! &&
-              dictionaryName == entry.dictionary.value!.name)
-          .toList();
+    if (selectedEntry != null) {
+      expandedEntries = [selectedEntry];
     } else {
       expandedEntries = heading.entries
           .where((entry) =>

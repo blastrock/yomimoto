@@ -31,7 +31,7 @@ class CardCreatorAction extends QuickAction {
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) async {
     if (appModel.isCreatorOpen) {
       Map<Field, String> newTextFields = {};
@@ -42,7 +42,7 @@ class CardCreatorAction extends QuickAction {
           creatorModel: creatorModel,
           heading: heading,
           creatorJustLaunched: false,
-          dictionaryName: dictionaryName,
+          selectedEntry: selectedEntry,
         );
 
         if (newTextField != null) {
@@ -88,7 +88,7 @@ class CardCreatorAction extends QuickAction {
           creatorModel: creatorModel,
           heading: heading,
           creatorJustLaunched: true,
-          dictionaryName: dictionaryName,
+          selectedEntry: selectedEntry,
         );
 
         if (newTextField != null) {

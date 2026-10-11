@@ -30,7 +30,7 @@ class ContextField extends Field {
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) {
     if (appModel.currentMediaItem != null) {
       return appModel.currentMediaItem!.title;

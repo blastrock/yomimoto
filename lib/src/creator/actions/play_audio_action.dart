@@ -36,7 +36,7 @@ class PlayAudioAction extends QuickAction {
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) async {
     _audioPlayer.stop();
 

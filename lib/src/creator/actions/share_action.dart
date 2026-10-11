@@ -27,7 +27,7 @@ class ShareAction extends QuickAction {
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) async {
     List<Dictionary> dictionaries = appModel.dictionaries;
 
@@ -41,10 +41,8 @@ class ShareAction extends QuickAction {
         .where(
             (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
         .toList();
-    if (dictionaryName != null) {
-      entries = [
-        ...entries.where((e) => dictionaryName == e.dictionary.value!.name)
-      ];
+    if (selectedEntry != null) {
+      entries = [selectedEntry];
     }
     entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
         .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));

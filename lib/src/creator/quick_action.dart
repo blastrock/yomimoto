@@ -68,13 +68,15 @@ abstract class QuickAction {
     return null;
   }
 
-  /// Execute the functionality of this action.
+  /// Execute the functionality of this action. [selectedEntry] is the single
+  /// entry the action was invoked on, or null when it applies to the whole
+  /// [heading].
   Future<void> executeAction({
     required BuildContext context,
     required WidgetRef ref,
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   });
 }

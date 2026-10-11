@@ -273,7 +273,7 @@ class _DictionaryTermActionsRowState
                 appModel: appModel,
                 creatorModel: creatorModel,
                 heading: widget.heading,
-                dictionaryName: null,
+                selectedEntry: null,
               );
 
               ref.invalidate(quickActionColorProvider(widget.heading));

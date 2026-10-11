@@ -43,13 +43,16 @@ abstract class Field {
   /// For example, the Sentence field must provide the current context or the
   /// sentence that is stored in the app state, while the Image field may be
   /// used to return a snapshot of the current app context.
+  ///
+  /// [selectedEntry] is the single entry the action was invoked on, or null
+  /// when it applies to the whole [heading].
   String? onCreatorOpenAction({
     required WidgetRef ref,
     required AppModel appModel,
     required CreatorModel creatorModel,
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
-    required String? dictionaryName,
+    required DictionaryEntry? selectedEntry,
   }) {
     throw UnimplementedError(
       'Field must generate a value upon opening creator',

@@ -4,9 +4,9 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 278
+/// Strings: 282
 ///
-/// Built on 2026-10-11 at 19:21 UTC
+/// Built on 2026-10-11 at 19:23 UTC
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -327,6 +327,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get stash_added => 'Added to stash';
 	String get stash_already => 'Already stashed';
 	String get stash_unavailable => 'Open a book to stash words';
+	String get stash_jump => 'Jump to word';
+	String get stash_all_dictionaries => 'All dictionaries';
+	String get stash_entry_missing => 'This dictionary entry is no longer installed';
+	String get stash_delete_one => 'Delete this stashed word?';
 	String get local_media_directory_empty => 'Directory has no folders or video';
 	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
 	String get record => 'Record';
@@ -625,6 +629,10 @@ extension on Translations {
 			case 'stash_added': return 'Added to stash';
 			case 'stash_already': return 'Already stashed';
 			case 'stash_unavailable': return 'Open a book to stash words';
+			case 'stash_jump': return 'Jump to word';
+			case 'stash_all_dictionaries': return 'All dictionaries';
+			case 'stash_entry_missing': return 'This dictionary entry is no longer installed';
+			case 'stash_delete_one': return 'Delete this stashed word?';
 			case 'local_media_directory_empty': return 'Directory has no folders or video';
 			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';
 			case 'record': return 'Record';

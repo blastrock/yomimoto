@@ -131,6 +131,7 @@ class ReaderTtuSource extends ReaderMediaSource {
           file.deleteSync();
         }
       }
+      appModel.deleteStashForMedia(entry.value);
       await appModel.deleteMediaItem(entry.value);
     }
 

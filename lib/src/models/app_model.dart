@@ -47,6 +47,7 @@ final List<CollectionSchema> globalSchemas = [
   AnkiMappingSchema,
   SearchHistoryItemSchema,
   MokuroCatalogSchema,
+  StashItemSchema,
 ];
 
 /// A list of fields that the app will support at runtime.
@@ -2707,6 +2708,76 @@ class AppModel with ChangeNotifier {
     _database.writeTxnSync(() {
       _database.mediaItems.deleteSync(item.id!);
     });
+  }
+
+  /// Save [item] to its book's stash. Returns false, saving nothing, if the
+  /// book already has this word.
+  bool putStashItem(StashItem item) {
+    return _database.writeTxnSync(() {
+      if (_database.stashItems.getByStashKeySync(item.stashKey) != null) {
+        return false;
+      }
+      _database.stashItems.putSync(item);
+      return true;
+    });
+  }
+
+  /// The stash of [mediaItem], in reading order.
+  List<StashItem> getStashItems(MediaItem mediaItem) {
+    return _database.stashItems
+        .filter()
+        .mediaSourceIdentifierEqualTo(mediaItem.mediaSourceIdentifier)
+        .mediaIdentifierEqualTo(mediaItem.mediaIdentifier)
+        .sortByPosition()
+        .findAllSync();
+  }
+
+  /// Delete the stash items with these [ids].
+  void deleteStashItems(List<int> ids) {
+    _database.writeTxnSync(() {
+      _database.stashItems.deleteAllSync(ids);
+    });
+  }
+
+  /// Delete the whole stash of [mediaItem].
+  void deleteStashForMedia(MediaItem mediaItem) {
+    _database.writeTxnSync(() {
+      _database.stashItems
+          .filter()
+          .mediaSourceIdentifierEqualTo(mediaItem.mediaSourceIdentifier)
+          .mediaIdentifierEqualTo(mediaItem.mediaIdentifier)
+          .deleteAllSync();
+    });
+  }
+
+  /// Find [item]'s word in the dictionaries for making a card. When the
+  /// heading is gone, `heading` is a stand-in with no entries; when the
+  /// stashed entry's dictionary is gone, `entry` is null (whole heading).
+  /// `found` tells whether the stashed entry could be found.
+  ({DictionaryHeading heading, DictionaryEntry? entry, bool found})
+      resolveStashItem(StashItem item) {
+    DictionaryHeading? heading = _database.dictionaryHeadings.getSync(
+      DictionaryHeading.hash(term: item.term, reading: item.reading),
+    );
+    if (heading == null) {
+      return (
+        heading: DictionaryHeading(term: item.term, reading: item.reading),
+        entry: null,
+        found: false,
+      );
+    }
+
+    DictionaryEntry? entry = item.dictionaryName == null
+        ? null
+        : heading.entries.firstWhereOrNull(
+            (entry) => entry.dictionary.value?.name == item.dictionaryName);
+
+    return (
+      heading: heading,
+      entry: entry,
+      found: heading.entries.isNotEmpty &&
+          (item.dictionaryName == null || entry != null),
+    );
   }
 
   /// Copies a [term] to clipboard and shows an appropriate toast.

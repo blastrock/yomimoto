@@ -1,6 +1,7 @@
 export 'src/media/home_tab.dart';
 export 'src/media/media_item.dart';
 export 'src/media/media_source.dart';
+export 'src/media/stash_item.dart';
 
 export 'src/media/tabs/dictionary_tab.dart';
 

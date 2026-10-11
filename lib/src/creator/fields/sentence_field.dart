@@ -33,9 +33,10 @@ class SentenceField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     if (creatorJustLaunched) {
-      return appModel.getCurrentSentence().text.trim();
+      return creatorContext.sentence.text.trim();
     } else {
       return null;
     }

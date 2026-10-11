@@ -33,6 +33,7 @@ class ExpandedMeaningField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(

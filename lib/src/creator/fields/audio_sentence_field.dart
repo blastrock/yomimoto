@@ -287,6 +287,7 @@ class AudioSentenceField extends AudioExportField {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     return null;
   }

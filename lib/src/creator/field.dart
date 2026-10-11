@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
 
@@ -45,7 +46,8 @@ abstract class Field {
   /// used to return a snapshot of the current app context.
   ///
   /// [selectedEntry] is the single entry the action was invoked on, or null
-  /// when it applies to the whole [heading].
+  /// when it applies to the whole [heading]. [creatorContext] gives the
+  /// sentence and media the word was met in.
   String? onCreatorOpenAction({
     required WidgetRef ref,
     required AppModel appModel,
@@ -53,6 +55,7 @@ abstract class Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     throw UnimplementedError(
       'Field must generate a value upon opening creator',

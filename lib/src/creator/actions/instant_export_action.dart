@@ -31,6 +31,26 @@ class InstantExportAction extends QuickAction {
     required DictionaryHeading heading,
     required DictionaryEntry? selectedEntry,
   }) async {
+    await exportCard(
+      context: context,
+      ref: ref,
+      appModel: appModel,
+      heading: heading,
+      selectedEntry: selectedEntry,
+      creatorContext: CreatorContext.current(appModel),
+    );
+  }
+
+  /// Export a card for [heading] straight to Anki, taking the sentence and
+  /// media from [creatorContext].
+  Future<void> exportCard({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppModel appModel,
+    required DictionaryHeading heading,
+    required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
+  }) async {
     await appModel.getModelList();
     CreatorModel creatorModel = ref.read(instantExportProvider);
 
@@ -43,6 +63,7 @@ class InstantExportAction extends QuickAction {
         heading: heading,
         creatorJustLaunched: true,
         selectedEntry: selectedEntry,
+        creatorContext: creatorContext,
       );
 
       if (newTextField != null) {

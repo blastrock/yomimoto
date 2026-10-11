@@ -31,11 +31,8 @@ class ContextField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
-    if (appModel.currentMediaItem != null) {
-      return appModel.currentMediaItem!.title;
-    } else {
-      return '';
-    }
+    return creatorContext.mediaItem?.title ?? '';
   }
 }

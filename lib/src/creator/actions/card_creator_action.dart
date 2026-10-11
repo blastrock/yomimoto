@@ -33,6 +33,28 @@ class CardCreatorAction extends QuickAction {
     required DictionaryHeading heading,
     required DictionaryEntry? selectedEntry,
   }) async {
+    await openCreatorFor(
+      context: context,
+      ref: ref,
+      appModel: appModel,
+      creatorModel: creatorModel,
+      heading: heading,
+      selectedEntry: selectedEntry,
+      creatorContext: CreatorContext.current(appModel),
+    );
+  }
+
+  /// Open the Card Creator for [heading], taking the sentence and media from
+  /// [creatorContext].
+  Future<void> openCreatorFor({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppModel appModel,
+    required CreatorModel creatorModel,
+    required DictionaryHeading heading,
+    required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
+  }) async {
     if (appModel.isCreatorOpen) {
       Map<Field, String> newTextFields = {};
       for (Field field in appModel.activeFields) {
@@ -43,6 +65,7 @@ class CardCreatorAction extends QuickAction {
           heading: heading,
           creatorJustLaunched: false,
           selectedEntry: selectedEntry,
+          creatorContext: creatorContext,
         );
 
         if (newTextField != null) {
@@ -89,6 +112,7 @@ class CardCreatorAction extends QuickAction {
           heading: heading,
           creatorJustLaunched: true,
           selectedEntry: selectedEntry,
+          creatorContext: creatorContext,
         );
 
         if (newTextField != null) {

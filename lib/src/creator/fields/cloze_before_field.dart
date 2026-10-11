@@ -33,9 +33,10 @@ class ClozeBeforeField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     if (creatorJustLaunched) {
-      return appModel.getCurrentSentence().textBefore.trimLeft();
+      return creatorContext.sentence.textBefore.trimLeft();
     } else {
       return null;
     }

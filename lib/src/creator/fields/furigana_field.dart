@@ -33,6 +33,7 @@ class FuriganaField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     List<RubyTextData>? rubyDatas = JapaneseLanguage.instance.fetchFurigana(
       heading: heading,

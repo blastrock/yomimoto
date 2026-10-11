@@ -32,6 +32,7 @@ class ReadingField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     return heading.reading;
   }

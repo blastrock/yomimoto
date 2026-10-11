@@ -32,9 +32,10 @@ class ClozeInsideField extends Field {
     required DictionaryHeading heading,
     required bool creatorJustLaunched,
     required DictionaryEntry? selectedEntry,
+    required CreatorContext creatorContext,
   }) {
     if (creatorJustLaunched) {
-      return appModel.getCurrentSentence().textInside;
+      return creatorContext.sentence.textInside;
     } else {
       return null;
     }

@@ -496,12 +496,6 @@ class _RecursiveDictionaryPageState
     );
   }
 
-  /// Get padding meant for a placeholder message in a floating body.
-  EdgeInsets get floatingBodyPadding => EdgeInsets.only(
-        top: (MediaQuery.of(context).size.height / 2) -
-            (AppBar().preferredSize.height * 2),
-      );
-
   Widget buildEnterSearchTermPlaceholderMessage() {
     return Center(
       child: JidoujishoPlaceholderMessage(

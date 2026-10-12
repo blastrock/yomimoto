@@ -26,7 +26,6 @@ abstract class MediaSource extends HomeTab {
     required this.implementsSearch,
     required this.implementsHistory,
     this.overridesAutoImage = false,
-    this.overridesAutoAudio = false,
   });
 
   /// Name of the source that very shortly describes what it does.
@@ -52,10 +51,6 @@ abstract class MediaSource extends HomeTab {
   /// Whether or not a media source overrides the auto image enhancement.
   /// See [generateImages].
   final bool overridesAutoImage;
-
-  /// Whether or not a media source overrides the auto audio enhancement.
-  /// See [generateAudio].
-  final bool overridesAutoAudio;
 
   /// Used for accessing persistent key-value data specific to this source.
   /// See [initialise].
@@ -183,31 +178,6 @@ abstract class MediaSource extends HomeTab {
     _currentExtraData = null;
   }
 
-  /// Gets whether or not a media source should currently supply images.
-  bool get shouldGenerateImage => _shouldGenerateImage;
-  bool _shouldGenerateImage = true;
-
-  /// Gets whether or not a media source should currently supply audio.
-  bool get shouldGenerateAudio => _shouldGenerateAudio;
-  bool _shouldGenerateAudio = true;
-
-  /// Controls whether or not a media source should currently supply images.
-  void setShouldGenerateImage({required bool value}) {
-    _shouldGenerateImage = value;
-  }
-
-  /// Controls whether or not a media source should currently supply audio.
-  void setShouldGenerateAudio({required bool value}) {
-    _shouldGenerateAudio = value;
-  }
-
-  /// Supplies a media item that can be used for tracking and updating history,
-  /// as well as generating video and audio with timestamp information. This
-  /// should be uniquely implemented for each source. Some sources may want
-  /// to generate their media item based on current playback information or
-  /// progress.
-  MediaItem get currentMediaItem => throw UnimplementedError();
-
   /// The body widget to show in the tab when this source's home tab and this
   /// source is selected.
   BasePage buildHistoryPage();
@@ -222,13 +192,6 @@ abstract class MediaSource extends HomeTab {
     }
 
     return item.title;
-  }
-
-  /// Given a [MediaItem], return its subtitle. Some media items may allow
-  /// overriding of values for display purposes. If a source does this,
-  /// override this function.
-  String getDisplaySubtitleFromMediaItem(MediaItem item) {
-    return item.mediaIdentifier;
   }
 
   /// Given a [MediaItem], return its thumbnail. Some media items may allow
@@ -272,34 +235,6 @@ abstract class MediaSource extends HomeTab {
     } else {
       return MemoryImage(kTransparentImage);
     }
-  }
-
-  /// Given a [MediaItem], return its thumbnail. Some media items may allow
-  /// overriding of values for display purposes.
-  String getThumbnailUri({
-    required AppModel appModel,
-    required MediaItem item,
-    bool noOverride = false,
-  }) {
-    ImageProvider<Object>? overrideThumbnail =
-        getOverrideThumbnailFromMediaItem(
-      appModel: appModel,
-      item: item,
-    );
-
-    if (!noOverride && overrideThumbnail != null) {
-      return getOverrideThumbnailFilename(appModel: appModel, item: item);
-    }
-
-    if (item.imageUrl != null) {
-      return item.imageUrl!;
-    }
-
-    if (item.base64Image == null) {
-      return '';
-    }
-
-    return '';
   }
 
   /// The map key used to store the override title of an item.
@@ -413,32 +348,6 @@ abstract class MediaSource extends HomeTab {
     required MediaItem item,
     String? data,
   }) {
-    throw UnimplementedError();
-  }
-
-  /// If this source is non-null, this will be used as the initial function
-  /// for the audio field over the auto enhancement.
-  Future<File?>? generateAudio({
-    required AppModel appModel,
-    required MediaItem item,
-    String? data,
-  }) {
-    throw UnimplementedError();
-  }
-
-  /// This returns a list of [MediaItem], and is performed to search the media
-  /// source for items.
-  Future<List<MediaItem>?> searchMediaItems({
-    required BuildContext context,
-    required String searchTerm,
-    required int pageKey,
-  }) async {
-    throw UnimplementedError();
-  }
-
-  /// Given a search term, this source may give search suggestions. If the
-  /// empty list is returned, then search history will be shown instead.
-  Future<List<String>> generateSearchSuggestions(String searchTerm) async {
     throw UnimplementedError();
   }
 

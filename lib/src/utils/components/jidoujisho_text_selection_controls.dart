@@ -10,9 +10,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yuuna/utils.dart';
 
-/// Used for handling text selection.
-typedef OffsetValue = void Function(int start, int end);
-
 /// Defined on [SelectableText] objects to allow for a custom action when
 /// selecting text.
 class JidoujishoTextSelectionControls extends MaterialTextSelectionControls {

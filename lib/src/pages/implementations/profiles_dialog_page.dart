@@ -309,21 +309,6 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
     );
   }
 
-  void openMappingOptionsMenu({
-    required TapDownDetails details,
-    required String label,
-  }) async {
-    RelativeRect position = RelativeRect.fromLTRB(
-        details.globalPosition.dx, details.globalPosition.dy, 0, 0);
-    Function()? selectedAction = await showMenu(
-      context: context,
-      position: position,
-      items: getMenuItems(label),
-    );
-
-    selectedAction?.call();
-  }
-
   List<PopupMenuItem<VoidCallback>> getMenuItems(String label) {
     AnkiMapping mapping = appModel.getMappingFromLabel(label)!;
 

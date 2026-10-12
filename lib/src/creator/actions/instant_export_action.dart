@@ -76,8 +76,8 @@ class InstantExportAction extends QuickAction {
     );
 
     for (Field field in appModel.activeFields) {
-      /// If a media source has a generate images or audio function, then use that
-      /// over any set auto enhancement.
+      /// If a media source has a generate images function, then use that over
+      /// any set auto enhancement.
       if (appModel.isMediaOpen && appModel.getCurrentMediaItem() != null) {
         MediaSource mediaSource =
             appModel.getCurrentMediaItem()!.getMediaSource(appModel: appModel);
@@ -93,22 +93,6 @@ class InstantExportAction extends QuickAction {
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
                 data: mediaSource.currentExtraData,
-              );
-            },
-          );
-          continue;
-        }
-        if (field is AudioSentenceField && mediaSource.overridesAutoAudio) {
-          await field.setAudio(
-            appModel: appModel,
-            creatorModel: creatorModel,
-            searchTerm: '',
-            newAutoCannotOverride: true,
-            cause: EnhancementTriggerCause.manual,
-            generateAudio: () async {
-              return mediaSource.generateAudio(
-                appModel: appModel,
-                item: appModel.getCurrentMediaItem()!,
               );
             },
           );

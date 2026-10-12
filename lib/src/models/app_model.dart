@@ -10,7 +10,6 @@ import 'package:external_path/external_path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -126,10 +125,6 @@ class AppModel with ChangeNotifier {
   late final GlobalKey<NavigatorState> _navigatorKey =
       GlobalKey<NavigatorState>();
 
-  /// Used to get the versioning metadata of the app. See [initialise].
-  RouteObserver<PageRoute> get routeObserver => _routeObserver;
-  final RouteObserver<PageRoute> _routeObserver = RouteObserver<PageRoute>();
-
   /// Used for accessing persistent key-value data. See [initialise].
   late final Box _preferences;
 
@@ -146,10 +141,6 @@ class AppModel with ChangeNotifier {
   /// Used to get information on the Android version of the device.
   AndroidDeviceInfo get androidDeviceInfo => _androidDeviceInfo;
   late final AndroidDeviceInfo _androidDeviceInfo;
-
-  /// Used for caching images and audio produced from media seeds.
-  DefaultCacheManager get cacheManager => _cacheManager;
-  final _cacheManager = DefaultCacheManager();
 
   /// Used to notify dictionary widgets to dictionary history additions.
   final ChangeNotifier dictionaryEntriesNotifier = ChangeNotifier();
@@ -193,11 +184,6 @@ class AppModel with ChangeNotifier {
   Directory get dictionaryResourceDirectory => _dictionaryResourceDirectory;
   late final Directory _dictionaryResourceDirectory;
 
-  /// Directory where webview cache data may be persisted. Used by the reader
-  /// sources that embed a webview.
-  Directory get browserDirectory => _browserDirectory;
-  late final Directory _browserDirectory;
-
   /// Directory where media source thumbnails may be persisted.
   Directory get thumbnailsDirectory => _thumbnailsDirectory;
   late final Directory _thumbnailsDirectory;
@@ -205,10 +191,6 @@ class AppModel with ChangeNotifier {
   /// Directory where Hive key-value data is stored.
   Directory get hiveDirectory => _hiveDirectory;
   late final Directory _hiveDirectory;
-
-  /// Directory where Isar database data is stored.
-  Directory get isarDirectory => _isarDirectory;
-  late final Directory _isarDirectory;
 
   /// Directory where media for export is stored for communication with
   /// third-party APIs.
@@ -232,10 +214,6 @@ class AppModel with ChangeNotifier {
   /// Used to fetch a home tab by its unique key with constant time
   /// performance. Initialised with [populateTabs] at startup.
   late final Map<String, HomeTab> tabs;
-
-  /// Used to fetch initialised fields by their unique key with constant
-  /// time performance. Initialised with [populateEnhancements] at startup.
-  late final Map<String, Field> fields;
 
   /// Used to fetch initialised enhancements by their unique key with constant
   /// time performance. Initialised with [populateEnhancements] at startup.
@@ -294,12 +272,6 @@ class AppModel with ChangeNotifier {
   Stream<void> Function(int) get watchDictionaryItem =>
       _database.dictionarySearchResults.watchObjectLazy;
 
-  /// For invoking pauses from media where needed.
-  Stream<void> get currentMediaPauseStream =>
-      _currentMediaPauseController.stream;
-  final StreamController<void> _currentMediaPauseController =
-      StreamController.broadcast();
-
   /// For listening to searches made inside the Card Creator.
   Stream<void> get cardCreatorRecursiveSearchStream =>
       _cardCreatorRecursiveSearchStreamController.stream;
@@ -310,12 +282,6 @@ class AppModel with ChangeNotifier {
   void notifyRecursiveSearch() {
     _cardCreatorRecursiveSearchStreamController.add(null);
   }
-
-  /// Allows actions to be performed upon Play/Pause on headset buttons.
-  Stream<void> get playPauseHeadsetActionStream =>
-      _playPauseHeadsetActionStreamController.stream;
-  final StreamController<void> _playPauseHeadsetActionStreamController =
-      StreamController.broadcast();
 
   /// For listening to changes for whether or not the Card Creator is open.
   Stream<bool> get creatorActiveStream => _creatorActiveController.stream;
@@ -668,17 +634,6 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// Populate maps for fields at startup to optimise performance.
-  void populateFields() async {
-    fields = Map<String, Field>.unmodifiable(
-      Map<String, Field>.fromEntries(
-        globalFields.map(
-          (field) => MapEntry(field.uniqueKey, field),
-        ),
-      ),
-    );
-  }
-
   /// Populate maps for enhancements at startup to optimise performance.
   void populateEnhancements() async {
     /// A list of enhancements that the app will support at runtime.
@@ -912,11 +867,6 @@ class AppModel with ChangeNotifier {
     return jidoujishoDirectory;
   }
 
-  /// Preloads the app icon so that there is no pop-in.
-  final Image appIcon = Image.asset(
-    'assets/meta/icon.png',
-  );
-
   /// Injects licenses to be displayed in the licenses page that aren't
   /// pre-included by Flutter upon compilation but are included as assets.
   Future<void> injectAssetLicenses() async {
@@ -958,7 +908,6 @@ class AppModel with ChangeNotifier {
     _temporaryDirectory = await getTemporaryDirectory();
     _appDirectory = await getApplicationDocumentsDirectory();
     _databaseDirectory = await getApplicationSupportDirectory();
-    _browserDirectory = Directory(path.join(appDirectory.path, 'browser'));
     _thumbnailsDirectory =
         Directory(path.join(appDirectory.path, 'thumbnails'));
     _hiveDirectory = Directory(path.join(appDirectory.path, 'hive'));
@@ -1521,21 +1470,6 @@ class AppModel with ChangeNotifier {
     return order;
   }
 
-  /// Override flag for when [isMediaOpen] is true but the status bar should
-  /// be kept open instead of closed.
-  bool get shouldHideStatusBarWhenInMedia => _shouldHideStatusBarWhenInMedia;
-  bool _shouldHideStatusBarWhenInMedia = true;
-
-  /// Override the flag for automatically disabling the status bar. Necessary
-  /// for some very specific edge cases and byproduct of letting global state
-  /// run its course. This is a band-aid solution.
-  Future<void> temporarilyDisableStatusBarHiding(
-      {required Future Function() action}) async {
-    _shouldHideStatusBarWhenInMedia = false;
-    await action.call();
-    _shouldHideStatusBarWhenInMedia = true;
-  }
-
   /// Requests for full external storage permissions. Required to browse for
   /// media anywhere on the device.
   Future<void> requestExternalStoragePermissions() async {
@@ -1662,18 +1596,6 @@ class AppModel with ChangeNotifier {
   /// Get the file to be written to for image export.
   File getPreviewImageFile(Directory directory, int index) {
     String imagePath = path.join(directory.path, 'previewImage$index.jpg');
-    return File(imagePath);
-  }
-
-  /// Get the file to be written to for audio export.
-  File getAudioPreviewFile(Directory directory) {
-    String audioPath = path.join(directory.path, 'previewAudio.mp3');
-    return File(audioPath);
-  }
-
-  /// Get the file to be written to for thumbnail export.
-  File getThumbnailFile() {
-    String imagePath = path.join(exportDirectory.path, 'thumbnail.jpg');
     return File(imagePath);
   }
 
@@ -2104,7 +2026,6 @@ class AppModel with ChangeNotifier {
     required bool killOnPop,
     CreatorFieldValues? creatorFieldValues,
   }) async {
-    _currentMediaPauseController.add(null);
 
     List<String> decks = await getDecks();
 
@@ -2196,8 +2117,6 @@ class AppModel with ChangeNotifier {
     required MediaSource mediaSource,
     MediaItem? item,
   }) async {
-    mediaSource.setShouldGenerateImage(value: true);
-    mediaSource.setShouldGenerateAudio(value: true);
     mediaSource.clearCurrentSentence();
     mediaSource.clearExtraData();
     _currentMediaSource = null;
@@ -2266,7 +2185,6 @@ class AppModel with ChangeNotifier {
     required bool killOnPop,
     Function(String)? onUpdateQuery,
   }) async {
-    _currentMediaPauseController.add(null);
 
     if (searchTerm.trim().isEmpty) {
       return;
@@ -2477,22 +2395,6 @@ class AppModel with ChangeNotifier {
     });
   }
 
-  /// Updates a given [mapping]'s persisted auto enhancement for a given
-  /// [field].
-  void setAutoFieldEnhancement({
-    required AnkiMapping mapping,
-    required Field field,
-    required Enhancement enhancement,
-  }) async {
-    /// -1 is reserved for the auto enhancement.
-    mapping.enhancements![field.uniqueKey]![AnkiMapping.autoModeSlotNumber] =
-        enhancement.uniqueKey;
-
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
-  }
-
   /// Removes a given [mapping]'s persisted auto enhancement for a given
   /// [field].
   void removeAutoFieldEnhancement({
@@ -2589,22 +2491,6 @@ class AppModel with ChangeNotifier {
     return history;
   }
 
-  /// Get whether or not a certain [searchTerm] is in a certain history.
-  bool isTermInSearchHistory({
-    required String historyKey,
-    required String searchTerm,
-  }) {
-    SearchHistoryItem searchHistoryItem = SearchHistoryItem(
-      searchTerm: searchTerm,
-      historyKey: historyKey,
-    );
-
-    SearchHistoryItem? duplicateItem = _database.searchHistoryItems
-        .getByUniqueKeySync(searchHistoryItem.uniqueKey);
-
-    return duplicateItem != null;
-  }
-
   /// Shown when a query fails to be made to an online service. For example,
   /// when there is no internet connection.
   void showFailedToCommunicateMessage() {
@@ -2613,22 +2499,6 @@ class AppModel with ChangeNotifier {
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
     );
-  }
-
-  /// Update the scroll index of a given [DictionarySearchResult] in the database.
-  Future<void> updateDictionaryResultScrollIndex({
-    required DictionarySearchResult result,
-    required int newIndex,
-  }) async {
-    ReceivePort receivePort = ReceivePort();
-    UpdateDictionaryHistoryParams params = UpdateDictionaryHistoryParams(
-      resultId: result.id!,
-      directoryPath: _databaseDirectory.path,
-      newPosition: newIndex,
-      maximumDictionaryHistoryItems: maximumDictionaryHistoryItems,
-      sendPort: receivePort.sendPort,
-    );
-    await compute(updateDictionaryHistoryHelper, params);
   }
 
   /// Clear the entire dictionary history. This must be performed when a
@@ -2837,16 +2707,6 @@ class AppModel with ChangeNotifier {
     }
 
     return directories;
-  }
-
-  /// Get whether or not to stretch to fill screen.
-  bool get isStretchToFill {
-    return _preferences.get('stretch_to_fill_screen', defaultValue: false);
-  }
-
-  /// Toggle stretch to fill screen.
-  void toggleStretchToFill() async {
-    await _preferences.put('stretch_to_fill_screen', !isStretchToFill);
   }
 
   /// Whether or not searching in the app is performed without hitting the

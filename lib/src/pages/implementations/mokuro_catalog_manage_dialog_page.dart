@@ -247,21 +247,6 @@ class _MokuroCatalogManageDialogPageState
     );
   }
 
-  void openCatalogOptionsMenu({
-    required TapDownDetails details,
-    required MokuroCatalog catalog,
-  }) async {
-    RelativeRect position = RelativeRect.fromLTRB(
-        details.globalPosition.dx, details.globalPosition.dy, 0, 0);
-    Function()? selectedAction = await showMenu(
-      context: context,
-      position: position,
-      items: getMenuItems(catalog),
-    );
-
-    selectedAction?.call();
-  }
-
   List<PopupMenuItem<VoidCallback>> getMenuItems(MokuroCatalog catalog) {
     return [
       buildPopupItem(

@@ -96,19 +96,12 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     );
 
     for (Field field in appModel.activeFields) {
-      /// If a media source has a generate images or audio function, then use that
-      /// over any set auto enhancement.
+      /// If a media source has a generate images function, then use that over
+      /// any set auto enhancement.
       if (appModel.isMediaOpen && appModel.getCurrentMediaItem() != null) {
         MediaSource mediaSource =
             appModel.getCurrentMediaItem()!.getMediaSource(appModel: appModel);
         if (field is ImageField && mediaSource.overridesAutoImage) {
-          if (!appModel
-              .getCurrentMediaItem()!
-              .getMediaSource(appModel: appModel)
-              .shouldGenerateImage) {
-            continue;
-          }
-
           await field.setImages(
             appModel: appModel,
             creatorModel: creatorModel,
@@ -139,30 +132,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               );
             }
           }
-          continue;
-        }
-        if (field is AudioSentenceField && mediaSource.overridesAutoAudio) {
-          if (!appModel
-              .getCurrentMediaItem()!
-              .getMediaSource(appModel: appModel)
-              .shouldGenerateAudio) {
-            continue;
-          }
-
-          await field.setAudio(
-            appModel: appModel,
-            creatorModel: creatorModel,
-            searchTerm: '',
-            newAutoCannotOverride: true,
-            cause: EnhancementTriggerCause.manual,
-            generateAudio: () async {
-              return mediaSource.generateAudio(
-                appModel: appModel,
-                item: appModel.getCurrentMediaItem()!,
-                data: mediaSource.currentExtraData,
-              );
-            },
-          );
           continue;
         }
       }
@@ -1146,8 +1115,8 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     );
   }
 
-  /// Allows user to toggle whether or not to filter for videos with
-  /// closed captions.
+  /// Allows user to toggle whether or not the Card Creator closes upon card
+  /// export.
   Widget buildCloseOnExportButton() {
     ValueNotifier<bool> notifier =
         ValueNotifier<bool>(appModel.closeCreatorOnExport);
@@ -1203,28 +1172,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     );
   }
 
-  Rect _getWidgetGlobalRect(GlobalKey key) {
-    RenderBox renderBox = key.currentContext?.findRenderObject() as RenderBox;
-    var offset = renderBox.localToGlobal(Offset.zero);
-    return Rect.fromLTWH(
-        offset.dx, offset.dy, renderBox.size.width, renderBox.size.height);
-  }
-
-  final GlobalKey _profileMenuKey = GlobalKey();
   final GlobalKey _scaffoldKey = GlobalKey();
-
-  void openProfilesMenu(TapDownDetails details) async {
-    RelativeRect position = RelativeRect.fromRect(
-        _getWidgetGlobalRect(_profileMenuKey),
-        _getWidgetGlobalRect(_scaffoldKey));
-    Function()? selectedAction = await showMenu(
-      context: context,
-      position: position,
-      items: getProfileItems(),
-    );
-
-    selectedAction?.call();
-  }
 
   List<PopupMenuItem<VoidCallback>> getProfileItems() {
     return appModel.mappings.map((mapping) {

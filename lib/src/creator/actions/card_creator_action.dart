@@ -98,7 +98,7 @@ class CardCreatorAction extends QuickAction {
         return route.settings.name == (CreatorPage).toString();
       });
     } else {
-      if (appModel.isMediaOpen && appModel.shouldHideStatusBarWhenInMedia) {
+      if (appModel.isMediaOpen) {
         await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         await Future.delayed(const Duration(milliseconds: 5), () {});
       }
@@ -126,7 +126,7 @@ class CardCreatorAction extends QuickAction {
         creatorFieldValues: CreatorFieldValues(textValues: newTextFields),
       );
 
-      if (appModel.isMediaOpen && appModel.shouldHideStatusBarWhenInMedia) {
+      if (appModel.isMediaOpen) {
         await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       }
     }

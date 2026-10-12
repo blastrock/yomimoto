@@ -196,15 +196,6 @@ class _HomePageState extends BasePageState<HomePage>
     ];
   }
 
-  Widget buildResumeButton() {
-    return JidoujishoIconButton(
-      tooltip: t.resume_last_media,
-      icon: Icons.update,
-      enabled: false,
-      onTap: resumeAction,
-    );
-  }
-
   Widget buildCreatorButton() {
     return JidoujishoIconButton(
       tooltip: t.card_creator,
@@ -227,6 +218,4 @@ class _HomePageState extends BasePageState<HomePage>
       ),
     );
   }
-
-  void resumeAction() {}
 }

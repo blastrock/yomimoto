@@ -475,19 +475,6 @@ class _DictionaryDialogPageState extends BasePageState {
     );
   }
 
-  void openDictionaryOptionsMenu(
-      {required TapDownDetails details, required Dictionary dictionary}) async {
-    RelativeRect position = RelativeRect.fromLTRB(
-        details.globalPosition.dx, details.globalPosition.dy, 0, 0);
-    Function()? selectedAction = await showMenu(
-      context: context,
-      position: position,
-      items: getMenuItems(dictionary),
-    );
-
-    selectedAction?.call();
-  }
-
   List<PopupMenuItem<VoidCallback>> getMenuItems(Dictionary dictionary) {
     return [
       buildPopupItem(

@@ -45,25 +45,6 @@ class ReaderMokuroSource extends ReaderMediaSource {
   @override
   double get aspectRatio => 257 / 364;
 
-  /// Generate a media item given required parameters.
-  MediaItem generateMediaItem({
-    required String title,
-    required String imageUrl,
-    required String url,
-    required int pageCount,
-  }) {
-    return MediaItem(
-      mediaIdentifier: url,
-      imageUrl: imageUrl,
-      title: title,
-      position: 0,
-      duration: pageCount,
-      mediaSourceIdentifier: uniqueKey,
-      canDelete: true,
-      canEdit: true,
-    );
-  }
-
   @override
   Future<void> onSearchBarTap({
     required BuildContext context,

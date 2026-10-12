@@ -68,21 +68,6 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
     throw UnimplementedError();
   }
 
-  /// Standard error message for use across the application.
-  /// General widget for showing an error or a retry screen.
-  Widget buildError({
-    Object? error,
-    StackTrace? stack,
-    Function()? refresh,
-  }) {
-    return Center(
-      child: JidoujishoPlaceholderMessage(
-        icon: Icons.error,
-        message: '$error',
-      ),
-    );
-  }
-
   /// Standard loading circle for use across the application.
   Widget buildLoading() {
     return Center(

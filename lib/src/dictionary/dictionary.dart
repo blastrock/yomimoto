@@ -1,6 +1,5 @@
 import 'package:yuuna/dictionary.dart';
 import 'package:isar_community/isar.dart';
-import 'package:path/path.dart' as path;
 
 part 'dictionary.g.dart';
 
@@ -54,29 +53,12 @@ class Dictionary {
   final IsarLinks<DictionaryFrequency> frequencies =
       IsarLinks<DictionaryFrequency>();
 
-  /// Returns the resource path for within the applications documents directory.
-  String getBasePath({required String appDirDocPath}) {
-    return path.join(appDirDocPath, name);
-  }
-
   /// Whether this dictionary's results are hidden from search results.
   bool isHidden;
 
   /// Whether this dictionary's results are collapsed by default in search
   /// results.
   bool isCollapsed;
-
-  /// Given an asset name, returns an appropriate path to place the asset
-  /// within this dictionary's resource path.
-  String getResourcePath({
-    required String appDirDocPath,
-    required String resourceBasename,
-  }) {
-    return path.join(
-      getBasePath(appDirDocPath: appDirDocPath),
-      resourceBasename,
-    );
-  }
 
   @override
   bool operator ==(Object other) => other is Dictionary && name == other.name;

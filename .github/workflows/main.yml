@@ -31,7 +31,7 @@ jobs:
           git diff --exit-code
 
       - name: Analyze
-        run: tool/check_analyze.sh
+        run: flutter analyze
 
       - name: Test
         run: flutter test

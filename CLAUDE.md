@@ -44,17 +44,14 @@ tool/fetch_ttu.sh                                          # ebook-reader-lite b
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Isar, json, dart_mappable
 dart run slang                                             # regenerate lib/i18n/strings.g.dart
-tool/check_analyze.sh                                      # flutter analyze gate: no errors/warnings, infos ≤ baseline
+flutter analyze                                            # must report no issues, infos included
 flutter test                                               # unit tests in test/
 flutter build apk --release --split-per-abi
 ```
 
-`flutter analyze` reports infos on pre-existing code
-(`use_build_context_synchronously`, `unnecessary_underscores`,
-`strict_top_level_inference`), and exits non-zero because of them.
-`tool/check_analyze.sh` is the real gate: it fails on any error or warning, or
-when infos exceed the baseline held in the script (`max_infos`). Do not let
-that number grow; new code should be clean. Lower it when you fix infos.
+`flutter analyze` is clean and must stay clean: it exits non-zero on any
+issue, infos included, and CI runs it as is. Fix new infos rather than
+suppressing them; `dart fix --apply` handles most of the mechanical ones.
 
 `flutter test` runs the unit tests in `test/`, which mirrors `lib/src/`. They
 cover pure code only (text selection, stash item, sentence splitting, the ttu
@@ -65,7 +62,7 @@ WebView is still verified by manual device testing.
 
 CI (`.github/workflows/main.yml`, every push and pull request) fetches the
 pinned ttu build, checks that generated files are fresh (regenerates them and
-fails on `git diff`), runs `tool/check_analyze.sh`, then `flutter test`. It
+fails on `git diff`), runs `flutter analyze`, then `flutter test`. It
 builds no APK. `slang.yaml` turns off slang's build timestamp so the
 freshness check is deterministic.
 

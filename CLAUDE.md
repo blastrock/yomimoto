@@ -234,7 +234,13 @@ translations are gone.
     fork, built by its `release.yml`; pin one with
     `tool/fetch_ttu.sh --update <tag>` and commit `tool/ttu.lock`.
   - Upstream's `pnpm check` already fails (42 errors); only CI's
-    `pnpm eslint .` and `pnpm build` are expected to pass.
+    `pnpm eslint .` (run from the fork's root), `pnpm build` and the
+    end-to-end tests are expected to pass.
+  - The overlay's end-to-end tests are Playwright, in the fork's
+    `apps/web/e2e/`: tap positions and peek, in both view modes, against a
+    generated fixture EPUB. Run them in `apps/web` after `pnpm build`, with
+    `pnpm test:e2e` (`pnpm exec playwright install chromium` once). A change
+    to positions or peek should come with a case there.
 
   Known quirks, all harmless:
 

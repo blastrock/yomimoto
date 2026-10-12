@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 286
+/// Strings: 216
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -159,7 +159,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get creator => 'Creator';
 	String get share => 'Share';
 	String get resume_last_media => 'Resume Last Media';
-	String get launch_source => 'Launch Source';
 	String get card_creator => 'Card Creator';
 	String get show_options => 'Show Options';
 	String get switch_profiles => 'Switch Profiles';
@@ -167,7 +166,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get enhancements => 'Enhancements';
 	String get dialog_read => 'READ';
 	String get dialog_edit => 'EDIT';
-	String get dialog_export => 'EXPORT';
 	String get dialog_import => 'IMPORT';
 	String get dialog_close => 'CLOSE';
 	String get dialog_clear => 'CLEAR';
@@ -177,8 +175,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_select => 'SELECT';
 	String get dialog_search => 'SEARCH';
 	String get dialog_exit => 'EXIT';
-	String get dialog_share => 'SHARE';
-	String get dialog_pop => 'POP';
 	String get dialog_save => 'SAVE';
 	String get dialog_crop => 'CROP';
 	String get dialog_append => 'APPEND';
@@ -188,14 +184,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_done => 'DONE';
 	String get reset => 'Reset';
 	String get dialog_launch_ankidroid => 'LAUNCH ANKIDROID';
-	String get media_item_delete_confirmation => 'This will clear this item from history. Are you sure you want to do this?';
-	String get dictionaries_delete_confirmation => 'Deleting a dictionary will also clear all dictionary results from history. Are you sure you want to do this?';
 	String get mappings_delete_confirmation => 'This profile will be deleted. Are you sure you want to do this?';
 	String get catalog_delete_confirmation => 'This catalog will be deleted. Are you sure you want to do this?';
 	String get dictionaries_deleting_data => 'Deleting dictionary data...';
 	String get dictionaries_menu_empty => 'Import a dictionary for use';
-	String get options_incognito_on => 'Turn on incognito mode';
-	String get options_incognito_off => 'Turn off incognito mode';
 	String get options_dictionaries => 'Manage dictionaries';
 	String get options_profiles => 'Export profiles';
 	String get options_enhancements => 'User enhancements';
@@ -213,11 +205,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get import_format => 'Import format';
 	String get import_in_progress => 'Import in progress';
 	String get import_start => 'Preparing for import...';
-	String get import_clean => 'Cleaning working space...';
 	String import_extract_count({required Object n}) => 'Extracted ${n} files...';
 	String get import_extract => 'Extracting files...';
 	String import_name({required Object name}) => 'Importing 『${name}』...';
-	String get import_entries => 'Processing entries...';
 	String import_found_entry({required Object count}) => 'Found ${count} entries...';
 	String import_found_tag({required Object count}) => 'Found ${count} tags...';
 	String import_found_frequency({required Object count}) => 'Found ${count} frequency entries...';
@@ -233,11 +223,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_content_dictionary_clear => 'Wiping the dictionary database will also clear all search results in history.';
 	String dialog_title_dictionary_delete({required Object name}) => 'Delete 『${name}』?';
 	String get dialog_content_dictionary_delete => 'Deleting a single dictionary may take longer than clearing the entire dictionary database. This will also clear all search results in history.';
-	String get delete_dictionary_data => 'Clearing all dictionary data...';
-	String dictionary_tag({required Object name}) => 'Imported from ${name}';
 	String get legalese => '読本 — a Japanese book reader, dictionary and card creation toolkit for e-ink devices, by Philippe Daouadi.\n\nYomimoto is a fork of jidoujisho, originally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\nYomimoto is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices.';
-	String get same_name_dictionary_found => 'Dictionary with same name found.';
-	String import_file_extension_invalid({required Object extensions}) => 'This format expects files with the following extensions: ${extensions}';
 	String get field_label_empty => 'Empty';
 	String get model_to_map => 'Card type to use for new profile';
 	String get mapping_name => 'Profile name';
@@ -267,16 +253,13 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get remove_enhancement => 'Remove Enhancement';
 	String copy_of_mapping({required Object name}) => 'Copy of ${name}';
 	String get enter_search_term => 'Enter a search term...';
-	String searching_for({required Object searchTerm}) => 'Searching for 『${searchTerm}』...';
 	String get no_search_results => 'No search results found.';
 	String get edit_actions => 'Edit Dictionary Quick Actions';
 	String get remove_action => 'Remove Action';
 	String get assign_action => 'Assign Action';
-	String dictionary_import_tag({required Object name}) => 'Imported from ${name}';
 	String get no_sentences_found => 'No sentences found';
 	String get failed_online_service => 'Failed to communicate with online service';
 	String get search_label_before => 'Show all ';
-	String get search_label_middle => 'out of ';
 	String get search_label_after => 'search results found for';
 	String get clear_dictionary_title => 'Clear Dictionary Result History';
 	String get clear_dictionary_description => 'This will clear all dictionary results from history. Are you sure?';
@@ -300,14 +283,11 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get image_search_label_after => 'found for';
 	String get image_search_label_none_middle => 'no image ';
 	String get image_search_label_none_before => 'Selecting ';
-	String get preparing_instant_export => 'Preparing card for export...';
 	String get processing_in_progress => 'Preparing images';
 	String get searching_in_progress => 'Searching for ';
 	String get audio_unavailable => 'No audio could be found.';
 	String get no_audio_enhancements => 'No audio enhancements are assigned.';
 	String card_exported({required Object deck}) => 'Card exported to 『${deck}』.';
-	String get info_incognito_on => 'Incognito mode on. Dictionary, media and search history will not be tracked.';
-	String get info_incognito_off => 'Incognito mode off. Dictionary, media and search history will be tracked.';
 	String get exit_media_title => 'Exit Media';
 	String get exit_media_description => 'This will return you to the main menu. Are you sure?';
 	String get unimplemented_source => 'Unimplemented source';
@@ -333,35 +313,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String stash_selected({required Object n}) => '${n} selected';
 	String get stash_select_all => 'Select all';
 	String stash_delete_confirm({required Object n}) => 'Delete ${n} stashed word(s)?';
-	String get local_media_directory_empty => 'Directory has no folders or video';
-	String get navigate_up_one_directory_level => 'Navigate Up One Directory Level';
-	String get record => 'Record';
-	String get stop => 'Stop';
-	String get player_option_shadowing => 'Shadowing Mode';
-	String get player_option_drag_to_select => 'Use Drag to Select Subtitle Selection';
-	String get player_option_tap_to_select => 'Use Tap to Select Subtitle Selection';
-	String get player_option_dictionary_menu => 'Select Active Dictionary Source';
-	String get player_option_cast_video => 'Cast to Display Device';
-	String get player_option_text_filter => 'Use Regular Expression Filter';
-	String get player_prepare_export => 'Preparing card...';
-	String get closed_captions_query => 'Querying for captions';
-	String get closed_captions_target => 'Target language captions';
-	String get closed_captions_app => 'App language captions';
-	String get closed_captions_other => 'Other language captions';
-	String get closed_captions_unavailable => 'No captions';
-	String get closed_captions_error => 'Error while querying captions';
 	String get paste => 'Paste';
-	String get select_all => 'Select all';
-	String get set_media => 'Set Media';
 	String get no_recordings_found => 'No recordings found';
 	String get wrap_image_audio => 'Include image/audio HTML tags on export';
-	String get server_address => 'Server Address';
-	String get no_active_connection => 'No active connection';
-	String get failed_server_connection => 'Failed to connect to server';
-	String get no_text_received => 'No text received';
 	String get text_segmentation => 'Text Segmentation';
-	String get connect_disconnect => 'Connect/Disconnect';
-	String get use_slow_import => 'Slow import (use if failing)';
 	String get settings => 'Settings';
 	String get settings_appearance => 'Appearance';
 	String get settings_dark_theme => 'Dark theme';
@@ -380,21 +335,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get export_profile_empty => 'Your export profile has no set fields and requires configuration.';
 	String get error_export_media_ankidroid => 'There was an error in exporting media to AnkiDroid.';
 	String get error_add_note => 'There was an error in adding a note to AnkiDroid.';
-	String get maximum_entries => 'Maximum dictionary entry query limit';
 	String get maximum_terms => 'Maximum dictionary headwords in result';
 	String get use_br_tags => 'Use line break tag instead of newline on export';
 	String get prepend_dictionary_names => 'Prepend dictionary name in meaning';
 	String get highlight_on_tap => 'Highlight text on tap';
 	String get no_audio_file => 'No audio file to save.';
 	String get storage_permissions => 'Please grant the following permissions for exporting to AnkiDroid.';
-	String get accessibility => 'Permission is required to capture text from accessibility events.';
-	String get cfhange_sort_order => 'Change Sort Order';
-	String get login => 'Login';
-	String get send => 'Send';
-	String get no_messages => 'Start a chat';
-	String get enter_message => 'Enter message...';
-	String get clear_message_title => 'Clear Messages';
-	String get clear_message_description => 'This will clear all messages and start a new chat. Are you sure?';
 	String get pick_file => 'Pick File';
 	String get open_url => 'Open URL';
 	String get catalogs => 'Catalogs';
@@ -402,7 +348,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get url => 'URL';
 	String get duplicate_catalog => 'A catalog with this URL already exists.';
 	String get no_catalogs_listed => 'No catalogs listed';
-	String get go_back => 'Go Back';
 	String get invalid_mokuro_file => 'File is not a Mokuro generated HTML file.';
 	String get create_catalog => 'Create Catalog';
 	String get adapt_ttu_theme => 'Adapt dictionary popup to theme';
@@ -411,38 +356,11 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get field_lock => 'Lock Field';
 	String get field_unlock => 'Unlock Field';
 	String get use_dark_theme => 'Use dark theme';
-	String get toggle_transcript_background => 'Toggle Transcript Background';
 	String get saved_tags => 'Tags saved.';
-	String structured_content_first({required Object i}) => '${i} definitions are unsupported and were omitted.';
-	String get structured_content_second => 'Consider a non-structured content version of this dictionary.';
-	String get cancel => 'Cancel';
 	String get cloze => 'Cloze';
 	String get info_standard_update => 'New standard profile card type';
 	String get info_standard_update_content => 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
-	late final _StringsViewRepliesEn view_replies = _StringsViewRepliesEn._(_root);
 	String get manage_duplicate_checks => 'Manage Duplicate Checks';
-	String get go_forward => 'Go Forward';
-	String get browse => 'Browse';
-	String get add_to_reading_list => 'Add To Reading List';
-	String get reading_list_empty => 'Reading list is empty';
-	String get reading_list_add_toast => 'Added to reading list.';
-	String get reading_list_remove_toast => 'Removed from the reading list.';
-	String get ad_block_hosts => 'Ad-block hosts';
-	String get error_parsing_hosts_file => 'Error parsing hosts file.';
-	String get loaded_from_cache => 'Loaded from web archive cache.';
-}
-
-// Path: view_replies
-class _StringsViewRepliesEn {
-	_StringsViewRepliesEn._(this._root);
-
-	final Translations _root; // ignore: unused_field
-
-	// Translations
-	String reply({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-		one: 'SHOW ${n} REPLY',
-		other: 'SHOW ${n} REPLIES',
-	);
 }
 
 /// Flat map(s) containing all translations.
@@ -465,7 +383,6 @@ extension on Translations {
 			case 'creator': return 'Creator';
 			case 'share': return 'Share';
 			case 'resume_last_media': return 'Resume Last Media';
-			case 'launch_source': return 'Launch Source';
 			case 'card_creator': return 'Card Creator';
 			case 'show_options': return 'Show Options';
 			case 'switch_profiles': return 'Switch Profiles';
@@ -473,7 +390,6 @@ extension on Translations {
 			case 'enhancements': return 'Enhancements';
 			case 'dialog_read': return 'READ';
 			case 'dialog_edit': return 'EDIT';
-			case 'dialog_export': return 'EXPORT';
 			case 'dialog_import': return 'IMPORT';
 			case 'dialog_close': return 'CLOSE';
 			case 'dialog_clear': return 'CLEAR';
@@ -483,8 +399,6 @@ extension on Translations {
 			case 'dialog_select': return 'SELECT';
 			case 'dialog_search': return 'SEARCH';
 			case 'dialog_exit': return 'EXIT';
-			case 'dialog_share': return 'SHARE';
-			case 'dialog_pop': return 'POP';
 			case 'dialog_save': return 'SAVE';
 			case 'dialog_crop': return 'CROP';
 			case 'dialog_append': return 'APPEND';
@@ -494,14 +408,10 @@ extension on Translations {
 			case 'dialog_done': return 'DONE';
 			case 'reset': return 'Reset';
 			case 'dialog_launch_ankidroid': return 'LAUNCH ANKIDROID';
-			case 'media_item_delete_confirmation': return 'This will clear this item from history. Are you sure you want to do this?';
-			case 'dictionaries_delete_confirmation': return 'Deleting a dictionary will also clear all dictionary results from history. Are you sure you want to do this?';
 			case 'mappings_delete_confirmation': return 'This profile will be deleted. Are you sure you want to do this?';
 			case 'catalog_delete_confirmation': return 'This catalog will be deleted. Are you sure you want to do this?';
 			case 'dictionaries_deleting_data': return 'Deleting dictionary data...';
 			case 'dictionaries_menu_empty': return 'Import a dictionary for use';
-			case 'options_incognito_on': return 'Turn on incognito mode';
-			case 'options_incognito_off': return 'Turn off incognito mode';
 			case 'options_dictionaries': return 'Manage dictionaries';
 			case 'options_profiles': return 'Export profiles';
 			case 'options_enhancements': return 'User enhancements';
@@ -519,11 +429,9 @@ extension on Translations {
 			case 'import_format': return 'Import format';
 			case 'import_in_progress': return 'Import in progress';
 			case 'import_start': return 'Preparing for import...';
-			case 'import_clean': return 'Cleaning working space...';
 			case 'import_extract_count': return ({required Object n}) => 'Extracted ${n} files...';
 			case 'import_extract': return 'Extracting files...';
 			case 'import_name': return ({required Object name}) => 'Importing 『${name}』...';
-			case 'import_entries': return 'Processing entries...';
 			case 'import_found_entry': return ({required Object count}) => 'Found ${count} entries...';
 			case 'import_found_tag': return ({required Object count}) => 'Found ${count} tags...';
 			case 'import_found_frequency': return ({required Object count}) => 'Found ${count} frequency entries...';
@@ -539,11 +447,7 @@ extension on Translations {
 			case 'dialog_content_dictionary_clear': return 'Wiping the dictionary database will also clear all search results in history.';
 			case 'dialog_title_dictionary_delete': return ({required Object name}) => 'Delete 『${name}』?';
 			case 'dialog_content_dictionary_delete': return 'Deleting a single dictionary may take longer than clearing the entire dictionary database. This will also clear all search results in history.';
-			case 'delete_dictionary_data': return 'Clearing all dictionary data...';
-			case 'dictionary_tag': return ({required Object name}) => 'Imported from ${name}';
 			case 'legalese': return '読本 — a Japanese book reader, dictionary and card creation toolkit for e-ink devices, by Philippe Daouadi.\n\nYomimoto is a fork of jidoujisho, originally built for the Japanese language learning community by Arianne Orpilla. Logo by suzy and Aaron Marbella.\n\nYomimoto is free and open source software. See the project repository for a comprehensive list of other licenses and attribution notices.';
-			case 'same_name_dictionary_found': return 'Dictionary with same name found.';
-			case 'import_file_extension_invalid': return ({required Object extensions}) => 'This format expects files with the following extensions: ${extensions}';
 			case 'field_label_empty': return 'Empty';
 			case 'model_to_map': return 'Card type to use for new profile';
 			case 'mapping_name': return 'Profile name';
@@ -573,16 +477,13 @@ extension on Translations {
 			case 'remove_enhancement': return 'Remove Enhancement';
 			case 'copy_of_mapping': return ({required Object name}) => 'Copy of ${name}';
 			case 'enter_search_term': return 'Enter a search term...';
-			case 'searching_for': return ({required Object searchTerm}) => 'Searching for 『${searchTerm}』...';
 			case 'no_search_results': return 'No search results found.';
 			case 'edit_actions': return 'Edit Dictionary Quick Actions';
 			case 'remove_action': return 'Remove Action';
 			case 'assign_action': return 'Assign Action';
-			case 'dictionary_import_tag': return ({required Object name}) => 'Imported from ${name}';
 			case 'no_sentences_found': return 'No sentences found';
 			case 'failed_online_service': return 'Failed to communicate with online service';
 			case 'search_label_before': return 'Show all ';
-			case 'search_label_middle': return 'out of ';
 			case 'search_label_after': return 'search results found for';
 			case 'clear_dictionary_title': return 'Clear Dictionary Result History';
 			case 'clear_dictionary_description': return 'This will clear all dictionary results from history. Are you sure?';
@@ -606,14 +507,11 @@ extension on Translations {
 			case 'image_search_label_after': return 'found for';
 			case 'image_search_label_none_middle': return 'no image ';
 			case 'image_search_label_none_before': return 'Selecting ';
-			case 'preparing_instant_export': return 'Preparing card for export...';
 			case 'processing_in_progress': return 'Preparing images';
 			case 'searching_in_progress': return 'Searching for ';
 			case 'audio_unavailable': return 'No audio could be found.';
 			case 'no_audio_enhancements': return 'No audio enhancements are assigned.';
 			case 'card_exported': return ({required Object deck}) => 'Card exported to 『${deck}』.';
-			case 'info_incognito_on': return 'Incognito mode on. Dictionary, media and search history will not be tracked.';
-			case 'info_incognito_off': return 'Incognito mode off. Dictionary, media and search history will be tracked.';
 			case 'exit_media_title': return 'Exit Media';
 			case 'exit_media_description': return 'This will return you to the main menu. Are you sure?';
 			case 'unimplemented_source': return 'Unimplemented source';
@@ -639,35 +537,10 @@ extension on Translations {
 			case 'stash_selected': return ({required Object n}) => '${n} selected';
 			case 'stash_select_all': return 'Select all';
 			case 'stash_delete_confirm': return ({required Object n}) => 'Delete ${n} stashed word(s)?';
-			case 'local_media_directory_empty': return 'Directory has no folders or video';
-			case 'navigate_up_one_directory_level': return 'Navigate Up One Directory Level';
-			case 'record': return 'Record';
-			case 'stop': return 'Stop';
-			case 'player_option_shadowing': return 'Shadowing Mode';
-			case 'player_option_drag_to_select': return 'Use Drag to Select Subtitle Selection';
-			case 'player_option_tap_to_select': return 'Use Tap to Select Subtitle Selection';
-			case 'player_option_dictionary_menu': return 'Select Active Dictionary Source';
-			case 'player_option_cast_video': return 'Cast to Display Device';
-			case 'player_option_text_filter': return 'Use Regular Expression Filter';
-			case 'player_prepare_export': return 'Preparing card...';
-			case 'closed_captions_query': return 'Querying for captions';
-			case 'closed_captions_target': return 'Target language captions';
-			case 'closed_captions_app': return 'App language captions';
-			case 'closed_captions_other': return 'Other language captions';
-			case 'closed_captions_unavailable': return 'No captions';
-			case 'closed_captions_error': return 'Error while querying captions';
 			case 'paste': return 'Paste';
-			case 'select_all': return 'Select all';
-			case 'set_media': return 'Set Media';
 			case 'no_recordings_found': return 'No recordings found';
 			case 'wrap_image_audio': return 'Include image/audio HTML tags on export';
-			case 'server_address': return 'Server Address';
-			case 'no_active_connection': return 'No active connection';
-			case 'failed_server_connection': return 'Failed to connect to server';
-			case 'no_text_received': return 'No text received';
 			case 'text_segmentation': return 'Text Segmentation';
-			case 'connect_disconnect': return 'Connect/Disconnect';
-			case 'use_slow_import': return 'Slow import (use if failing)';
 			case 'settings': return 'Settings';
 			case 'settings_appearance': return 'Appearance';
 			case 'settings_dark_theme': return 'Dark theme';
@@ -686,21 +559,12 @@ extension on Translations {
 			case 'export_profile_empty': return 'Your export profile has no set fields and requires configuration.';
 			case 'error_export_media_ankidroid': return 'There was an error in exporting media to AnkiDroid.';
 			case 'error_add_note': return 'There was an error in adding a note to AnkiDroid.';
-			case 'maximum_entries': return 'Maximum dictionary entry query limit';
 			case 'maximum_terms': return 'Maximum dictionary headwords in result';
 			case 'use_br_tags': return 'Use line break tag instead of newline on export';
 			case 'prepend_dictionary_names': return 'Prepend dictionary name in meaning';
 			case 'highlight_on_tap': return 'Highlight text on tap';
 			case 'no_audio_file': return 'No audio file to save.';
 			case 'storage_permissions': return 'Please grant the following permissions for exporting to AnkiDroid.';
-			case 'accessibility': return 'Permission is required to capture text from accessibility events.';
-			case 'cfhange_sort_order': return 'Change Sort Order';
-			case 'login': return 'Login';
-			case 'send': return 'Send';
-			case 'no_messages': return 'Start a chat';
-			case 'enter_message': return 'Enter message...';
-			case 'clear_message_title': return 'Clear Messages';
-			case 'clear_message_description': return 'This will clear all messages and start a new chat. Are you sure?';
 			case 'pick_file': return 'Pick File';
 			case 'open_url': return 'Open URL';
 			case 'catalogs': return 'Catalogs';
@@ -708,7 +572,6 @@ extension on Translations {
 			case 'url': return 'URL';
 			case 'duplicate_catalog': return 'A catalog with this URL already exists.';
 			case 'no_catalogs_listed': return 'No catalogs listed';
-			case 'go_back': return 'Go Back';
 			case 'invalid_mokuro_file': return 'File is not a Mokuro generated HTML file.';
 			case 'create_catalog': return 'Create Catalog';
 			case 'adapt_ttu_theme': return 'Adapt dictionary popup to theme';
@@ -717,28 +580,11 @@ extension on Translations {
 			case 'field_lock': return 'Lock Field';
 			case 'field_unlock': return 'Unlock Field';
 			case 'use_dark_theme': return 'Use dark theme';
-			case 'toggle_transcript_background': return 'Toggle Transcript Background';
 			case 'saved_tags': return 'Tags saved.';
-			case 'structured_content_first': return ({required Object i}) => '${i} definitions are unsupported and were omitted.';
-			case 'structured_content_second': return 'Consider a non-structured content version of this dictionary.';
-			case 'cancel': return 'Cancel';
 			case 'cloze': return 'Cloze';
 			case 'info_standard_update': return 'New standard profile card type';
 			case 'info_standard_update_content': return 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
-			case 'view_replies.reply': return ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
-				one: 'SHOW ${n} REPLY',
-				other: 'SHOW ${n} REPLIES',
-			);
 			case 'manage_duplicate_checks': return 'Manage Duplicate Checks';
-			case 'go_forward': return 'Go Forward';
-			case 'browse': return 'Browse';
-			case 'add_to_reading_list': return 'Add To Reading List';
-			case 'reading_list_empty': return 'Reading list is empty';
-			case 'reading_list_add_toast': return 'Added to reading list.';
-			case 'reading_list_remove_toast': return 'Removed from the reading list.';
-			case 'ad_block_hosts': return 'Ad-block hosts';
-			case 'error_parsing_hosts_file': return 'Error parsing hosts file.';
-			case 'loaded_from_cache': return 'Loaded from web archive cache.';
 			default: return null;
 		}
 	}

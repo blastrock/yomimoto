@@ -44,21 +44,25 @@ tool/fetch_ttu.sh                                          # ebook-reader-lite b
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Isar, json, dart_mappable
 dart run slang                                             # regenerate lib/i18n/strings.g.dart
-flutter analyze                                            # must stay free of errors and warnings
+tool/check_analyze.sh                                      # flutter analyze gate: no errors/warnings, infos ≤ baseline
 flutter build apk --release --split-per-abi
 ```
 
-`flutter analyze` currently reports **76 infos, 0 errors, 0 warnings**, all on
-pre-existing code (`use_build_context_synchronously`, `unnecessary_underscores`,
-`strict_top_level_inference`). Do not let that number grow; new code should be
-clean.
+`flutter analyze` reports infos on pre-existing code
+(`use_build_context_synchronously`, `unnecessary_underscores`,
+`strict_top_level_inference`), and exits non-zero because of them.
+`tool/check_analyze.sh` is the real gate: it fails on any error or warning, or
+when infos exceed the baseline held in the script (`max_infos`). Do not let
+that number grow; new code should be clean. Lower it when you fix infos.
 
 There are **no tests** — no `test/` directory, no widget or unit tests. Changes
 are verified by `flutter analyze` plus manual device testing.
 
-`.github/workflows/main.yml` is **stale**: it still pins Flutter 3.13.5 and JDK
-11 and will fail against the current toolchain. Ignore it, or fix it as part of
-whatever you are doing.
+CI (`.github/workflows/main.yml`, every push and pull request) fetches the
+pinned ttu build, checks that generated files are fresh (regenerates them and
+fails on `git diff`), and runs `tool/check_analyze.sh`. It builds no APK.
+`slang.yaml` turns off slang's build timestamp so the freshness check is
+deterministic.
 
 ## Toolchain
 

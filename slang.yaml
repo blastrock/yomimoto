@@ -1,0 +1,3 @@
+# The default header carries a "Built on" timestamp, which would make
+# strings.g.dart differ on every run and break CI's generated-files check.
+timestamp: false

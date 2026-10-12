@@ -190,11 +190,11 @@ class _AudioRecorderDialogPageState
             position = Duration.zero;
           }
 
-          return JidoujishoTimeFormat.getVideoDurationText(position).trim();
+          return JidoujishoTimeFormat.getDurationText(position).trim();
         }
 
         String getDurationText() {
-          return JidoujishoTimeFormat.getVideoDurationText(duration).trim();
+          return JidoujishoTimeFormat.getDurationText(duration).trim();
         }
 
         return Text(

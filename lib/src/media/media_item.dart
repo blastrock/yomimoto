@@ -58,8 +58,8 @@ class MediaItem {
   @Index()
   String mediaIdentifier;
 
-  /// The name of this item. Typically, this could be the name of a video
-  /// or a book.
+  /// The name of this item. Typically, this is the name of a book or a manga
+  /// volume.
   String title;
 
   /// The media source, and so the home tab, where this item is from.
@@ -78,8 +78,7 @@ class MediaItem {
   String? audioUrl;
 
   /// This field is a convenience field as it may be common to store this
-  /// detail. For a web video, this could be the channel where the video is
-  /// from. For a book, it is the author.
+  /// detail. For a book, it is the author.
   String? author;
 
   /// Used to provide any extra URL information.
@@ -89,7 +88,7 @@ class MediaItem {
   String? extra;
 
   /// This field is for future-proofing, and can be used to store an identifier
-  /// for an author, for example, a YouTube channel.
+  /// for an author.
   String? authorIdentifier;
 
   /// This field may be used to store additional details that the source may
@@ -97,8 +96,7 @@ class MediaItem {
   String? sourceMetadata;
 
   /// The current progress of the media in the time this context was made.
-  /// This could be the seconds of a playing video or the page number of a
-  /// book or comic.
+  /// This could be the page number of a book or comic.
   int position;
 
   /// The media's full duration, used to be able to tell the completion of

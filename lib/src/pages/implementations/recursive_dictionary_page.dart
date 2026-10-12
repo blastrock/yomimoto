@@ -52,6 +52,9 @@ class _RecursiveDictionaryPageState
       _controller.open();
 
       Future.delayed(const Duration(milliseconds: 50), () {
+        if (!mounted) {
+          return;
+        }
         FocusScope.of(context).unfocus();
       });
 

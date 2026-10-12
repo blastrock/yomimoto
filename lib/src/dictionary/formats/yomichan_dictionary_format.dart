@@ -131,7 +131,7 @@ class YomichanFormat extends DictionaryFormat {
   }
 
   /// For [prepareEntriesYomichanFormat].
-  static String? processDefinition(var definition) {
+  static String? processDefinition(dynamic definition) {
     if (definition is String) {
       final plainText = definition;
       return plainText;

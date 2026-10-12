@@ -650,7 +650,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
         ),
       ],
     );
-    if (context.mounted) {
+    if (mounted) {
       showDialog(
         context: context,
         builder: (context) => alertDialog,

@@ -1819,8 +1819,7 @@ class Deinflector {
     ];
     for (int i = 0; i < results.length; ++i) {
       Deinflection result = results[i];
-      for (NormalizedReason normalizedReason
-          in normalizeReasons(deinflectRules)) {
+      for (NormalizedReason normalizedReason in normalizeReasons()) {
         for (Variant variant in normalizedReason.variants) {
           if ((result.rules != 0 && (result.rules & variant.rulesIn) == 0) ||
               !result.term.endsWith(variant.kanaIn) ||
@@ -1844,7 +1843,7 @@ class Deinflector {
   }
 
   /// Sort variants per reason.
-  static List<NormalizedReason> normalizeReasons(reasons) {
+  static List<NormalizedReason> normalizeReasons() {
     List<NormalizedReason> normalizedReasons = [];
     for (MapEntry<String, List<DeinflectRule>> reasons
         in deinflectRules.entries) {

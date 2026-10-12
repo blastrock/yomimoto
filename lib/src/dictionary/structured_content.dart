@@ -38,7 +38,7 @@ sealed class StructuredContent with StructuredContentMappable {
   final StructuredContent? content;
 
   /// Handles nested content.
-  static StructuredContent? processContent(var content) {
+  static StructuredContent? processContent(dynamic content) {
     if (content is String) {
       return StructuredContentTextNode(text: content);
     } else if (content is List) {
@@ -76,7 +76,7 @@ class StructuredContentTextNode extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && value['text'] != null;
   }
 }
@@ -102,7 +102,7 @@ class StructuredContentChildContent extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is List;
   }
 }
@@ -120,7 +120,7 @@ class StructuredContentLineBreak extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && value['tag'] == 'br';
   }
 }
@@ -222,7 +222,7 @@ class StructuredContentImage extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && (value['tag'] == 'img' || value['type'] == 'image');
   }
 }
@@ -264,7 +264,7 @@ class StructuredContentLink extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && (value['tag'] == 'a');
   }
 }
@@ -319,7 +319,7 @@ class StructuredContentContainer extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && validTags.contains(value['tag']);
   }
 }
@@ -376,7 +376,7 @@ class StructuredContentStyledContainer extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && validTags.contains(value['tag']);
   }
 }
@@ -440,7 +440,7 @@ class StructuredContentTableElement extends StructuredContent
   }
 
   /// Discriminator logic.
-  static bool checkType(value) {
+  static bool checkType(dynamic value) {
     return value is Map && validTags.contains(value['tag']);
   }
 }

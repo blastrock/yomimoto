@@ -122,7 +122,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             Enhancement? enhancement = appModel.lastSelectedMapping
                 .getAutoFieldEnhancement(appModel: appModel, field: field);
 
-            if (enhancement != null && context.mounted) {
+            if (enhancement != null && mounted) {
               enhancement.enhanceCreatorParams(
                 context: context,
                 ref: ref,
@@ -139,7 +139,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       Enhancement? enhancement = appModel.lastSelectedMapping
           .getAutoFieldEnhancement(appModel: appModel, field: field);
 
-      if (enhancement != null && context.mounted) {
+      if (enhancement != null && mounted) {
         enhancement.enhanceCreatorParams(
           context: context,
           ref: ref,

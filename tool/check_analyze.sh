@@ -10,8 +10,8 @@ max_infos=76
 
 out="$(flutter analyze --no-fatal-infos 2>&1)"
 rc=$?
-infos="$(grep -c ' info ' <<<"$out")"
-bad="$(grep -cE ' (error|warning) ' <<<"$out")"
+infos="$(grep -cE '^ *info • ' <<<"$out")"
+bad="$(grep -cE '^ *(error|warning) • ' <<<"$out")"
 echo "analyze: rc=$rc infos=$infos (max $max_infos) errors+warnings=$bad"
 
 if [[ $rc -ne 0 || $bad -ne 0 || $infos -gt $max_infos ]]; then

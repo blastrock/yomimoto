@@ -206,7 +206,7 @@ class _ImmersionKitSentencesDialogPageState
               aspectRatio: 16 / 9,
               child: FadeInImage(
                 placeholder: MemoryImage(kTransparentImage),
-                imageErrorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                imageErrorBuilder: (_, _, _) => const SizedBox.shrink(),
                 image: CachedNetworkImageProvider(result.imageUrl),
                 alignment: Alignment.topCenter,
                 fit: BoxFit.fitWidth,

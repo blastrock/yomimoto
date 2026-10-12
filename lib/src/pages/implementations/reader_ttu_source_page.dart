@@ -121,7 +121,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         }
       },
       canRequestFocus: true,
-      onKeyEvent: (FocusNode node, KeyEvent event) {
+      onKeyEvent: (node, event) {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           if (mediaSource.volumePageTurningEnabled) {
             if (isDictionaryShown) {
@@ -159,7 +159,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         // PopScope inverts WillPopScope: refuse the pop up front, run the
         // same confirmation, and pop by hand if it is accepted.
         canPop: false,
-        onPopInvokedWithResult: (bool didPop, Object? result) async {
+        onPopInvokedWithResult: (didPop, result) async {
           if (didPop) {
             return;
           }

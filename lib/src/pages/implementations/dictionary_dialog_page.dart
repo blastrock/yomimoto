@@ -539,7 +539,7 @@ class _DictionaryDialogPageState extends BasePageState {
           children: [
             ChangeNotifierBuilder(
               notifier: _formatNotifier,
-              builder: (_, __, ___) => JidoujishoDropdown<DictionaryFormat>(
+              builder: (_, _, _) => JidoujishoDropdown<DictionaryFormat>(
                 options: appModel.dictionaryFormats.values.toList(),
                 initialOption: appModel.lastSelectedDictionaryFormat,
                 generateLabel: (format) => format.name,

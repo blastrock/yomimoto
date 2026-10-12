@@ -157,7 +157,7 @@ Future<void> prepareDirectoryYomichanFormat(
     PrepareDirectoryParams params) async {
   int n = 0;
   extractZipArchiveSync(params.file, params.resourceDirectory,
-      callback: (_, __) {
+      callback: (_, _) {
     n++;
     params.send(t.import_extract_count(n: n));
   });

@@ -58,7 +58,7 @@ abstract class HistoryReaderPageState<T extends HistoryReaderPage>
               aspectRatio: mediaSource.aspectRatio,
               child: FadeInImage(
                 key: UniqueKey(),
-                imageErrorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                imageErrorBuilder: (_, _, _) => const SizedBox.shrink(),
                 placeholder: MemoryImage(kTransparentImage),
                 image: mediaSource.getDisplayThumbnailFromMediaItem(
                   appModel: appModel,

@@ -166,7 +166,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       // PopScope inverts WillPopScope: refuse the pop up front, run the
       // same confirmation, and pop by hand if it is accepted.
       canPop: false,
-      onPopInvokedWithResult: (bool didPop, Object? result) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           return;
         }
@@ -753,7 +753,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       icon: Icons.add_circle,
       onTap: () async {
         await showDialog(
-          barrierDismissible: true,
           context: context,
           builder: (context) => FieldPickerDialogPage(
             mapping: mapping,
@@ -780,7 +779,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         icon: Icons.add_circle,
         onTap: () async {
           await showDialog(
-            barrierDismissible: true,
             context: context,
             builder: (context) => EnhancementsPickerDialogPage(
               mapping: mapping,
@@ -896,7 +894,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         icon: Icons.add_circle,
         onTap: () async {
           await showDialog(
-            barrierDismissible: true,
             context: context,
             builder: (context) => EnhancementsPickerDialogPage(
               mapping: mapping,

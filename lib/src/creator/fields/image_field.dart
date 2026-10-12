@@ -128,7 +128,7 @@ class ImageField extends ImageExportField {
   }) {
     return ChangeNotifierBuilder(
       notifier: carouselNotifier,
-      builder: (_, __, ___) {
+      builder: (_, _, _) {
         return CarouselSlider.builder(
           key: carouselKey,
           itemCount: itemCount + 1,

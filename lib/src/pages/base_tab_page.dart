@@ -59,7 +59,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
           isScrollControlled: true,
           hint: mediaSource.sourceName,
           controller: homeTab.floatingSearchBarController,
-          builder: (_, __) => const SizedBox.shrink(),
+          builder: (_, _) => const SizedBox.shrink(),
           borderRadius: BorderRadius.zero,
           elevation: 0,
           backgroundColor: appModel.isDarkMode

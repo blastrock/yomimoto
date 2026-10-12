@@ -798,7 +798,6 @@ class AppModel with ChangeNotifier {
         });
 
         await showDialog(
-          barrierDismissible: true,
           context: _navigatorKey.currentContext!,
           builder: (context) => AlertDialog(
             title: Text(t.info_standard_update),
@@ -1098,7 +1097,6 @@ class AppModel with ChangeNotifier {
   /// app, so it is appropriately handled by the model.
   Future<void> showDictionaryMenu() async {
     await showDialog(
-      barrierDismissible: true,
       context: navigatorKey.currentContext!,
       builder: (context) => const DictionaryDialogPage(),
     );
@@ -1114,7 +1112,6 @@ class AppModel with ChangeNotifier {
     String initialModel = lastSelectedModel ?? models.first;
 
     await showDialog(
-      barrierDismissible: true,
       context: navigatorKey.currentContext!,
       builder: (context) => ProfilesDialogPage(
         models: models,
@@ -1510,7 +1507,6 @@ class AppModel with ChangeNotifier {
     await requestAnkidroidPermissions();
 
     await showDialog(
-      barrierDismissible: true,
       context: _navigatorKey.currentContext!,
       builder: (context) => AlertDialog(
         title: Text(t.error_ankidroid_api),
@@ -1551,7 +1547,6 @@ class AppModel with ChangeNotifier {
       methodChannel.invokeMethod('addDefaultModel');
 
       await showDialog(
-        barrierDismissible: true,
         context: _navigatorKey.currentContext!,
         builder: (context) => AlertDialog(
           title: Text(t.info_standard_model),
@@ -1967,7 +1962,6 @@ class AppModel with ChangeNotifier {
     if (!newMappingModelExists) {
       if (context.mounted) {
         await showDialog(
-          barrierDismissible: true,
           context: context,
           builder: (_) => AlertDialog(
             title: Text(t.error_model_missing),
@@ -1995,7 +1989,6 @@ class AppModel with ChangeNotifier {
     if (!newMappingModelLengthMatches) {
       if (context.mounted) {
         await showDialog(
-          barrierDismissible: true,
           context: context,
           builder: (_) => AlertDialog(
             title: Text(t.error_model_changed),

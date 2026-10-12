@@ -218,7 +218,7 @@ class _DictionaryTermActionsRowState
         ref: ref,
         colors: defaultColors,
       ),
-      error: (_, __) => buildRow(
+      error: (_, _) => buildRow(
         context: context,
         appModel: appModel,
         creatorModel: creatorModel,

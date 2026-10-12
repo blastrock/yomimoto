@@ -139,8 +139,7 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
                             expandableControllersByHeading[heading]!,
                         dictionaryNamesByHidden: dictionaryNamesByHidden,
                         dictionaryNamesByOrder: dictionaryNamesByOrder,
-                      ))
-                  .toList(),
+                      )),
               if (widget.footerWidget != null) widget.footerWidget!,
             ],
           ),

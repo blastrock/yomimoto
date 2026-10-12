@@ -53,8 +53,7 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
                 onShare: widget.onShare,
                 lastSelectedMapping: lastSelectedMapping,
               ),
-            )
-            .toList(),
+            ),
       ],
     );
   }

@@ -382,7 +382,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   Widget buildSearchResult() {
     return ValueListenableBuilder(
       valueListenable: _dictionaryResultNotifier,
-      builder: (_, __, ___) {
+      builder: (_, _, _) {
         if (_dictionaryResultNotifier.value == null) {
           return SizedBox(
             height: double.infinity,

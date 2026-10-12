@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 jobs:
   check:
-    name: Analyze
+    name: Analyze and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -32,3 +32,6 @@ jobs:
 
       - name: Analyze
         run: tool/check_analyze.sh
+
+      - name: Test
+        run: flutter test

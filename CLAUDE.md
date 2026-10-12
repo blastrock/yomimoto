@@ -45,6 +45,7 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # Isar, json, dart_mappable
 dart run slang                                             # regenerate lib/i18n/strings.g.dart
 tool/check_analyze.sh                                      # flutter analyze gate: no errors/warnings, infos ≤ baseline
+flutter test                                               # unit tests in test/
 flutter build apk --release --split-per-abi
 ```
 
@@ -55,14 +56,18 @@ flutter build apk --release --split-per-abi
 when infos exceed the baseline held in the script (`max_infos`). Do not let
 that number grow; new code should be clean. Lower it when you fix infos.
 
-There are **no tests** — no `test/` directory, no widget or unit tests. Changes
-are verified by `flutter analyze` plus manual device testing.
+`flutter test` runs the unit tests in `test/`, which mirrors `lib/src/`. They
+cover pure code only (text selection, stash item, sentence splitting, the ttu
+bridge's event parsing): no device, no database, no mocks. They characterise
+current behaviour, oddities included, rather than prescribe it. The strict lint
+set applies to them too. Anything touching `AppModel`, Isar, MeCab or the
+WebView is still verified by manual device testing.
 
 CI (`.github/workflows/main.yml`, every push and pull request) fetches the
 pinned ttu build, checks that generated files are fresh (regenerates them and
-fails on `git diff`), and runs `tool/check_analyze.sh`. It builds no APK.
-`slang.yaml` turns off slang's build timestamp so the freshness check is
-deterministic.
+fails on `git diff`), runs `tool/check_analyze.sh`, then `flutter test`. It
+builds no APK. `slang.yaml` turns off slang's build timestamp so the
+freshness check is deterministic.
 
 ## Toolchain
 

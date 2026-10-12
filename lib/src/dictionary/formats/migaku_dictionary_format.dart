@@ -24,7 +24,6 @@ class MigakuFormat extends DictionaryFormat {
           name: 'Migaku Dictionary',
           icon: Icons.auto_stories_rounded,
           allowedExtensions: const ['zip'],
-          isTextFormat: false,
           fileType: FileType.any,
           prepareDirectory: prepareDirectoryMigakuFormat,
           prepareName: prepareNameMigakuFormat,

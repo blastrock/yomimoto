@@ -11,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_charset_detector/flutter_charset_detector.dart';
 import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1213,18 +1212,6 @@ class AppModel with ChangeNotifier {
     /// shown below. A dialog is shown to show the progress of the dictionary
     /// file import, with messages pertaining to the above [ValueNotifier].
     try {
-      String charset = '';
-
-      /// Find a way to check if this is a text file or a binary file instead
-      /// of doing this, it's not good to do format-specific tweaks in a
-      /// general function like this.
-      if (dictionaryFormat.isTextFormat) {
-        var randomAccessFile = file.openSync();
-        var bytes = randomAccessFile.readSync(100);
-        DecodingResult result = await CharsetDetector.autoDecode(bytes);
-        charset = result.charset;
-      }
-
       final int highestId = _database.dictionarys
               .where(sort: Sort.desc)
               .anyId()
@@ -1242,7 +1229,6 @@ class AppModel with ChangeNotifier {
 
       PrepareDirectoryParams prepareDirectoryParams = PrepareDirectoryParams(
         file: file,
-        charset: charset,
         directoryPath: _databaseDirectory.path,
         resourceDirectory: resourceDirectory,
         dictionaryFormat: dictionaryFormat,

@@ -1,4 +1,3 @@
-import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as path;
@@ -8,7 +7,6 @@ part 'dictionary.g.dart';
 /// A dictionary that can be imported into the application, encapsulating its
 /// metadata and current preferences.
 @Collection()
-@CopyWith()
 class Dictionary {
   /// Initialise a dictionary with details determined from import.
   Dictionary({

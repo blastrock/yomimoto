@@ -15,7 +15,6 @@ dependencies:
   carousel_slider: ^5.1.2
   change_notifier_builder: ^1.1.2
   collection:
-  copy_with_extension: ^17.0.0
   crop_image: ^1.0.4
   dart_mappable: ^4.7.0
   device_info_plus: ^13.2.0
@@ -33,15 +32,12 @@ dependencies:
     sdk: flutter
   flutter_archive: ^6.3.1
   flutter_cache_manager: ^3.3.0
-  flutter_charset_detector: ^6.0.0
   flutter_exit_app: ^2.1.2
   flutter_html: ^3.0.0
   flutter_html_table: ^3.0.0
   flutter_image_compress: ^2.5.1
   flutter_inappwebview: ^6.1.5
-  flutter_launcher_icons: ^0.14.4
   flutter_logs: ^2.1.11
-  flutter_native_splash: ^2.2.8
   flutter_riverpod: ^2.3.6
   flutter_staggered_grid_view: ^0.7.0
   fluttertoast: ^10.0.0
@@ -54,7 +50,6 @@ dependencies:
   isar_community: ^3.3.2
   isar_community_flutter_libs: ^3.3.2
   json_annotation: ^4.9.0
-  json_serializable: ^6.6.1
   just_audio: ^0.10.6
   kana_kit: ^2.0.0
   list_counter: ^1.0.2
@@ -112,7 +107,7 @@ dependencies:
       ref: c366bb1ae24f6fad4f5c7e3a1efad5f2b8122e58
   visibility_detector: ^0.4.0+2
   wakelock_plus: ^1.7.0
- 
+
 dependency_overrides:
   freezed_annotation: ^2.2.0 # Caused by spaces
   gap: ^3.0.1 # Caused by spaces
@@ -132,11 +127,15 @@ dev_dependencies:
   # dependency_validator is pinned to analyzer <13 while dart_mappable_builder
   # requires ^13; it is a hygiene tool with no build role, so it stays out until
   # the two agree again.
+
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.2.8
   flutter_test:
     sdk: flutter
   isar_community_generator: ^3.3.2
- 
+  json_serializable: ^6.6.1
+
 flutter_icons:
   android: "launcher_icon"
   image_path: "assets/meta/icon.png"

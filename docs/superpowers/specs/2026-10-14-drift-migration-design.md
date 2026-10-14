@@ -26,11 +26,14 @@ spec before 1.0.
 
 ## Architecture
 
-- **Backend**: Drift's `NativeDatabase` over `package:sqlite3` (FFI, bundled
-  SQLite). Not `drift_sqflite`.
-- **One file**, `yomimoto.sqlite`, in the app documents directory, with
-  `journal_mode=WAL`, `foreign_keys=ON`, `busy_timeout` set, and
-  `auto_vacuum=INCREMENTAL` (set in `onCreate`, before any table exists).
+- **Backend**: Drift's `NativeDatabase` over `package:sqlite3` (FFI, SQLite
+  bundled by the package's build hook). Not `drift_sqflite`. `sqlite3` is
+  held at 3.5: 3.6+ needs a `meta` newer than the one Flutter 3.44 pins.
+- **One file**, `yomimoto.sqlite`, in the app support directory (where Isar
+  lived), with `journal_mode=WAL`, `foreign_keys=ON`, `busy_timeout` set, and
+  `auto_vacuum=INCREMENTAL`. Every connection applies these on open; the
+  `auto_vacuum` setting only takes effect on a database with no tables yet,
+  so it sticks from the first open.
 - **Main isolate**: `AppModel.initialise()` opens a `sqlite3.Database`, wraps
   it with `NativeDatabase.opened(raw)` into `AppDatabase`, and forces it open
   so the schema exists before the first read. `AppModel` keeps both handles:
@@ -58,16 +61,22 @@ spec before 1.0.
   (the eighth). It holds the Drift table definitions, `AppDatabase`, the JSON
   type converters, `search.drift`, the heading loader, the raw read helper and
   `DictionaryImportWriter`.
-- Model classes stay where they are, with their names and helper methods, and
-  become Drift row classes through `@UseRowClass`: `Dictionary`,
-  `DictionaryEntry`, `DictionaryHeading`, `DictionaryTag`, `DictionaryPitch`,
-  `DictionaryFrequency`, `MediaItem`, `StashItem`, `AnkiMapping`,
-  `MokuroCatalog`, `SearchHistoryItem`. They lose their Isar annotations and
-  links. Fields that are not columns become plain mutable fields with empty
-  defaults, filled by the loader:
-  - `DictionaryHeading.entries`, `.pitches`, `.frequencies`, `.tags`
-  - `DictionaryEntry.tags`, `.dictionary`
-  - `DictionaryPitch.dictionary`, `DictionaryFrequency.dictionary`
+- Model classes stay where they are, with their names and helper methods,
+  and lose their Isar annotations and links.
+  - `Dictionary`, `MediaItem`, `StashItem`, `AnkiMapping` and `MokuroCatalog`
+    become Drift row classes through `@UseRowClass`.
+  - The dictionary content tables (heading, entry, pitch, frequency, tag and
+    the two tag links) keep Drift's generated row classes (`HeadingRow`,
+    `EntryRow`, …). The heading loader builds `DictionaryHeading`,
+    `DictionaryEntry`, `DictionaryPitch`, `DictionaryFrequency` and
+    `DictionaryTag` from them, so those models carry aggregate fields rather
+    than foreign-key columns:
+    - `DictionaryHeading.entries`, `.pitches`, `.frequencies`, `.tags`,
+      `.noReadingFrequencies`
+    - `DictionaryEntry.tags`, `.dictionary`, `.heading`
+    - `DictionaryPitch.dictionary`, `DictionaryFrequency.dictionary`
+  - `SearchHistoryItem` is deleted: the search history and dictionary history
+    tables keep generated row classes, and the store returns plain terms.
 - `DictionarySearchResult` becomes a plain in-memory class (`searchTerm`,
   `bestLength`, `headings`). It is no longer persisted.
 
@@ -119,7 +128,8 @@ entry_tag(entry_id → entry ON DELETE CASCADE, tag_id → tag ON DELETE CASCADE
 
 ```
 media_item(id PK, media_source_identifier, media_identifier, title, image_url?,
-           position, duration, can_delete, can_edit, last_opened_at,
+           source_metadata?, position, duration, can_delete, can_edit,
+           last_opened_at,
            UNIQUE(media_source_identifier, media_identifier))
 
 stash_item(id PK, media_item_id → media_item ON DELETE CASCADE, term, reading,
@@ -152,8 +162,9 @@ dictionary_history(id PK, search_term UNIQUE)
   new id each time it was put, and the Novels library (newest first) and the
   mokuro history are ordered by that. Both upserts set `last_opened_at` to
   now; `updateMediaItem` (mokuro's page position) does not. The media lists
-  are ordered by `last_opened_at`, and mokuro trimming removes the oldest by
-  it.
+  are ordered by `last_opened_at`, then id, and mokuro trimming removes the
+  oldest by it. It is stored as microseconds since the epoch, so that two
+  items opened within the same second keep their order.
 - Mokuro media items are trimmed to the 100 most recent by `addMediaItem`.
   Mokuro items cannot be stashed today (no `currentPosition`), so the cascade
   cannot delete a stash through trimming. Mokuro stashing is planned; this is
@@ -165,8 +176,8 @@ dictionary_history(id PK, search_term UNIQUE)
 
 - `entry.imagePaths`, `entry.audioPaths`, `entry.extra`: never written.
 - `media_item.base64Image`, `audioUrl`, `author`, `extraUrl`, `extra`,
-  `authorIdentifier`, `sourceMetadata`: never written by the remaining
-  sources. Code reading them goes too.
+  `authorIdentifier`: never written by the remaining sources. Code reading
+  them goes too. (`sourceMetadata` stays: mokuro stores a "used" flag in it.)
 - `search_history_item.historyKey`: every caller passes the dictionary tab's
   key. Search history and dictionary history keep id order as recency:
   re-adding a term deletes and reinserts it, as today.
@@ -211,7 +222,7 @@ Users: the search isolate, `resolveStashItem`, `getNoReadingFrequencies`.
 ## Search
 
 - Still runs in a `cancelable_compute` isolate, which opens its own
-  `AppDatabase`. A new lookup cancels the one in flight, as today. (Drift on
+  `AppDatabase`. Lookups are not cancelled, as today. (Drift on
   the main isolate runs SQLite on the main isolate, so searching there would
   block the UI.)
 - The isolate searches, loads the aggregates, ranks them and returns a fully

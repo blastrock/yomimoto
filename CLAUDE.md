@@ -94,6 +94,9 @@ in 46 files and is the only reason for two `dependency_overrides`; `ve_dart` is
 also a third-party git ref. Both are liabilities of the same kind that already
 bit this project once.
 
+Deliberate shortcuts that will need revisiting are recorded in **`DEBT.md`**.
+Add an entry when you take one.
+
 ## Architecture
 
 ### Barrel imports

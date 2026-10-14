@@ -150,8 +150,8 @@ dictionary_history(id PK, search_term UNIQUE)
   the cascade.
 - Mokuro media items are trimmed to the 100 most recent by `addMediaItem`.
   Mokuro items cannot be stashed today (no `currentPosition`), so the cascade
-  cannot delete a stash through trimming. If stashing from mokuro is ever
-  added, the trimming must be revisited.
+  cannot delete a stash through trimming. Mokuro stashing is planned; this is
+  recorded in `DEBT.md`.
 - `dictionary_history` replaces the `dictionaryHistory` Hive box and the
   persisted `DictionarySearchResult` collection.
 

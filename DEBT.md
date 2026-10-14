@@ -9,9 +9,10 @@ to change when that stops being true. Remove an entry once it is paid off.
 **Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
 
 `stash_item.media_item_id` references `media_item` with `ON DELETE CASCADE`.
-Mokuro volumes are stored as a reading history capped at the 100 most recent
-(`AppModel.addMediaItem`), so opening a 101st volume deletes the oldest
-`media_item` row, and the cascade would delete its stash with it.
+Mokuro volumes are stored as a reading history capped at the 100 most
+recently opened (`AppModel.addMediaItem`, ordered by `last_opened_at`), so
+opening a 101st volume deletes the oldest `media_item` row, and the cascade
+would delete its stash with it.
 
 This is harmless only because mokuro cannot stash yet: the mokuro reader calls
 `setCurrentSentence` without a position, so `AddToStashAction` refuses.

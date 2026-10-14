@@ -119,7 +119,7 @@ entry_tag(entry_id → entry ON DELETE CASCADE, tag_id → tag ON DELETE CASCADE
 
 ```
 media_item(id PK, media_source_identifier, media_identifier, title, image_url?,
-           position, duration, can_delete, can_edit,
+           position, duration, can_delete, can_edit, last_opened_at,
            UNIQUE(media_source_identifier, media_identifier))
 
 stash_item(id PK, media_item_id → media_item ON DELETE CASCADE, term, reading,
@@ -144,10 +144,16 @@ dictionary_history(id PK, search_term UNIQUE)
   dictionary word by `(term, reading, dictionary_name)` strings on purpose:
   the stash is user data that must survive a dictionary being deleted and
   reimported, and reattach when it returns.
-- `putMediaItem` becomes a true upsert
+- `putMediaItem` and `addMediaItem` become true upserts
   (`ON CONFLICT(media_source_identifier, media_identifier) DO UPDATE`) that
-  keeps the row id. Its current delete-then-put would wipe every stash through
-  the cascade.
+  keep the row id. Their current delete-then-put would wipe every stash
+  through the cascade.
+- `last_opened_at` replaces the id as the recency order. Isar gave an item a
+  new id each time it was put, and the Novels library (newest first) and the
+  mokuro history are ordered by that. Both upserts set `last_opened_at` to
+  now; `updateMediaItem` (mokuro's page position) does not. The media lists
+  are ordered by `last_opened_at`, and mokuro trimming removes the oldest by
+  it.
 - Mokuro media items are trimmed to the 100 most recent by `addMediaItem`.
   Mokuro items cannot be stashed today (no `currentPosition`), so the cascade
   cannot delete a stash through trimming. Mokuro stashing is planned; this is
@@ -162,7 +168,8 @@ dictionary_history(id PK, search_term UNIQUE)
   `authorIdentifier`, `sourceMetadata`: never written by the remaining
   sources. Code reading them goes too.
 - `search_history_item.historyKey`: every caller passes the dictionary tab's
-  key.
+  key. Search history and dictionary history keep id order as recency:
+  re-adding a term deletes and reinserts it, as today.
 - `DictionarySearchResult.scrollPosition`: always 0; its updater
   (`updateDictionaryHistoryHelper`) is never called.
 - The Isar `termLength` and `popularity` indexes, and the concatenated unique

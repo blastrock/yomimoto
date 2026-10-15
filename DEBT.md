@@ -20,3 +20,20 @@ This is harmless only because mokuro cannot stash yet: the mokuro reader calls
 **When stashing from mokuro is added**, which is planned, the trimming
 must spare items that have a stash (or mokuro must stop being a capped history
 and become a library like Novels). Do not ship mokuro stashing without this.
+
+## Un-awaited futures are not linted
+
+**Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
+
+Moving `AppModel` from Isar's synchronous writes to Drift turned many mutators
+into `Future`s. Their callers were found by hand, and a review caught seven
+that had been missed: none was flagged, because `analysis_options.yaml`
+enables neither `unawaited_futures` (a Future dropped inside an `async` body)
+nor `discarded_futures` (an async call from a non-async block, such as a
+plain `onTap` closure). Neither is in `flutter_lints`.
+
+**To pay it off**, go over the lint rules not yet enabled that would have
+caught this class of bug, starting with those two. Enable them, and mark the
+deliberate fire-and-forget calls with `unawaited(...)` (for instance
+`populateDefaultMapping` in `home_page.dart`, and `addToSearchHistory` in the
+dictionary pages).

@@ -23,8 +23,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:remove_emoji/remove_emoji.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
@@ -134,6 +136,9 @@ class AppModel with ChangeNotifier {
   /// Used for accessing persistent database data. See [initialise].
   late final Isar _database;
 
+  /// The SQLite database. See [initialise].
+  late final AppDatabase _db;
+
   /// Used to get the versioning metadata of the app. See [initialise].
   PackageInfo get packageInfo => _packageInfo;
   late final PackageInfo _packageInfo;
@@ -179,6 +184,10 @@ class AppModel with ChangeNotifier {
   /// Directory where database data is persisted.
   Directory get databaseDirectory => _databaseDirectory;
   late final Directory _databaseDirectory;
+
+  /// Path of the SQLite database file.
+  String get databasePath =>
+      path.join(_databaseDirectory.path, databaseFileName);
 
   /// Directory where database data is persisted.
   Directory get dictionaryResourceDirectory => _dictionaryResourceDirectory;
@@ -954,6 +963,12 @@ class AppModel with ChangeNotifier {
     for (MediaSource source in tabs.values.whereType<MediaSource>()) {
       await source.initialise();
     }
+
+    /// Open the SQLite database. The first query creates the schema on a
+    /// fresh install, before anything reads it.
+    Database raw = openRawDatabase(databasePath);
+    _db = AppDatabase.fromRaw(raw);
+    await _db.customSelect('SELECT 1').get();
 
     /// Initialise persistent database.
     _database = await Isar.open(
@@ -2833,6 +2848,7 @@ class AppModel with ChangeNotifier {
   void shutdown() async {
     databaseCloseNotifier.notifyListeners();
     await _database.close();
+    await _db.close();
     FlutterExitApp.exitApp();
   }
 

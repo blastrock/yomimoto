@@ -1,0 +1,76 @@
+import 'tables.dart';
+
+-- How many headings have this term, with or without entries.
+headingCountByTerm: SELECT COUNT(*) FROM heading WHERE term = :term;
+
+-- Headings with entries whose term is one of these.
+headingsByTerms: SELECT * FROM heading
+  WHERE term IN :terms
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY id;
+
+-- Same, most popular first: by the sum of their entries' popularity.
+headingsByTermsByPopularity: SELECT * FROM heading
+  WHERE term IN :terms
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY (SELECT SUM(popularity) FROM entry WHERE entry.heading_id = heading.id) DESC, id;
+
+-- Headings with entries whose reading is one of these.
+headingsByReadings: SELECT * FROM heading
+  WHERE reading IN :readings
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY id
+  LIMIT :limit;
+
+-- Headings with entries whose term starts with :prefix, shortest first.
+-- :prefixEnd is :prefix followed by U+10FFFF, so the range uses the index.
+headingsByTermPrefix: SELECT * FROM heading
+  WHERE term >= :prefix AND term < :prefix_end
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY length(term), id
+  LIMIT :limit;
+
+-- Headings with entries whose term matches a GLOB pattern, within a length
+-- range counted in characters.
+headingsByTermGlob: SELECT * FROM heading
+  WHERE term GLOB :pattern
+    AND length(term) BETWEEN :minimum_length AND :maximum_length
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY id
+  LIMIT :limit;
+
+-- Headings with entries whose reading matches either GLOB pattern.
+headingsByReadingGlob: SELECT * FROM heading
+  WHERE (reading GLOB :pattern OR reading GLOB :alternative_pattern)
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id)
+  ORDER BY id
+  LIMIT :limit;
+
+-- The heading (term, reading), if it has entries.
+headingWithEntries: SELECT * FROM heading
+  WHERE term = :term AND reading = :reading
+    AND EXISTS (SELECT 1 FROM entry WHERE entry.heading_id = heading.id);
+
+-- The heading (term, reading), with or without entries.
+headingByTermAndReading: SELECT * FROM heading
+  WHERE term = :term AND reading = :reading;
+
+-- What the heading loader reads.
+headingsByIds: SELECT * FROM heading WHERE id IN :ids;
+entriesByHeadings: SELECT * FROM entry WHERE heading_id IN :ids ORDER BY id;
+pitchesByHeadings: SELECT * FROM pitch WHERE heading_id IN :ids ORDER BY id;
+frequenciesByHeadings: SELECT * FROM frequency WHERE heading_id IN :ids ORDER BY id;
+headingTagsByHeadings: SELECT heading_tag.heading_id AS owner_id, tag.**
+  FROM heading_tag INNER JOIN tag ON tag.id = heading_tag.tag_id
+  WHERE heading_tag.heading_id IN :ids
+  ORDER BY tag.id;
+entryTagsByEntries: SELECT entry_tag.entry_id AS owner_id, tag.**
+  FROM entry_tag INNER JOIN tag ON tag.id = entry_tag.tag_id
+  WHERE entry_tag.entry_id IN :ids
+  ORDER BY tag.id;
+-- Frequencies given for these terms without a reading.
+noReadingFrequencies: SELECT heading.term AS term, frequency.**
+  FROM frequency INNER JOIN heading ON heading.id = frequency.heading_id
+  WHERE heading.reading = '' AND heading.term IN :terms
+  ORDER BY frequency.id;
+allDictionaries: SELECT * FROM dictionary ORDER BY "order";

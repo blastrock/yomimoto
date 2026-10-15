@@ -3,6 +3,259 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class $HeadingsTable extends Headings
+    with TableInfo<$HeadingsTable, HeadingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HeadingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _termMeta = const VerificationMeta('term');
+  @override
+  late final GeneratedColumn<String> term = GeneratedColumn<String>(
+    'term',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _readingMeta = const VerificationMeta(
+    'reading',
+  );
+  @override
+  late final GeneratedColumn<String> reading = GeneratedColumn<String>(
+    'reading',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, term, reading];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'heading';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HeadingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('term')) {
+      context.handle(
+        _termMeta,
+        term.isAcceptableOrUnknown(data['term']!, _termMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_termMeta);
+    }
+    if (data.containsKey('reading')) {
+      context.handle(
+        _readingMeta,
+        reading.isAcceptableOrUnknown(data['reading']!, _readingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_readingMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {term, reading},
+  ];
+  @override
+  HeadingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HeadingRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      term: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}term'],
+      )!,
+      reading: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reading'],
+      )!,
+    );
+  }
+
+  @override
+  $HeadingsTable createAlias(String alias) {
+    return $HeadingsTable(attachedDatabase, alias);
+  }
+}
+
+class HeadingRow extends DataClass implements Insertable<HeadingRow> {
+  /// Assigned by SQLite on insert.
+  final int id;
+
+  /// The word as written.
+  final String term;
+
+  /// The word's reading, empty for kanji entries and words given no reading.
+  final String reading;
+  const HeadingRow({
+    required this.id,
+    required this.term,
+    required this.reading,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['term'] = Variable<String>(term);
+    map['reading'] = Variable<String>(reading);
+    return map;
+  }
+
+  HeadingsCompanion toCompanion(bool nullToAbsent) {
+    return HeadingsCompanion(
+      id: Value(id),
+      term: Value(term),
+      reading: Value(reading),
+    );
+  }
+
+  factory HeadingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HeadingRow(
+      id: serializer.fromJson<int>(json['id']),
+      term: serializer.fromJson<String>(json['term']),
+      reading: serializer.fromJson<String>(json['reading']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'term': serializer.toJson<String>(term),
+      'reading': serializer.toJson<String>(reading),
+    };
+  }
+
+  HeadingRow copyWith({int? id, String? term, String? reading}) => HeadingRow(
+    id: id ?? this.id,
+    term: term ?? this.term,
+    reading: reading ?? this.reading,
+  );
+  HeadingRow copyWithCompanion(HeadingsCompanion data) {
+    return HeadingRow(
+      id: data.id.present ? data.id.value : this.id,
+      term: data.term.present ? data.term.value : this.term,
+      reading: data.reading.present ? data.reading.value : this.reading,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HeadingRow(')
+          ..write('id: $id, ')
+          ..write('term: $term, ')
+          ..write('reading: $reading')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, term, reading);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HeadingRow &&
+          other.id == this.id &&
+          other.term == this.term &&
+          other.reading == this.reading);
+}
+
+class HeadingsCompanion extends UpdateCompanion<HeadingRow> {
+  final Value<int> id;
+  final Value<String> term;
+  final Value<String> reading;
+  const HeadingsCompanion({
+    this.id = const Value.absent(),
+    this.term = const Value.absent(),
+    this.reading = const Value.absent(),
+  });
+  HeadingsCompanion.insert({
+    this.id = const Value.absent(),
+    required String term,
+    required String reading,
+  }) : term = Value(term),
+       reading = Value(reading);
+  static Insertable<HeadingRow> custom({
+    Expression<int>? id,
+    Expression<String>? term,
+    Expression<String>? reading,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (term != null) 'term': term,
+      if (reading != null) 'reading': reading,
+    });
+  }
+
+  HeadingsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? term,
+    Value<String>? reading,
+  }) {
+    return HeadingsCompanion(
+      id: id ?? this.id,
+      term: term ?? this.term,
+      reading: reading ?? this.reading,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (term.present) {
+      map['term'] = Variable<String>(term.value);
+    }
+    if (reading.present) {
+      map['reading'] = Variable<String>(reading.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HeadingsCompanion(')
+          ..write('id: $id, ')
+          ..write('term: $term, ')
+          ..write('reading: $reading')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $DictionariesTable extends Dictionaries
     with TableInfo<$DictionariesTable, Dictionary> {
   @override
@@ -282,259 +535,6 @@ class DictionariesCompanion extends UpdateCompanion<Dictionary> {
           ..write('order: $order, ')
           ..write('isHidden: $isHidden, ')
           ..write('isCollapsed: $isCollapsed')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $HeadingsTable extends Headings
-    with TableInfo<$HeadingsTable, HeadingRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $HeadingsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _termMeta = const VerificationMeta('term');
-  @override
-  late final GeneratedColumn<String> term = GeneratedColumn<String>(
-    'term',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _readingMeta = const VerificationMeta(
-    'reading',
-  );
-  @override
-  late final GeneratedColumn<String> reading = GeneratedColumn<String>(
-    'reading',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, term, reading];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'heading';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<HeadingRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('term')) {
-      context.handle(
-        _termMeta,
-        term.isAcceptableOrUnknown(data['term']!, _termMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_termMeta);
-    }
-    if (data.containsKey('reading')) {
-      context.handle(
-        _readingMeta,
-        reading.isAcceptableOrUnknown(data['reading']!, _readingMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_readingMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  List<Set<GeneratedColumn>> get uniqueKeys => [
-    {term, reading},
-  ];
-  @override
-  HeadingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return HeadingRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      term: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}term'],
-      )!,
-      reading: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}reading'],
-      )!,
-    );
-  }
-
-  @override
-  $HeadingsTable createAlias(String alias) {
-    return $HeadingsTable(attachedDatabase, alias);
-  }
-}
-
-class HeadingRow extends DataClass implements Insertable<HeadingRow> {
-  /// Assigned by SQLite on insert.
-  final int id;
-
-  /// The word as written.
-  final String term;
-
-  /// The word's reading, empty for kanji entries and words given no reading.
-  final String reading;
-  const HeadingRow({
-    required this.id,
-    required this.term,
-    required this.reading,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['term'] = Variable<String>(term);
-    map['reading'] = Variable<String>(reading);
-    return map;
-  }
-
-  HeadingsCompanion toCompanion(bool nullToAbsent) {
-    return HeadingsCompanion(
-      id: Value(id),
-      term: Value(term),
-      reading: Value(reading),
-    );
-  }
-
-  factory HeadingRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return HeadingRow(
-      id: serializer.fromJson<int>(json['id']),
-      term: serializer.fromJson<String>(json['term']),
-      reading: serializer.fromJson<String>(json['reading']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'term': serializer.toJson<String>(term),
-      'reading': serializer.toJson<String>(reading),
-    };
-  }
-
-  HeadingRow copyWith({int? id, String? term, String? reading}) => HeadingRow(
-    id: id ?? this.id,
-    term: term ?? this.term,
-    reading: reading ?? this.reading,
-  );
-  HeadingRow copyWithCompanion(HeadingsCompanion data) {
-    return HeadingRow(
-      id: data.id.present ? data.id.value : this.id,
-      term: data.term.present ? data.term.value : this.term,
-      reading: data.reading.present ? data.reading.value : this.reading,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('HeadingRow(')
-          ..write('id: $id, ')
-          ..write('term: $term, ')
-          ..write('reading: $reading')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, term, reading);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is HeadingRow &&
-          other.id == this.id &&
-          other.term == this.term &&
-          other.reading == this.reading);
-}
-
-class HeadingsCompanion extends UpdateCompanion<HeadingRow> {
-  final Value<int> id;
-  final Value<String> term;
-  final Value<String> reading;
-  const HeadingsCompanion({
-    this.id = const Value.absent(),
-    this.term = const Value.absent(),
-    this.reading = const Value.absent(),
-  });
-  HeadingsCompanion.insert({
-    this.id = const Value.absent(),
-    required String term,
-    required String reading,
-  }) : term = Value(term),
-       reading = Value(reading);
-  static Insertable<HeadingRow> custom({
-    Expression<int>? id,
-    Expression<String>? term,
-    Expression<String>? reading,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (term != null) 'term': term,
-      if (reading != null) 'reading': reading,
-    });
-  }
-
-  HeadingsCompanion copyWith({
-    Value<int>? id,
-    Value<String>? term,
-    Value<String>? reading,
-  }) {
-    return HeadingsCompanion(
-      id: id ?? this.id,
-      term: term ?? this.term,
-      reading: reading ?? this.reading,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (term.present) {
-      map['term'] = Variable<String>(term.value);
-    }
-    if (reading.present) {
-      map['reading'] = Variable<String>(reading.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('HeadingsCompanion(')
-          ..write('id: $id, ')
-          ..write('term: $term, ')
-          ..write('reading: $reading')
           ..write(')'))
         .toString();
   }
@@ -4615,8 +4615,8 @@ class DictionaryHistoryItemsCompanion
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
-  late final $DictionariesTable dictionaries = $DictionariesTable(this);
   late final $HeadingsTable headings = $HeadingsTable(this);
+  late final $DictionariesTable dictionaries = $DictionariesTable(this);
   late final $EntriesTable entries = $EntriesTable(this);
   late final $PitchesTable pitches = $PitchesTable(this);
   late final $FrequenciesTable frequencies = $FrequenciesTable(this);
@@ -4667,13 +4667,243 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'entry_tag_tag_id',
     'CREATE INDEX entry_tag_tag_id ON entry_tag (tag_id)',
   );
+  Selectable<int> headingCountByTerm({required String term}) {
+    return customSelect(
+      'SELECT COUNT(*) AS _c0 FROM heading WHERE term = ?1',
+      variables: [Variable<String>(term)],
+      readsFrom: {this.headings},
+    ).map((QueryRow row) => row.read<int>('_c0'));
+  }
+
+  Selectable<HeadingRow> headingsByTerms({required List<String> terms}) {
+    var $arrayStartIndex = 1;
+    final expandedterms = $expandVar($arrayStartIndex, terms.length);
+    $arrayStartIndex += terms.length;
+    return customSelect(
+      'SELECT * FROM heading WHERE term IN ($expandedterms) AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY id',
+      variables: [for (var $ in terms) Variable<String>($)],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByTermsByPopularity({
+    required List<String> terms,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedterms = $expandVar($arrayStartIndex, terms.length);
+    $arrayStartIndex += terms.length;
+    return customSelect(
+      'SELECT * FROM heading WHERE term IN ($expandedterms) AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY (SELECT SUM(popularity) FROM entry WHERE entry.heading_id = heading.id) DESC, id',
+      variables: [for (var $ in terms) Variable<String>($)],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByReadings({
+    required List<String> readings,
+    required int limit,
+  }) {
+    var $arrayStartIndex = 2;
+    final expandedreadings = $expandVar($arrayStartIndex, readings.length);
+    $arrayStartIndex += readings.length;
+    return customSelect(
+      'SELECT * FROM heading WHERE reading IN ($expandedreadings) AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY id LIMIT ?1',
+      variables: [
+        Variable<int>(limit),
+        for (var $ in readings) Variable<String>($),
+      ],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByTermPrefix({
+    required String prefix,
+    required String prefixEnd,
+    required int limit,
+  }) {
+    return customSelect(
+      'SELECT * FROM heading WHERE term >= ?1 AND term < ?2 AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY length(term), id LIMIT ?3',
+      variables: [
+        Variable<String>(prefix),
+        Variable<String>(prefixEnd),
+        Variable<int>(limit),
+      ],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByTermGlob({
+    required String pattern,
+    required int minimumLength,
+    required int maximumLength,
+    required int limit,
+  }) {
+    return customSelect(
+      'SELECT * FROM heading WHERE term GLOB ?1 AND length(term) BETWEEN ?2 AND ?3 AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY id LIMIT ?4',
+      variables: [
+        Variable<String>(pattern),
+        Variable<int>(minimumLength),
+        Variable<int>(maximumLength),
+        Variable<int>(limit),
+      ],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByReadingGlob({
+    required String pattern,
+    required String alternativePattern,
+    required int limit,
+  }) {
+    return customSelect(
+      'SELECT * FROM heading WHERE(reading GLOB ?1 OR reading GLOB ?2)AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id) ORDER BY id LIMIT ?3',
+      variables: [
+        Variable<String>(pattern),
+        Variable<String>(alternativePattern),
+        Variable<int>(limit),
+      ],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingWithEntries({
+    required String term,
+    required String reading,
+  }) {
+    return customSelect(
+      'SELECT * FROM heading WHERE term = ?1 AND reading = ?2 AND EXISTS (SELECT 1 AS _c0 FROM entry WHERE entry.heading_id = heading.id)',
+      variables: [Variable<String>(term), Variable<String>(reading)],
+      readsFrom: {this.headings, this.entries},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingByTermAndReading({
+    required String term,
+    required String reading,
+  }) {
+    return customSelect(
+      'SELECT * FROM heading WHERE term = ?1 AND reading = ?2',
+      variables: [Variable<String>(term), Variable<String>(reading)],
+      readsFrom: {this.headings},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<HeadingRow> headingsByIds({required List<int> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM heading WHERE id IN ($expandedids)',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.headings},
+    ).asyncMap(this.headings.mapFromRow);
+  }
+
+  Selectable<EntryRow> entriesByHeadings({required List<int> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM entry WHERE heading_id IN ($expandedids) ORDER BY id',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.entries},
+    ).asyncMap(this.entries.mapFromRow);
+  }
+
+  Selectable<PitchRow> pitchesByHeadings({required List<int> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM pitch WHERE heading_id IN ($expandedids) ORDER BY id',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.pitches},
+    ).asyncMap(this.pitches.mapFromRow);
+  }
+
+  Selectable<FrequencyRow> frequenciesByHeadings({required List<int> ids}) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT * FROM frequency WHERE heading_id IN ($expandedids) ORDER BY id',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.frequencies},
+    ).asyncMap(this.frequencies.mapFromRow);
+  }
+
+  Selectable<HeadingTagsByHeadingsResult> headingTagsByHeadings({
+    required List<int> ids,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT heading_tag.heading_id AS owner_id,"tag"."id" AS "nested_0.id", "tag"."dictionary_id" AS "nested_0.dictionary_id", "tag"."name" AS "nested_0.name", "tag"."category" AS "nested_0.category", "tag"."sorting_order" AS "nested_0.sorting_order", "tag"."notes" AS "nested_0.notes", "tag"."popularity" AS "nested_0.popularity" FROM heading_tag INNER JOIN tag ON tag.id = heading_tag.tag_id WHERE heading_tag.heading_id IN ($expandedids) ORDER BY tag.id',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.headingTags, this.tags},
+    ).asyncMap(
+      (QueryRow row) async => HeadingTagsByHeadingsResult(
+        ownerId: row.read<int>('owner_id'),
+        tag: await this.tags.mapFromRow(row, tablePrefix: 'nested_0'),
+      ),
+    );
+  }
+
+  Selectable<EntryTagsByEntriesResult> entryTagsByEntries({
+    required List<int> ids,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedids = $expandVar($arrayStartIndex, ids.length);
+    $arrayStartIndex += ids.length;
+    return customSelect(
+      'SELECT entry_tag.entry_id AS owner_id,"tag"."id" AS "nested_0.id", "tag"."dictionary_id" AS "nested_0.dictionary_id", "tag"."name" AS "nested_0.name", "tag"."category" AS "nested_0.category", "tag"."sorting_order" AS "nested_0.sorting_order", "tag"."notes" AS "nested_0.notes", "tag"."popularity" AS "nested_0.popularity" FROM entry_tag INNER JOIN tag ON tag.id = entry_tag.tag_id WHERE entry_tag.entry_id IN ($expandedids) ORDER BY tag.id',
+      variables: [for (var $ in ids) Variable<int>($)],
+      readsFrom: {this.entryTags, this.tags},
+    ).asyncMap(
+      (QueryRow row) async => EntryTagsByEntriesResult(
+        ownerId: row.read<int>('owner_id'),
+        tag: await this.tags.mapFromRow(row, tablePrefix: 'nested_0'),
+      ),
+    );
+  }
+
+  Selectable<NoReadingFrequenciesResult> noReadingFrequencies({
+    required List<String> terms,
+  }) {
+    var $arrayStartIndex = 1;
+    final expandedterms = $expandVar($arrayStartIndex, terms.length);
+    $arrayStartIndex += terms.length;
+    return customSelect(
+      'SELECT heading.term AS term,"frequency"."id" AS "nested_0.id", "frequency"."heading_id" AS "nested_0.heading_id", "frequency"."dictionary_id" AS "nested_0.dictionary_id", "frequency"."value" AS "nested_0.value", "frequency"."display_value" AS "nested_0.display_value" FROM frequency INNER JOIN heading ON heading.id = frequency.heading_id WHERE heading.reading = \'\' AND heading.term IN ($expandedterms) ORDER BY frequency.id',
+      variables: [for (var $ in terms) Variable<String>($)],
+      readsFrom: {this.headings, this.frequencies},
+    ).asyncMap(
+      (QueryRow row) async => NoReadingFrequenciesResult(
+        term: row.read<String>('term'),
+        frequency: await this.frequencies.mapFromRow(
+          row,
+          tablePrefix: 'nested_0',
+        ),
+      ),
+    );
+  }
+
+  Selectable<Dictionary> allDictionaries() {
+    return customSelect(
+      'SELECT * FROM dictionary ORDER BY "order"',
+      variables: [],
+      readsFrom: {this.dictionaries},
+    ).asyncMap(this.dictionaries.mapFromRow);
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-    dictionaries,
     headings,
+    dictionaries,
     entries,
     pitches,
     frequencies,
@@ -4764,6 +4994,551 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
+typedef $$HeadingsTableCreateCompanionBuilder =
+    HeadingsCompanion Function({
+      Value<int> id,
+      required String term,
+      required String reading,
+    });
+typedef $$HeadingsTableUpdateCompanionBuilder =
+    HeadingsCompanion Function({
+      Value<int> id,
+      Value<String> term,
+      Value<String> reading,
+    });
+
+final class $$HeadingsTableReferences
+    extends BaseReferences<_$AppDatabase, $HeadingsTable, HeadingRow> {
+  $$HeadingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$EntriesTable, List<EntryRow>> _entriesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.entries,
+    aliasName: 'heading__id__entry__heading_id',
+  );
+
+  $$EntriesTableProcessedTableManager get entriesRefs {
+    final manager = $$EntriesTableTableManager(
+      $_db,
+      $_db.entries,
+    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_entriesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PitchesTable, List<PitchRow>> _pitchesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.pitches,
+    aliasName: 'heading__id__pitch__heading_id',
+  );
+
+  $$PitchesTableProcessedTableManager get pitchesRefs {
+    final manager = $$PitchesTableTableManager(
+      $_db,
+      $_db.pitches,
+    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_pitchesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FrequenciesTable, List<FrequencyRow>>
+  _frequenciesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.frequencies,
+    aliasName: 'heading__id__frequency__heading_id',
+  );
+
+  $$FrequenciesTableProcessedTableManager get frequenciesRefs {
+    final manager = $$FrequenciesTableTableManager(
+      $_db,
+      $_db.frequencies,
+    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_frequenciesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$HeadingTagsTable, List<HeadingTagRow>>
+  _headingTagsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.headingTags,
+    aliasName: 'heading__id__heading_tag__heading_id',
+  );
+
+  $$HeadingTagsTableProcessedTableManager get headingTagsRefs {
+    final manager = $$HeadingTagsTableTableManager(
+      $_db,
+      $_db.headingTags,
+    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_headingTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$HeadingsTableFilterComposer
+    extends Composer<_$AppDatabase, $HeadingsTable> {
+  $$HeadingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get term => $composableBuilder(
+    column: $table.term,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reading => $composableBuilder(
+    column: $table.reading,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> entriesRefs(
+    Expression<bool> Function($$EntriesTableFilterComposer f) f,
+  ) {
+    final $$EntriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entries,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntriesTableFilterComposer(
+            $db: $db,
+            $table: $db.entries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> pitchesRefs(
+    Expression<bool> Function($$PitchesTableFilterComposer f) f,
+  ) {
+    final $$PitchesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.pitches,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PitchesTableFilterComposer(
+            $db: $db,
+            $table: $db.pitches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> frequenciesRefs(
+    Expression<bool> Function($$FrequenciesTableFilterComposer f) f,
+  ) {
+    final $$FrequenciesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.frequencies,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FrequenciesTableFilterComposer(
+            $db: $db,
+            $table: $db.frequencies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> headingTagsRefs(
+    Expression<bool> Function($$HeadingTagsTableFilterComposer f) f,
+  ) {
+    final $$HeadingTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.headingTags,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HeadingTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.headingTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$HeadingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $HeadingsTable> {
+  $$HeadingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get term => $composableBuilder(
+    column: $table.term,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reading => $composableBuilder(
+    column: $table.reading,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HeadingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HeadingsTable> {
+  $$HeadingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get term =>
+      $composableBuilder(column: $table.term, builder: (column) => column);
+
+  GeneratedColumn<String> get reading =>
+      $composableBuilder(column: $table.reading, builder: (column) => column);
+
+  Expression<T> entriesRefs<T extends Object>(
+    Expression<T> Function($$EntriesTableAnnotationComposer a) f,
+  ) {
+    final $$EntriesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.entries,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EntriesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.entries,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> pitchesRefs<T extends Object>(
+    Expression<T> Function($$PitchesTableAnnotationComposer a) f,
+  ) {
+    final $$PitchesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.pitches,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PitchesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.pitches,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> frequenciesRefs<T extends Object>(
+    Expression<T> Function($$FrequenciesTableAnnotationComposer a) f,
+  ) {
+    final $$FrequenciesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.frequencies,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FrequenciesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.frequencies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> headingTagsRefs<T extends Object>(
+    Expression<T> Function($$HeadingTagsTableAnnotationComposer a) f,
+  ) {
+    final $$HeadingTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.headingTags,
+      getReferencedColumn: (t) => t.headingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$HeadingTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.headingTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$HeadingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HeadingsTable,
+          HeadingRow,
+          $$HeadingsTableFilterComposer,
+          $$HeadingsTableOrderingComposer,
+          $$HeadingsTableAnnotationComposer,
+          $$HeadingsTableCreateCompanionBuilder,
+          $$HeadingsTableUpdateCompanionBuilder,
+          (HeadingRow, $$HeadingsTableReferences),
+          HeadingRow,
+          PrefetchHooks Function({
+            bool entriesRefs,
+            bool pitchesRefs,
+            bool frequenciesRefs,
+            bool headingTagsRefs,
+          })
+        > {
+  $$HeadingsTableTableManager(_$AppDatabase db, $HeadingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HeadingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HeadingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HeadingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> term = const Value.absent(),
+                Value<String> reading = const Value.absent(),
+              }) => HeadingsCompanion(id: id, term: term, reading: reading),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String term,
+                required String reading,
+              }) => HeadingsCompanion.insert(
+                id: id,
+                term: term,
+                reading: reading,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$HeadingsTable, HeadingRow>(table),
+                  $$HeadingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                entriesRefs = false,
+                pitchesRefs = false,
+                frequenciesRefs = false,
+                headingTagsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (entriesRefs) db.entries,
+                    if (pitchesRefs) db.pitches,
+                    if (frequenciesRefs) db.frequencies,
+                    if (headingTagsRefs) db.headingTags,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (entriesRefs)
+                        await $_getPrefetchedData<
+                          HeadingRow,
+                          $HeadingsTable,
+                          EntryRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HeadingsTableReferences
+                              ._entriesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HeadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).entriesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.headingId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (pitchesRefs)
+                        await $_getPrefetchedData<
+                          HeadingRow,
+                          $HeadingsTable,
+                          PitchRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HeadingsTableReferences
+                              ._pitchesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HeadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).pitchesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.headingId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (frequenciesRefs)
+                        await $_getPrefetchedData<
+                          HeadingRow,
+                          $HeadingsTable,
+                          FrequencyRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HeadingsTableReferences
+                              ._frequenciesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HeadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).frequenciesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.headingId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (headingTagsRefs)
+                        await $_getPrefetchedData<
+                          HeadingRow,
+                          $HeadingsTable,
+                          HeadingTagRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$HeadingsTableReferences
+                              ._headingTagsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$HeadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).headingTagsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.headingId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$HeadingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HeadingsTable,
+      HeadingRow,
+      $$HeadingsTableFilterComposer,
+      $$HeadingsTableOrderingComposer,
+      $$HeadingsTableAnnotationComposer,
+      $$HeadingsTableCreateCompanionBuilder,
+      $$HeadingsTableUpdateCompanionBuilder,
+      (HeadingRow, $$HeadingsTableReferences),
+      HeadingRow,
+      PrefetchHooks Function({
+        bool entriesRefs,
+        bool pitchesRefs,
+        bool frequenciesRefs,
+        bool headingTagsRefs,
+      })
+    >;
 typedef $$DictionariesTableCreateCompanionBuilder =
     DictionariesCompanion Function({
       Value<int> id,
@@ -5371,551 +6146,6 @@ typedef $$DictionariesTableProcessedTableManager =
         bool pitchesRefs,
         bool frequenciesRefs,
         bool tagsRefs,
-      })
-    >;
-typedef $$HeadingsTableCreateCompanionBuilder =
-    HeadingsCompanion Function({
-      Value<int> id,
-      required String term,
-      required String reading,
-    });
-typedef $$HeadingsTableUpdateCompanionBuilder =
-    HeadingsCompanion Function({
-      Value<int> id,
-      Value<String> term,
-      Value<String> reading,
-    });
-
-final class $$HeadingsTableReferences
-    extends BaseReferences<_$AppDatabase, $HeadingsTable, HeadingRow> {
-  $$HeadingsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$EntriesTable, List<EntryRow>> _entriesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.entries,
-    aliasName: 'heading__id__entry__heading_id',
-  );
-
-  $$EntriesTableProcessedTableManager get entriesRefs {
-    final manager = $$EntriesTableTableManager(
-      $_db,
-      $_db.entries,
-    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_entriesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$PitchesTable, List<PitchRow>> _pitchesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.pitches,
-    aliasName: 'heading__id__pitch__heading_id',
-  );
-
-  $$PitchesTableProcessedTableManager get pitchesRefs {
-    final manager = $$PitchesTableTableManager(
-      $_db,
-      $_db.pitches,
-    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_pitchesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$FrequenciesTable, List<FrequencyRow>>
-  _frequenciesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.frequencies,
-    aliasName: 'heading__id__frequency__heading_id',
-  );
-
-  $$FrequenciesTableProcessedTableManager get frequenciesRefs {
-    final manager = $$FrequenciesTableTableManager(
-      $_db,
-      $_db.frequencies,
-    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_frequenciesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$HeadingTagsTable, List<HeadingTagRow>>
-  _headingTagsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.headingTags,
-    aliasName: 'heading__id__heading_tag__heading_id',
-  );
-
-  $$HeadingTagsTableProcessedTableManager get headingTagsRefs {
-    final manager = $$HeadingTagsTableTableManager(
-      $_db,
-      $_db.headingTags,
-    ).filter((f) => f.headingId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_headingTagsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$HeadingsTableFilterComposer
-    extends Composer<_$AppDatabase, $HeadingsTable> {
-  $$HeadingsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get term => $composableBuilder(
-    column: $table.term,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get reading => $composableBuilder(
-    column: $table.reading,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> entriesRefs(
-    Expression<bool> Function($$EntriesTableFilterComposer f) f,
-  ) {
-    final $$EntriesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.entries,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EntriesTableFilterComposer(
-            $db: $db,
-            $table: $db.entries,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> pitchesRefs(
-    Expression<bool> Function($$PitchesTableFilterComposer f) f,
-  ) {
-    final $$PitchesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.pitches,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PitchesTableFilterComposer(
-            $db: $db,
-            $table: $db.pitches,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> frequenciesRefs(
-    Expression<bool> Function($$FrequenciesTableFilterComposer f) f,
-  ) {
-    final $$FrequenciesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.frequencies,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FrequenciesTableFilterComposer(
-            $db: $db,
-            $table: $db.frequencies,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> headingTagsRefs(
-    Expression<bool> Function($$HeadingTagsTableFilterComposer f) f,
-  ) {
-    final $$HeadingTagsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.headingTags,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HeadingTagsTableFilterComposer(
-            $db: $db,
-            $table: $db.headingTags,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$HeadingsTableOrderingComposer
-    extends Composer<_$AppDatabase, $HeadingsTable> {
-  $$HeadingsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get term => $composableBuilder(
-    column: $table.term,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get reading => $composableBuilder(
-    column: $table.reading,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$HeadingsTableAnnotationComposer
-    extends Composer<_$AppDatabase, $HeadingsTable> {
-  $$HeadingsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get term =>
-      $composableBuilder(column: $table.term, builder: (column) => column);
-
-  GeneratedColumn<String> get reading =>
-      $composableBuilder(column: $table.reading, builder: (column) => column);
-
-  Expression<T> entriesRefs<T extends Object>(
-    Expression<T> Function($$EntriesTableAnnotationComposer a) f,
-  ) {
-    final $$EntriesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.entries,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EntriesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.entries,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> pitchesRefs<T extends Object>(
-    Expression<T> Function($$PitchesTableAnnotationComposer a) f,
-  ) {
-    final $$PitchesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.pitches,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PitchesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.pitches,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> frequenciesRefs<T extends Object>(
-    Expression<T> Function($$FrequenciesTableAnnotationComposer a) f,
-  ) {
-    final $$FrequenciesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.frequencies,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$FrequenciesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.frequencies,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> headingTagsRefs<T extends Object>(
-    Expression<T> Function($$HeadingTagsTableAnnotationComposer a) f,
-  ) {
-    final $$HeadingTagsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.headingTags,
-      getReferencedColumn: (t) => t.headingId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HeadingTagsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.headingTags,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$HeadingsTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $HeadingsTable,
-          HeadingRow,
-          $$HeadingsTableFilterComposer,
-          $$HeadingsTableOrderingComposer,
-          $$HeadingsTableAnnotationComposer,
-          $$HeadingsTableCreateCompanionBuilder,
-          $$HeadingsTableUpdateCompanionBuilder,
-          (HeadingRow, $$HeadingsTableReferences),
-          HeadingRow,
-          PrefetchHooks Function({
-            bool entriesRefs,
-            bool pitchesRefs,
-            bool frequenciesRefs,
-            bool headingTagsRefs,
-          })
-        > {
-  $$HeadingsTableTableManager(_$AppDatabase db, $HeadingsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$HeadingsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$HeadingsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$HeadingsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> term = const Value.absent(),
-                Value<String> reading = const Value.absent(),
-              }) => HeadingsCompanion(id: id, term: term, reading: reading),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String term,
-                required String reading,
-              }) => HeadingsCompanion.insert(
-                id: id,
-                term: term,
-                reading: reading,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable<$HeadingsTable, HeadingRow>(table),
-                  $$HeadingsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({
-                entriesRefs = false,
-                pitchesRefs = false,
-                frequenciesRefs = false,
-                headingTagsRefs = false,
-              }) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (entriesRefs) db.entries,
-                    if (pitchesRefs) db.pitches,
-                    if (frequenciesRefs) db.frequencies,
-                    if (headingTagsRefs) db.headingTags,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (entriesRefs)
-                        await $_getPrefetchedData<
-                          HeadingRow,
-                          $HeadingsTable,
-                          EntryRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$HeadingsTableReferences
-                              ._entriesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$HeadingsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).entriesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (pitchesRefs)
-                        await $_getPrefetchedData<
-                          HeadingRow,
-                          $HeadingsTable,
-                          PitchRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$HeadingsTableReferences
-                              ._pitchesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$HeadingsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).pitchesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (frequenciesRefs)
-                        await $_getPrefetchedData<
-                          HeadingRow,
-                          $HeadingsTable,
-                          FrequencyRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$HeadingsTableReferences
-                              ._frequenciesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$HeadingsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).frequenciesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (headingTagsRefs)
-                        await $_getPrefetchedData<
-                          HeadingRow,
-                          $HeadingsTable,
-                          HeadingTagRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$HeadingsTableReferences
-                              ._headingTagsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$HeadingsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).headingTagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$HeadingsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $HeadingsTable,
-      HeadingRow,
-      $$HeadingsTableFilterComposer,
-      $$HeadingsTableOrderingComposer,
-      $$HeadingsTableAnnotationComposer,
-      $$HeadingsTableCreateCompanionBuilder,
-      $$HeadingsTableUpdateCompanionBuilder,
-      (HeadingRow, $$HeadingsTableReferences),
-      HeadingRow,
-      PrefetchHooks Function({
-        bool entriesRefs,
-        bool pitchesRefs,
-        bool frequenciesRefs,
-        bool headingTagsRefs,
       })
     >;
 typedef $$EntriesTableCreateCompanionBuilder =
@@ -10194,10 +10424,10 @@ typedef $$DictionaryHistoryItemsTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$DictionariesTableTableManager get dictionaries =>
-      $$DictionariesTableTableManager(_db, _db.dictionaries);
   $$HeadingsTableTableManager get headings =>
       $$HeadingsTableTableManager(_db, _db.headings);
+  $$DictionariesTableTableManager get dictionaries =>
+      $$DictionariesTableTableManager(_db, _db.dictionaries);
   $$EntriesTableTableManager get entries =>
       $$EntriesTableTableManager(_db, _db.entries);
   $$PitchesTableTableManager get pitches =>
@@ -10224,4 +10454,22 @@ class $AppDatabaseManager {
         _db,
         _db.dictionaryHistoryItems,
       );
+}
+
+class HeadingTagsByHeadingsResult {
+  final int ownerId;
+  final TagRow tag;
+  HeadingTagsByHeadingsResult({required this.ownerId, required this.tag});
+}
+
+class EntryTagsByEntriesResult {
+  final int ownerId;
+  final TagRow tag;
+  EntryTagsByEntriesResult({required this.ownerId, required this.tag});
+}
+
+class NoReadingFrequenciesResult {
+  final String term;
+  final FrequencyRow frequency;
+  NoReadingFrequenciesResult({required this.term, required this.frequency});
 }

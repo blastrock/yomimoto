@@ -32,6 +32,7 @@ const String databaseFileName = 'yomimoto.sqlite';
     SearchHistoryItems,
     DictionaryHistoryItems,
   ],
+  include: {'search.drift'},
 )
 class AppDatabase extends _$AppDatabase {
   /// Open the database over [executor]. Tests pass in-memory executors.

@@ -58,8 +58,8 @@ at the constraint itself:
 | `targetSdk` | 32 | Raising it changes runtime behaviour, not just the build | granular media permissions, predictive back, edge-to-edge, 16 KB page-size audit |
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
-| `dart_mappable_builder` | < 4.8 | Its analyzer range must overlap `isar_community_generator`'s (`>=8 <11`) | Whichever generator widens first |
-| `dependency_validator` | removed | Needs analyzer < 13, `dart_mappable_builder` needs ^13 | Same |
+| `sqlite3` | 3.5.x | 3.6+ needs `hooks` ^2.2 → `record_use` → `meta` ^1.19, and Flutter 3.44 pins `meta` 1.18 | A Flutter release pinning `meta` ≥ 1.19 |
+| `dependency_validator` | removed | Needs analyzer < 13; drift_dev and dart_mappable_builder need ≥ 13 | Same |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 
 `dependency_overrides` holds three entries for two reasons, each documented in

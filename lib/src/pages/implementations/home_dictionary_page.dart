@@ -195,7 +195,6 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
           Future.delayed(historyDelay, () async {
             if (query == homeTab.floatingSearchBarController.query) {
               appModel.addToSearchHistory(
-                historyKey: homeTab.uniqueKey,
                 searchTerm: homeTab.floatingSearchBarController.query,
               );
               if (_result!.headings.isNotEmpty) {
@@ -293,8 +292,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
             ),
           ),
           onPressed: () async {
-            appModel.clearSearchHistory(
-                historyKey: DictionaryTab.instance.uniqueKey);
+            await appModel.clearSearchHistory();
+            if (!mounted) {
+              return;
+            }
             homeTab.floatingSearchBarController.clear();
 
             setState(() {});
@@ -356,11 +357,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       return buildImportDictionariesPlaceholderMessage();
     }
     if (homeTab.floatingSearchBarController.query.isEmpty) {
-      if (appModel.getSearchHistory(historyKey: homeTab.uniqueKey).isEmpty) {
+      if (appModel.getSearchHistory().isEmpty) {
         return buildEnterSearchTermPlaceholderMessage();
       } else {
         return JidoujishoSearchHistory(
-          uniqueKey: homeTab.uniqueKey,
           onSearchTermSelect: (searchTerm) {
             setState(() {
               homeTab.floatingSearchBarController.query = searchTerm;

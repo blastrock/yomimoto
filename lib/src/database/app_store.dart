@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
+import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/utils.dart';
 
 /// The app's own data over one connection: the libraries and their stashes,
 /// and in later additions the profiles, catalogs, histories and dictionary
@@ -154,5 +156,191 @@ class AppStore {
   Future<void> deleteStashItems(List<int> ids) async {
     await (db.delete(db.stashItems)..where((table) => table.id.isIn(ids)))
         .go();
+  }
+
+  /// The card creation profiles, in the user's order.
+  List<AnkiMapping> mappings() {
+    return _select(
+        db.ankiMappings.map, 'SELECT * FROM anki_mapping ORDER BY "order"');
+  }
+
+  /// The profile named [label], if any.
+  AnkiMapping? mappingByLabel(String label) {
+    return _select(db.ankiMappings.map,
+        'SELECT * FROM anki_mapping WHERE label = ?', [label]).firstOrNull;
+  }
+
+  /// Whether another profile, at another position, is named like [mapping].
+  bool mappingLabelTaken(AnkiMapping mapping) {
+    return raw.select(
+      'SELECT 1 FROM anki_mapping WHERE label = ? AND "order" != ? LIMIT 1',
+      [mapping.label, mapping.order],
+    ).isNotEmpty;
+  }
+
+  /// The position after the last profile.
+  int nextMappingOrder() {
+    return raw
+        .select('SELECT COALESCE(MAX("order") + 1, 0) AS next '
+            'FROM anki_mapping')
+        .first['next'] as int;
+  }
+
+  /// Save [mapping], replacing the profile with its id, label or position,
+  /// and set its id.
+  Future<void> putMapping(AnkiMapping mapping) async {
+    AnkiMapping row = await db.into(db.ankiMappings).insertReturning(
+          _mappingCompanion(mapping),
+          mode: InsertMode.insertOrReplace,
+        );
+    mapping.id = row.id;
+  }
+
+  /// Replace every profile with [mappings], keeping their ids. Used to save
+  /// a new order: positions are unique, so they cannot be updated one by one.
+  Future<void> replaceMappings(List<AnkiMapping> mappings) async {
+    await db.transaction(() async {
+      await db.delete(db.ankiMappings).go();
+      for (AnkiMapping mapping in mappings) {
+        await db.into(db.ankiMappings).insert(_mappingCompanion(mapping));
+      }
+    });
+  }
+
+  /// Delete the profile [id].
+  Future<void> deleteMapping(int id) async {
+    await (db.delete(db.ankiMappings)..where((table) => table.id.equals(id)))
+        .go();
+  }
+
+  AnkiMappingsCompanion _mappingCompanion(AnkiMapping mapping) {
+    return AnkiMappingsCompanion.insert(
+      id: Value.absentIfNull(mapping.id),
+      label: mapping.label,
+      model: mapping.model,
+      order: mapping.order,
+      exportFieldKeys: mapping.exportFieldKeys,
+      creatorFieldKeys: mapping.creatorFieldKeys,
+      creatorCollapsedFieldKeys: mapping.creatorCollapsedFieldKeys,
+      tags: mapping.tags,
+      actions: mapping.actions!,
+      enhancements: mapping.enhancements!,
+      exportMediaTags: Value(mapping.exportMediaTags),
+      useBrTags: Value(mapping.useBrTags),
+      prependDictionaryNames: Value(mapping.prependDictionaryNames),
+    );
+  }
+
+  /// The mokuro catalogs, in the user's order.
+  List<MokuroCatalog> catalogs() {
+    return _select(db.mokuroCatalogs.map,
+        'SELECT * FROM mokuro_catalog ORDER BY "order"');
+  }
+
+  /// Whether another catalog, at another position, has [catalog]'s URL.
+  bool catalogUrlTaken(MokuroCatalog catalog) {
+    return raw.select(
+      'SELECT 1 FROM mokuro_catalog WHERE url = ? AND "order" != ? LIMIT 1',
+      [catalog.url, catalog.order],
+    ).isNotEmpty;
+  }
+
+  /// The position after the last catalog.
+  int nextCatalogOrder() {
+    return raw
+        .select('SELECT COALESCE(MAX("order") + 1, 0) AS next '
+            'FROM mokuro_catalog')
+        .first['next'] as int;
+  }
+
+  /// Save [catalog], replacing the catalog with its id, URL or position, and
+  /// set its id.
+  Future<void> putCatalog(MokuroCatalog catalog) async {
+    MokuroCatalog row = await db.into(db.mokuroCatalogs).insertReturning(
+          _catalogCompanion(catalog),
+          mode: InsertMode.insertOrReplace,
+        );
+    catalog.id = row.id;
+  }
+
+  /// Replace every catalog with [catalogs], keeping their ids. Used to save a
+  /// new order.
+  Future<void> replaceCatalogs(List<MokuroCatalog> catalogs) async {
+    await db.transaction(() async {
+      await db.delete(db.mokuroCatalogs).go();
+      for (MokuroCatalog catalog in catalogs) {
+        await db.into(db.mokuroCatalogs).insert(_catalogCompanion(catalog));
+      }
+    });
+  }
+
+  /// Delete the catalog [id].
+  Future<void> deleteCatalog(int id) async {
+    await (db.delete(db.mokuroCatalogs)..where((table) => table.id.equals(id)))
+        .go();
+  }
+
+  MokuroCatalogsCompanion _catalogCompanion(MokuroCatalog catalog) {
+    return MokuroCatalogsCompanion.insert(
+      id: Value.absentIfNull(catalog.id),
+      name: catalog.name,
+      url: catalog.url,
+      order: catalog.order,
+    );
+  }
+
+  /// The search bar's history, oldest first.
+  List<String> searchHistory() {
+    return raw
+        .select('SELECT search_term FROM search_history_item ORDER BY id')
+        .map((row) => row['search_term'] as String)
+        .toList();
+  }
+
+  /// Make [searchTerm] the newest search, keeping the [maximum] newest.
+  Future<void> addToSearchHistory(String searchTerm, {required int maximum}) =>
+      _addRecentTerm(db.searchHistoryItems, searchTerm, maximum);
+
+  /// Forget the search [searchTerm].
+  Future<void> removeFromSearchHistory(String searchTerm) async {
+    await (db.delete(db.searchHistoryItems)
+          ..where((table) => table.searchTerm.equals(searchTerm)))
+        .go();
+  }
+
+  /// Forget every search.
+  Future<void> clearSearchHistory() async {
+    await db.delete(db.searchHistoryItems).go();
+  }
+
+  /// Delete [searchTerm] from [table], a table of unique `search_term`s whose
+  /// ids give recency, insert it again as the newest, and keep only the
+  /// [maximum] newest.
+  Future<void> _addRecentTerm(
+    TableInfo<Table, dynamic> table,
+    String searchTerm,
+    int maximum,
+  ) async {
+    String name = table.actualTableName;
+    await db.transaction(() async {
+      await db.customUpdate(
+        'DELETE FROM $name WHERE search_term = ?',
+        variables: [Variable.withString(searchTerm)],
+        updates: {table},
+        updateKind: UpdateKind.delete,
+      );
+      await db.customInsert(
+        'INSERT INTO $name (search_term) VALUES (?)',
+        variables: [Variable.withString(searchTerm)],
+        updates: {table},
+      );
+      await db.customUpdate(
+        'DELETE FROM $name WHERE id NOT IN '
+        '(SELECT id FROM $name ORDER BY id DESC LIMIT ?)',
+        variables: [Variable.withInt(maximum)],
+        updates: {table},
+        updateKind: UpdateKind.delete,
+      );
+    });
   }
 }

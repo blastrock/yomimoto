@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:sqlite3/sqlite3.dart' show Database, sqlite3;
+import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/utils.dart';
 
 part 'app_database.g.dart';
 

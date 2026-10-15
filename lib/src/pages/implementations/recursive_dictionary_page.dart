@@ -3,7 +3,6 @@ import 'package:material_floating_search_bar_2/material_floating_search_bar_2.da
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
@@ -59,7 +58,6 @@ class _RecursiveDictionaryPageState
       });
 
       appModel.addToSearchHistory(
-        historyKey: DictionaryTab.instance.uniqueKey,
         searchTerm: widget.searchTerm,
       );
 
@@ -220,8 +218,7 @@ class _RecursiveDictionaryPageState
           Future.delayed(historyDelay, () async {
             if (query == _controller.query) {
               appModel.addToSearchHistory(
-                historyKey: DictionaryTab.instance.uniqueKey,
-                searchTerm: _controller.query,
+                        searchTerm: _controller.query,
               );
             }
             if (_result!.headings.isNotEmpty) {
@@ -372,8 +369,7 @@ class _RecursiveDictionaryPageState
             ),
           ),
           onPressed: () async {
-            appModel.clearSearchHistory(
-                historyKey: DictionaryTab.instance.uniqueKey);
+            await appModel.clearSearchHistory();
             _controller.clear();
 
             if (mounted) {
@@ -404,12 +400,11 @@ class _RecursiveDictionaryPageState
     }
     if (_controller.query.isEmpty) {
       if (appModel
-          .getSearchHistory(historyKey: DictionaryTab.instance.uniqueKey)
+          .getSearchHistory()
           .isEmpty) {
         return buildEnterSearchTermPlaceholderMessage();
       } else {
         return JidoujishoSearchHistory(
-          uniqueKey: DictionaryTab.instance.uniqueKey,
           onSearchTermSelect: (searchTerm) {
             setState(() {
               _controller.query = searchTerm;

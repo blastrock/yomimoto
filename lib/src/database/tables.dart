@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
+import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/utils.dart';
 
 /// Imported dictionaries.
 @UseRowClass(Dictionary)
@@ -304,7 +306,7 @@ class StashItems extends Table {
 }
 
 /// Card creation profiles.
-@DataClassName('AnkiMappingRow')
+@UseRowClass(AnkiMapping)
 class AnkiMappings extends Table {
   @override
   String get tableName => 'anki_mapping';
@@ -354,7 +356,7 @@ class AnkiMappings extends Table {
 }
 
 /// Saved mokuro catalogs.
-@DataClassName('MokuroCatalogRow')
+@UseRowClass(MokuroCatalog)
 class MokuroCatalogs extends Table {
   @override
   String get tableName => 'mokuro_catalog';

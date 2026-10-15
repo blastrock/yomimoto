@@ -3,20 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/models.dart';
 
-/// Used in a floating search bar body for showing search history items for
-/// a certain collection named [uniqueKey].
+/// Used in a floating search bar body for showing search history items.
 class JidoujishoSearchHistory extends ConsumerStatefulWidget {
   /// Create an instance of this widget.
   const JidoujishoSearchHistory({
-    required this.uniqueKey,
     required this.onSearchTermSelect,
     required this.onUpdate,
     this.searchSuggestions = const [],
     super.key,
   });
-
-  /// The name of the collection that will be displayed.
-  final String uniqueKey;
 
   /// An action that will be performed upon selecting a search term.
   final Function(String) onSearchTermSelect;
@@ -43,10 +38,7 @@ class _JidoujishoSearchHistoryState
     if (widget.searchSuggestions.isNotEmpty) {
       searchHistory = widget.searchSuggestions;
     } else {
-      searchHistory = appModel
-          .getSearchHistory(historyKey: widget.uniqueKey)
-          .reversed
-          .toList();
+      searchHistory = appModel.getSearchHistory().reversed.toList();
     }
 
     return ClipRRect(
@@ -63,7 +55,6 @@ class _JidoujishoSearchHistoryState
             }
 
             return buildSearchHistoryItem(
-              uniqueKey: widget.uniqueKey,
               searchTerm: searchHistory[index - 1],
               onSearchTermSelect: widget.onSearchTermSelect,
             );
@@ -74,21 +65,17 @@ class _JidoujishoSearchHistoryState
   }
 
   Widget buildSearchHistoryItem({
-    required String uniqueKey,
     required String searchTerm,
     required Function(String) onSearchTermSelect,
   }) {
     return InkWell(
       onTap: () => onSearchTermSelect(searchTerm),
-      onLongPress: () {
+      onLongPress: () async {
         if (widget.searchSuggestions.isNotEmpty) {
           return;
         }
 
-        appModel.removeFromSearchHistory(
-          historyKey: uniqueKey,
-          searchTerm: searchTerm,
-        );
+        await appModel.removeFromSearchHistory(searchTerm: searchTerm);
         setState(() {});
         widget.onUpdate();
       },

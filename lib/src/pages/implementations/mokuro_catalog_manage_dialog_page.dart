@@ -139,7 +139,7 @@ class _MokuroCatalogManageDialogPageState
 
         updateSelectedOrder(newIndex);
 
-        appModel.updateCatalogsOrder(cloneCatalogs);
+        await appModel.updateCatalogsOrder(cloneCatalogs);
         setState(() {});
       },
     );
@@ -284,7 +284,10 @@ class _MokuroCatalogManageDialogPageState
             style: TextStyle(color: theme.colorScheme.primary),
           ),
           onPressed: () async {
-            appModel.deleteCatalog(catalog);
+            await appModel.deleteCatalog(catalog);
+            if (!mounted) {
+              return;
+            }
             Navigator.pop(context);
 
             _selectedOrder = -1;

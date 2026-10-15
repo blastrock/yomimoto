@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/utils.dart';
 
 import 'test_database.dart';
 
@@ -147,6 +149,96 @@ void main() {
       await store.deleteStashItems([gone.id!]);
 
       expect(store.stashItems(book.id!).map((item) => item.term), ['残']);
+    });
+  });
+  group('profiles', () {
+    AnkiMapping profile(String label, int order) =>
+        AnkiMapping.defaultMapping(order: order).copyWith(label: label);
+
+    test('putMapping round-trips every field and sets the id', () async {
+      AnkiMapping standard = AnkiMapping.defaultMapping(order: 0);
+      await store.putMapping(standard);
+
+      AnkiMapping loaded = store.mappingByLabel(standard.label)!;
+      expect(loaded.id, standard.id);
+      expect(loaded.exportFieldKeys, standard.exportFieldKeys);
+      expect(loaded.creatorFieldKeys, standard.creatorFieldKeys);
+      expect(loaded.tags, standard.tags);
+      expect(loaded.actions, standard.actions);
+      expect(loaded.enhancements, standard.enhancements);
+      expect(loaded.useBrTags, isTrue);
+    });
+
+    test('putMapping on a saved profile replaces it', () async {
+      AnkiMapping mapping = profile('Mine', 0);
+      await store.putMapping(mapping);
+      mapping.creatorFieldKeys = ['term'];
+      await store.putMapping(mapping);
+
+      expect(store.mappings().single.creatorFieldKeys, ['term']);
+    });
+
+    test('replaceMappings swaps orders without a constraint error', () async {
+      AnkiMapping a = profile('A', 0);
+      AnkiMapping b = profile('B', 1);
+      await store.putMapping(a);
+      await store.putMapping(b);
+
+      a.order = 1;
+      b.order = 0;
+      await store.replaceMappings([b, a]);
+
+      expect(store.mappings().map((mapping) => mapping.label), ['B', 'A']);
+    });
+
+    test('nextMappingOrder and mappingLabelTaken', () async {
+      expect(store.nextMappingOrder(), 0);
+      await store.putMapping(profile('A', 0));
+      expect(store.nextMappingOrder(), 1);
+      expect(store.mappingLabelTaken(profile('A', 5)), isTrue);
+      expect(store.mappingLabelTaken(profile('A', 0)), isFalse);
+    });
+  });
+
+  group('catalogs', () {
+    test('put, reorder and delete', () async {
+      MokuroCatalog a = MokuroCatalog(name: 'A', url: 'https://a', order: 0);
+      MokuroCatalog b = MokuroCatalog(name: 'B', url: 'https://b', order: 1);
+      await store.putCatalog(a);
+      await store.putCatalog(b);
+      expect(store.catalogUrlTaken(
+          MokuroCatalog(name: 'C', url: 'https://a', order: 7)), isTrue);
+      expect(store.nextCatalogOrder(), 2);
+
+      a.order = 1;
+      b.order = 0;
+      await store.replaceCatalogs([b, a]);
+      expect(store.catalogs().map((catalog) => catalog.name), ['B', 'A']);
+
+      await store.deleteCatalog(b.id!);
+      expect(store.catalogs().map((catalog) => catalog.name), ['A']);
+    });
+  });
+
+  group('search history', () {
+    test('re-adding a term makes it the newest, and the oldest go', () async {
+      await store.addToSearchHistory('一', maximum: 3);
+      await store.addToSearchHistory('二', maximum: 3);
+      await store.addToSearchHistory('三', maximum: 3);
+      await store.addToSearchHistory('一', maximum: 3);
+      await store.addToSearchHistory('四', maximum: 3);
+
+      expect(store.searchHistory(), ['三', '一', '四']);
+    });
+
+    test('remove and clear', () async {
+      await store.addToSearchHistory('一', maximum: 3);
+      await store.addToSearchHistory('二', maximum: 3);
+      await store.removeFromSearchHistory('一');
+      expect(store.searchHistory(), ['二']);
+
+      await store.clearSearchHistory();
+      expect(store.searchHistory(), isEmpty);
     });
   });
 }

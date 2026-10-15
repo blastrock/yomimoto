@@ -1,9 +1,4 @@
-import 'package:isar_community/isar.dart';
-
-part 'mokuro_catalog.g.dart';
-
 /// Used to persist online catalogs of Mokuro manga.
-@Collection()
 class MokuroCatalog {
   /// Initialise this object.
   MokuroCatalog({
@@ -13,19 +8,17 @@ class MokuroCatalog {
     this.id,
   });
 
-  /// Used for database purposes.
-  Id? id;
+  /// Used for database purposes. Null until the catalog is saved.
+  int? id;
 
   /// Name of the catalog.
   final String name;
 
   /// The URL pertaining to the catalog.
-  @Index(unique: true, replace: true)
   final String url;
 
-  /// The order of this dictionary in terms of user sorting, relative to other
-  /// dictionaries.
-  @Index(unique: true, replace: true)
+  /// The order of this catalog in terms of user sorting, relative to other
+  /// catalogs.
   int order;
 
   @override

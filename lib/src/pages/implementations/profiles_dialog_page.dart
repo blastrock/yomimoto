@@ -188,7 +188,10 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
           appModel.setLastSelectedMapping(item);
           updateSelectedOrder(newIndex);
 
-          appModel.updateMappingsOrder(cloneMappings);
+          await appModel.updateMappingsOrder(cloneMappings);
+          if (!mounted) {
+            return;
+          }
           setState(() {});
 
           await appModel.validateSelectedMapping(
@@ -357,7 +360,10 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             style: TextStyle(color: theme.colorScheme.primary),
           ),
           onPressed: () async {
-            appModel.deleteMapping(mapping);
+            await appModel.deleteMapping(mapping);
+            if (!mounted) {
+              return;
+            }
             Navigator.pop(context);
 
             _selectedOrder = -1;
@@ -721,7 +727,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
       }
     }
 
-    appModel.addMapping(newMapping);
+    await appModel.addMapping(newMapping);
     navigator.pop();
 
     setState(() {});

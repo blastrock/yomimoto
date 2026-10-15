@@ -43,9 +43,6 @@ final List<CollectionSchema> globalSchemas = [
   DictionaryFrequencySchema,
   DictionaryTagSchema,
   DictionarySearchResultSchema,
-  AnkiMappingSchema,
-  SearchHistoryItemSchema,
-  MokuroCatalogSchema,
 ];
 
 /// A list of fields that the app will support at runtime.
@@ -264,12 +261,10 @@ class AppModel with ChangeNotifier {
       _database.dictionarys.where().sortByOrder().findAllSync();
 
   /// Returns all export profiles.
-  List<AnkiMapping> get mappings =>
-      _database.ankiMappings.where().sortByOrder().findAllSync();
+  List<AnkiMapping> get mappings => _store.mappings();
 
   /// Returns all Mokuro catalogs.
-  List<MokuroCatalog> get mokuroCatalogs =>
-      _database.mokuroCatalogs.where().sortByOrder().findAllSync();
+  List<MokuroCatalog> get mokuroCatalogs => _store.catalogs();
 
   /// Returns all dictionary history results. Oldest is first.
   List<DictionarySearchResult> get dictionaryHistory =>
@@ -565,9 +560,8 @@ class AppModel with ChangeNotifier {
   }
 
   /// Get a mapping with a given mapping name.
-  AnkiMapping? getMappingFromLabel(String label) {
-    return _database.ankiMappings.where().labelEqualTo(label).findFirstSync();
-  }
+  AnkiMapping? getMappingFromLabel(String label) =>
+      _store.mappingByLabel(label);
 
   /// Change this once a field hide/show system is in place.
   List<Field> get activeFields => [
@@ -585,21 +579,13 @@ class AppModel with ChangeNotifier {
 
   /// Update the user-defined order of a given dictionary in the database.
   /// See the dictionary dialog's [ReorderableListView] for usage.
-  void updateMappingsOrder(List<AnkiMapping> newMappings) async {
-    _database.writeTxnSync(() {
-      _database.ankiMappings.clearSync();
-      _database.ankiMappings.putAllSync(newMappings);
-    });
-  }
+  Future<void> updateMappingsOrder(List<AnkiMapping> newMappings) =>
+      _store.replaceMappings(newMappings);
 
   /// Update the user-defined order of given catalogs in the database.
   /// See the catalog dialog's [ReorderableListView] for usage.
-  void updateCatalogsOrder(List<MokuroCatalog> newCatalogs) async {
-    _database.writeTxnSync(() {
-      _database.mokuroCatalogs.clearSync();
-      _database.mokuroCatalogs.putAllSync(newCatalogs);
-    });
-  }
+  Future<void> updateCatalogsOrder(List<MokuroCatalog> newCatalogs) =>
+      _store.replaceCatalogs(newCatalogs);
 
   /// Populate maps for home tabs at startup to optimise performance.
   void populateTabs() async {
@@ -771,25 +757,17 @@ class AppModel with ChangeNotifier {
   }
 
   /// Populate default mapping if it does not exist in the database.
-  void populateDefaultMapping() async {
-    if (_database.ankiMappings.where().findAllSync().isEmpty) {
-      _database.writeTxnSync(() {
-        _database.ankiMappings.putSync(AnkiMapping.defaultMapping(order: 0));
-      });
+  Future<void> populateDefaultMapping() async {
+    if (mappings.isEmpty) {
+      await _store.putMapping(AnkiMapping.defaultMapping(order: 0));
     } else {
-      AnkiMapping standardProfile = _database.ankiMappings
-          .where()
-          .labelEqualTo(AnkiMapping.standardProfileName)
-          .findFirstSync()!;
+      AnkiMapping standardProfile =
+          _store.mappingByLabel(AnkiMapping.standardProfileName)!;
       if (standardProfile.model != AnkiMapping.standardModelName) {
         String newLabel = 'Legacy Standard';
         int attempts = 1;
 
-        while (_database.ankiMappings
-            .where()
-            .labelEqualTo(newLabel)
-            .findAllSync()
-            .isNotEmpty) {
+        while (_store.mappingByLabel(newLabel) != null) {
           attempts += 1;
           newLabel = 'Legacy Standard ($attempts)';
         }
@@ -798,14 +776,9 @@ class AppModel with ChangeNotifier {
           label: newLabel,
         );
 
-        _database.writeTxnSync(() {
-          _database.ankiMappings.putAllSync(
-            [
-              legacyProfile,
-              AnkiMapping.defaultMapping(order: nextMappingOrder),
-            ],
-          );
-        });
+        await _store.putMapping(legacyProfile);
+        await _store.putMapping(
+            AnkiMapping.defaultMapping(order: nextMappingOrder));
 
         await showDialog(
           context: _navigatorKey.currentContext!,
@@ -1048,14 +1021,8 @@ class AppModel with ChangeNotifier {
       defaultValue: mappings.first.label,
     );
 
-    AnkiMapping mapping = _database.ankiMappings
-            .where()
-            .labelEqualTo(mappingName)
-            .findFirstSync() ??
-        _database.ankiMappings
-            .where()
-            .labelEqualTo(mappings.first.label)
-            .findFirstSync()!;
+    AnkiMapping mapping = _store.mappingByLabel(mappingName) ??
+        _store.mappingByLabel(mappings.first.label)!;
 
     return mapping;
   }
@@ -1314,10 +1281,8 @@ class AppModel with ChangeNotifier {
   }
 
   /// Delete a selected mapping from the database.
-  void deleteMapping(AnkiMapping mapping) async {
-    _database.writeTxnSync(() {
-      _database.ankiMappings.deleteSync(mapping.id!);
-    });
+  Future<void> deleteMapping(AnkiMapping mapping) async {
+    await _store.deleteMapping(mapping.id!);
 
     if (mapping.label == lastSelectedMappingName) {
       await setLastSelectedMapping(mappings.first);
@@ -1325,33 +1290,14 @@ class AppModel with ChangeNotifier {
   }
 
   /// Add a selected mapping to the database.
-  void addMapping(AnkiMapping mapping) async {
-    _database.writeTxnSync(() {
-      if (mapping.id != null &&
-          _database.ankiMappings.getSync(mapping.id!) != null) {
-        _database.ankiMappings.deleteSync(mapping.id!);
-      }
-      _database.ankiMappings.putSync(mapping);
-    });
-  }
+  Future<void> addMapping(AnkiMapping mapping) => _store.putMapping(mapping);
 
   /// Delete a selected catalog from the database.
-  void deleteCatalog(MokuroCatalog mapping) async {
-    _database.writeTxnSync(() {
-      _database.mokuroCatalogs.deleteSync(mapping.id!);
-    });
-  }
+  Future<void> deleteCatalog(MokuroCatalog catalog) =>
+      _store.deleteCatalog(catalog.id!);
 
   /// Add a selected catalog to the database.
-  Future<void> addCatalog(MokuroCatalog catalog) async {
-    await _database.writeTxnSync(() async {
-      if (catalog.id != null &&
-          _database.mokuroCatalogs.getSync(catalog.id!) != null) {
-        _database.mokuroCatalogs.deleteSync(catalog.id!);
-      }
-      _database.mokuroCatalogs.putSync(catalog);
-    });
-  }
+  Future<void> addCatalog(MokuroCatalog catalog) => _store.putCatalog(catalog);
 
   /// Used for caching search results. Cleared when a dictionary is added or
   /// deleted.
@@ -1432,57 +1378,19 @@ class AppModel with ChangeNotifier {
 
   /// Check if a mapping with a certain name with a different order already
   /// exists.
-  bool mappingNameHasDuplicate(AnkiMapping mapping) {
-    return _database.ankiMappings
-            .where()
-            .labelEqualTo(mapping.label)
-            .filter()
-            .not()
-            .orderEqualTo(mapping.order)
-            .findFirstSync() !=
-        null;
-  }
+  bool mappingNameHasDuplicate(AnkiMapping mapping) =>
+      _store.mappingLabelTaken(mapping);
 
-  /// Check if a catalog with a certain name with a different order already
+  /// Check if a catalog with a certain URL with a different order already
   /// exists.
-  bool catalogUrlHasDuplicate(MokuroCatalog catalog) {
-    return _database.mokuroCatalogs
-            .where()
-            .urlEqualTo(catalog.url)
-            .filter()
-            .not()
-            .orderEqualTo(catalog.order)
-            .findFirstSync() !=
-        null;
-  }
+  bool catalogUrlHasDuplicate(MokuroCatalog catalog) =>
+      _store.catalogUrlTaken(catalog);
 
   /// Get the newest available order for a new mapping.
-  int get nextMappingOrder {
-    AnkiMapping? highestOrderMapping =
-        _database.ankiMappings.where().sortByOrderDesc().findFirstSync();
-    late int order;
-    if (highestOrderMapping != null) {
-      order = highestOrderMapping.order + 1;
-    } else {
-      order = 0;
-    }
-
-    return order;
-  }
+  int get nextMappingOrder => _store.nextMappingOrder();
 
   /// Get the newest available order for a new catalog.
-  int get nextCatalogOrder {
-    MokuroCatalog? highestOrderCatalog =
-        _database.mokuroCatalogs.where().sortByOrderDesc().findFirstSync();
-    late int order;
-    if (highestOrderCatalog != null) {
-      order = highestOrderCatalog.order + 1;
-    } else {
-      order = 0;
-    }
-
-    return order;
-  }
+  int get nextCatalogOrder => _store.nextCatalogOrder();
 
   /// Requests for full external storage permissions. Required to browse for
   /// media anywhere on the device.
@@ -1955,13 +1863,7 @@ class AppModel with ChangeNotifier {
 
     AnkiMapping resetMapping =
         mapping.copyWith(exportFieldKeys: exportFieldKeys);
-    _database.writeTxnSync(() {
-      if (mapping.id != null &&
-          _database.ankiMappings.getSync(resetMapping.id!) != null) {
-        _database.ankiMappings.deleteSync(resetMapping.id!);
-      }
-      _database.ankiMappings.putSync(resetMapping);
-    });
+    await _store.putMapping(resetMapping);
   }
 
   /// Check for errors relating to the current selected export profile.
@@ -1996,7 +1898,7 @@ class AppModel with ChangeNotifier {
       }
 
       await selectStandardProfile();
-      deleteMapping(mapping);
+      await deleteMapping(mapping);
       return;
     }
 
@@ -2306,7 +2208,7 @@ class AppModel with ChangeNotifier {
 
   /// Updates a given [mapping]'s persisted enhancement for a given [field]
   /// and [slotNumber].
-  void setFieldEnhancement({
+  Future<void> setFieldEnhancement({
     required AnkiMapping mapping,
     required Field field,
     required int slotNumber,
@@ -2315,13 +2217,11 @@ class AppModel with ChangeNotifier {
     mapping.enhancements![field.uniqueKey] ??= {};
     mapping.enhancements![field.uniqueKey]![slotNumber] = enhancement.uniqueKey;
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
   /// Updates a given [mapping] to remove a [Field].
-  void removeField({
+  Future<void> removeField({
     required AnkiMapping mapping,
     required Field field,
     required bool isCollapsed,
@@ -2337,13 +2237,11 @@ class AppModel with ChangeNotifier {
       ];
     }
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
   /// Updates a given [mapping] to include a [Field].
-  void setField({
+  Future<void> setField({
     required AnkiMapping mapping,
     required Field field,
     required bool isCollapsed,
@@ -2360,54 +2258,46 @@ class AppModel with ChangeNotifier {
       ];
     }
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
   /// Removes a given [mapping]'s persisted enhancement for a given [field]
   /// and [slotNumber].
-  void removeFieldEnhancement({
+  Future<void> removeFieldEnhancement({
     required AnkiMapping mapping,
     required Field field,
     required int slotNumber,
   }) async {
     mapping.enhancements![field.uniqueKey]!.remove(slotNumber);
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
   /// Updates a given [mapping]'s persisted action for a given [slotNumber].
-  void setQuickAction(
+  Future<void> setQuickAction(
       {required AnkiMapping mapping,
       required int slotNumber,
       required QuickAction quickAction}) async {
     mapping.actions![slotNumber] = quickAction.uniqueKey;
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
 
     notifyListeners();
   }
 
   /// Removes a given [mapping]'s persisted action for a given [slotNumber].
-  void removeQuickAction({
+  Future<void> removeQuickAction({
     required AnkiMapping mapping,
     required int slotNumber,
   }) async {
     mapping.actions!.remove(slotNumber);
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
   /// Removes a given [mapping]'s persisted auto enhancement for a given
   /// [field].
-  void removeAutoFieldEnhancement({
+  Future<void> removeAutoFieldEnhancement({
     required AnkiMapping mapping,
     required Field field,
   }) async {
@@ -2415,91 +2305,29 @@ class AppModel with ChangeNotifier {
     mapping.enhancements![field.uniqueKey]!
         .remove(AnkiMapping.autoModeSlotNumber);
 
-    _database.writeTxnSync(() {
-      _database.ankiMappings.putSync(mapping);
-    });
+    await _store.putMapping(mapping);
   }
 
-  /// Add the [searchTerm] to a search history with the given [historyKey]. If
-  /// there are already a maximum number of items in history, this will be
-  /// capped. Oldest items will be discarded in that scenario.
-  void addToSearchHistory({
-    required String historyKey,
-    required String searchTerm,
-  }) async {
+  /// Add [searchTerm] to the search history. If there are already a maximum
+  /// number of items in history, the oldest are discarded.
+  Future<void> addToSearchHistory({required String searchTerm}) async {
     if (searchTerm.trim().isEmpty) {
       return;
     }
 
-    _database.writeTxnSync(() {
-      SearchHistoryItem searchHistoryItem = SearchHistoryItem(
-        searchTerm: searchTerm,
-        historyKey: historyKey,
-      );
-
-      _database.searchHistoryItems
-          .deleteByUniqueKeySync(searchHistoryItem.uniqueKey);
-
-      _database.searchHistoryItems.putSync(searchHistoryItem);
-
-      int countInSameHistory = _database.searchHistoryItems
-          .filter()
-          .historyKeyEqualTo(historyKey)
-          .countSync();
-
-      if (maximumSearchHistoryItems < countInSameHistory) {
-        int surplus = countInSameHistory - maximumSearchHistoryItems;
-        _database.searchHistoryItems
-            .filter()
-            .historyKeyEqualTo(historyKey)
-            .limit(surplus)
-            .build()
-            .deleteAllSync();
-      }
-    });
+    await _store.addToSearchHistory(searchTerm,
+        maximum: maximumSearchHistoryItems);
   }
 
-  /// Remove the [searchTerm] from a search history with the given [historyKey].
-  Future<void> removeFromSearchHistory({
-    required String historyKey,
-    required String searchTerm,
-  }) async {
-    _database.writeTxnSync(() {
-      SearchHistoryItem searchHistoryItem = SearchHistoryItem(
-        searchTerm: searchTerm,
-        historyKey: historyKey,
-      );
+  /// Remove [searchTerm] from the search history.
+  Future<void> removeFromSearchHistory({required String searchTerm}) =>
+      _store.removeFromSearchHistory(searchTerm);
 
-      _database.searchHistoryItems
-          .deleteByUniqueKeySync(searchHistoryItem.uniqueKey);
-    });
-  }
+  /// Clear the search history.
+  Future<void> clearSearchHistory() => _store.clearSearchHistory();
 
-  /// Clear the search history with the given [historyKey].
-  void clearSearchHistory({
-    required String historyKey,
-  }) {
-    _database.writeTxnSync(() {
-      _database.searchHistoryItems
-          .where()
-          .historyKeyEqualTo(historyKey)
-          .build()
-          .deleteAllSync();
-    });
-  }
-
-  /// Get the search history for a given collection named [historyKey].
-  List<String> getSearchHistory({required String historyKey}) {
-    List<SearchHistoryItem> items = _database.searchHistoryItems
-        .filter()
-        .historyKeyEqualTo(historyKey)
-        .build()
-        .findAllSync();
-
-    List<String> history = items.map((item) => item.searchTerm).toList();
-
-    return history;
-  }
+  /// Get the search history, oldest first.
+  List<String> getSearchHistory() => _store.searchHistory();
 
   /// Shown when a query fails to be made to an online service. For example,
   /// when there is no internet connection.

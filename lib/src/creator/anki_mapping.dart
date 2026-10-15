@@ -1,8 +1,6 @@
-import 'package:isar_community/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
-import 'package:yuuna/utils.dart';
 
 part 'anki_mapping.g.dart';
 
@@ -10,7 +8,6 @@ part 'anki_mapping.g.dart';
 /// the application. A mapping is bound to a [model], which must have a length
 /// of fields equal or more than the length of [getExportFields].
 @JsonSerializable()
-@Collection()
 class AnkiMapping {
   /// Initialise a model mapping with the given parameters.
   AnkiMapping({
@@ -163,10 +160,9 @@ class AnkiMapping {
   static String standardProfileName = 'Standard';
 
   /// A unique identifier for the purposes of database storage.
-  Id? id;
+  int? id;
 
   /// The name of this mapping.
-  @Index(unique: true, replace: true)
   final String label;
 
   /// The name of the model to use when exporting with this mapping.
@@ -192,22 +188,10 @@ class AnkiMapping {
       exportFieldKeys.where((e) => e != null).isEmpty;
 
   /// Used to keep track of actions used in dictionary results.
-  @ignore
   Map<int, String>? actions;
 
-  /// Serializes [actions].
-  String get actionsIsar => QuickActionsConverter.toIsar(actions!);
-  set actionsIsar(String object) =>
-      actions = QuickActionsConverter.fromIsar(object);
-
   /// Used to keep track of enhancements used in the creator per field.
-  @ignore
   late Map<String, Map<int, String>>? enhancements;
-
-  /// Serializes [enhancements].
-  String get enhancementsIsar => EnhancementsConverter.toIsar(enhancements!);
-  set enhancementsIsar(String object) =>
-      enhancements = EnhancementsConverter.fromIsar(object);
 
   /// Reserved index for the auto mode field in the map of enhancement names
   /// for a field.
@@ -225,7 +209,6 @@ class AnkiMapping {
 
   /// The order of this dictionary in terms of user sorting, relative to other
   /// dictionaries.
-  @Index(unique: true, replace: true)
   int order;
 
   /// Convert unique keys to fields.

@@ -3458,7 +3458,7 @@ class StashItemsCompanion extends UpdateCompanion<StashItem> {
 }
 
 class $AnkiMappingsTable extends AnkiMappings
-    with TableInfo<$AnkiMappingsTable, AnkiMappingRow> {
+    with TableInfo<$AnkiMappingsTable, AnkiMapping> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3633,7 +3633,7 @@ class $AnkiMappingsTable extends AnkiMappings
   static const String $name = 'anki_mapping';
   @override
   VerificationContext validateIntegrity(
-    Insertable<AnkiMappingRow> instance, {
+    Insertable<AnkiMapping> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3695,13 +3695,9 @@ class $AnkiMappingsTable extends AnkiMappings
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  AnkiMappingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AnkiMapping map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return AnkiMappingRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
+    return AnkiMapping(
       label: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}label'],
@@ -3709,10 +3705,6 @@ class $AnkiMappingsTable extends AnkiMappings
       model: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}model'],
-      )!,
-      order: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}order'],
       )!,
       exportFieldKeys: $AnkiMappingsTable.$converterexportFieldKeys.fromSql(
         attachedDatabase.typeMapping.read(
@@ -3734,22 +3726,14 @@ class $AnkiMappingsTable extends AnkiMappings
               data['${effectivePrefix}creator_collapsed_field_keys'],
             )!,
           ),
+      order: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}order'],
+      )!,
       tags: $AnkiMappingsTable.$convertertags.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
           data['${effectivePrefix}tags'],
-        )!,
-      ),
-      actions: $AnkiMappingsTable.$converteractions.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}actions'],
-        )!,
-      ),
-      enhancements: $AnkiMappingsTable.$converterenhancements.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}enhancements'],
         )!,
       ),
       exportMediaTags: attachedDatabase.typeMapping.read(
@@ -3764,6 +3748,22 @@ class $AnkiMappingsTable extends AnkiMappings
         DriftSqlType.bool,
         data['${effectivePrefix}prepend_dictionary_names'],
       ),
+      enhancements: $AnkiMappingsTable.$converterenhancements.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}enhancements'],
+        )!,
+      ),
+      actions: $AnkiMappingsTable.$converteractions.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}actions'],
+        )!,
+      ),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
     );
   }
 
@@ -3786,312 +3786,7 @@ class $AnkiMappingsTable extends AnkiMappings
   $converterenhancements = const EnhancementsColumnConverter();
 }
 
-class AnkiMappingRow extends DataClass implements Insertable<AnkiMappingRow> {
-  /// Assigned on insert.
-  final int id;
-
-  /// The profile name.
-  final String label;
-
-  /// The AnkiDroid note type exported to.
-  final String model;
-
-  /// Position in the profile list.
-  final int order;
-
-  /// Creator field keys, in note field order; null for an empty note field.
-  final List<String?> exportFieldKeys;
-
-  /// Creator fields shown.
-  final List<String> creatorFieldKeys;
-
-  /// Creator fields shown folded.
-  final List<String> creatorCollapsedFieldKeys;
-
-  /// Tags added to every exported card.
-  final List<String> tags;
-
-  /// Quick actions on dictionary results, slot to action key.
-  final Map<int, String> actions;
-
-  /// Enhancements per field, slot to enhancement key.
-  final Map<String, Map<int, String>> enhancements;
-
-  /// Whether exported media get Anki tags rather than bare file names.
-  final bool? exportMediaTags;
-
-  /// Whether line breaks are exported as `<br>`.
-  final bool? useBrTags;
-
-  /// Whether meanings are prefixed with their dictionary's name.
-  final bool? prependDictionaryNames;
-  const AnkiMappingRow({
-    required this.id,
-    required this.label,
-    required this.model,
-    required this.order,
-    required this.exportFieldKeys,
-    required this.creatorFieldKeys,
-    required this.creatorCollapsedFieldKeys,
-    required this.tags,
-    required this.actions,
-    required this.enhancements,
-    this.exportMediaTags,
-    this.useBrTags,
-    this.prependDictionaryNames,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['label'] = Variable<String>(label);
-    map['model'] = Variable<String>(model);
-    map['order'] = Variable<int>(order);
-    {
-      map['export_field_keys'] = Variable<String>(
-        $AnkiMappingsTable.$converterexportFieldKeys.toSql(exportFieldKeys),
-      );
-    }
-    {
-      map['creator_field_keys'] = Variable<String>(
-        $AnkiMappingsTable.$convertercreatorFieldKeys.toSql(creatorFieldKeys),
-      );
-    }
-    {
-      map['creator_collapsed_field_keys'] = Variable<String>(
-        $AnkiMappingsTable.$convertercreatorCollapsedFieldKeys.toSql(
-          creatorCollapsedFieldKeys,
-        ),
-      );
-    }
-    {
-      map['tags'] = Variable<String>(
-        $AnkiMappingsTable.$convertertags.toSql(tags),
-      );
-    }
-    {
-      map['actions'] = Variable<String>(
-        $AnkiMappingsTable.$converteractions.toSql(actions),
-      );
-    }
-    {
-      map['enhancements'] = Variable<String>(
-        $AnkiMappingsTable.$converterenhancements.toSql(enhancements),
-      );
-    }
-    if (!nullToAbsent || exportMediaTags != null) {
-      map['export_media_tags'] = Variable<bool>(exportMediaTags);
-    }
-    if (!nullToAbsent || useBrTags != null) {
-      map['use_br_tags'] = Variable<bool>(useBrTags);
-    }
-    if (!nullToAbsent || prependDictionaryNames != null) {
-      map['prepend_dictionary_names'] = Variable<bool>(prependDictionaryNames);
-    }
-    return map;
-  }
-
-  AnkiMappingsCompanion toCompanion(bool nullToAbsent) {
-    return AnkiMappingsCompanion(
-      id: Value(id),
-      label: Value(label),
-      model: Value(model),
-      order: Value(order),
-      exportFieldKeys: Value(exportFieldKeys),
-      creatorFieldKeys: Value(creatorFieldKeys),
-      creatorCollapsedFieldKeys: Value(creatorCollapsedFieldKeys),
-      tags: Value(tags),
-      actions: Value(actions),
-      enhancements: Value(enhancements),
-      exportMediaTags: exportMediaTags == null && nullToAbsent
-          ? const Value.absent()
-          : Value(exportMediaTags),
-      useBrTags: useBrTags == null && nullToAbsent
-          ? const Value.absent()
-          : Value(useBrTags),
-      prependDictionaryNames: prependDictionaryNames == null && nullToAbsent
-          ? const Value.absent()
-          : Value(prependDictionaryNames),
-    );
-  }
-
-  factory AnkiMappingRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return AnkiMappingRow(
-      id: serializer.fromJson<int>(json['id']),
-      label: serializer.fromJson<String>(json['label']),
-      model: serializer.fromJson<String>(json['model']),
-      order: serializer.fromJson<int>(json['order']),
-      exportFieldKeys: serializer.fromJson<List<String?>>(
-        json['exportFieldKeys'],
-      ),
-      creatorFieldKeys: serializer.fromJson<List<String>>(
-        json['creatorFieldKeys'],
-      ),
-      creatorCollapsedFieldKeys: serializer.fromJson<List<String>>(
-        json['creatorCollapsedFieldKeys'],
-      ),
-      tags: serializer.fromJson<List<String>>(json['tags']),
-      actions: serializer.fromJson<Map<int, String>>(json['actions']),
-      enhancements: serializer.fromJson<Map<String, Map<int, String>>>(
-        json['enhancements'],
-      ),
-      exportMediaTags: serializer.fromJson<bool?>(json['exportMediaTags']),
-      useBrTags: serializer.fromJson<bool?>(json['useBrTags']),
-      prependDictionaryNames: serializer.fromJson<bool?>(
-        json['prependDictionaryNames'],
-      ),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'label': serializer.toJson<String>(label),
-      'model': serializer.toJson<String>(model),
-      'order': serializer.toJson<int>(order),
-      'exportFieldKeys': serializer.toJson<List<String?>>(exportFieldKeys),
-      'creatorFieldKeys': serializer.toJson<List<String>>(creatorFieldKeys),
-      'creatorCollapsedFieldKeys': serializer.toJson<List<String>>(
-        creatorCollapsedFieldKeys,
-      ),
-      'tags': serializer.toJson<List<String>>(tags),
-      'actions': serializer.toJson<Map<int, String>>(actions),
-      'enhancements': serializer.toJson<Map<String, Map<int, String>>>(
-        enhancements,
-      ),
-      'exportMediaTags': serializer.toJson<bool?>(exportMediaTags),
-      'useBrTags': serializer.toJson<bool?>(useBrTags),
-      'prependDictionaryNames': serializer.toJson<bool?>(
-        prependDictionaryNames,
-      ),
-    };
-  }
-
-  AnkiMappingRow copyWith({
-    int? id,
-    String? label,
-    String? model,
-    int? order,
-    List<String?>? exportFieldKeys,
-    List<String>? creatorFieldKeys,
-    List<String>? creatorCollapsedFieldKeys,
-    List<String>? tags,
-    Map<int, String>? actions,
-    Map<String, Map<int, String>>? enhancements,
-    Value<bool?> exportMediaTags = const Value.absent(),
-    Value<bool?> useBrTags = const Value.absent(),
-    Value<bool?> prependDictionaryNames = const Value.absent(),
-  }) => AnkiMappingRow(
-    id: id ?? this.id,
-    label: label ?? this.label,
-    model: model ?? this.model,
-    order: order ?? this.order,
-    exportFieldKeys: exportFieldKeys ?? this.exportFieldKeys,
-    creatorFieldKeys: creatorFieldKeys ?? this.creatorFieldKeys,
-    creatorCollapsedFieldKeys:
-        creatorCollapsedFieldKeys ?? this.creatorCollapsedFieldKeys,
-    tags: tags ?? this.tags,
-    actions: actions ?? this.actions,
-    enhancements: enhancements ?? this.enhancements,
-    exportMediaTags: exportMediaTags.present
-        ? exportMediaTags.value
-        : this.exportMediaTags,
-    useBrTags: useBrTags.present ? useBrTags.value : this.useBrTags,
-    prependDictionaryNames: prependDictionaryNames.present
-        ? prependDictionaryNames.value
-        : this.prependDictionaryNames,
-  );
-  AnkiMappingRow copyWithCompanion(AnkiMappingsCompanion data) {
-    return AnkiMappingRow(
-      id: data.id.present ? data.id.value : this.id,
-      label: data.label.present ? data.label.value : this.label,
-      model: data.model.present ? data.model.value : this.model,
-      order: data.order.present ? data.order.value : this.order,
-      exportFieldKeys: data.exportFieldKeys.present
-          ? data.exportFieldKeys.value
-          : this.exportFieldKeys,
-      creatorFieldKeys: data.creatorFieldKeys.present
-          ? data.creatorFieldKeys.value
-          : this.creatorFieldKeys,
-      creatorCollapsedFieldKeys: data.creatorCollapsedFieldKeys.present
-          ? data.creatorCollapsedFieldKeys.value
-          : this.creatorCollapsedFieldKeys,
-      tags: data.tags.present ? data.tags.value : this.tags,
-      actions: data.actions.present ? data.actions.value : this.actions,
-      enhancements: data.enhancements.present
-          ? data.enhancements.value
-          : this.enhancements,
-      exportMediaTags: data.exportMediaTags.present
-          ? data.exportMediaTags.value
-          : this.exportMediaTags,
-      useBrTags: data.useBrTags.present ? data.useBrTags.value : this.useBrTags,
-      prependDictionaryNames: data.prependDictionaryNames.present
-          ? data.prependDictionaryNames.value
-          : this.prependDictionaryNames,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('AnkiMappingRow(')
-          ..write('id: $id, ')
-          ..write('label: $label, ')
-          ..write('model: $model, ')
-          ..write('order: $order, ')
-          ..write('exportFieldKeys: $exportFieldKeys, ')
-          ..write('creatorFieldKeys: $creatorFieldKeys, ')
-          ..write('creatorCollapsedFieldKeys: $creatorCollapsedFieldKeys, ')
-          ..write('tags: $tags, ')
-          ..write('actions: $actions, ')
-          ..write('enhancements: $enhancements, ')
-          ..write('exportMediaTags: $exportMediaTags, ')
-          ..write('useBrTags: $useBrTags, ')
-          ..write('prependDictionaryNames: $prependDictionaryNames')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    label,
-    model,
-    order,
-    exportFieldKeys,
-    creatorFieldKeys,
-    creatorCollapsedFieldKeys,
-    tags,
-    actions,
-    enhancements,
-    exportMediaTags,
-    useBrTags,
-    prependDictionaryNames,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is AnkiMappingRow &&
-          other.id == this.id &&
-          other.label == this.label &&
-          other.model == this.model &&
-          other.order == this.order &&
-          other.exportFieldKeys == this.exportFieldKeys &&
-          other.creatorFieldKeys == this.creatorFieldKeys &&
-          other.creatorCollapsedFieldKeys == this.creatorCollapsedFieldKeys &&
-          other.tags == this.tags &&
-          other.actions == this.actions &&
-          other.enhancements == this.enhancements &&
-          other.exportMediaTags == this.exportMediaTags &&
-          other.useBrTags == this.useBrTags &&
-          other.prependDictionaryNames == this.prependDictionaryNames);
-}
-
-class AnkiMappingsCompanion extends UpdateCompanion<AnkiMappingRow> {
+class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
   final Value<int> id;
   final Value<String> label;
   final Value<String> model;
@@ -4143,7 +3838,7 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMappingRow> {
        tags = Value(tags),
        actions = Value(actions),
        enhancements = Value(enhancements);
-  static Insertable<AnkiMappingRow> custom({
+  static Insertable<AnkiMapping> custom({
     Expression<int>? id,
     Expression<String>? label,
     Expression<String>? model,
@@ -4298,7 +3993,7 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMappingRow> {
 }
 
 class $MokuroCatalogsTable extends MokuroCatalogs
-    with TableInfo<$MokuroCatalogsTable, MokuroCatalogRow> {
+    with TableInfo<$MokuroCatalogsTable, MokuroCatalog> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -4354,7 +4049,7 @@ class $MokuroCatalogsTable extends MokuroCatalogs
   static const String $name = 'mokuro_catalog';
   @override
   VerificationContext validateIntegrity(
-    Insertable<MokuroCatalogRow> instance, {
+    Insertable<MokuroCatalog> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -4392,13 +4087,9 @@ class $MokuroCatalogsTable extends MokuroCatalogs
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  MokuroCatalogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MokuroCatalog map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MokuroCatalogRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
+    return MokuroCatalog(
       name: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}name'],
@@ -4411,6 +4102,10 @@ class $MokuroCatalogsTable extends MokuroCatalogs
         DriftSqlType.int,
         data['${effectivePrefix}order'],
       )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
     );
   }
 
@@ -4420,107 +4115,7 @@ class $MokuroCatalogsTable extends MokuroCatalogs
   }
 }
 
-class MokuroCatalogRow extends DataClass
-    implements Insertable<MokuroCatalogRow> {
-  /// Assigned on insert.
-  final int id;
-
-  /// Display name.
-  final String name;
-
-  /// Where the catalog is.
-  final String url;
-
-  /// Position in the catalog list.
-  final int order;
-  const MokuroCatalogRow({
-    required this.id,
-    required this.name,
-    required this.url,
-    required this.order,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['name'] = Variable<String>(name);
-    map['url'] = Variable<String>(url);
-    map['order'] = Variable<int>(order);
-    return map;
-  }
-
-  MokuroCatalogsCompanion toCompanion(bool nullToAbsent) {
-    return MokuroCatalogsCompanion(
-      id: Value(id),
-      name: Value(name),
-      url: Value(url),
-      order: Value(order),
-    );
-  }
-
-  factory MokuroCatalogRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MokuroCatalogRow(
-      id: serializer.fromJson<int>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
-      url: serializer.fromJson<String>(json['url']),
-      order: serializer.fromJson<int>(json['order']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'name': serializer.toJson<String>(name),
-      'url': serializer.toJson<String>(url),
-      'order': serializer.toJson<int>(order),
-    };
-  }
-
-  MokuroCatalogRow copyWith({int? id, String? name, String? url, int? order}) =>
-      MokuroCatalogRow(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        url: url ?? this.url,
-        order: order ?? this.order,
-      );
-  MokuroCatalogRow copyWithCompanion(MokuroCatalogsCompanion data) {
-    return MokuroCatalogRow(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      url: data.url.present ? data.url.value : this.url,
-      order: data.order.present ? data.order.value : this.order,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('MokuroCatalogRow(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('url: $url, ')
-          ..write('order: $order')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, name, url, order);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is MokuroCatalogRow &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.url == this.url &&
-          other.order == this.order);
-}
-
-class MokuroCatalogsCompanion extends UpdateCompanion<MokuroCatalogRow> {
+class MokuroCatalogsCompanion extends UpdateCompanion<MokuroCatalog> {
   final Value<int> id;
   final Value<String> name;
   final Value<String> url;
@@ -4539,7 +4134,7 @@ class MokuroCatalogsCompanion extends UpdateCompanion<MokuroCatalogRow> {
   }) : name = Value(name),
        url = Value(url),
        order = Value(order);
-  static Insertable<MokuroCatalogRow> custom({
+  static Insertable<MokuroCatalog> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<String>? url,
@@ -9959,17 +9554,17 @@ class $$AnkiMappingsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $AnkiMappingsTable,
-          AnkiMappingRow,
+          AnkiMapping,
           $$AnkiMappingsTableFilterComposer,
           $$AnkiMappingsTableOrderingComposer,
           $$AnkiMappingsTableAnnotationComposer,
           $$AnkiMappingsTableCreateCompanionBuilder,
           $$AnkiMappingsTableUpdateCompanionBuilder,
           (
-            AnkiMappingRow,
-            BaseReferences<_$AppDatabase, $AnkiMappingsTable, AnkiMappingRow>,
+            AnkiMapping,
+            BaseReferences<_$AppDatabase, $AnkiMappingsTable, AnkiMapping>,
           ),
-          AnkiMappingRow,
+          AnkiMapping,
           PrefetchHooks Function()
         > {
   $$AnkiMappingsTableTableManager(_$AppDatabase db, $AnkiMappingsTable table)
@@ -10048,11 +9643,11 @@ class $$AnkiMappingsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$AnkiMappingsTable, AnkiMappingRow>(table),
+                  e.readTable<$AnkiMappingsTable, AnkiMapping>(table),
                   BaseReferences<
                     _$AppDatabase,
                     $AnkiMappingsTable,
-                    AnkiMappingRow
+                    AnkiMapping
                   >(db, table, e),
                 ),
               )
@@ -10066,17 +9661,17 @@ typedef $$AnkiMappingsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $AnkiMappingsTable,
-      AnkiMappingRow,
+      AnkiMapping,
       $$AnkiMappingsTableFilterComposer,
       $$AnkiMappingsTableOrderingComposer,
       $$AnkiMappingsTableAnnotationComposer,
       $$AnkiMappingsTableCreateCompanionBuilder,
       $$AnkiMappingsTableUpdateCompanionBuilder,
       (
-        AnkiMappingRow,
-        BaseReferences<_$AppDatabase, $AnkiMappingsTable, AnkiMappingRow>,
+        AnkiMapping,
+        BaseReferences<_$AppDatabase, $AnkiMappingsTable, AnkiMapping>,
       ),
-      AnkiMappingRow,
+      AnkiMapping,
       PrefetchHooks Function()
     >;
 typedef $$MokuroCatalogsTableCreateCompanionBuilder =
@@ -10181,21 +9776,17 @@ class $$MokuroCatalogsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $MokuroCatalogsTable,
-          MokuroCatalogRow,
+          MokuroCatalog,
           $$MokuroCatalogsTableFilterComposer,
           $$MokuroCatalogsTableOrderingComposer,
           $$MokuroCatalogsTableAnnotationComposer,
           $$MokuroCatalogsTableCreateCompanionBuilder,
           $$MokuroCatalogsTableUpdateCompanionBuilder,
           (
-            MokuroCatalogRow,
-            BaseReferences<
-              _$AppDatabase,
-              $MokuroCatalogsTable,
-              MokuroCatalogRow
-            >,
+            MokuroCatalog,
+            BaseReferences<_$AppDatabase, $MokuroCatalogsTable, MokuroCatalog>,
           ),
-          MokuroCatalogRow,
+          MokuroCatalog,
           PrefetchHooks Function()
         > {
   $$MokuroCatalogsTableTableManager(
@@ -10238,11 +9829,11 @@ class $$MokuroCatalogsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$MokuroCatalogsTable, MokuroCatalogRow>(table),
+                  e.readTable<$MokuroCatalogsTable, MokuroCatalog>(table),
                   BaseReferences<
                     _$AppDatabase,
                     $MokuroCatalogsTable,
-                    MokuroCatalogRow
+                    MokuroCatalog
                   >(db, table, e),
                 ),
               )
@@ -10256,17 +9847,17 @@ typedef $$MokuroCatalogsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $MokuroCatalogsTable,
-      MokuroCatalogRow,
+      MokuroCatalog,
       $$MokuroCatalogsTableFilterComposer,
       $$MokuroCatalogsTableOrderingComposer,
       $$MokuroCatalogsTableAnnotationComposer,
       $$MokuroCatalogsTableCreateCompanionBuilder,
       $$MokuroCatalogsTableUpdateCompanionBuilder,
       (
-        MokuroCatalogRow,
-        BaseReferences<_$AppDatabase, $MokuroCatalogsTable, MokuroCatalogRow>,
+        MokuroCatalog,
+        BaseReferences<_$AppDatabase, $MokuroCatalogsTable, MokuroCatalog>,
       ),
-      MokuroCatalogRow,
+      MokuroCatalog,
       PrefetchHooks Function()
     >;
 typedef $$SearchHistoryItemsTableCreateCompanionBuilder =

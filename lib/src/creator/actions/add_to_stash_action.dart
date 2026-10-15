@@ -54,7 +54,7 @@ class AddToStashAction extends QuickAction {
         mediaItemId: mediaItemId,
         term: heading.term,
         reading: heading.reading,
-        dictionaryName: selectedEntry?.dictionary.value?.name,
+        dictionaryName: selectedEntry?.dictionary.name,
         definitions: getDefinitions(
           appModel: appModel,
           heading: heading,
@@ -87,16 +87,16 @@ class AddToStashAction extends QuickAction {
         ? [selectedEntry]
         : heading.entries
             .where((entry) =>
-                !(dictionariesByName[entry.dictionary.value!.name]?.isHidden ??
+                !(dictionariesByName[entry.dictionary.name]?.isHidden ??
                     true))
             .toList();
-    entries.sort((a, b) => dictionariesByName[a.dictionary.value!.name]!.order
-        .compareTo(dictionariesByName[b.dictionary.value!.name]!.order));
+    entries.sort((a, b) => dictionariesByName[a.dictionary.name]!.order
+        .compareTo(dictionariesByName[b.dictionary.name]!.order));
 
     List<String> definitions = [];
     for (DictionaryEntry entry in entries) {
       DictionaryFormat format =
-          appModel.getDictionaryFormat(entry.dictionary.value!);
+          appModel.getDictionaryFormat(entry.dictionary);
       for (String definition in entry.definitions) {
         if (format.shouldUseCustomDefinitionWidget(definition)) {
           definition = format.getCustomDefinitionText(definition);

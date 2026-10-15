@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
-import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -14,6 +13,7 @@ class StashItemPage extends BasePage {
   const StashItemPage({
     required this.item,
     required this.mediaItem,
+    required this.resolved,
     super.key,
   });
 
@@ -23,6 +23,9 @@ class StashItemPage extends BasePage {
   /// The book the word was stashed from.
   final MediaItem mediaItem;
 
+  /// [item]'s word found in the dictionaries.
+  final ResolvedStashItem resolved;
+
   @override
   BasePageState<StashItemPage> createState() => _StashItemPageState();
 }
@@ -30,8 +33,7 @@ class StashItemPage extends BasePage {
 class _StashItemPageState extends BasePageState<StashItemPage> {
   StashItem get item => widget.item;
 
-  late ({DictionaryHeading heading, DictionaryEntry? entry, bool found})
-      _resolved;
+  ResolvedStashItem get _resolved => widget.resolved;
   late Future<Color?> _duplicateColour;
 
   InstantExportAction get _instantExport =>
@@ -50,7 +52,6 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
   @override
   void initState() {
     super.initState();
-    _resolved = appModelNoUpdate.resolveStashItem(item);
     _duplicateColour = _instantExport.getIconColor(
       appModel: appModelNoUpdate,
       heading: _resolved.heading,

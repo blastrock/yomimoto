@@ -1,33 +1,26 @@
 import 'package:yuuna/dictionary.dart';
-import 'package:isar_community/isar.dart';
 
-part 'dictionary_frequency.g.dart';
-
-/// A database entity that that represents supplementary frequency data for a
-/// certain search key.
-@Collection()
+/// A frequency rank of a heading, from a frequency dictionary.
 class DictionaryFrequency {
-  /// Frequency data contains a numerical and text value.
+  /// Create a frequency from [dictionary].
   DictionaryFrequency({
+    required this.id,
     required this.value,
     required this.displayValue,
-    this.id,
+    required this.dictionary,
   });
 
-  /// Identifier for database purposes.
-  Id? id;
+  /// The database id.
+  final int id;
 
-  /// Numerical representation of the frequency information.
+  /// The rank, for sorting; lower is more frequent.
   final double value;
 
-  /// Text representation of the frequency information.
+  /// The rank as the dictionary displays it.
   final String displayValue;
 
-  /// This object belongs to a certain heading.
-  final IsarLink<DictionaryHeading> heading = IsarLink<DictionaryHeading>();
-
-  /// This object belongs to a dictionary.
-  final IsarLink<Dictionary> dictionary = IsarLink<Dictionary>();
+  /// The frequency dictionary it comes from.
+  final Dictionary dictionary;
 
   @override
   bool operator ==(Object other) =>

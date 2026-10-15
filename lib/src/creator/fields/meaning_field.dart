@@ -35,7 +35,7 @@ class MeaningField extends Field {
     Map<String, List<DictionaryEntry>> entriesByDictionaryName =
         groupBy<DictionaryEntry, String>(
       entries,
-      (entry) => entry.dictionary.value!.name,
+      (entry) => entry.dictionary.name,
     );
 
     entriesByDictionaryName.forEach((dictionaryName, singleDictionaryEntries) {
@@ -50,7 +50,7 @@ class MeaningField extends Field {
 
       for (DictionaryEntry entry in singleDictionaryEntries) {
         DictionaryFormat dictionaryFormat =
-            appModel.getDictionaryFormat(entry.dictionary.value!);
+            appModel.getDictionaryFormat(entry.dictionary);
 
         if (singleDictionaryEntries.length == 1) {
           entry.definitions.forEachIndexed((index, meaning) {
@@ -107,13 +107,13 @@ class MeaningField extends Field {
 
     List<DictionaryEntry> entries = heading.entries
         .where(
-            (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
+            (entry) => !dictionaryNamesByHidden[entry.dictionary.name]!)
         .toList();
     if (selectedEntry != null) {
       entries = [selectedEntry];
     }
-    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
-        .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.name]!
+        .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     return flattenMeanings(
       appModel: appModel,

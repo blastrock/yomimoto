@@ -51,14 +51,14 @@ class ExpandedMeaningField extends Field {
     } else {
       expandedEntries = heading.entries
           .where((entry) =>
-              !dictionaryNamesByHidden[entry.dictionary.value!.name]! &&
-              !dictionaryNamesByCollapsed[entry.dictionary.value!.name]!)
+              !dictionaryNamesByHidden[entry.dictionary.name]! &&
+              !dictionaryNamesByCollapsed[entry.dictionary.name]!)
           .toList();
     }
 
     expandedEntries.sort((a, b) =>
-        dictionaryNamesByOrder[a.dictionary.value!.name]!
-            .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+        dictionaryNamesByOrder[a.dictionary.name]!
+            .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     return MeaningField.flattenMeanings(
         appModel: appModel,

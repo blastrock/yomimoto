@@ -51,20 +51,20 @@ class CollapsedMeaningField extends Field {
     if (selectedEntry != null) {
       collapsedEntries = heading.entries
           .where((entry) =>
-              !dictionaryNamesByHidden[entry.dictionary.value!.name]! &&
+              !dictionaryNamesByHidden[entry.dictionary.name]! &&
               entry != selectedEntry)
           .toList();
     } else {
       collapsedEntries = heading.entries
           .where((entry) =>
-              !dictionaryNamesByHidden[entry.dictionary.value!.name]! &&
-              dictionaryNamesByCollapsed[entry.dictionary.value!.name]!)
+              !dictionaryNamesByHidden[entry.dictionary.name]! &&
+              dictionaryNamesByCollapsed[entry.dictionary.name]!)
           .toList();
     }
 
     collapsedEntries.sort((a, b) =>
-        dictionaryNamesByOrder[a.dictionary.value!.name]!
-            .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+        dictionaryNamesByOrder[a.dictionary.name]!
+            .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     return MeaningField.flattenMeanings(
         appModel: appModel,

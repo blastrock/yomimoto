@@ -126,7 +126,7 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    Dictionary dictionary = entry.dictionary.value!;
+    Dictionary dictionary = entry.dictionary;
     List<Widget> children = [
       JidoujishoTag(
         text: dictionary.name,
@@ -164,7 +164,7 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
               itemBuilder: (context) => getMenuItems(
                 context: context,
                 ref: ref,
-                heading: entry.heading.value!,
+                heading: entry.heading,
               ),
             ),
           )

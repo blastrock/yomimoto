@@ -69,11 +69,11 @@ class DictionaryTermPage extends ConsumerWidget {
 
     List<DictionaryEntry> entries = heading.entries
         .where(
-            (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
+            (entry) => !dictionaryNamesByHidden[entry.dictionary.name]!)
         .toList();
 
-    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
-        .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.name]!
+        .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     if (entries.isEmpty) {
       return const SliverPadding(padding: EdgeInsets.zero);
@@ -139,7 +139,7 @@ class DictionaryTermPage extends ConsumerWidget {
                       onSearch: onSearch,
                       onShare: onShare,
                       expandableController:
-                          expandableControllers[entry.dictionary.value!]!,
+                          expandableControllers[entry.dictionary]!,
                     );
                   },
                 ),
@@ -308,18 +308,18 @@ class _DictionaryTermPitchList extends ConsumerWidget {
 
     List<DictionaryPitch> pitches = heading.pitches
         .where((pitch) =>
-            !pitch.dictionary.value!.isHidden)
+            !pitch.dictionary.isHidden)
         .toList();
     if (pitches.isEmpty) {
       return const SliverPadding(padding: EdgeInsets.zero);
     }
 
     pitches.sort((a, b) =>
-        a.dictionary.value!.order.compareTo(b.dictionary.value!.order));
+        a.dictionary.order.compareTo(b.dictionary.order));
 
     Map<Dictionary, List<DictionaryPitch>> pitchesByDictionary =
         groupBy<DictionaryPitch, Dictionary>(
-            pitches, (pitch) => pitch.dictionary.value!);
+            pitches, (pitch) => pitch.dictionary);
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -401,14 +401,15 @@ class _DictionaryTermFreqList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AppModel appModel = ref.watch(appProvider);
-
     List<DictionaryFrequency> frequencies = heading.frequencies
         .where((frequency) =>
-            !dictionaryNamesByHidden[frequency.dictionary.value!.name]!)
+            !dictionaryNamesByHidden[frequency.dictionary.name]!)
         .toList();
 
-    frequencies += appModel.getNoReadingFrequencies(heading: heading);
+    frequencies += heading.noReadingFrequencies
+        .where((frequency) =>
+            !dictionaryNamesByHidden[frequency.dictionary.name]!)
+        .toList();
 
     if (frequencies.isEmpty) {
       return const SizedBox.shrink();
@@ -416,7 +417,7 @@ class _DictionaryTermFreqList extends ConsumerWidget {
 
     List<MapEntry<Dictionary, List<DictionaryFrequency>>>
         frequenciesByDictionary = groupBy<DictionaryFrequency, Dictionary>(
-                frequencies, (frequency) => frequency.dictionary.value!)
+                frequencies, (frequency) => frequency.dictionary)
             .entries
             .toList();
 

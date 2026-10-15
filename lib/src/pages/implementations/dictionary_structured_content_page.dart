@@ -139,7 +139,7 @@ class JidoujishoDictionaryImage extends ConsumerWidget {
         .replaceAll(RegExp(r'\D'), ''));
 
     final directory = ref
-        .read(dictionaryResourceDirectoryProvider(entry.dictionary.value!.id));
+        .read(dictionaryResourceDirectoryProvider(entry.dictionary.id));
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

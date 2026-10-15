@@ -15,7 +15,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:isar_community/isar.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:path/path.dart' as path;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -33,17 +32,6 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
-
-/// Schemas used in Isar database.
-final List<CollectionSchema> globalSchemas = [
-  DictionarySchema,
-  DictionaryEntrySchema,
-  DictionaryHeadingSchema,
-  DictionaryPitchSchema,
-  DictionaryFrequencySchema,
-  DictionaryTagSchema,
-  DictionarySearchResultSchema,
-];
 
 /// A list of fields that the app will support at runtime.
 final List<Field> globalFields = List<Field>.unmodifiable(
@@ -124,12 +112,6 @@ class AppModel with ChangeNotifier {
 
   /// Used for accessing persistent key-value data. See [initialise].
   late final Box _preferences;
-
-  /// Used for accessing persistent dictonary history. See [initialise].
-  late final Box<int> _dictionaryHistory;
-
-  /// Used for accessing persistent database data. See [initialise].
-  late final Isar _database;
 
   /// The SQLite database. See [initialise].
   late final AppDatabase _db;
@@ -265,16 +247,8 @@ class AppModel with ChangeNotifier {
   /// Returns all Mokuro catalogs.
   List<MokuroCatalog> get mokuroCatalogs => _store.catalogs();
 
-  /// Returns all dictionary history results. Oldest is first.
-  List<DictionarySearchResult> get dictionaryHistory =>
-      _database.dictionarySearchResults
-          .getAllSync(_dictionaryHistory.values.toList())
-          .nonNulls
-          .toList();
-
-  /// For watching the dictionary history collection.
-  Stream<void> Function(int) get watchDictionaryItem =>
-      _database.dictionarySearchResults.watchObjectLazy;
+  /// The terms whose results the Dictionary tab shows. Oldest is first.
+  List<String> get dictionaryHistory => _store.dictionaryHistory();
 
   /// For listening to searches made inside the Card Creator.
   Stream<void> get cardCreatorRecursiveSearchStream =>
@@ -876,7 +850,6 @@ class AppModel with ChangeNotifier {
     /// Initialise persistent key-value store.
     await Hive.initFlutter();
     _preferences = await Hive.openBox('appModel');
-    _dictionaryHistory = await Hive.openBox('dictionaryHistory');
 
     /// Perform startup activities unnecessary to further initialisation here.
     await requestExternalStoragePermissions();
@@ -940,13 +913,6 @@ class AppModel with ChangeNotifier {
     _db = AppDatabase.fromRaw(raw);
     await _db.customSelect('SELECT 1').get();
     _store = AppStore(db: _db, raw: raw);
-
-    /// Initialise persistent database.
-    _database = await Isar.open(
-      globalSchemas,
-      directory: _databaseDirectory.path,
-      maxSizeMiB: 8192,
-    );
 
     /// Preloads the search database in memory.
     searchDictionary(
@@ -1147,7 +1113,6 @@ class AppModel with ChangeNotifier {
 
       PrepareDirectoryParams prepareDirectoryParams = PrepareDirectoryParams(
         file: file,
-        directoryPath: _databaseDirectory.path,
         databasePath: databasePath,
         resourceDirectory: stagingDirectory,
         dictionaryFormat: dictionaryFormat,
@@ -1168,7 +1133,6 @@ class AppModel with ChangeNotifier {
         dictionaryName: name,
         dictionaryFormat: dictionaryFormat,
         resourceDirectory: stagingDirectory,
-        directoryPath: _databaseDirectory.path,
         databasePath: databasePath,
         sendPort: receivePort.sendPort,
         alertSendPort: alertReceivePort.sendPort,
@@ -1222,13 +1186,12 @@ class AppModel with ChangeNotifier {
 
     ReceivePort receivePort = ReceivePort();
     DeleteDictionaryParams params = DeleteDictionaryParams(
-      directoryPath: _databaseDirectory.path,
       databasePath: databasePath,
       sendPort: receivePort.sendPort,
     );
 
     await compute(deleteDictionariesHelper, params);
-    await _dictionaryHistory.clear();
+    await _store.clearDictionaryHistory();
 
     if (dictionaryResourceDirectory.existsSync()) {
       dictionaryResourceDirectory.deleteSync(recursive: true);
@@ -1246,13 +1209,12 @@ class AppModel with ChangeNotifier {
     ReceivePort receivePort = ReceivePort();
     DeleteDictionaryParams params = DeleteDictionaryParams(
       dictionaryId: dictionary.id,
-      directoryPath: _databaseDirectory.path,
       databasePath: databasePath,
       sendPort: receivePort.sendPort,
     );
 
     await compute(deleteDictionaryHelper, params);
-    await _dictionaryHistory.clear();
+    await _store.clearDictionaryHistory();
 
     final directory = Directory(
         path.join(dictionaryResourceDirectory.path, dictionary.id.toString()));
@@ -1294,7 +1256,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Whether or not the app is currently searching.
-  cancelable.ComputeOperation? _searchOperation;
+  cancelable.ComputeOperation<DictionarySearchResult?>? _searchOperation;
 
   /// Gets the raw unprocessed entries straight from a dictionary database
   /// given a search term. This will be processed later for user viewing.
@@ -1325,7 +1287,6 @@ class AppModel with ChangeNotifier {
 
     DictionarySearchParams params = DictionarySearchParams(
       searchTerm: searchTerm,
-      directoryPath: _databaseDirectory.path,
       databasePath: databasePath,
       maximumDictionarySearchResults: maximumDictionarySearchResults,
       maximumDictionaryTermsInResult: overrideMaximumTerms ?? maximumTerms,
@@ -1338,27 +1299,16 @@ class AppModel with ChangeNotifier {
       return DictionarySearchResult(searchTerm: searchTerm);
     }
 
-    /// Searching also persists the result in the database. This is useful for
-    /// dictionary search history, as well as allowing a result to be linked
-    /// to the actual data, rather than duplicating that data within the
-    /// database, which is not ideal for storage purposes.
     _searchOperation =
         cancelable.compute(prepareSearchResultsJapaneseLanguage, params);
-    int? id = await _searchOperation?.value;
+    DictionarySearchResult? result = await _searchOperation?.value;
 
-    if (id == null) {
+    if (result == null || result.headings.isEmpty) {
       return DictionarySearchResult(searchTerm: searchTerm);
     }
 
-    DictionarySearchResult? result =
-        _database.dictionarySearchResults.getSync(id);
-
-    if (result != null && result.headingIds.isNotEmpty) {
-      _dictionarySearchCache['$searchTerm/$overrideMaximumTerms'] = result;
-      return result;
-    } else {
-      return DictionarySearchResult(searchTerm: searchTerm);
-    }
+    _dictionarySearchCache['$searchTerm/$overrideMaximumTerms'] = result;
+    return result;
   }
 
   /// Check if a mapping with a certain name with a different order already
@@ -2328,7 +2278,7 @@ class AppModel with ChangeNotifier {
   /// dictionary is deleted, otherwise history data cannot be viewed without
   /// the necessary dictionary metadata.
   Future<void> clearDictionaryHistory() async {
-    await _dictionaryHistory.clear();
+    await _store.clearDictionaryHistory();
 
     dictionaryEntriesNotifier.notifyListeners();
   }
@@ -2374,12 +2324,11 @@ class AppModel with ChangeNotifier {
   /// heading is gone, `heading` is a stand-in with no entries; when the
   /// stashed entry's dictionary is gone, `entry` is null (whole heading).
   /// `found` tells whether the stashed entry could be found.
-  ({DictionaryHeading heading, DictionaryEntry? entry, bool found})
-      resolveStashItem(StashItem item) {
-    DictionaryHeading? heading = _database.dictionaryHeadings.getSync(
-      DictionaryHeading.hash(term: item.term, reading: item.reading),
-    );
-    if (heading == null) {
+  Future<ResolvedStashItem> resolveStashItem(StashItem item) async {
+    HeadingRow? row = await _db
+        .headingByTermAndReading(term: item.term, reading: item.reading)
+        .getSingleOrNull();
+    if (row == null) {
       return (
         heading: DictionaryHeading(term: item.term, reading: item.reading),
         entry: null,
@@ -2387,10 +2336,11 @@ class AppModel with ChangeNotifier {
       );
     }
 
+    DictionaryHeading heading = (await loadHeadings(_db, [row.id])).single;
     DictionaryEntry? entry = item.dictionaryName == null
         ? null
         : heading.entries.firstWhereOrNull(
-            (entry) => entry.dictionary.value?.name == item.dictionaryName);
+            (entry) => entry.dictionary.name == item.dictionaryName);
 
     return (
       heading: heading,
@@ -2543,7 +2493,8 @@ class AppModel with ChangeNotifier {
   }
 
   /// Adds a [DictionarySearchResult] to dictionary history.
-  void addToDictionaryHistory({required DictionarySearchResult result}) async {
+  Future<void> addToDictionaryHistory(
+      {required DictionarySearchResult result}) async {
     HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
     if (homeTab != DictionaryTab.instance) {
       shouldRefreshTabs = true;
@@ -2558,49 +2509,19 @@ class AppModel with ChangeNotifier {
       return;
     }
 
-    _dictionaryHistory.deleteAll(_dictionaryHistory
-        .toMap()
-        .entries
-        .where((e) => e.value == result.id)
-        .map((e) => e.key)
-        .toList());
-
-    await _dictionaryHistory.add(result.id!);
-
-    int countInSameHistory = _dictionaryHistory.length;
-
-    if (maximumDictionaryHistoryItems < countInSameHistory) {
-      int surplus = countInSameHistory - maximumDictionaryHistoryItems;
-
-      _dictionaryHistory
-          .deleteAll(_dictionaryHistory.keys.toList().sublist(0, surplus));
-    }
-  }
-
-  /// Adds a [DictionarySearchResult] to dictionary history.
-  List<DictionaryFrequency> getNoReadingFrequencies(
-      {required DictionaryHeading heading}) {
-    if (heading.reading.isEmpty) {
-      return [];
-    }
-
-    return _database.dictionaryHeadings
-            .getSync(DictionaryHeading.hash(term: heading.term, reading: ''))
-            ?.frequencies
-            .where((frequency) =>
-                !frequency.dictionary.value!.isHidden)
-            .toList() ??
-        [];
+    await _store.addToDictionaryHistory(result.searchTerm,
+        maximum: maximumDictionaryHistoryItems);
   }
 
   /// Check if the database is still open or has the app been flagged to be
   /// shutdown.
-  bool get isDatabaseOpen => _database.isOpen;
+  bool get isDatabaseOpen => _isDatabaseOpen;
+  bool _isDatabaseOpen = true;
 
   /// Safely shutdown and stop database operations.
   void shutdown() async {
     databaseCloseNotifier.notifyListeners();
-    await _database.close();
+    _isDatabaseOpen = false;
     await _db.close();
     FlutterExitApp.exitApp();
   }

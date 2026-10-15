@@ -1,40 +1,21 @@
 import 'package:yuuna/dictionary.dart';
-import 'package:isar_community/isar.dart';
 
-part 'dictionary_search_result.g.dart';
-
-/// A database entity for storing references to [DictionaryEntry] results that
-/// are yielded from dictionary database searches.
-@Collection()
+/// The headings found for a search term, best first.
 class DictionarySearchResult {
-  /// Define a search result with the given references to [DictionaryEntry]
-  /// items.
+  /// Create a result. Empty [headings] mean nothing was found.
   DictionarySearchResult({
     required this.searchTerm,
     this.bestLength = 0,
-    this.scrollPosition = 0,
-    this.headingIds = const [],
-    this.id,
+    this.headings = const [],
   });
 
-  /// Identifier for database purposes.
-  Id? id;
-
-  /// Original search term used to make the result.
-  @Index(unique: true, replace: true)
+  /// The term searched.
   final String searchTerm;
 
-  /// The best length found for the search term used for highlighting the
-  /// selected word.
+  /// How many leading characters of [searchTerm] matched, for highlighting
+  /// the selected word.
   final int bestLength;
 
-  /// The current scroll position of the result in dictionary history.
-  int scrollPosition;
-
-  /// List of heading ids by sorting order.
-  final List<int> headingIds;
-
-  /// A single result may have multiple headings in the result, which in turn
-  /// contain multiple dictionary entries.
-  final IsarLinks<DictionaryHeading> headings = IsarLinks<DictionaryHeading>();
+  /// The headings found, fully loaded, best first.
+  final List<DictionaryHeading> headings;
 }

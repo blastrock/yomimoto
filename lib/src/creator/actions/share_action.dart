@@ -39,13 +39,13 @@ class ShareAction extends QuickAction {
 
     List<DictionaryEntry> entries = heading.entries
         .where(
-            (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
+            (entry) => !dictionaryNamesByHidden[entry.dictionary.name]!)
         .toList();
     if (selectedEntry != null) {
       entries = [selectedEntry];
     }
-    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
-        .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+    entries.sort((a, b) => dictionaryNamesByOrder[a.dictionary.name]!
+        .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     StringBuffer buffer = StringBuffer();
     buffer.write(heading.term);

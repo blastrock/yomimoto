@@ -9,15 +9,11 @@ class IsolateParams {
   /// Base entity which allows messaging updates from other isolates.
   IsolateParams({
     required this.sendPort,
-    required this.directoryPath,
     required this.databasePath,
   });
 
   /// For communication with a [ReceivePort] for isolate updates.
   final SendPort sendPort;
-
-  /// Database directory path.
-  final String directoryPath;
 
   /// Path of the SQLite database file.
   final String databasePath;
@@ -37,7 +33,6 @@ class PrepareDirectoryParams extends IsolateParams {
     required this.resourceDirectory,
     required this.dictionaryFormat,
     required super.sendPort,
-    required super.directoryPath,
     required super.databasePath,
   });
 
@@ -66,7 +61,6 @@ class PrepareDictionaryParams extends IsolateParams {
     required this.resourceDirectory,
     required this.alertSendPort,
     required super.sendPort,
-    required super.directoryPath,
     required super.databasePath,
   });
 
@@ -95,35 +89,12 @@ class DeleteDictionaryParams extends IsolateParams {
   /// isolate.
   DeleteDictionaryParams({
     required super.sendPort,
-    required super.directoryPath,
     required super.databasePath,
     this.dictionaryId,
   });
 
   /// If null, this will delete all dictionaries.
   final int? dictionaryId;
-}
-
-/// For isolate communication purposes. Used for dictionary deletion.
-class UpdateDictionaryHistoryParams extends IsolateParams {
-  /// Prepare parameters needed to update dictionary history.
-  UpdateDictionaryHistoryParams({
-    required this.resultId,
-    required this.newPosition,
-    required this.maximumDictionaryHistoryItems,
-    required super.sendPort,
-    required super.directoryPath,
-    required super.databasePath,
-  });
-
-  /// The result of a dictionary search to be added to history.
-  final int resultId;
-
-  /// New position to record.
-  final int newPosition;
-
-  /// Maximum number of history items.
-  final int maximumDictionaryHistoryItems;
 }
 
 /// For isolate communication purposes. Used for dictionary search.
@@ -137,7 +108,6 @@ class DictionarySearchParams extends IsolateParams {
     required this.enabledDictionaryIds,
     required this.searchWithWildcards,
     required super.sendPort,
-    required super.directoryPath,
     required super.databasePath,
   });
 

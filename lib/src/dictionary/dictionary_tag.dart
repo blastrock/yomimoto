@@ -1,15 +1,10 @@
 import 'dart:ui';
 
-import 'package:yuuna/dictionary.dart';
-import 'package:isar_community/isar.dart';
-
-part 'dictionary_tag.g.dart';
-
-/// A database entity for tags, heavily based on the Yomichan format.
-@Collection()
+/// A label a dictionary defines, on its entries or on headings.
 class DictionaryTag {
-  /// Initiates a tag with given parameters.
+  /// Create a tag of the dictionary [dictionaryId].
   DictionaryTag({
+    required this.id,
     required this.dictionaryId,
     required this.name,
     required this.category,
@@ -18,49 +13,28 @@ class DictionaryTag {
     required this.popularity,
   });
 
-  /// Makes a tag for a dictionary.
-  factory DictionaryTag.dictionary(Dictionary dictionary) {
-    return DictionaryTag(
-      dictionaryId: dictionary.id,
-      name: dictionary.name,
-      notes: '',
-      sortingOrder: -100000000000,
-      category: 'frequent',
-      popularity: 0,
-    );
-  }
+  /// The database id.
+  final int id;
 
-  /// Dictionary ID for hashing this tag.
+  /// The dictionary defining the tag.
   final int dictionaryId;
 
-  /// Function to generate a lookup ID for heading by its unique string key.
-  static int hash({required int dictionaryId, required String name}) {
-    return fastHash('$dictionaryId/$name');
-  }
-
-  /// Identifier for database purposes.
-  Id get isarId => hash(dictionaryId: dictionaryId, name: name);
-
-  /// Display name for the tag.
-  @Index()
+  /// The short label, such as `v1` or `P`.
   final String name;
 
-  /// Category for the tag.
+  /// The kind of tag; picks its colour.
   final String category;
 
-  /// Sorting order for the tag.
+  /// Display order among tags.
   final int sortingOrder;
 
-  /// Notes for this tag.
+  /// What the label means.
   final String notes;
 
-  /// Score used to determine popularity.
-  /// Negative values are more rare and positive values are more frequent.
-  /// This score is also used to sort search results.
+  /// The dictionary's score for the tag.
   final double popularity;
 
   /// Get the color for this tag based on its category.
-  @ignore
   Color get color {
     switch (category) {
       case 'name':
@@ -84,13 +58,9 @@ class DictionaryTag {
     return const Color(0xFF616161);
   }
 
-  /// A value is yielded from a single key.
-  final IsarLink<Dictionary> dictionary = IsarLink<Dictionary>();
+  @override
+  bool operator ==(Object other) => other is DictionaryTag && id == other.id;
 
   @override
-  bool operator ==(Object other) =>
-      other is DictionaryTag && isarId == other.isarId;
-
-  @override
-  int get hashCode => isarId.hashCode;
+  int get hashCode => id.hashCode;
 }

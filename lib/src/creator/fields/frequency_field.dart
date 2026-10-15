@@ -44,8 +44,8 @@ class FrequencyField extends Field {
 
     List<(double, String)> unhiddenFrequencies = heading.frequencies
         .where((entry) =>
-            unhiddenDictionaries.contains(entry.dictionary.value!.name))
-        .map((freq) => (freq.value, freq.dictionary.value!.name))
+            unhiddenDictionaries.contains(entry.dictionary.name))
+        .map((freq) => (freq.value, freq.dictionary.name))
         .toList();
 
     List<double> frequencies = useMinInDictionary

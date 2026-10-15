@@ -264,4 +264,18 @@ void main() {
           ['B', 'A']);
     });
   });
+
+  group('dictionary history', () {
+    test('keeps the newest terms, re-added terms last', () async {
+      await store.addToDictionaryHistory('一', maximum: 2);
+      await store.addToDictionaryHistory('二', maximum: 2);
+      await store.addToDictionaryHistory('一', maximum: 2);
+      await store.addToDictionaryHistory('三', maximum: 2);
+
+      expect(store.dictionaryHistory(), ['一', '三']);
+
+      await store.clearDictionaryHistory();
+      expect(store.dictionaryHistory(), isEmpty);
+    });
+  });
 }

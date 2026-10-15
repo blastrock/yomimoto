@@ -50,12 +50,19 @@ class _StashPageState extends BasePageState<StashPage> {
   }
 
   Future<void> _open(StashItem item) async {
+    ResolvedStashItem resolved =
+        await appModelNoUpdate.resolveStashItem(item);
+    if (!mounted) {
+      return;
+    }
+
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => StashItemPage(
           item: item,
           mediaItem: widget.item,
+          resolved: resolved,
         ),
       ),
     );

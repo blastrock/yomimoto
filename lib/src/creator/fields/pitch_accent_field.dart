@@ -40,10 +40,10 @@ class PitchAccentField extends Field {
 
     List<DictionaryPitch> pitches = heading.pitches
         .where(
-            (entry) => !dictionaryNamesByHidden[entry.dictionary.value!.name]!)
+            (entry) => !dictionaryNamesByHidden[entry.dictionary.name]!)
         .toList();
-    pitches.sort((a, b) => dictionaryNamesByOrder[a.dictionary.value!.name]!
-        .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+    pitches.sort((a, b) => dictionaryNamesByOrder[a.dictionary.name]!
+        .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     if (pitches.isEmpty) {
       return '';

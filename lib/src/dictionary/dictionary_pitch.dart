@@ -1,30 +1,22 @@
 import 'package:yuuna/dictionary.dart';
-import 'package:isar_community/isar.dart';
 
-part 'dictionary_pitch.g.dart';
-
-/// A database entity that that represents supplementary pitch accent data for
-/// a certain search key.
-@Collection()
+/// A pitch accent of a heading, from a pitch dictionary.
 class DictionaryPitch {
-  /// Pitch data contains a downstep value, and pertains to a certain search
-  /// key and a dictionary.
+  /// Create a pitch accent from [dictionary].
   DictionaryPitch({
+    required this.id,
     required this.downstep,
-    this.id,
+    required this.dictionary,
   });
 
-  /// Identifier for database purposes.
-  Id? id;
+  /// The database id.
+  final int id;
 
-  /// Number that represents the index of the morae where the downstep occurs.
+  /// The mora after which the pitch drops; 0 for a flat pattern.
   final int downstep;
 
-  /// This object pertains to a certain heading.
-  final IsarLink<DictionaryHeading> heading = IsarLink<DictionaryHeading>();
-
-  /// This object belongs to a dictionary.
-  final IsarLink<Dictionary> dictionary = IsarLink<Dictionary>();
+  /// The pitch dictionary it comes from.
+  final Dictionary dictionary;
 
   @override
   bool operator ==(Object other) => other is DictionaryPitch && id == other.id;

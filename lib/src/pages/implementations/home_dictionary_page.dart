@@ -198,7 +198,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                 searchTerm: homeTab.floatingSearchBarController.query,
               );
               if (_result!.headings.isNotEmpty) {
-                appModel.addToDictionaryHistory(result: _result!);
+                await appModel.addToDictionaryHistory(result: _result!);
               }
             }
           });
@@ -415,7 +415,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                     search(
                       homeTab.floatingSearchBarController.query,
                       overrideMaximumTerms:
-                          _result!.headingIds.length + appModel.maximumTerms,
+                          _result!.headings.length + appModel.maximumTerms,
                     );
                   },
             child: Container(

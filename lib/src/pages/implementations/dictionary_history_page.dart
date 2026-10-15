@@ -34,8 +34,7 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
   Widget build(BuildContext context) {
     AnkiMapping lastSelectedMapping = appModel.lastSelectedMapping;
 
-    List<DictionarySearchResult> historyResults =
-        appModel.dictionaryHistory.reversed.toList();
+    List<String> historyTerms = appModel.dictionaryHistory.reversed.toList();
 
     return CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.pixels(999999999999999),
@@ -45,15 +44,15 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
       ),
       slivers: [
         const SliverPadding(padding: EdgeInsets.only(top: 60)),
-        ...historyResults
-            .map(
-              (result) => _DictionaryHistoryScrollableItem(
-                result: result,
-                onSearch: widget.onSearch,
-                onShare: widget.onShare,
-                lastSelectedMapping: lastSelectedMapping,
-              ),
-            ),
+        ...historyTerms.map(
+          (searchTerm) => _DictionaryHistoryScrollableItem(
+            key: ValueKey(searchTerm),
+            searchTerm: searchTerm,
+            onSearch: widget.onSearch,
+            onShare: widget.onShare,
+            lastSelectedMapping: lastSelectedMapping,
+          ),
+        ),
       ],
     );
   }
@@ -61,14 +60,15 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
 
 class _DictionaryHistoryScrollableItem extends BasePage {
   const _DictionaryHistoryScrollableItem({
-    required this.result,
+    required this.searchTerm,
     required this.onSearch,
     required this.onShare,
     required this.lastSelectedMapping,
+    super.key,
   });
 
-  /// The result pertaining to this item.
-  final DictionarySearchResult result;
+  /// The term of this history item, searched again to show its result.
+  final String searchTerm;
 
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
@@ -90,19 +90,32 @@ class _DictionaryHistoryScrollableItemState
   @override
   bool get wantKeepAlive => true;
 
+  late final Future<DictionarySearchResult> _result =
+      appModelNoUpdate.searchDictionary(
+    searchTerm: widget.searchTerm,
+    searchWithWildcards: false,
+  );
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
-    DictionarySearchResult result = widget.result;
-    Map<int, DictionaryHeading> headingsById = Map.fromEntries(
-      result.headings.map(
-        (heading) => MapEntry(heading.id, heading),
-      ),
-    );
+    return FutureBuilder<DictionarySearchResult>(
+      future: _result,
+      builder: (context, snapshot) {
+        DictionarySearchResult? result = snapshot.data;
+        if (result == null || result.headings.isEmpty) {
+          return const SliverPadding(padding: EdgeInsets.zero);
+        }
 
-    List<DictionaryHeading> headings =
-        result.headingIds.map((id) => headingsById[id]).nonNulls.toList();
+        return buildResult(result);
+      },
+    );
+  }
+
+  /// The first heading of [result], with a footer to open the rest.
+  Widget buildResult(DictionarySearchResult result) {
+    List<DictionaryHeading> headings = result.headings;
 
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
@@ -119,7 +132,7 @@ class _DictionaryHistoryScrollableItemState
     for (DictionaryHeading heading in headings) {
       expandableControllersByHeading.putIfAbsent(heading, () => {});
       for (DictionaryEntry entry in heading.entries) {
-        Dictionary dictionary = entry.dictionary.value!;
+        Dictionary dictionary = entry.dictionary;
         expandableControllersByHeading[heading]?.putIfAbsent(
           dictionary,
           () => ExpandableController(

@@ -44,12 +44,12 @@ class HiddenMeaningField extends Field {
 
     List<DictionaryEntry> hiddenEntries = heading.entries
         .where(
-            (entry) => dictionaryNamesByHidden[entry.dictionary.value!.name]!)
+            (entry) => dictionaryNamesByHidden[entry.dictionary.name]!)
         .toList();
 
     hiddenEntries.sort((a, b) =>
-        dictionaryNamesByOrder[a.dictionary.value!.name]!
-            .compareTo(dictionaryNamesByOrder[b.dictionary.value!.name]!));
+        dictionaryNamesByOrder[a.dictionary.name]!
+            .compareTo(dictionaryNamesByOrder[b.dictionary.name]!));
 
     return MeaningField.flattenMeanings(
         appModel: appModel,

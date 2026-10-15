@@ -381,4 +381,25 @@ class AppStore {
     await (db.update(db.dictionaries)..where((table) => table.id.equals(id)))
         .write(DictionariesCompanion(order: Value(order)));
   }
+
+  /// The terms whose results the Dictionary tab shows, oldest first.
+  List<String> dictionaryHistory() {
+    return raw
+        .select('SELECT search_term FROM dictionary_history ORDER BY id')
+        .map((row) => row['search_term'] as String)
+        .toList();
+  }
+
+  /// Make [searchTerm] the newest dictionary history item, keeping the
+  /// [maximum] newest.
+  Future<void> addToDictionaryHistory(
+    String searchTerm, {
+    required int maximum,
+  }) =>
+      _addRecentTerm(db.dictionaryHistoryItems, searchTerm, maximum);
+
+  /// Forget the dictionary history.
+  Future<void> clearDictionaryHistory() async {
+    await db.delete(db.dictionaryHistoryItems).go();
+  }
 }

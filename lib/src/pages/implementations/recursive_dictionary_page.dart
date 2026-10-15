@@ -222,7 +222,7 @@ class _RecursiveDictionaryPageState
               );
             }
             if (_result!.headings.isNotEmpty) {
-              appModel.addToDictionaryHistory(result: _result!);
+              await appModel.addToDictionaryHistory(result: _result!);
             }
           });
         }
@@ -468,7 +468,7 @@ class _RecursiveDictionaryPageState
                     search(
                       _controller.query,
                       overrideMaximumTerms:
-                          _result!.headingIds.length + appModel.maximumTerms,
+                          _result!.headings.length + appModel.maximumTerms,
                     );
                   },
             child: Container(

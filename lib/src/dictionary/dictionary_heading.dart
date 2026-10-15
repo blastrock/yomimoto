@@ -1,67 +1,46 @@
 import 'package:collection/collection.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:isar_community/isar.dart';
 
-part 'dictionary_heading.g.dart';
-
-/// A database entity that that effectively acts as the primary key for a
-/// dictionary search. Dictionary headings, which specify the [term] and
-/// [reading], may point to multiple dictionary entries.
-///
-/// Dictionary keys are shared between multiple imported dictionaries.
-@Collection()
+/// A word: a term and its reading, shared by every dictionary that has
+/// something to say about it. Built fully loaded by `loadHeadings`.
 class DictionaryHeading {
-  /// A heading must have a term and a reading. Different languages may perform
-  /// searches based on only the term or only the reading, or both.
+  /// Create a heading. [id] is null for a stand-in that is not in the
+  /// database.
   DictionaryHeading({
     required this.term,
     this.reading = '',
+    this.id,
   });
 
-  /// Function to generate a lookup ID for heading by its unique string key.
-  static int hash({required String term, required String reading}) {
-    return fastHash('$term/$reading');
-  }
+  /// The database id; null for a stand-in.
+  final int? id;
 
-  /// Identifier for database purposes.
-  Id get id => hash(term: term, reading: reading);
+  /// The word as written.
+  final String term;
 
-  /// Sum of popularity of all dictionary entries belonging to this entry.
-  @ignore
+  /// The word's reading; empty for kanji entries and words given no reading.
+  final String reading;
+
+  /// Entries for this word, one or more per dictionary defining it.
+  final List<DictionaryEntry> entries = [];
+
+  /// Pitch accents of this word.
+  final List<DictionaryPitch> pitches = [];
+
+  /// Frequencies of this word.
+  final List<DictionaryFrequency> frequencies = [];
+
+  /// Tags on this word as a whole.
+  final List<DictionaryTag> tags = [];
+
+  /// Frequencies that frequency dictionaries give for [term] without a
+  /// reading. Empty when [reading] is empty: those are [frequencies].
+  final List<DictionaryFrequency> noReadingFrequencies = [];
+
+  /// The sum of the popularity of this word's entries.
   double get popularitySum {
     return entries.map((entry) => entry.popularity).sum;
   }
-
-  /// A word or phrase. This effectively acts as the headword, or the primary
-  /// concept to be learned or represented in a dictionary entry.
-  @Index(type: IndexType.value, caseSensitive: false)
-  final String term;
-
-  /// An alternate form of the term. This is useful for languages which have an
-  /// which must distinguish different keys which share the same term, but may
-  /// have multiple pronunciations.
-  @Index(type: IndexType.value, caseSensitive: false)
-  final String reading;
-
-  /// Term of the reading. Used for prioritising starts with matches.
-  @Index()
-  int get termLength => term.length;
-
-  /// A heading may have multiple dictionary entries.
-  @Backlink(to: 'heading')
-  final IsarLinks<DictionaryEntry> entries = IsarLinks<DictionaryEntry>();
-
-  /// A heading may have multiple pitch data.
-  @Backlink(to: 'heading')
-  final IsarLinks<DictionaryPitch> pitches = IsarLinks<DictionaryPitch>();
-
-  /// A heading may have multiple tags.
-  final IsarLinks<DictionaryTag> tags = IsarLinks<DictionaryTag>();
-
-  /// A heading may have multiple frequency data.
-  @Backlink(to: 'heading')
-  final IsarLinks<DictionaryFrequency> frequencies =
-      IsarLinks<DictionaryFrequency>();
 
   @override
   bool operator ==(Object other) =>

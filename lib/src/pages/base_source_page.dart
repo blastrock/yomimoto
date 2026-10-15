@@ -163,9 +163,9 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
       _lastSearchTerm = searchTerm;
 
-      appModel.addToDictionaryHistory(result: dictionaryResult);
       _showMore = dictionaryResult.headings.length < overrideMaximumTerms;
       _dictionaryResultNotifier.value = dictionaryResult;
+      await appModel.addToDictionaryHistory(result: dictionaryResult);
     } finally {
       _isSearchingNotifier.value = false;
     }
@@ -439,7 +439,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
                       searchTerm: _lastSearchTerm!,
                       position: _popupPositionNotifier.value!,
                       overrideMaximumTerms:
-                          _dictionaryResultNotifier.value!.headingIds.length +
+                          _dictionaryResultNotifier.value!.headings.length +
                               appModel.maximumTerms,
                     );
                   },

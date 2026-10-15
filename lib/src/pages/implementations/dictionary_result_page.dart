@@ -71,14 +71,7 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
   Widget build(BuildContext context) {
     AnkiMapping lastSelectedMapping = appModel.lastSelectedMapping;
 
-    Map<int, DictionaryHeading> headingsById = Map.fromEntries(
-      widget.result.headings.map(
-        (heading) => MapEntry(heading.id, heading),
-      ),
-    );
-
-    List<DictionaryHeading> headings =
-        widget.result.headingIds.map((id) => headingsById[id]!).toList();
+    List<DictionaryHeading> headings = widget.result.headings;
 
     List<Dictionary> dictionaries = appModel.dictionaries;
     Map<String, bool> dictionaryNamesByHidden = Map<String, bool>.fromEntries(
@@ -93,7 +86,7 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
     for (DictionaryHeading heading in headings) {
       expandableControllersByHeading.putIfAbsent(heading, () => {});
       for (DictionaryEntry entry in heading.entries) {
-        Dictionary dictionary = entry.dictionary.value!;
+        Dictionary dictionary = entry.dictionary;
         expandableControllersByHeading[heading]?.putIfAbsent(
           dictionary,
           () => ExpandableController(

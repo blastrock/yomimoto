@@ -41,7 +41,6 @@ void main() {
         resourceDirectory: resources,
         alertSendPort: alerts.sendPort,
         sendPort: progress.sendPort,
-        directoryPath: directory.path,
         databasePath: databasePath,
       );
 

@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/utils.dart';
 
 /// A word saved from a book while reading, with the sentence it was found
@@ -61,3 +62,13 @@ class StashItem {
     );
   }
 }
+
+/// A stash item's word found in the dictionaries: `heading` is a stand-in
+/// with no entries when the word is gone; `entry` is null when the stashed
+/// entry's dictionary is gone or the whole heading was stashed; `found` tells
+/// whether the stashed entry could be found.
+typedef ResolvedStashItem = ({
+  DictionaryHeading heading,
+  DictionaryEntry? entry,
+  bool found,
+});

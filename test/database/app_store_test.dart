@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
+import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/utils.dart';
 
@@ -239,6 +240,28 @@ void main() {
 
       await store.clearSearchHistory();
       expect(store.searchHistory(), isEmpty);
+    });
+  });
+
+  group('dictionaries', () {
+    test('listed in order; flags saved; reordered without constraint errors',
+        () async {
+      insertTestDictionary(database.raw, 'A');
+      insertTestDictionary(database.raw, 'B');
+
+      List<Dictionary> dictionaries = store.dictionaries();
+      expect(dictionaries.map((dictionary) => dictionary.name), ['A', 'B']);
+
+      Dictionary a = dictionaries.first..isHidden = true;
+      await store.updateDictionaryFlags(a);
+      expect(store.dictionaries().first.isHidden, isTrue);
+
+      Dictionary b = dictionaries.last;
+      a.order = 1;
+      b.order = 0;
+      await store.reorderDictionaries([b, a]);
+      expect(store.dictionaries().map((dictionary) => dictionary.name),
+          ['B', 'A']);
     });
   });
 }

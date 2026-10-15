@@ -257,8 +257,7 @@ class AppModel with ChangeNotifier {
 
   /// Returns all dictionaries imported into the database. Sorted by the
   /// user-defined order in the dictionary menu.
-  List<Dictionary> get dictionaries =>
-      _database.dictionarys.where().sortByOrder().findAllSync();
+  List<Dictionary> get dictionaries => _store.dictionaries();
 
   /// Returns all export profiles.
   List<AnkiMapping> get mappings => _store.mappings();
@@ -571,11 +570,8 @@ class AppModel with ChangeNotifier {
 
   /// Update the user-defined order of a given dictionary in the database.
   /// See the dictionary dialog's [ReorderableListView] for usage.
-  void updateDictionaryOrder(List<Dictionary> newDictionaries) async {
-    _database.writeTxnSync(() {
-      _database.dictionarys.putAllSync(newDictionaries);
-    });
-  }
+  Future<void> updateDictionaryOrder(List<Dictionary> newDictionaries) =>
+      _store.reorderDictionaries(newDictionaries);
 
   /// Update the user-defined order of a given dictionary in the database.
   /// See the dictionary dialog's [ReorderableListView] for usage.
@@ -1141,26 +1137,19 @@ class AppModel with ChangeNotifier {
     /// If any [Exception] occurs, the process is aborted with a message as
     /// shown below. A dialog is shown to show the progress of the dictionary
     /// file import, with messages pertaining to the above [ValueNotifier].
+    Directory stagingDirectory =
+        Directory(path.join(dictionaryResourceDirectory.path, 'importing'));
     try {
-      final int highestId = _database.dictionarys
-              .where(sort: Sort.desc)
-              .anyId()
-              .findFirstSync()
-              ?.id ??
-          1;
-      final int id = highestId + 1;
-      final Directory resourceDirectory =
-          Directory(path.join(dictionaryResourceDirectory.path, id.toString()));
-      if (resourceDirectory.existsSync()) {
-        resourceDirectory.deleteSync(recursive: true);
+      if (stagingDirectory.existsSync()) {
+        stagingDirectory.deleteSync(recursive: true);
       }
-
-      resourceDirectory.createSync(recursive: true);
+      stagingDirectory.createSync(recursive: true);
 
       PrepareDirectoryParams prepareDirectoryParams = PrepareDirectoryParams(
         file: file,
         directoryPath: _databaseDirectory.path,
-        resourceDirectory: resourceDirectory,
+        databasePath: databasePath,
+        resourceDirectory: stagingDirectory,
         dictionaryFormat: dictionaryFormat,
         sendPort: receivePort.sendPort,
       );
@@ -1170,41 +1159,38 @@ class AppModel with ChangeNotifier {
 
       String name = await dictionaryFormat.prepareName(prepareDirectoryParams);
       progressNotifier.value = t.import_name(name: name);
-      Dictionary? bottomMostDictionary = _database.dictionarys
-          .where(sort: Sort.desc)
-          .anyOrder()
-          .findFirstSync();
 
-      Dictionary? sameNameDictionary =
-          _database.dictionarys.where().nameEqualTo(name).findFirstSync();
-      if (sameNameDictionary != null) {
+      if (dictionaries.any((dictionary) => dictionary.name == name)) {
         throw Exception(t.import_duplicate(name: name));
       }
 
-      int order = (bottomMostDictionary?.order ?? 0) + 1;
-
-      Dictionary dictionary = Dictionary(
-        id: id,
-        order: order,
-        name: name,
-        formatKey: dictionaryFormat.uniqueKey,
-      );
-
       PrepareDictionaryParams prepareDictionaryParams = PrepareDictionaryParams(
-        dictionary: dictionary,
-        resourceDirectory: resourceDirectory,
-        directoryPath: _databaseDirectory.path,
+        dictionaryName: name,
         dictionaryFormat: dictionaryFormat,
+        resourceDirectory: stagingDirectory,
+        directoryPath: _databaseDirectory.path,
+        databasePath: databasePath,
         sendPort: receivePort.sendPort,
         alertSendPort: alertReceivePort.sendPort,
       );
 
-      await compute(depositDictionaryDataHelper, prepareDictionaryParams);
+      int id =
+          await compute(depositDictionaryDataHelper, prepareDictionaryParams);
+
+      Directory resourceDirectory =
+          Directory(path.join(dictionaryResourceDirectory.path, '$id'));
+      if (resourceDirectory.existsSync()) {
+        resourceDirectory.deleteSync(recursive: true);
+      }
+      stagingDirectory.renameSync(resourceDirectory.path);
 
       progressNotifier.value = t.import_complete;
       onImportSuccess();
       await Future.delayed(const Duration(seconds: 1), () {});
     } catch (e) {
+      if (stagingDirectory.existsSync()) {
+        stagingDirectory.deleteSync(recursive: true);
+      }
       progressNotifier.value = '$e';
       await Future.delayed(const Duration(seconds: 3), () {});
       progressNotifier.value = t.import_failed;
@@ -1216,20 +1202,16 @@ class AppModel with ChangeNotifier {
 
   /// Toggle a dictionary's between collapsed and expanded state. This will
   /// affect how a dictionary's search results are shown by default.
-  void toggleDictionaryCollapsed(Dictionary dictionary) {
-    _database.writeTxnSync(() {
-      dictionary.isCollapsed = !dictionary.isCollapsed;
-      _database.dictionarys.putSync(dictionary);
-    });
+  Future<void> toggleDictionaryCollapsed(Dictionary dictionary) async {
+    dictionary.isCollapsed = !dictionary.isCollapsed;
+    await _store.updateDictionaryFlags(dictionary);
   }
 
   /// Toggle a dictionary's between hidden and shown state. This will
   /// affect how a dictionary's search results are shown by default.
-  void toggleDictionaryHidden(Dictionary dictionary) {
-    _database.writeTxnSync(() {
-      dictionary.isHidden = !dictionary.isHidden;
-      _database.dictionarys.putSync(dictionary);
-    });
+  Future<void> toggleDictionaryHidden(Dictionary dictionary) async {
+    dictionary.isHidden = !dictionary.isHidden;
+    await _store.updateDictionaryFlags(dictionary);
   }
 
   /// Delete all dictionary data from the database.
@@ -1241,6 +1223,7 @@ class AppModel with ChangeNotifier {
     ReceivePort receivePort = ReceivePort();
     DeleteDictionaryParams params = DeleteDictionaryParams(
       directoryPath: _databaseDirectory.path,
+      databasePath: databasePath,
       sendPort: receivePort.sendPort,
     );
 
@@ -1264,6 +1247,7 @@ class AppModel with ChangeNotifier {
     DeleteDictionaryParams params = DeleteDictionaryParams(
       dictionaryId: dictionary.id,
       directoryPath: _databaseDirectory.path,
+      databasePath: databasePath,
       sendPort: receivePort.sendPort,
     );
 
@@ -1342,6 +1326,7 @@ class AppModel with ChangeNotifier {
     DictionarySearchParams params = DictionarySearchParams(
       searchTerm: searchTerm,
       directoryPath: _databaseDirectory.path,
+      databasePath: databasePath,
       maximumDictionarySearchResults: maximumDictionarySearchResults,
       maximumDictionaryTermsInResult: overrideMaximumTerms ?? maximumTerms,
       searchWithWildcards: searchWithWildcards,

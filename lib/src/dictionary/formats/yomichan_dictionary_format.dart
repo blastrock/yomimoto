@@ -6,10 +6,10 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:isar_community/isar.dart';
 import 'package:list_counter/list_counter.dart';
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/utils.dart';
 
@@ -179,7 +179,7 @@ Future<String> prepareNameYomichanFormat(PrepareDirectoryParams params) async {
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
 void prepareEntriesYomichanFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
+  required DictionaryImportWriter writer,
 }) {
   final List<FileSystemEntity> entities = params.resourceDirectory.listSync();
   final Iterable<File> files = entities.whereType<File>();
@@ -222,50 +222,13 @@ void prepareEntriesYomichanFormat({
             .whereType<String>()
             .toList();
 
-        int headingId = DictionaryHeading.hash(
-          term: term,
-          reading: reading,
-        );
-
-        final entry = DictionaryEntry(
+        writer.addEntry(
+          headingId: writer.headingId(term: term, reading: reading),
           definitions: definitions,
           popularity: popularity,
           entryTagNames: entryTagNames,
           headingTagNames: headingTagNames,
         );
-
-        List<int> entryTagHashes = entryTagNames.map((name) {
-          int dictionaryId = params.dictionary.id;
-          return DictionaryTag.hash(dictionaryId: dictionaryId, name: name);
-        }).toList();
-
-        List<DictionaryTag> entryTags = isar.dictionaryTags
-            .getAllSync(entryTagHashes)
-            .whereType<DictionaryTag>()
-            .toList();
-
-        List<int> headingTagHashes = headingTagNames.map((name) {
-          int dictionaryId = params.dictionary.id;
-          return DictionaryTag.hash(dictionaryId: dictionaryId, name: name);
-        }).toList();
-
-        List<DictionaryTag> headingTags = isar.dictionaryTags
-            .getAllSync(headingTagHashes)
-            .whereType<DictionaryTag>()
-            .toList();
-
-        DictionaryHeading heading =
-            isar.dictionaryHeadings.getSync(headingId) ??
-                DictionaryHeading(term: term, reading: reading);
-
-        entry.tags.addAll(entryTags);
-        entry.heading.value = heading;
-        entry.dictionary.value = params.dictionary;
-        isar.dictionaryEntrys.putSync(entry);
-
-        heading.entries.add(entry);
-        heading.tags.addAll(headingTags);
-        isar.dictionaryHeadings.putSync(heading);
 
         n++;
         params.send(t.import_write_entry(
@@ -309,35 +272,12 @@ void prepareEntriesYomichanFormat({
         String definition = buffer.toString().trim();
 
         if (definition.isNotEmpty) {
-          int headingId = DictionaryHeading.hash(term: term, reading: '');
-
-          final entry = DictionaryEntry(
+          writer.addEntry(
+            headingId: writer.headingId(term: term, reading: ''),
             definitions: [definition],
             popularity: 0,
             headingTagNames: headingTagNames,
           );
-
-          DictionaryHeading heading =
-              isar.dictionaryHeadings.getSync(headingId) ??
-                  DictionaryHeading(term: term);
-
-          entry.heading.value = heading;
-          entry.dictionary.value = params.dictionary;
-          List<int> headingTagHashes = headingTagNames.map((name) {
-            int dictionaryId = params.dictionary.id;
-            return DictionaryTag.hash(dictionaryId: dictionaryId, name: name);
-          }).toList();
-
-          List<DictionaryTag> headingTags = isar.dictionaryTags
-              .getAllSync(headingTagHashes)
-              .whereType<DictionaryTag>()
-              .toList();
-
-          isar.dictionaryEntrys.putSync(entry);
-
-          heading.entries.add(entry);
-          heading.tags.addAll(headingTags);
-          isar.dictionaryHeadings.putSync(heading);
 
           n++;
           params.send(t.import_write_entry(
@@ -351,10 +291,10 @@ void prepareEntriesYomichanFormat({
 }
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
-Future<void> prepareTagsYomichanFormat({
+void prepareTagsYomichanFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {
+  required DictionaryImportWriter writer,
+}) {
   final List<FileSystemEntity> entities = params.resourceDirectory.listSync();
   final Iterable<File> files = entities.whereType<File>();
 
@@ -388,8 +328,7 @@ Future<void> prepareTagsYomichanFormat({
       String notes = item[3] as String;
       double popularity = (item[4] as num).toDouble();
 
-      DictionaryTag tag = DictionaryTag(
-        dictionaryId: params.dictionary.id,
+      writer.addTag(
         name: name,
         category: category,
         sortingOrder: sortingOrder,
@@ -398,7 +337,6 @@ Future<void> prepareTagsYomichanFormat({
       );
 
       n++;
-      isar.dictionaryTags.putSync(tag);
       params.send(t.import_write_tag(
         count: n,
         total: count,
@@ -408,10 +346,10 @@ Future<void> prepareTagsYomichanFormat({
 }
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
-Future<void> preparePitchesYomichanFormat({
+void preparePitchesYomichanFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {
+  required DictionaryImportWriter writer,
+}) {
   final List<FileSystemEntity> entities = params.resourceDirectory.listSync();
   final Iterable<File> files = entities.whereType<File>();
 
@@ -445,23 +383,14 @@ Future<void> preparePitchesYomichanFormat({
       if (type == 'pitch') {
         Map<String, dynamic> data = Map<String, dynamic>.from(item[2]);
         String reading = data['reading'] ?? '';
-        int headingId = DictionaryHeading.hash(term: term, reading: reading);
-        DictionaryHeading heading =
-            isar.dictionaryHeadings.getSync(headingId) ??
-                DictionaryHeading(term: term);
+        int headingId = writer.headingId(term: term, reading: reading);
 
         List<Map<String, dynamic>> distinctPitchJsons =
             List<Map<String, dynamic>>.from(data['pitches']);
         for (Map<String, dynamic> distinctPitch in distinctPitchJsons) {
           int downstep = distinctPitch['position'];
-          DictionaryPitch pitch = DictionaryPitch(downstep: downstep);
-
-          pitch.dictionary.value = params.dictionary;
-          isar.dictionaryPitchs.putSync(pitch);
-          heading.pitches.add(pitch);
+          writer.addPitch(headingId: headingId, downstep: downstep);
         }
-
-        isar.dictionaryHeadings.putSync(heading);
       } else {
         continue;
       }
@@ -472,10 +401,10 @@ Future<void> preparePitchesYomichanFormat({
 }
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
-Future<void> prepareFrequenciesYomichanFormat({
+void prepareFrequenciesYomichanFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {
+  required DictionaryImportWriter writer,
+}) {
   final List<FileSystemEntity> entities = params.resourceDirectory.listSync();
   final Iterable<File> files = entities.whereType<File>();
 
@@ -507,20 +436,20 @@ Future<void> prepareFrequenciesYomichanFormat({
       String type = item[1] as String;
 
       if (type == 'freq') {
-        int? headingId;
+        String? reading;
         late double value;
         late String? displayValue;
 
         if (item[2] is double) {
           double number = item[2] as double;
 
-          headingId = DictionaryHeading.hash(term: term, reading: '');
+          reading = '';
           value = number;
           displayValue =
               (number % 1 == 0) ? number.toInt().toString() : number.toString();
         } else if (item[2] is int) {
           int number = item[2] as int;
-          headingId = DictionaryHeading.hash(term: term, reading: '');
+          reading = '';
           value = number.toDouble();
           displayValue = number.toString();
         } else if (item[2] is Map) {
@@ -530,24 +459,21 @@ Future<void> prepareFrequenciesYomichanFormat({
             Map<String, dynamic> frequencyData =
                 Map<String, dynamic>.from(data['frequency']);
 
-            String reading = data['reading'] ?? '';
-            headingId = DictionaryHeading.hash(term: term, reading: reading);
+            reading = data['reading'] ?? '';
 
             num number = frequencyData['value'] ?? 0;
 
             value = number.toDouble();
             displayValue = frequencyData['displayValue'];
           } else if (data['displayValue'] != null) {
-            String reading = data['reading'] ?? '';
-            headingId = DictionaryHeading.hash(term: term, reading: reading);
+            reading = data['reading'] ?? '';
 
             num number = data['value'] ?? 0;
 
             value = number.toDouble();
             displayValue = data['displayValue'];
           } else if (data['value'] != null) {
-            String reading = data['reading'] ?? '';
-            headingId = DictionaryHeading.hash(term: term, reading: reading);
+            reading = data['reading'] ?? '';
 
             num number = data['value'] ?? 0;
 
@@ -555,8 +481,7 @@ Future<void> prepareFrequenciesYomichanFormat({
             displayValue = number.toInt().toString();
           } else if (data['frequency'] is num) {
             num frequencyValue = data['frequency'];
-            String reading = data['reading'] ?? '';
-            headingId = DictionaryHeading.hash(term: term, reading: reading);
+            reading = data['reading'] ?? '';
 
             value = frequencyValue.toDouble();
             displayValue = (frequencyValue % 1 == 0)
@@ -564,28 +489,20 @@ Future<void> prepareFrequenciesYomichanFormat({
                 : frequencyValue.toDouble().toString();
           }
         } else {
-          headingId = DictionaryHeading.hash(term: term, reading: '');
+          reading = '';
 
           value = 0;
           displayValue = item[2].toString();
         }
 
-        if (headingId != null) {
-          DictionaryHeading heading =
-              isar.dictionaryHeadings.getSync(headingId) ??
-                  DictionaryHeading(term: term);
-
-          final frequency = DictionaryFrequency(
-            displayValue: displayValue ?? '',
+        if (reading != null) {
+          writer.addFrequency(
+            headingId: writer.headingId(term: term, reading: reading),
             value: value,
+            displayValue: displayValue ?? '',
           );
 
           n++;
-          frequency.dictionary.value = params.dictionary;
-          frequency.heading.value = heading;
-          isar.dictionaryFrequencys.putSync(frequency);
-          heading.frequencies.add(frequency);
-
           params.send(t.import_write_frequency(count: n, total: count));
         }
       } else {

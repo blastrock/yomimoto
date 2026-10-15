@@ -10,6 +10,7 @@ class IsolateParams {
   IsolateParams({
     required this.sendPort,
     required this.directoryPath,
+    required this.databasePath,
   });
 
   /// For communication with a [ReceivePort] for isolate updates.
@@ -17,6 +18,9 @@ class IsolateParams {
 
   /// Database directory path.
   final String directoryPath;
+
+  /// Path of the SQLite database file.
+  final String databasePath;
 
   /// Send a message through the [sendPort].
   void send(Object? message) {
@@ -34,6 +38,7 @@ class PrepareDirectoryParams extends IsolateParams {
     required this.dictionaryFormat,
     required super.sendPort,
     required super.directoryPath,
+    required super.databasePath,
   });
 
   /// A file from which the contents must be put in working directory. This
@@ -56,16 +61,17 @@ class PrepareDictionaryParams extends IsolateParams {
   /// Prepare parameters for a dictionary format's name, entries and metadata
   /// preparation methods.
   PrepareDictionaryParams({
-    required this.dictionary,
+    required this.dictionaryName,
     required this.dictionaryFormat,
     required this.resourceDirectory,
     required this.alertSendPort,
     required super.sendPort,
     required super.directoryPath,
+    required super.databasePath,
   });
 
-  /// The new dictionary to be added after the import is complete.
-  final Dictionary dictionary;
+  /// The name of the dictionary being imported.
+  final String dictionaryName;
 
   /// The dictionary format to be used for entry processing.
   final DictionaryFormat dictionaryFormat;
@@ -90,6 +96,7 @@ class DeleteDictionaryParams extends IsolateParams {
   DeleteDictionaryParams({
     required super.sendPort,
     required super.directoryPath,
+    required super.databasePath,
     this.dictionaryId,
   });
 
@@ -106,6 +113,7 @@ class UpdateDictionaryHistoryParams extends IsolateParams {
     required this.maximumDictionaryHistoryItems,
     required super.sendPort,
     required super.directoryPath,
+    required super.databasePath,
   });
 
   /// The result of a dictionary search to be added to history.
@@ -130,6 +138,7 @@ class DictionarySearchParams extends IsolateParams {
     required this.searchWithWildcards,
     required super.sendPort,
     required super.directoryPath,
+    required super.databasePath,
   });
 
   /// Primary search term, likely taken from context.

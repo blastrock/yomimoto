@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:isar_community/isar.dart';
+import 'package:sqlite3/sqlite3.dart' show Database;
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
 
@@ -23,32 +25,41 @@ int fastHash(String string) {
   return hash;
 }
 
-/// Performed in another isolate with compute. This is a top-level utility
-/// function that makes use of Isar allowing instances to be opened through
-/// multiple isolates. The function for preparing entries and tags according to
-/// the [DictionaryFormat] is also done in the same isolate, to remove having
-/// to communicate potentially hundreds of thousands of entries to another
-/// newly opened isolate.
-Future<void> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
+/// Import the dictionary described by [params] in one transaction, and
+/// return its new id. On failure nothing is written. Top-level for
+/// `compute`.
+Future<int> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
+  Database database = openRawDatabase(params.databasePath);
   try {
-    /// Create a new instance of Isar as this is a different isolate.
-    final Isar isar = await Isar.open(
-      globalSchemas,
-      directory: params.directoryPath,
-      maxSizeMiB: 8192,
-    );
+    database.execute('BEGIN IMMEDIATE');
+    try {
+      database.execute(
+        'INSERT INTO dictionary (name, format_key, "order") VALUES '
+        '(?, ?, (SELECT COALESCE(MAX("order"), 0) + 1 FROM dictionary))',
+        [params.dictionaryName, params.dictionaryFormat.uniqueKey],
+      );
+      int dictionaryId = database.lastInsertRowId;
 
-    /// Write as one transaction. If anything fails, no changes should occur.
-    await isar.writeTxnSync(() async {
-      /// Write the [Dictionary] entity.
-      isar.dictionarys.putSync(params.dictionary);
+      DictionaryImportWriter writer = DictionaryImportWriter(
+        database: database,
+        dictionaryId: dictionaryId,
+      );
+      try {
+        params.dictionaryFormat.prepareTags(params: params, writer: writer);
+        params.dictionaryFormat.prepareEntries(params: params, writer: writer);
+        params.dictionaryFormat.preparePitches(params: params, writer: writer);
+        params.dictionaryFormat
+            .prepareFrequencies(params: params, writer: writer);
+      } finally {
+        writer.close();
+      }
 
-      /// Write entities.
-      params.dictionaryFormat.prepareTags(params: params, isar: isar);
-      params.dictionaryFormat.prepareEntries(params: params, isar: isar);
-      params.dictionaryFormat.preparePitches(params: params, isar: isar);
-      params.dictionaryFormat.prepareFrequencies(params: params, isar: isar);
-    });
+      database.execute('COMMIT');
+      return dictionaryId;
+    } catch (_) {
+      database.execute('ROLLBACK');
+      rethrow;
+    }
   } catch (e, stack) {
     debugPrint('$e');
     debugPrint('$stack');
@@ -56,6 +67,8 @@ Future<void> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
     params.send('$stack');
 
     rethrow;
+  } finally {
+    database.close();
   }
 }
 
@@ -104,62 +117,20 @@ Future<void> updateDictionaryHistoryHelper(
 
 /// Clears all data from the dictionary database.
 Future<void> deleteDictionariesHelper(DeleteDictionaryParams params) async {
-  final Isar database = await Isar.open(
-    globalSchemas,
-    directory: params.directoryPath,
-    maxSizeMiB: 8192,
-  );
-
-  database.writeTxnSync(() {
-    database.dictionarySearchResults.clearSync();
-    database.dictionaryTags.clearSync();
-    database.dictionaryEntrys.clearSync();
-    database.dictionaryHeadings.clearSync();
-    database.dictionaryPitchs.clearSync();
-    database.dictionaryFrequencys.clearSync();
-    database.dictionarys.clearSync();
-  });
+  AppDatabase database = AppDatabase.open(params.databasePath);
+  try {
+    await deleteAllDictionaryData(database);
+  } finally {
+    await database.close();
+  }
 }
 
 /// Clears single dictionary data from the dictionary database.
 Future<void> deleteDictionaryHelper(DeleteDictionaryParams params) async {
-  final Isar database = await Isar.open(
-    globalSchemas,
-    directory: params.directoryPath,
-    maxSizeMiB: 8192,
-  );
-
-  int id = params.dictionaryId!;
-  Dictionary dictionary = database.dictionarys.getSync(id)!;
-
-  database.writeTxnSync(() {
-    database.dictionarySearchResults.clearSync();
-    database.dictionaryEntrys
-        .filter()
-        .dictionary((q) => q.idEqualTo(id))
-        .deleteAllSync();
-    database.dictionaryTags
-        .filter()
-        .dictionary((q) => q.idEqualTo(id))
-        .deleteAllSync();
-    database.dictionaryPitchs
-        .filter()
-        .dictionary((q) => q.idEqualTo(id))
-        .deleteAllSync();
-    database.dictionaryFrequencys
-        .filter()
-        .dictionary((q) => q.idEqualTo(id))
-        .deleteAllSync();
-    database.dictionaryHeadings
-        .filter()
-        .entriesIsEmpty()
-        .and()
-        .tagsIsEmpty()
-        .and()
-        .pitchesIsEmpty()
-        .and()
-        .frequenciesIsEmpty()
-        .deleteAllSync();
-    database.dictionarys.deleteSync(dictionary.id);
-  });
+  AppDatabase database = AppDatabase.open(params.databasePath);
+  try {
+    await deleteDictionaryData(database, params.dictionaryId!);
+  } finally {
+    await database.close();
+  }
 }

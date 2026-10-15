@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/utils.dart';
@@ -342,5 +343,42 @@ class AppStore {
         updateKind: UpdateKind.delete,
       );
     });
+  }
+
+  /// The imported dictionaries, in the user's order.
+  List<Dictionary> dictionaries() {
+    return _select(
+        db.dictionaries.map, 'SELECT * FROM dictionary ORDER BY "order"');
+  }
+
+  /// Save [dictionary]'s hidden and collapsed flags.
+  Future<void> updateDictionaryFlags(Dictionary dictionary) async {
+    await (db.update(db.dictionaries)
+          ..where((table) => table.id.equals(dictionary.id)))
+        .write(
+      DictionariesCompanion(
+        isHidden: Value(dictionary.isHidden),
+        isCollapsed: Value(dictionary.isCollapsed),
+      ),
+    );
+  }
+
+  /// Save the order of [dictionaries], whose `order` fields hold their new
+  /// positions. Positions are unique, so they pass through negative values
+  /// first.
+  Future<void> reorderDictionaries(List<Dictionary> dictionaries) async {
+    await db.transaction(() async {
+      for (Dictionary dictionary in dictionaries) {
+        await _setDictionaryOrder(dictionary.id, -1 - dictionary.order);
+      }
+      for (Dictionary dictionary in dictionaries) {
+        await _setDictionaryOrder(dictionary.id, dictionary.order);
+      }
+    });
+  }
+
+  Future<void> _setDictionaryOrder(int id, int order) async {
+    await (db.update(db.dictionaries)..where((table) => table.id.equals(id)))
+        .write(DictionariesCompanion(order: Value(order)));
   }
 }

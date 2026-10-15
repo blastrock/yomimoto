@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_archive/flutter_archive.dart';
-import 'package:isar_community/isar.dart';
 import 'package:path/path.dart' as path;
 
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/i18n/strings.g.dart';
 
@@ -56,8 +56,8 @@ Future<String> prepareNameMigakuFormat(PrepareDirectoryParams params) async {
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
 void prepareEntriesMigakuFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {
+  required DictionaryImportWriter writer,
+}) {
   final List<FileSystemEntity> entities = params.resourceDirectory.listSync();
   final Iterable<File> files = entities.whereType<File>();
 
@@ -77,22 +77,11 @@ void prepareEntriesMigakuFormat({
           .replaceAll('<br>', '\n')
           .replaceAll(RegExp('<[^<]+?>'), '');
 
-      int headingId = DictionaryHeading.hash(term: term, reading: reading);
-      DictionaryHeading heading = isar.dictionaryHeadings.getSync(headingId) ??
-          DictionaryHeading(term: term, reading: reading);
-
-      DictionaryEntry entry = DictionaryEntry(
+      writer.addEntry(
+        headingId: writer.headingId(term: term, reading: reading),
         definitions: [definition],
         popularity: 0,
       );
-
-      entry.heading.value = heading;
-      entry.dictionary.value = params.dictionary;
-      isar.dictionaryEntrys.putSync(entry);
-
-      heading.entries.add(entry);
-
-      isar.dictionaryHeadings.putSync(heading);
 
       count++;
       params.send(t.import_found_entry(
@@ -107,17 +96,17 @@ void prepareEntriesMigakuFormat({
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
 void prepareTagsMigakuFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {}
+  required DictionaryImportWriter writer,
+}) {}
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
 void preparePitchesMigakuFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {}
+  required DictionaryImportWriter writer,
+}) {}
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
 void prepareFrequenciesMigakuFormat({
   required PrepareDictionaryParams params,
-  required Isar isar,
-}) async {}
+  required DictionaryImportWriter writer,
+}) {}

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar_community/isar.dart';
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:flutter/widgets.dart';
 
@@ -80,36 +80,36 @@ abstract class DictionaryFormat {
   /// parameters.
   Future<String> Function(PrepareDirectoryParams params) prepareName;
 
-  /// Prepares a list of tags that will be added to the database.
+  /// Prepares a list of tags that will be written to the database, synchronously, through `writer`.
   /// See [PrepareDictionaryParams] for how to work with the individual input
   /// parameters.
   void Function({
     required PrepareDictionaryParams params,
-    required Isar isar,
+    required DictionaryImportWriter writer,
   }) prepareTags;
 
-  /// Prepares entries that will be added to the database.
+  /// Prepares entries that will be written to the database, synchronously, through `writer`.
   /// See [PrepareDictionaryParams] for how to work with the individual input
   /// parameters.
   void Function({
     required PrepareDictionaryParams params,
-    required Isar isar,
+    required DictionaryImportWriter writer,
   }) prepareEntries;
 
-  /// Prepares pitch entries that will be added to the database.
+  /// Prepares pitch entries that will be written to the database, synchronously, through `writer`.
   /// See [PrepareDictionaryParams] for how to work with the individual input
   /// parameters.
   void Function({
     required PrepareDictionaryParams params,
-    required Isar isar,
+    required DictionaryImportWriter writer,
   }) preparePitches;
 
-  /// Prepares frequency entries that will be added to the database.
+  /// Prepares frequency entries that will be written to the database, synchronously, through `writer`.
   /// See [PrepareDictionaryParams] for how to work with the individual input
   /// parameters.
   void Function({
     required PrepareDictionaryParams params,
-    required Isar isar,
+    required DictionaryImportWriter writer,
   }) prepareFrequencies;
 
   /// Used to allow a format to render its dictionary entries with a custom

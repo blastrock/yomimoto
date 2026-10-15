@@ -313,7 +313,7 @@ class _DictionaryDialogPageState extends BasePageState {
             _notifiersByDictionary[dictionary]!,
           );
         }),
-        onReorder: (oldIndex, newIndex) {
+        onReorder: (oldIndex, newIndex) async {
           List<Dictionary> cloneDictionaries = [];
           cloneDictionaries.addAll(dictionaries);
 
@@ -327,7 +327,10 @@ class _DictionaryDialogPageState extends BasePageState {
 
           _selectedOrder = newIndex;
 
-          appModel.updateDictionaryOrder(cloneDictionaries);
+          await appModel.updateDictionaryOrder(cloneDictionaries);
+          if (!mounted) {
+            return;
+          }
           setState(() {});
         },
       ),
@@ -484,8 +487,8 @@ class _DictionaryDialogPageState extends BasePageState {
         icon: dictionary.isCollapsed
             ? Icons.open_in_full
             : Icons.close_fullscreen,
-        action: () {
-          appModel.toggleDictionaryCollapsed(dictionary);
+        action: () async {
+          await appModel.toggleDictionaryCollapsed(dictionary);
           _notifiersByDictionary[dictionary]!.value =
               !_notifiersByDictionary[dictionary]!.value;
           _notifiersByDictionary[dictionary]!.value =
@@ -499,8 +502,8 @@ class _DictionaryDialogPageState extends BasePageState {
         icon: dictionary.isCollapsed
             ? Icons.visibility
             : Icons.visibility_off,
-        action: () {
-          appModel.toggleDictionaryHidden(dictionary);
+        action: () async {
+          await appModel.toggleDictionaryHidden(dictionary);
           _notifiersByDictionary[dictionary]!.value =
               !_notifiersByDictionary[dictionary]!.value;
           _notifiersByDictionary[dictionary]!.value =

@@ -94,4 +94,17 @@ void main() {
     expect(count('dictionary'), 0);
     expect(count('heading'), 0);
   });
+
+  test('a malformed item after a valid one rolls back what was written',
+      () async {
+    writeBank('[{"term": "猫", "definition": "cat", "pronunciation": "ねこ"}, '
+        '{"definition": "dog"}]');
+
+    await expectLater(
+        depositDictionaryDataHelper(params('Partial')), throwsA(anything));
+
+    expect(count('dictionary'), 0);
+    expect(count('heading'), 0);
+    expect(count('entry'), 0);
+  });
 }

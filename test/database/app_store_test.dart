@@ -257,8 +257,8 @@ void main() {
       expect(store.dictionaries().first.isHidden, isTrue);
 
       Dictionary b = dictionaries.last;
-      a.order = 1;
-      b.order = 0;
+      a.order = 2;
+      b.order = 1;
       await store.reorderDictionaries([b, a]);
       expect(store.dictionaries().map((dictionary) => dictionary.name),
           ['B', 'A']);

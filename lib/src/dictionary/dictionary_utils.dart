@@ -57,7 +57,9 @@ Future<int> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
       database.execute('COMMIT');
       return dictionaryId;
     } catch (_) {
-      database.execute('ROLLBACK');
+      if (!database.autocommit) {
+        database.execute('ROLLBACK');
+      }
       rethrow;
     }
   } catch (e, stack) {

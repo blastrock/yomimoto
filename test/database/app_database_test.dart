@@ -29,6 +29,30 @@ void main() {
       addTearDown(configured.close);
       expect(configured.select('PRAGMA foreign_keys').first.columnAt(0), 1);
     });
+
+    test('opens and reads while another connection holds the write lock',
+        () async {
+      Directory directory =
+          Directory.systemTemp.createTempSync('yomimoto_database_');
+      addTearDown(() => directory.deleteSync(recursive: true));
+      String file = path.join(directory.path, databaseFileName);
+
+      AppDatabase db = AppDatabase.open(file);
+      await db.customSelect('SELECT 1').get();
+      await db.close();
+
+      Database writer = openRawDatabase(file);
+      addTearDown(writer.close);
+      writer.execute('BEGIN IMMEDIATE');
+      addTearDown(() => writer.execute('ROLLBACK'));
+
+      Database reader = openRawDatabase(file);
+      addTearDown(reader.close);
+      expect(
+        reader.select('SELECT COUNT(*) FROM dictionary').first.columnAt(0),
+        0,
+      );
+    });
   });
 
   group('schema', () {

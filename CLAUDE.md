@@ -19,10 +19,10 @@ remains is deliberately three things:
 ### Fork ground rules
 
 - **No backward compatibility is owed.** The fork ships under its own
-  Android `applicationId`, so every install is fresh: the database and Hive start empty.
-  Do not write migration code, orphan cleanup, index clamping, or defensive
-  nullable-ing for things that were removed. Changing schema version 1
-  is free until 1.0.
+  Android `applicationId`, so every install is fresh: the database and Hive
+  start empty. Do not write migration code, orphan cleanup, index clamping,
+  or defensive nullable-ing for things that were removed. Changing schema
+  version 1 is free until 1.0.
 - **The rename is external only.** The `applicationId` is
   `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
   DCIM folder and exported file names say Yomimoto too. Internal identifiers
@@ -56,11 +56,13 @@ issue, infos included, and CI runs it as is. Fix new infos rather than
 suppressing them; `dart fix --apply` handles most of the mechanical ones.
 
 `flutter test` runs the unit tests in `test/`, which mirrors `lib/src/`. They
-cover pure code only (text selection, stash item, sentence splitting, the ttu
-bridge's event parsing): no device, no database, no mocks. They characterise
-current behaviour, oddities included, rather than prescribe it. The strict lint
-set applies to them too. Anything touching `AppModel`, the database, MeCab or the
-WebView is still verified by manual device testing.
+cover pure code (text selection, stash item, sentence splitting, the ttu
+bridge's event parsing) and the database layer (schema, queries, `AppStore`,
+dictionary import and deletion), which runs against in-memory or temp-file
+SQLite: no device, no mocks. They characterise current behaviour, oddities
+included, rather than prescribe it. The strict lint set applies to them too.
+Anything touching `AppModel`, MeCab or the WebView is still verified by manual
+device testing.
 
 CI (`.github/workflows/main.yml`, every push and pull request) fetches the
 pinned ttu build, checks that generated files are fresh (regenerates them and
@@ -104,12 +106,12 @@ Add an entry when you take one.
 
 ### Barrel imports
 
-`lib/` has eight barrel files — `creator.dart`, `database.dart`, `dictionary.dart`,
-`language.dart`, `media.dart`, `models.dart`, `pages.dart`, `utils.dart` —
-re-exporting everything under `lib/src/<name>/`. **Always import the barrel**
-(`package:yuuna/media.dart`), never a file under `lib/src/` directly, and always
-`package:` imports (`always_use_package_imports` is enforced). Adding a file
-means adding an `export` line to its barrel.
+`lib/` has eight barrel files — `creator.dart`, `database.dart`,
+`dictionary.dart`, `language.dart`, `media.dart`, `models.dart`, `pages.dart`,
+`utils.dart` — re-exporting everything under `lib/src/<name>/`. **Always import
+the barrel** (`package:yuuna/media.dart`), never a file under `lib/src/`
+directly, and always `package:` imports (`always_use_package_imports` is
+enforced). Adding a file means adding an `export` line to its barrel.
 
 ### Everything is a registered singleton
 
@@ -159,11 +161,14 @@ its size — but splitting it is its own project, not a side effect of a feature
 - **Hive** — key-value preferences. `Box('appModel')` for app-wide settings
   (accessed through typed getter/setter pairs on `AppModel`, e.g. `isDarkMode`,
   `maximumTerms`), plus a per-`MediaSource` box for source-specific settings.
-- **SQLite** — the real database, through Drift over `sqlite3` (FFI; the package's
-  build hook bundles SQLite): dictionary entries, headings, pitches,
-  frequencies, tags, search-result cache, media items, Anki mappings, search
-  history, mokuro catalogs, stash items. One file, `yomimoto.sqlite`, in the
-  support directory. `AppDatabase` (`lib/src/database/`) declares the tables
+- **SQLite** — the real database, through Drift over `sqlite3` (FFI; the
+  package's build hook bundles SQLite): dictionary entries, headings,
+  pitches, frequencies, tags, media items, Anki mappings, mokuro catalogs,
+  stash items, the search history, and the dictionary history
+  (`dictionary_history`, which stores each looked-up term with the wildcard
+  flag it was searched with; the Dictionary tab searches them again to show
+  its history cards). One file, `yomimoto.sqlite`, in the support
+  directory. `AppDatabase` (`lib/src/database/`) declares the tables
   (`tables.dart`) and the search and loader queries (`search.drift`).
   `AppStore` holds app data: synchronous raw `sqlite3` reads and Drift writes
   over one shared connection. On the main isolate raw SQL is for reads only;
@@ -228,17 +233,17 @@ translations are gone.
   headless WebView on the fork's `host` route), then `syncLibrary`
   reconciles the mirror. ttu's manager page is not reachable from the app.
 
-  The **stash** is a per-book list of saved words (`StashItem`, keyed by the
-  book's `mediaIdentifier`), filled by the `AddToStashAction` quick action and
-  shown by `StashPage` / `StashItemPage` from the library's long-press dialog.
-  A `tap` event carries the tapped character's `position` in ttu bookmark
-  units; `ReaderTtuSource.peekBook` opens `b.html?id=N&peek=<position>`,
-  which starts at that position and saves no bookmark for the session.
-  Card fields take their sentence and book from a `CreatorContext`, never
-  from the reader's live state, so cards can be made from a stash item.
-  Deleting a book (through `syncLibrary`) deletes its stash. `putMediaItem`
-  upserts by source and identifier, keeps the row id (the stash refers to it)
-  and orders the library by `last_opened_at`.
+  The **stash** is a per-book list of saved words (`StashItem`, a foreign key to
+  the book's `media_item` row, `ON DELETE CASCADE`), filled by the
+  `AddToStashAction` quick action and shown by `StashPage` / `StashItemPage`
+  from the library's long-press dialog. A `tap` event carries the tapped
+  character's `position` in ttu bookmark units; `ReaderTtuSource.peekBook` opens
+  `b.html?id=N&peek=<position>`, which starts at that position and saves no
+  bookmark for the session. Card fields take their sentence and book from a
+  `CreatorContext`, never from the reader's live state, so cards can be made
+  from a stash item. Deleting a book (through `syncLibrary`) deletes its stash.
+  `putMediaItem` upserts by source and identifier, keeps the row id (the stash
+  refers to it) and orders the library by `last_opened_at`.
 
   Working on the ttu side:
 

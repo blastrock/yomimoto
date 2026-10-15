@@ -76,6 +76,9 @@ class _JidoujishoSearchHistoryState
         }
 
         await appModel.removeFromSearchHistory(searchTerm: searchTerm);
+        if (!mounted) {
+          return;
+        }
         setState(() {});
         widget.onUpdate();
       },

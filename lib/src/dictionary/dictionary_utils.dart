@@ -33,6 +33,10 @@ Future<int> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
       }
 
       database.execute('COMMIT');
+      // The import is one transaction, so the WAL file has grown to the
+      // dictionary's size; truncate it, or it keeps that size for as long
+      // as the main connection stays open.
+      database.select('PRAGMA wal_checkpoint(TRUNCATE)');
       return dictionaryId;
     } catch (_) {
       if (!database.autocommit) {

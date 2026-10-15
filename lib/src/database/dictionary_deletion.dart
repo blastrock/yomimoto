@@ -2,7 +2,7 @@ import 'package:yuuna/database.dart';
 
 /// Delete the dictionary [dictionaryId] with everything it brought, then the
 /// headings nothing refers to any more, then give the freed pages back to
-/// the file system.
+/// the file system and truncate the WAL file.
 Future<void> deleteDictionaryData(AppDatabase db, int dictionaryId) async {
   await db.transaction(() async {
     await (db.delete(db.dictionaries)
@@ -10,16 +10,25 @@ Future<void> deleteDictionaryData(AppDatabase db, int dictionaryId) async {
         .go();
     await db.customStatement(_deleteOrphanHeadings);
   });
-  await db.customStatement('PRAGMA incremental_vacuum');
+  await _releaseSpace(db);
 }
 
-/// Delete every dictionary and all their data.
+/// Delete every dictionary and all their data, then give the freed pages
+/// back to the file system and truncate the WAL file.
 Future<void> deleteAllDictionaryData(AppDatabase db) async {
   await db.transaction(() async {
     await db.delete(db.dictionaries).go();
     await db.customStatement(_deleteOrphanHeadings);
   });
+  await _releaseSpace(db);
+}
+
+/// Give the pages freed by a deletion back to the file system, and truncate
+/// the WAL file, which otherwise keeps the size of the largest transaction
+/// for as long as the main connection stays open.
+Future<void> _releaseSpace(AppDatabase db) async {
   await db.customStatement('PRAGMA incremental_vacuum');
+  await db.customSelect('PRAGMA wal_checkpoint(TRUNCATE)').get();
 }
 
 /// Deleting a dictionary cascades to its entries, pitches, frequencies and

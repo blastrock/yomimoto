@@ -7,9 +7,10 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/utils.dart';
 
 /// The app's own data over one connection: the libraries and their stashes,
-/// and in later additions the profiles, catalogs, histories and dictionary
-/// list. Reads are synchronous, through [raw], so widgets can call them while
-/// building; writes go through [db], which runs on that same connection.
+/// the Anki mappings, the mokuro catalogs, the search and dictionary
+/// histories, and the dictionary list. Reads are synchronous, through [raw],
+/// so widgets can call them while building; writes go through [db], which
+/// runs on that same connection.
 class AppStore {
   /// Wrap [db] and [raw], the connection it runs on.
   AppStore({required this.db, required this.raw});

@@ -72,6 +72,18 @@ void main() {
     expect(countRows(raw, 'entry'), 1);
   });
 
+  test('empties the WAL file once committed', () async {
+    writeBank('[{"term": "猫", "definition": "cat", "pronunciation": "ねこ"}]');
+    // Another open connection keeps SQLite from removing the WAL file when
+    // the import's connection closes, as the app's main connection does.
+    Database other = openRawDatabase(databasePath);
+    addTearDown(other.close);
+
+    await depositDictionaryDataHelper(params('Test'));
+
+    expect(File('$databasePath-wal').lengthSync(), 0);
+  });
+
   test('a duplicate name fails and leaves the first dictionary alone',
       () async {
     writeBank('[{"term": "猫", "definition": "cat", "pronunciation": "ねこ"}]');

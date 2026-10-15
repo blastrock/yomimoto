@@ -35,5 +35,26 @@ plain `onTap` closure). Neither is in `flutter_lints`.
 **To pay it off**, go over the lint rules not yet enabled that would have
 caught this class of bug, starting with those two. Enable them, and mark the
 deliberate fire-and-forget calls with `unawaited(...)` (for instance
-`populateDefaultMapping` in `home_page.dart`, and `addToSearchHistory` in the
-dictionary pages).
+`populateDefaultMapping` in `home_page.dart`, `addToSearchHistory` in the
+dictionary pages, and `putMediaItem` in `reader_ttu_source_page.dart`'s
+`initState`, already wrapped).
+
+## The dictionary import holds the write lock throughout
+
+**Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
+
+`depositDictionaryDataHelper` imports a dictionary in one `BEGIN IMMEDIATE`
+transaction, so nothing is written if it fails. That holds the database's
+write lock for the whole import, which can take minutes. A Drift write from
+the main isolate meanwhile waits up to the 10 s `busy_timeout`, freezing the
+UI, and then fails with "database is locked". Reads are unaffected (WAL).
+
+This is harmless only because the import dialog is modal
+(`DictionaryDialogImportPage` is a `PopScope(canPop: false)` dialog shown
+with `barrierDismissible: false`), so nothing in the app writes during an
+import.
+
+**If imports become non-modal** (running in the background while the user
+reads), either queue main-isolate writes until the import ends, or commit
+the import in batches and mark the dictionary incomplete until its last
+batch, deleting incomplete dictionaries on failure and at startup.

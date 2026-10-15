@@ -98,6 +98,10 @@ class _DictionaryHistoryScrollableItemState
     searchWithWildcards: widget.item.searchWithWildcards,
   );
 
+  /// Whether the search's failure has been logged, so rebuilds do not log
+  /// it again.
+  bool _errorLogged = false;
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -105,6 +109,12 @@ class _DictionaryHistoryScrollableItemState
     return FutureBuilder<DictionarySearchResult>(
       future: _result,
       builder: (context, snapshot) {
+        if (snapshot.hasError && !_errorLogged) {
+          _errorLogged = true;
+          debugPrint('${snapshot.error}');
+          debugPrint('${snapshot.stackTrace}');
+        }
+
         DictionarySearchResult? result = snapshot.data;
         if (result == null || result.headings.isEmpty) {
           return const SliverPadding(padding: EdgeInsets.zero);

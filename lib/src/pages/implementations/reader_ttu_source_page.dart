@@ -46,7 +46,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
     MediaItem? item = widget.item;
     if (item != null && mediaSource.bookIdOf(item) != null) {
-      appModelNoUpdate.putMediaItem(item);
+      unawaited(appModelNoUpdate.putMediaItem(item));
     }
   }
 

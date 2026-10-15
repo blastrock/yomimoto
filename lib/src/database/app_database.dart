@@ -52,21 +52,31 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 }
 
-/// Apply the settings every connection needs: foreign keys, WAL, a busy
-/// timeout, and incremental vacuum. `auto_vacuum` only takes effect while the
-/// database has no tables, so it sticks from the first open.
+/// Apply the settings every connection needs: a busy timeout, incremental
+/// vacuum, WAL and foreign keys. The busy timeout comes first so the others
+/// wait for a writer instead of failing. Setting `auto_vacuum` opens a write
+/// transaction, so it is only set when not already incremental; it only takes
+/// effect while the database has no tables, so in practice it is set once,
+/// on the first open of a fresh file.
 void configureConnection(Database database) {
+  database.execute('PRAGMA busy_timeout = 10000');
+  if (database.select('PRAGMA auto_vacuum').first.columnAt(0) != 2) {
+    database.execute('PRAGMA auto_vacuum = INCREMENTAL');
+  }
   database
-    ..execute('PRAGMA auto_vacuum = INCREMENTAL')
     ..execute('PRAGMA journal_mode = WAL')
-    ..execute('PRAGMA foreign_keys = ON')
-    ..execute('PRAGMA busy_timeout = 10000');
+    ..execute('PRAGMA foreign_keys = ON');
 }
 
 /// Open the database file at [path] on a new raw connection, prepared by
-/// [configureConnection].
+/// [configureConnection]. The connection is closed if preparing it fails.
 Database openRawDatabase(String path) {
   Database database = sqlite3.open(path);
-  configureConnection(database);
+  try {
+    configureConnection(database);
+  } catch (_) {
+    database.close();
+    rethrow;
+  }
   return database;
 }

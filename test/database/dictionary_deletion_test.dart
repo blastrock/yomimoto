@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as path;
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:yuuna/database.dart';
 
@@ -71,5 +74,43 @@ void main() {
     ]) {
       expect(countRows(raw, table), 0, reason: table);
     }
+  });
+
+  test('deleting empties the WAL file, even with another connection open',
+      () async {
+    Directory directory =
+        Directory.systemTemp.createTempSync('yomimoto_deletion_');
+    addTearDown(() => directory.deleteSync(recursive: true));
+    String file = path.join(directory.path, databaseFileName);
+    Database fileRaw = openRawDatabase(file);
+    AppDatabase fileDb = AppDatabase.fromRaw(fileRaw);
+    addTearDown(fileDb.close);
+    await fileDb.customSelect('SELECT 1').get();
+    Database other = openRawDatabase(file);
+    addTearDown(other.close);
+
+    int dictionary = writeTestDictionary(fileRaw, 'JMdict', (writer) {
+      writer.addEntry(
+        headingId: writer.headingId(term: '猫', reading: 'ねこ'),
+        definitions: ['cat'],
+        popularity: 0,
+      );
+    });
+    expect(File('$file-wal').lengthSync(), greaterThan(0));
+
+    await deleteDictionaryData(fileDb, dictionary);
+    expect(File('$file-wal').lengthSync(), 0);
+
+    writeTestDictionary(fileRaw, 'JMdict', (writer) {
+      writer.addEntry(
+        headingId: writer.headingId(term: '犬', reading: 'いぬ'),
+        definitions: ['dog'],
+        popularity: 0,
+      );
+    });
+    expect(File('$file-wal').lengthSync(), greaterThan(0));
+
+    await deleteAllDictionaryData(fileDb);
+    expect(File('$file-wal').lengthSync(), 0);
   });
 }

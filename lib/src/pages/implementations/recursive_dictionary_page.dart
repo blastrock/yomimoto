@@ -222,7 +222,10 @@ class _RecursiveDictionaryPageState
               );
             }
             if (_result!.headings.isNotEmpty) {
-              await appModel.addToDictionaryHistory(result: _result!);
+              await appModel.addToDictionaryHistory(
+                result: _result!,
+                searchWithWildcards: true,
+              );
             }
           });
         }

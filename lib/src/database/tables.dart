@@ -399,4 +399,9 @@ class DictionaryHistoryItems extends Table {
 
   /// The term searched.
   TextColumn get searchTerm => text().unique()();
+
+  /// Whether the term was searched with wildcards, so that it is searched
+  /// again the same way.
+  BoolColumn get searchWithWildcards =>
+      boolean().withDefault(const Constant(false))();
 }

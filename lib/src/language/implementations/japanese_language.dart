@@ -404,6 +404,9 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
 
   Map<int, HeadingRow> uniqueHeadingsById = {};
 
+  /// The slots left for the limited queries. Unlimited ones can overspend
+  /// it, so a limited query runs only while it is positive: SQLite reads a
+  /// negative LIMIT as no limit.
   int limit() {
     return maximumHeadings - uniqueHeadingsById.length;
   }
@@ -439,7 +442,7 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
       int length = matchesTerm.runes.length;
       int minimumLength = matchesTerm.replaceAll('*', '').runes.length;
 
-      if (maximumTerms > uniqueHeadingsById.length) {
+      if (maximumTerms > uniqueHeadingsById.length && limit() > 0) {
         addHeadings(await database
             .headingsByTermGlob(
               pattern: pattern,
@@ -450,7 +453,9 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
             .get());
       }
 
-      if (maximumTerms > uniqueHeadingsById.length && matchTermIsKana) {
+      if (maximumTerms > uniqueHeadingsById.length &&
+          limit() > 0 &&
+          matchTermIsKana) {
         addHeadings(await database
             .headingsByReadingGlob(
               pattern: pattern,
@@ -498,7 +503,9 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
         addHeadings(termExactResults);
       }
 
-      if (maximumTerms > uniqueHeadingsById.length && partialTermIsKana) {
+      if (maximumTerms > uniqueHeadingsById.length &&
+          limit() > 0 &&
+          partialTermIsKana) {
         readingExactResults = await database.headingsByReadings(
           readings: [
             partialTerm,
@@ -516,7 +523,9 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
         addHeadings(termDeinflectedResults);
       }
 
-      if (maximumTerms > uniqueHeadingsById.length && partialTermIsKana) {
+      if (maximumTerms > uniqueHeadingsById.length &&
+          limit() > 0 &&
+          partialTermIsKana) {
         readingDeinflectedResults = await database.headingsByReadings(
           readings: [...possibleDeinflections, ...hiraganaDeinflections],
           limit: limit(),
@@ -542,7 +551,7 @@ Future<DictionarySearchResult?> searchDictionaryJapanese({
         bestLength = partialTerm.length;
       }
 
-      if (maximumTerms > uniqueHeadingsById.length) {
+      if (maximumTerms > uniqueHeadingsById.length && limit() > 0) {
         bool addStartsWith = searchWithWildcards
             ? i == 0
             : !startsWithAdded && uniqueHeadingsById.isNotEmpty;

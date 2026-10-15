@@ -1379,6 +1379,20 @@
             "dsl_features": [
               "unique"
             ]
+          },
+          {
+            "name": "search_with_wildcards",
+            "getter_name": "searchWithWildcards",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": null,
+            "defaultConstraints": "CHECK (\"search_with_wildcards\" IN (0, 1))",
+            "dialectAwareDefaultConstraints": {
+              "sqlite": "CHECK (\"search_with_wildcards\" IN (0, 1))"
+            },
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
           }
         ],
         "is_virtual": false,
@@ -1681,7 +1695,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"dictionary_history\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"search_term\" TEXT NOT NULL UNIQUE);"
+          "sql": "CREATE TABLE IF NOT EXISTS \"dictionary_history\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"search_term\" TEXT NOT NULL UNIQUE, \"search_with_wildcards\" INTEGER NOT NULL DEFAULT 0 CHECK (\"search_with_wildcards\" IN (0, 1)));"
         }
       ]
     },

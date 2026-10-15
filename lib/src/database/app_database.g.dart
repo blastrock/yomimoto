@@ -4432,8 +4432,22 @@ class $DictionaryHistoryItemsTable extends DictionaryHistoryItems
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
+  static const VerificationMeta _searchWithWildcardsMeta =
+      const VerificationMeta('searchWithWildcards');
   @override
-  List<GeneratedColumn> get $columns => [id, searchTerm];
+  late final GeneratedColumn<bool> searchWithWildcards = GeneratedColumn<bool>(
+    'search_with_wildcards',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("search_with_wildcards" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, searchTerm, searchWithWildcards];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -4457,6 +4471,15 @@ class $DictionaryHistoryItemsTable extends DictionaryHistoryItems
     } else if (isInserting) {
       context.missing(_searchTermMeta);
     }
+    if (data.containsKey('search_with_wildcards')) {
+      context.handle(
+        _searchWithWildcardsMeta,
+        searchWithWildcards.isAcceptableOrUnknown(
+          data['search_with_wildcards']!,
+          _searchWithWildcardsMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -4474,6 +4497,10 @@ class $DictionaryHistoryItemsTable extends DictionaryHistoryItems
         DriftSqlType.string,
         data['${effectivePrefix}search_term'],
       )!,
+      searchWithWildcards: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}search_with_wildcards'],
+      )!,
     );
   }
 
@@ -4490,12 +4517,21 @@ class DictionaryHistoryRow extends DataClass
 
   /// The term searched.
   final String searchTerm;
-  const DictionaryHistoryRow({required this.id, required this.searchTerm});
+
+  /// Whether the term was searched with wildcards, so that it is searched
+  /// again the same way.
+  final bool searchWithWildcards;
+  const DictionaryHistoryRow({
+    required this.id,
+    required this.searchTerm,
+    required this.searchWithWildcards,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['search_term'] = Variable<String>(searchTerm);
+    map['search_with_wildcards'] = Variable<bool>(searchWithWildcards);
     return map;
   }
 
@@ -4503,6 +4539,7 @@ class DictionaryHistoryRow extends DataClass
     return DictionaryHistoryItemsCompanion(
       id: Value(id),
       searchTerm: Value(searchTerm),
+      searchWithWildcards: Value(searchWithWildcards),
     );
   }
 
@@ -4514,6 +4551,9 @@ class DictionaryHistoryRow extends DataClass
     return DictionaryHistoryRow(
       id: serializer.fromJson<int>(json['id']),
       searchTerm: serializer.fromJson<String>(json['searchTerm']),
+      searchWithWildcards: serializer.fromJson<bool>(
+        json['searchWithWildcards'],
+      ),
     );
   }
   @override
@@ -4522,20 +4562,28 @@ class DictionaryHistoryRow extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'searchTerm': serializer.toJson<String>(searchTerm),
+      'searchWithWildcards': serializer.toJson<bool>(searchWithWildcards),
     };
   }
 
-  DictionaryHistoryRow copyWith({int? id, String? searchTerm}) =>
-      DictionaryHistoryRow(
-        id: id ?? this.id,
-        searchTerm: searchTerm ?? this.searchTerm,
-      );
+  DictionaryHistoryRow copyWith({
+    int? id,
+    String? searchTerm,
+    bool? searchWithWildcards,
+  }) => DictionaryHistoryRow(
+    id: id ?? this.id,
+    searchTerm: searchTerm ?? this.searchTerm,
+    searchWithWildcards: searchWithWildcards ?? this.searchWithWildcards,
+  );
   DictionaryHistoryRow copyWithCompanion(DictionaryHistoryItemsCompanion data) {
     return DictionaryHistoryRow(
       id: data.id.present ? data.id.value : this.id,
       searchTerm: data.searchTerm.present
           ? data.searchTerm.value
           : this.searchTerm,
+      searchWithWildcards: data.searchWithWildcards.present
+          ? data.searchWithWildcards.value
+          : this.searchWithWildcards,
     );
   }
 
@@ -4543,50 +4591,60 @@ class DictionaryHistoryRow extends DataClass
   String toString() {
     return (StringBuffer('DictionaryHistoryRow(')
           ..write('id: $id, ')
-          ..write('searchTerm: $searchTerm')
+          ..write('searchTerm: $searchTerm, ')
+          ..write('searchWithWildcards: $searchWithWildcards')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, searchTerm);
+  int get hashCode => Object.hash(id, searchTerm, searchWithWildcards);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DictionaryHistoryRow &&
           other.id == this.id &&
-          other.searchTerm == this.searchTerm);
+          other.searchTerm == this.searchTerm &&
+          other.searchWithWildcards == this.searchWithWildcards);
 }
 
 class DictionaryHistoryItemsCompanion
     extends UpdateCompanion<DictionaryHistoryRow> {
   final Value<int> id;
   final Value<String> searchTerm;
+  final Value<bool> searchWithWildcards;
   const DictionaryHistoryItemsCompanion({
     this.id = const Value.absent(),
     this.searchTerm = const Value.absent(),
+    this.searchWithWildcards = const Value.absent(),
   });
   DictionaryHistoryItemsCompanion.insert({
     this.id = const Value.absent(),
     required String searchTerm,
+    this.searchWithWildcards = const Value.absent(),
   }) : searchTerm = Value(searchTerm);
   static Insertable<DictionaryHistoryRow> custom({
     Expression<int>? id,
     Expression<String>? searchTerm,
+    Expression<bool>? searchWithWildcards,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (searchTerm != null) 'search_term': searchTerm,
+      if (searchWithWildcards != null)
+        'search_with_wildcards': searchWithWildcards,
     });
   }
 
   DictionaryHistoryItemsCompanion copyWith({
     Value<int>? id,
     Value<String>? searchTerm,
+    Value<bool>? searchWithWildcards,
   }) {
     return DictionaryHistoryItemsCompanion(
       id: id ?? this.id,
       searchTerm: searchTerm ?? this.searchTerm,
+      searchWithWildcards: searchWithWildcards ?? this.searchWithWildcards,
     );
   }
 
@@ -4599,6 +4657,9 @@ class DictionaryHistoryItemsCompanion
     if (searchTerm.present) {
       map['search_term'] = Variable<String>(searchTerm.value);
     }
+    if (searchWithWildcards.present) {
+      map['search_with_wildcards'] = Variable<bool>(searchWithWildcards.value);
+    }
     return map;
   }
 
@@ -4606,7 +4667,8 @@ class DictionaryHistoryItemsCompanion
   String toString() {
     return (StringBuffer('DictionaryHistoryItemsCompanion(')
           ..write('id: $id, ')
-          ..write('searchTerm: $searchTerm')
+          ..write('searchTerm: $searchTerm, ')
+          ..write('searchWithWildcards: $searchWithWildcards')
           ..write(')'))
         .toString();
   }
@@ -10254,11 +10316,13 @@ typedef $$DictionaryHistoryItemsTableCreateCompanionBuilder =
     DictionaryHistoryItemsCompanion Function({
       Value<int> id,
       required String searchTerm,
+      Value<bool> searchWithWildcards,
     });
 typedef $$DictionaryHistoryItemsTableUpdateCompanionBuilder =
     DictionaryHistoryItemsCompanion Function({
       Value<int> id,
       Value<String> searchTerm,
+      Value<bool> searchWithWildcards,
     });
 
 class $$DictionaryHistoryItemsTableFilterComposer
@@ -10277,6 +10341,11 @@ class $$DictionaryHistoryItemsTableFilterComposer
 
   ColumnFilters<String> get searchTerm => $composableBuilder(
     column: $table.searchTerm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get searchWithWildcards => $composableBuilder(
+    column: $table.searchWithWildcards,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -10299,6 +10368,11 @@ class $$DictionaryHistoryItemsTableOrderingComposer
     column: $table.searchTerm,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get searchWithWildcards => $composableBuilder(
+    column: $table.searchWithWildcards,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DictionaryHistoryItemsTableAnnotationComposer
@@ -10315,6 +10389,11 @@ class $$DictionaryHistoryItemsTableAnnotationComposer
 
   GeneratedColumn<String> get searchTerm => $composableBuilder(
     column: $table.searchTerm,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get searchWithWildcards => $composableBuilder(
+    column: $table.searchWithWildcards,
     builder: (column) => column,
   );
 }
@@ -10367,17 +10446,21 @@ class $$DictionaryHistoryItemsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> searchTerm = const Value.absent(),
+                Value<bool> searchWithWildcards = const Value.absent(),
               }) => DictionaryHistoryItemsCompanion(
                 id: id,
                 searchTerm: searchTerm,
+                searchWithWildcards: searchWithWildcards,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required String searchTerm,
+                Value<bool> searchWithWildcards = const Value.absent(),
               }) => DictionaryHistoryItemsCompanion.insert(
                 id: id,
                 searchTerm: searchTerm,
+                searchWithWildcards: searchWithWildcards,
               ),
           withReferenceMapper: (p0) => p0
               .map(

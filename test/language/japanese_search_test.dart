@@ -28,6 +28,10 @@ void main() {
         ('方', 'かた', 1, false),
         ('方', 'ほう', 1, false),
         ('𠮟る', 'しかる', 1, false),
+        ('記[号]', 'きごう', 1, false),
+        ('日', 'ひ', 1, false),
+        ('日', 'にち', 1, false),
+        ('日本', 'にほん', 1, false),
       ]) {
         writer.addEntry(
           headingId: writer.headingId(term: word.$1, reading: word.$2),
@@ -56,11 +60,12 @@ void main() {
     String query, {
     bool wildcards = false,
     int maximumTerms = 10,
+    int maximumHeadings = 200,
   }) {
     return searchDictionaryJapanese(
       database: database.db,
       query: query,
-      maximumHeadings: 200,
+      maximumHeadings: maximumHeadings,
       maximumTerms: maximumTerms,
       searchWithWildcards: wildcards,
     );
@@ -115,6 +120,17 @@ void main() {
       () async {
     expect(await search('[*', wildcards: true), isNull);
     expect(await search('a[b'), isNull);
+    expect(await search('食[？', wildcards: true), isNull);
+  });
+
+  test('a [ in a wildcard search matches itself', () async {
+    expect(words(await search('記[？]', wildcards: true)), ['記[号]/きごう']);
+  });
+
+  test('no query runs unbounded once the heading budget is spent', () async {
+    expect(words(await search('日')), ['日/ひ', '日/にち', '日本/にほん']);
+    expect(words(await search('日', maximumHeadings: 1)),
+        ['日/ひ', '日/にち']);
   });
 
   test('returns null when nothing matches', () async {

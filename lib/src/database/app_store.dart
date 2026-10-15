@@ -316,13 +316,16 @@ class AppStore {
 
   /// Delete [searchTerm] from [table], a table of unique `search_term`s whose
   /// ids give recency, insert it again as the newest, and keep only the
-  /// [maximum] newest.
+  /// [maximum] newest. [extraColumns] are more column values for the new row.
   Future<void> _addRecentTerm(
     TableInfo<Table, dynamic> table,
     String searchTerm,
-    int maximum,
-  ) async {
+    int maximum, {
+    Map<String, Variable> extraColumns = const {},
+  }) async {
     String name = table.actualTableName;
+    String columns = ['search_term', ...extraColumns.keys].join(', ');
+    String placeholders = List.filled(extraColumns.length + 1, '?').join(', ');
     await db.transaction(() async {
       await db.customUpdate(
         'DELETE FROM $name WHERE search_term = ?',
@@ -331,8 +334,8 @@ class AppStore {
         updateKind: UpdateKind.delete,
       );
       await db.customInsert(
-        'INSERT INTO $name (search_term) VALUES (?)',
-        variables: [Variable.withString(searchTerm)],
+        'INSERT INTO $name ($columns) VALUES ($placeholders)',
+        variables: [Variable.withString(searchTerm), ...extraColumns.values],
         updates: {table},
       );
       await db.customUpdate(
@@ -382,24 +385,41 @@ class AppStore {
         .write(DictionariesCompanion(order: Value(order)));
   }
 
-  /// The terms whose results the Dictionary tab shows, oldest first.
-  List<String> dictionaryHistory() {
+  /// The searches whose results the Dictionary tab shows, oldest first.
+  List<DictionaryHistoryItem> dictionaryHistory() {
     return raw
-        .select('SELECT search_term FROM dictionary_history ORDER BY id')
-        .map((row) => row['search_term'] as String)
+        .select('SELECT search_term, search_with_wildcards '
+            'FROM dictionary_history ORDER BY id')
+        .map((row) => (
+              searchTerm: row['search_term'] as String,
+              searchWithWildcards: row['search_with_wildcards'] == 1,
+            ))
         .toList();
   }
 
-  /// Make [searchTerm] the newest dictionary history item, keeping the
-  /// [maximum] newest.
+  /// Make [searchTerm], searched with or without wildcards, the newest
+  /// dictionary history item, keeping the [maximum] newest. Re-adding a term
+  /// replaces its flag.
   Future<void> addToDictionaryHistory(
     String searchTerm, {
+    required bool searchWithWildcards,
     required int maximum,
   }) =>
-      _addRecentTerm(db.dictionaryHistoryItems, searchTerm, maximum);
+      _addRecentTerm(
+        db.dictionaryHistoryItems,
+        searchTerm,
+        maximum,
+        extraColumns: {
+          'search_with_wildcards': Variable.withBool(searchWithWildcards),
+        },
+      );
 
   /// Forget the dictionary history.
   Future<void> clearDictionaryHistory() async {
     await db.delete(db.dictionaryHistoryItems).go();
   }
 }
+
+/// A Dictionary tab history item: the term searched, and whether it was
+/// searched with wildcards.
+typedef DictionaryHistoryItem = ({String searchTerm, bool searchWithWildcards});

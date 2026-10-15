@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
+import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/i18n/strings.g.dart';
 import 'package:yuuna/media.dart';
@@ -34,7 +35,8 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
   Widget build(BuildContext context) {
     AnkiMapping lastSelectedMapping = appModel.lastSelectedMapping;
 
-    List<String> historyTerms = appModel.dictionaryHistory.reversed.toList();
+    List<DictionaryHistoryItem> historyItems =
+        appModel.dictionaryHistory.reversed.toList();
 
     return CustomScrollView(
       scrollCacheExtent: const ScrollCacheExtent.pixels(999999999999999),
@@ -44,10 +46,10 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
       ),
       slivers: [
         const SliverPadding(padding: EdgeInsets.only(top: 60)),
-        ...historyTerms.map(
-          (searchTerm) => _DictionaryHistoryScrollableItem(
-            key: ValueKey(searchTerm),
-            searchTerm: searchTerm,
+        ...historyItems.map(
+          (item) => _DictionaryHistoryScrollableItem(
+            key: ValueKey(item),
+            item: item,
             onSearch: widget.onSearch,
             onShare: widget.onShare,
             lastSelectedMapping: lastSelectedMapping,
@@ -60,15 +62,15 @@ class _DictionaryHistoryPageState extends BasePageState<DictionaryHistoryPage> {
 
 class _DictionaryHistoryScrollableItem extends BasePage {
   const _DictionaryHistoryScrollableItem({
-    required this.searchTerm,
+    required this.item,
     required this.onSearch,
     required this.onShare,
     required this.lastSelectedMapping,
     super.key,
   });
 
-  /// The term of this history item, searched again to show its result.
-  final String searchTerm;
+  /// The search of this history item, made again to show its result.
+  final DictionaryHistoryItem item;
 
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
@@ -92,8 +94,8 @@ class _DictionaryHistoryScrollableItemState
 
   late final Future<DictionarySearchResult> _result =
       appModelNoUpdate.searchDictionary(
-    searchTerm: widget.searchTerm,
-    searchWithWildcards: false,
+    searchTerm: widget.item.searchTerm,
+    searchWithWildcards: widget.item.searchWithWildcards,
   );
 
   @override

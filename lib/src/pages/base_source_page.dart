@@ -165,7 +165,10 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
       _showMore = dictionaryResult.headings.length < overrideMaximumTerms;
       _dictionaryResultNotifier.value = dictionaryResult;
-      await appModel.addToDictionaryHistory(result: dictionaryResult);
+      await appModel.addToDictionaryHistory(
+        result: dictionaryResult,
+        searchWithWildcards: false,
+      );
     } finally {
       _isSearchingNotifier.value = false;
     }

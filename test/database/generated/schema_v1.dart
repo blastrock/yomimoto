@@ -4,6 +4,67 @@
 //
 import 'package:drift/drift.dart';
 
+class Heading extends Table with TableInfo {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Heading(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints: 'NOT NULL',
+  );
+  late final GeneratedColumn<String> term = GeneratedColumn<String>(
+    'term',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  late final GeneratedColumn<String> reading = GeneratedColumn<String>(
+    'reading',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, term, reading];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'heading';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {term, reading},
+  ];
+  @override
+  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
+    throw UnsupportedError('TableInfo.map in schema verification code');
+  }
+
+  @override
+  Heading createAlias(String alias) {
+    return Heading(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const [
+    'PRIMARY KEY(id)',
+    'UNIQUE(term, reading)',
+  ];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
 class Dictionary extends Table with TableInfo {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -86,67 +147,6 @@ class Dictionary extends Table with TableInfo {
     return Dictionary(attachedDatabase, alias);
   }
 
-  @override
-  bool get dontWriteConstraints => true;
-}
-
-class Heading extends Table with TableInfo {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  Heading(this.attachedDatabase, [this._alias]);
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    $customConstraints: 'NOT NULL',
-  );
-  late final GeneratedColumn<String> term = GeneratedColumn<String>(
-    'term',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  late final GeneratedColumn<String> reading = GeneratedColumn<String>(
-    'reading',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, term, reading];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'heading';
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  List<Set<GeneratedColumn>> get uniqueKeys => [
-    {term, reading},
-  ];
-  @override
-  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
-    throw UnsupportedError('TableInfo.map in schema verification code');
-  }
-
-  @override
-  Heading createAlias(String alias) {
-    return Heading(attachedDatabase, alias);
-  }
-
-  @override
-  List<String> get customConstraints => const [
-    'PRIMARY KEY(id)',
-    'UNIQUE(term, reading)',
-  ];
   @override
   bool get dontWriteConstraints => true;
 }
@@ -1111,8 +1111,18 @@ class DictionaryHistory extends Table with TableInfo {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL UNIQUE',
   );
+  late final GeneratedColumn<int> searchWithWildcards = GeneratedColumn<int>(
+    'search_with_wildcards',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT 0 CHECK (search_with_wildcards IN (0, 1))',
+    defaultValue: const CustomExpression('0'),
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, searchTerm];
+  List<GeneratedColumn> get $columns => [id, searchTerm, searchWithWildcards];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1136,8 +1146,8 @@ class DictionaryHistory extends Table with TableInfo {
 
 class DatabaseAtV1 extends GeneratedDatabase {
   DatabaseAtV1(QueryExecutor e) : super(e);
-  late final Dictionary dictionary = Dictionary(this);
   late final Heading heading = Heading(this);
+  late final Dictionary dictionary = Dictionary(this);
   late final Entry entry = Entry(this);
   late final Pitch pitch = Pitch(this);
   late final Frequency frequency = Frequency(this);
@@ -1191,8 +1201,8 @@ class DatabaseAtV1 extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-    dictionary,
     heading,
+    dictionary,
     entry,
     pitch,
     frequency,

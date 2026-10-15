@@ -247,8 +247,9 @@ class AppModel with ChangeNotifier {
   /// Returns all Mokuro catalogs.
   List<MokuroCatalog> get mokuroCatalogs => _store.catalogs();
 
-  /// The terms whose results the Dictionary tab shows. Oldest is first.
-  List<String> get dictionaryHistory => _store.dictionaryHistory();
+  /// The searches whose results the Dictionary tab shows. Oldest is first.
+  List<DictionaryHistoryItem> get dictionaryHistory =>
+      _store.dictionaryHistory();
 
   /// For listening to searches made inside the Card Creator.
   Stream<void> get cardCreatorRecursiveSearchStream =>
@@ -2493,8 +2494,12 @@ class AppModel with ChangeNotifier {
   }
 
   /// Adds a [DictionarySearchResult] to dictionary history.
-  Future<void> addToDictionaryHistory(
-      {required DictionarySearchResult result}) async {
+  /// [searchWithWildcards] is how [result] was searched, so that the history
+  /// searches it again the same way.
+  Future<void> addToDictionaryHistory({
+    required DictionarySearchResult result,
+    required bool searchWithWildcards,
+  }) async {
     HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
     if (homeTab != DictionaryTab.instance) {
       shouldRefreshTabs = true;
@@ -2509,8 +2514,11 @@ class AppModel with ChangeNotifier {
       return;
     }
 
-    await _store.addToDictionaryHistory(result.searchTerm,
-        maximum: maximumDictionaryHistoryItems);
+    await _store.addToDictionaryHistory(
+      result.searchTerm,
+      searchWithWildcards: searchWithWildcards,
+      maximum: maximumDictionaryHistoryItems,
+    );
   }
 
   /// Check if the database is still open or has the app been flagged to be

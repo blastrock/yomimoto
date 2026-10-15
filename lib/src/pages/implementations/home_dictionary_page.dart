@@ -198,7 +198,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                 searchTerm: homeTab.floatingSearchBarController.query,
               );
               if (_result!.headings.isNotEmpty) {
-                await appModel.addToDictionaryHistory(result: _result!);
+                await appModel.addToDictionaryHistory(
+                  result: _result!,
+                  searchWithWildcards: true,
+                );
               }
             }
           });

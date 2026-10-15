@@ -266,16 +266,37 @@ void main() {
   });
 
   group('dictionary history', () {
-    test('keeps the newest terms, re-added terms last', () async {
-      await store.addToDictionaryHistory('一', maximum: 2);
-      await store.addToDictionaryHistory('二', maximum: 2);
-      await store.addToDictionaryHistory('一', maximum: 2);
-      await store.addToDictionaryHistory('三', maximum: 2);
+    List<(String, bool)> history() => store
+        .dictionaryHistory()
+        .map((item) => (item.searchTerm, item.searchWithWildcards))
+        .toList();
 
-      expect(store.dictionaryHistory(), ['一', '三']);
+    test('keeps the newest terms, re-added terms last', () async {
+      await store.addToDictionaryHistory('一',
+          searchWithWildcards: false, maximum: 2);
+      await store.addToDictionaryHistory('二',
+          searchWithWildcards: false, maximum: 2);
+      await store.addToDictionaryHistory('一',
+          searchWithWildcards: false, maximum: 2);
+      await store.addToDictionaryHistory('三',
+          searchWithWildcards: false, maximum: 2);
+
+      expect(history(), [('一', false), ('三', false)]);
 
       await store.clearDictionaryHistory();
       expect(store.dictionaryHistory(), isEmpty);
+    });
+
+    test('keeps the wildcard flag; re-adding a term replaces it', () async {
+      await store.addToDictionaryHistory('食？？',
+          searchWithWildcards: true, maximum: 10);
+      await store.addToDictionaryHistory('猫',
+          searchWithWildcards: false, maximum: 10);
+      expect(history(), [('食？？', true), ('猫', false)]);
+
+      await store.addToDictionaryHistory('食？？',
+          searchWithWildcards: false, maximum: 10);
+      expect(history(), [('猫', false), ('食？？', false)]);
     });
   });
 }

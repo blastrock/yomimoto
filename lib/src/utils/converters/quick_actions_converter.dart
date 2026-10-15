@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 /// A type converter for a general purpose key-value map for conversion to a
-/// primitive compatible with Isar.
+/// primitive the database can store.
 class QuickActionsConverter {
-  /// Deserializes the object.
-  static Map<int, String> fromIsar(String object) {
+  /// Decodes the JSON stored in the database.
+  static Map<int, String> decode(String object) {
     Map<dynamic, dynamic> json = jsonDecode(object);
 
     return json.map(
@@ -12,8 +12,8 @@ class QuickActionsConverter {
     );
   }
 
-  /// Serializes the object.
-  static String toIsar(Map<int, String> object) {
+  /// Encodes for the database as JSON.
+  static String encode(Map<int, String> object) {
     return jsonEncode(object.map((k, e) => MapEntry(k.toString(), e)));
   }
 }

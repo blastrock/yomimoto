@@ -48,8 +48,6 @@ dependencies:
   http: ^1.0.0
   image_picker: ^1.2.3
   intl: ^0.20.3
-  isar_community: ^3.4.1
-  isar_community_flutter_libs: ^3.4.1
   json_annotation: ^4.9.0
   just_audio: ^0.10.6
   kana_kit: ^2.0.0
@@ -127,18 +125,15 @@ dev_dependencies:
   build_runner: ^2.3.3
   dart_mappable_builder: ^4.10.0
   drift_dev: ^2.35.1
-  # dependency_validator is pinned to analyzer <13 while dart_mappable_builder
-  # requires ^13; it is a hygiene tool with no build role, so it stays out until
-  # the two agree again.
+  # dependency_validator is pinned to analyzer <13 while drift_dev and
+  # dart_mappable_builder require ^13; it is a hygiene tool with no build role,
+  # so it stays out until they agree again.
 
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
   flutter_native_splash: ^2.2.8
   flutter_test:
     sdk: flutter
-  # 3.4.1 is the first release accepting analyzer >=13, which drift_dev and
-  # dart_mappable_builder 4.10 need. Removed with Isar.
-  isar_community_generator: ^3.4.1
   json_serializable: ^6.6.1
 
 flutter_icons:

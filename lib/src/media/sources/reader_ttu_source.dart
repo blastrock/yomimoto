@@ -87,7 +87,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   Directory coversDirectory(AppModel appModel) =>
       Directory(path.join(appModel.appDirectory.path, 'ttuCovers'));
 
-  /// Make the Isar library match ttu's IndexedDB: add missing books (with
+  /// Make the database library match ttu's IndexedDB: add missing books (with
   /// their covers) and drop entries whose book is gone.
   Future<void> syncLibrary({
     required AppModel appModel,

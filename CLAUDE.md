@@ -12,17 +12,17 @@ clipboard/websocket/lyrics readers, image share intents — has been deleted. Wh
 remains is deliberately three things:
 
 1. **Reading** — the embedded ッツ (ttu) EPUB reader and mokuro manga reader.
-2. **Dictionary** — Yomichan / Migaku imports, searched from Isar.
+2. **Dictionary** — Yomichan / Migaku imports, searched from SQLite.
 3. **Card creation** — the full Anki creator, with all its enhancements, exported
    to AnkiDroid.
 
 ### Fork ground rules
 
 - **No backward compatibility is owed.** The fork ships under its own
-  Android `applicationId`, so every install is fresh: Isar and Hive start empty.
+  Android `applicationId`, so every install is fresh: the database and Hive start empty.
   Do not write migration code, orphan cleanup, index clamping, or defensive
-  nullable-ing for things that were removed. Deleting a schema from
-  `globalSchemas` is free.
+  nullable-ing for things that were removed. Changing schema version 1
+  is free until 1.0.
 - **The rename is external only.** The `applicationId` is
   `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
   DCIM folder and exported file names say Yomimoto too. Internal identifiers
@@ -42,7 +42,9 @@ remains is deliberately three things:
 ```sh
 tool/fetch_ttu.sh                                          # ebook-reader-lite build → assets/ttu-ebook-reader/ (--local <path> to build a checkout)
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # Isar, json, dart_mappable
+dart run build_runner build --delete-conflicting-outputs   # json, dart_mappable, Drift
+dart run drift_dev schema dump lib/src/database/app_database.dart drift_schemas/
+dart run drift_dev schema generate drift_schemas/ test/database/generated/
 dart run slang                                             # regenerate lib/i18n/strings.g.dart
 flutter analyze                                            # must report no issues, infos included
 flutter test                                               # unit tests in test/
@@ -57,12 +59,13 @@ suppressing them; `dart fix --apply` handles most of the mechanical ones.
 cover pure code only (text selection, stash item, sentence splitting, the ttu
 bridge's event parsing): no device, no database, no mocks. They characterise
 current behaviour, oddities included, rather than prescribe it. The strict lint
-set applies to them too. Anything touching `AppModel`, Isar, MeCab or the
+set applies to them too. Anything touching `AppModel`, the database, MeCab or the
 WebView is still verified by manual device testing.
 
 CI (`.github/workflows/main.yml`, every push and pull request) fetches the
 pinned ttu build, checks that generated files are fresh (regenerates them and
-fails on `git diff`), runs `flutter analyze`, then `flutter test`. It
+fails on `git diff`; the Drift schema dump and its test helpers are
+regenerated and diffed too), runs `flutter analyze`, then `flutter test`. It
 builds no APK. `slang.yaml` turns off slang's build timestamp so the
 freshness check is deterministic.
 
@@ -73,7 +76,7 @@ Read **`docs/TOOLCHAIN.md`** before touching `pubspec.yaml` or anything under
 compileSdk 36 / targetSdk 32 / minSdk 24), and — more importantly — *what is
 pinned below latest and why*: AGP stays on 8 because `app/build.gradle` uses the
 legacy variant API and plugins still call `jcenter()`; `targetSdk` stays at 32;
-Material 3 stays off; `permission_handler`, `dart_mappable_builder` are held.
+Material 3 stays off; `permission_handler` and `sqlite3` (3.5) are held.
 Each pin also carries its reason in a comment at the constraint itself. **Do not
 bump a pinned thing without reading the reason first.**
 
@@ -101,7 +104,7 @@ Add an entry when you take one.
 
 ### Barrel imports
 
-`lib/` has seven barrel files — `creator.dart`, `dictionary.dart`,
+`lib/` has eight barrel files — `creator.dart`, `database.dart`, `dictionary.dart`,
 `language.dart`, `media.dart`, `models.dart`, `pages.dart`, `utils.dart` —
 re-exporting everything under `lib/src/<name>/`. **Always import the barrel**
 (`package:yuuna/media.dart`), never a file under `lib/src/` directly, and always
@@ -140,7 +143,7 @@ file.
 
 `lib/src/models/app_model.dart` (~3200 lines) is the god object: a
 `ChangeNotifier` behind a Riverpod `appProvider`, holding every registry, every
-directory path, the Isar handle, the Hive preference boxes, dictionary search,
+directory path, the database handles, the Hive preference boxes, dictionary search,
 Anki export, and a navigator key so dialogs can be opened without a
 `BuildContext`. `AppModel.initialise()` in `main()` runs the whole startup
 sequence and must complete before `runApp`.
@@ -156,12 +159,24 @@ its size — but splitting it is its own project, not a side effect of a feature
 - **Hive** — key-value preferences. `Box('appModel')` for app-wide settings
   (accessed through typed getter/setter pairs on `AppModel`, e.g. `isDarkMode`,
   `maximumTerms`), plus a per-`MediaSource` box for source-specific settings.
-- **Isar** (`isar_community` fork) — the real database: dictionary entries,
-  headings, pitches, frequencies, tags, search-result cache, media items, Anki
-  mappings, search history, mokuro catalogs, stash items. Schemas are listed
-  in `globalSchemas` at the top of `app_model.dart`; the list must match the
-  `@Collection()` classes. A `MediaItem` names its origin with a single
+- **SQLite** — the real database, through Drift over `sqlite3` (FFI; the package's
+  build hook bundles SQLite): dictionary entries, headings, pitches,
+  frequencies, tags, search-result cache, media items, Anki mappings, search
+  history, mokuro catalogs, stash items. One file, `yomimoto.sqlite`, in the
+  support directory. `AppDatabase` (`lib/src/database/`) declares the tables
+  (`tables.dart`) and the search and loader queries (`search.drift`).
+  `AppStore` holds app data: synchronous raw `sqlite3` reads and Drift writes
+  over one shared connection. On the main isolate raw SQL is for reads only;
+  every write goes through Drift. The isolates (`search`, import with
+  `DictionaryImportWriter`, deletion) open their own connections, and the
+  import writer is the one raw writer. `loadHeadings` produces fully loaded
+  headings. A `MediaItem` names its origin with a single
   `mediaSourceIdentifier` — the source and the tab are the same object.
+
+  Schema version 1 is the 1.0 baseline. Until 1.0 ships, schema edits change
+  version 1 and re-dump it (`drift_schemas/`). After 1.0, every change bumps
+  `schemaVersion`, adds a migration, dumps a new snapshot and adds a migration
+  test (`drift_dev make-migrations`).
 
 Dictionary import, deletion and search run in **isolates** via `compute` /
 `cancelable_compute`. Isolate entry points must therefore be **top-level
@@ -204,7 +219,7 @@ translations are gone.
   IndexedDB is tied to it. The app talks to ttu only through `TtuBridge` (the
   fork's `apps/web/src/lib/host/`), never by injecting JS.
 
-  The Novels tab is an Isar mirror of that library: `MediaItem` rows whose
+  The Novels tab is a database mirror of that library: `MediaItem` rows whose
   `mediaIdentifier` is the relative reader path `b.html?id=<ttu id>`, with
   covers stored in `ttuCovers/`. Rows are written with
   `AppModel.putMediaItem`, which unlike `addMediaItem` has no 100-item cap;
@@ -221,7 +236,9 @@ translations are gone.
   which starts at that position and saves no bookmark for the session.
   Card fields take their sentence and book from a `CreatorContext`, never
   from the reader's live state, so cards can be made from a stash item.
-  Deleting a book (through `syncLibrary`) deletes its stash.
+  Deleting a book (through `syncLibrary`) deletes its stash. `putMediaItem`
+  upserts by source and identifier, keeps the row id (the stash refers to it)
+  and orders the library by `last_opened_at`.
 
   Working on the ttu side:
 
@@ -260,7 +277,7 @@ translations are gone.
   - Tapping another word while one is highlighted starts a new lookup: the
     tap's mousedown clears the selection before `click` fires.
 - **mokuro** — reads mokuro-processed manga (HTML + OCR text overlay), with a
-  catalog of remote/local sources persisted in Isar (`MokuroCatalog`).
+  catalog of remote/local sources persisted in the database (`MokuroCatalog`).
 
 Both hand selected text to `AppModel.openRecursiveDictionarySearch` — that path,
 selection → lookup → card creation, is the app's core interaction. Treat it as

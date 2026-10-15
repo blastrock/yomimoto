@@ -38,10 +38,10 @@ class QuickActionsColumnConverter
 
   @override
   Map<int, String> fromSql(String fromDb) =>
-      QuickActionsConverter.fromIsar(fromDb);
+      QuickActionsConverter.decode(fromDb);
 
   @override
-  String toSql(Map<int, String> value) => QuickActionsConverter.toIsar(value);
+  String toSql(Map<int, String> value) => QuickActionsConverter.encode(value);
 }
 
 /// Stores a profile's enhancements, field to slot to enhancement key, as JSON.
@@ -52,11 +52,11 @@ class EnhancementsColumnConverter
 
   @override
   Map<String, Map<int, String>> fromSql(String fromDb) =>
-      EnhancementsConverter.fromIsar(fromDb);
+      EnhancementsConverter.decode(fromDb);
 
   @override
   String toSql(Map<String, Map<int, String>> value) =>
-      EnhancementsConverter.toIsar(value);
+      EnhancementsConverter.encode(value);
 }
 
 /// Stores an instant as microseconds since the epoch, so that instants within

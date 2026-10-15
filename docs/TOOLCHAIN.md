@@ -59,7 +59,7 @@ at the constraint itself:
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
 | `sqlite3` | 3.5.x | 3.6+ needs `hooks` ^2.2 → `record_use` → `meta` ^1.19, and Flutter 3.44 pins `meta` 1.18 | A Flutter release pinning `meta` ≥ 1.19 |
-| `dependency_validator` | removed | Needs analyzer < 13; drift_dev and dart_mappable_builder need ≥ 13 | Same |
+| `dependency_validator` | removed | Needs analyzer < 13; drift_dev and dart_mappable_builder need ≥ 13 | A dependency_validator release supporting analyzer ≥ 13 |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 
 `dependency_overrides` holds three entries for two reasons, each documented in
@@ -94,7 +94,7 @@ is a fresh one — there is no existing database to preserve. Check at minimum:
 
 - cold launch: first-time setup runs and the bottom bar shows exactly two tabs,
   Reader and Dictionary
-- dictionary import and lookup (confirms `isar_community` opens the schema set)
+- dictionary import and lookup (confirms the SQLite database and its build hook work on the device)
 - text selection -> dictionary lookup in the TTU reader and in mokuro
 - volume-key page turning in the TTU reader and mokuro browse (the
   `onKey` -> `onKeyEvent` change)

@@ -4,7 +4,7 @@ import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
 /// A page for [ReaderTtuSource]'s tab body content when selected as a source
-/// in the main menu: the library, read from its Isar mirror.
+/// in the main menu: the library, read from its database mirror.
 class ReaderTtuSourceHistoryPage extends HistoryReaderPage {
   /// Create an instance of this tab page.
   const ReaderTtuSourceHistoryPage({

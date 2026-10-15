@@ -218,7 +218,7 @@ class _RecursiveDictionaryPageState
           Future.delayed(historyDelay, () async {
             if (query == _controller.query) {
               appModel.addToSearchHistory(
-                        searchTerm: _controller.query,
+                searchTerm: _controller.query,
               );
             }
             if (_result!.headings.isNotEmpty) {

@@ -148,10 +148,13 @@ class _CreatorQuickActionsPageState extends BasePageState {
         enabledColor: theme.colorScheme.primary,
         icon: action.icon,
         onTap: () async {
-          appModel.removeQuickAction(
+          await appModel.removeQuickAction(
             mapping: mapping,
             slotNumber: slotNumber,
           );
+          if (!mounted) {
+            return;
+          }
           setState(() {});
         },
       );

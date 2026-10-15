@@ -135,13 +135,16 @@ class _EnhancementsPickerDialogPage
             ),
           ],
         ),
-        onTap: () {
-          appModel.setFieldEnhancement(
+        onTap: () async {
+          await appModel.setFieldEnhancement(
             mapping: widget.mapping,
             field: widget.field,
             slotNumber: widget.slotNumber,
             enhancement: enhancement,
           );
+          if (!mounted) {
+            return;
+          }
           Navigator.pop(context);
         },
       ),

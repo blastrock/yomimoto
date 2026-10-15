@@ -140,6 +140,9 @@ class _MokuroCatalogManageDialogPageState
         updateSelectedOrder(newIndex);
 
         await appModel.updateCatalogsOrder(cloneCatalogs);
+        if (!mounted) {
+          return;
+        }
         setState(() {});
       },
     );

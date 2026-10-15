@@ -127,12 +127,15 @@ class _QuickActionsPickerDialogPageState
             ),
           ],
         ),
-        onTap: () {
-          appModel.setQuickAction(
+        onTap: () async {
+          await appModel.setQuickAction(
             mapping: widget.mapping,
             slotNumber: widget.slotNumber,
             quickAction: quickAction,
           );
+          if (!mounted) {
+            return;
+          }
           Navigator.pop(context);
         },
       ),

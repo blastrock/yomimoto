@@ -732,11 +732,14 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       enabledColor: theme.colorScheme.primary,
       icon: field.icon,
       onTap: () async {
-        appModel.removeField(
+        await appModel.removeField(
           mapping: mapping,
           field: field,
           isCollapsed: isCollapsed,
         );
+        if (!mounted) {
+          return;
+        }
         setState(() {});
       },
     );
@@ -797,7 +800,10 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         enabledColor: theme.colorScheme.primary,
         icon: enhancement.icon,
         onTap: () async {
-          appModel.removeAutoFieldEnhancement(mapping: mapping, field: field);
+          await appModel.removeAutoFieldEnhancement(mapping: mapping, field: field);
+          if (!mounted) {
+            return;
+          }
           setState(() {});
         },
       );
@@ -912,11 +918,14 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         enabledColor: theme.colorScheme.primary,
         icon: enhancement.icon,
         onTap: () async {
-          appModel.removeFieldEnhancement(
+          await appModel.removeFieldEnhancement(
             mapping: mapping,
             field: field,
             slotNumber: slotNumber,
           );
+          if (!mounted) {
+            return;
+          }
           setState(() {});
         },
       );

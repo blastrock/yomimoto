@@ -126,12 +126,15 @@ class _FieldPickerDialogPageState extends BasePageState<FieldPickerDialogPage> {
             ),
           ],
         ),
-        onTap: () {
-          appModel.setField(
+        onTap: () async {
+          await appModel.setField(
             mapping: widget.mapping,
             field: field,
             isCollapsed: widget.isCollapsed,
           );
+          if (!mounted) {
+            return;
+          }
           Navigator.pop(context);
         },
       ),

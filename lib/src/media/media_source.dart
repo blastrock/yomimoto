@@ -223,18 +223,7 @@ abstract class MediaSource extends HomeTab {
       }
     }
 
-    if (item.base64Image == null) {
-      return MemoryImage(kTransparentImage);
-    }
-
-    UriData? data = Uri.parse(item.base64Image!).data;
-    if (data != null) {
-      /// A cached version of [MemoryImage] so that the image does not reload
-      /// on every revisit
-      return CacheImageProvider(item.uniqueKey, data.contentAsBytes());
-    } else {
-      return MemoryImage(kTransparentImage);
-    }
+    return MemoryImage(kTransparentImage);
   }
 
   /// The map key used to store the override title of an item.

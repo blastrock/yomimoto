@@ -9,8 +9,7 @@ StashItem _item({
   int wordLength = 2,
 }) {
   return StashItem(
-    mediaSourceIdentifier: 'reader_ttu',
-    mediaIdentifier: 'b.html?id=3',
+    mediaItemId: 3,
     term: '漢字',
     reading: 'かんじ',
     dictionaryName: 'JMdict',
@@ -25,10 +24,6 @@ StashItem _item({
 
 void main() {
   group('StashItem', () {
-    test('is keyed by source, book, term and reading', () {
-      expect(_item().stashKey, 'reader_ttu/b.html?id=3/漢字/かんじ');
-    });
-
     test('selects the word in its sentence', () {
       JidoujishoTextSelection selection = _item().getSelection();
 

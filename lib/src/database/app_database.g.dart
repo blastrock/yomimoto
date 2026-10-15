@@ -2519,7 +2519,7 @@ class EntryTagsCompanion extends UpdateCompanion<EntryTagRow> {
 }
 
 class $MediaItemsTable extends MediaItems
-    with TableInfo<$MediaItemsTable, MediaItemRow> {
+    with TableInfo<$MediaItemsTable, MediaItem> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2670,7 +2670,7 @@ class $MediaItemsTable extends MediaItems
   static const String $name = 'media_item';
   @override
   VerificationContext validateIntegrity(
-    Insertable<MediaItemRow> instance, {
+    Insertable<MediaItem> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2765,17 +2765,9 @@ class $MediaItemsTable extends MediaItems
     {mediaSourceIdentifier, mediaIdentifier},
   ];
   @override
-  MediaItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  MediaItem map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return MediaItemRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      mediaSourceIdentifier: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}media_source_identifier'],
-      )!,
+    return MediaItem(
       mediaIdentifier: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}media_identifier'],
@@ -2784,14 +2776,10 @@ class $MediaItemsTable extends MediaItems
         DriftSqlType.string,
         data['${effectivePrefix}title'],
       )!,
-      imageUrl: attachedDatabase.typeMapping.read(
+      mediaSourceIdentifier: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}image_url'],
-      ),
-      sourceMetadata: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}source_metadata'],
-      ),
+        data['${effectivePrefix}media_source_identifier'],
+      )!,
       position: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}position'],
@@ -2808,6 +2796,18 @@ class $MediaItemsTable extends MediaItems
         DriftSqlType.bool,
         data['${effectivePrefix}can_edit'],
       )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      imageUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_url'],
+      ),
+      sourceMetadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_metadata'],
+      ),
       lastOpenedAt: $MediaItemsTable.$converterlastOpenedAt.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.int,
@@ -2826,237 +2826,7 @@ class $MediaItemsTable extends MediaItems
       const MicrosecondsConverter();
 }
 
-class MediaItemRow extends DataClass implements Insertable<MediaItemRow> {
-  /// Kept across saves: the stash refers to it.
-  final int id;
-
-  /// The media source owning the item.
-  final String mediaSourceIdentifier;
-
-  /// The item within its source.
-  final String mediaIdentifier;
-
-  /// Display title.
-  final String title;
-
-  /// Cover image.
-  final String? imageUrl;
-
-  /// Source-specific state.
-  final String? sourceMetadata;
-
-  /// Progress, in the source's units.
-  final int position;
-
-  /// Length, in the source's units.
-  final int duration;
-
-  /// Whether the user may delete the item.
-  final bool canDelete;
-
-  /// Whether the user may override its title and cover.
-  final bool canEdit;
-
-  /// When the item was last opened; orders the libraries.
-  final DateTime lastOpenedAt;
-  const MediaItemRow({
-    required this.id,
-    required this.mediaSourceIdentifier,
-    required this.mediaIdentifier,
-    required this.title,
-    this.imageUrl,
-    this.sourceMetadata,
-    required this.position,
-    required this.duration,
-    required this.canDelete,
-    required this.canEdit,
-    required this.lastOpenedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['media_source_identifier'] = Variable<String>(mediaSourceIdentifier);
-    map['media_identifier'] = Variable<String>(mediaIdentifier);
-    map['title'] = Variable<String>(title);
-    if (!nullToAbsent || imageUrl != null) {
-      map['image_url'] = Variable<String>(imageUrl);
-    }
-    if (!nullToAbsent || sourceMetadata != null) {
-      map['source_metadata'] = Variable<String>(sourceMetadata);
-    }
-    map['position'] = Variable<int>(position);
-    map['duration'] = Variable<int>(duration);
-    map['can_delete'] = Variable<bool>(canDelete);
-    map['can_edit'] = Variable<bool>(canEdit);
-    {
-      map['last_opened_at'] = Variable<int>(
-        $MediaItemsTable.$converterlastOpenedAt.toSql(lastOpenedAt),
-      );
-    }
-    return map;
-  }
-
-  MediaItemsCompanion toCompanion(bool nullToAbsent) {
-    return MediaItemsCompanion(
-      id: Value(id),
-      mediaSourceIdentifier: Value(mediaSourceIdentifier),
-      mediaIdentifier: Value(mediaIdentifier),
-      title: Value(title),
-      imageUrl: imageUrl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(imageUrl),
-      sourceMetadata: sourceMetadata == null && nullToAbsent
-          ? const Value.absent()
-          : Value(sourceMetadata),
-      position: Value(position),
-      duration: Value(duration),
-      canDelete: Value(canDelete),
-      canEdit: Value(canEdit),
-      lastOpenedAt: Value(lastOpenedAt),
-    );
-  }
-
-  factory MediaItemRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return MediaItemRow(
-      id: serializer.fromJson<int>(json['id']),
-      mediaSourceIdentifier: serializer.fromJson<String>(
-        json['mediaSourceIdentifier'],
-      ),
-      mediaIdentifier: serializer.fromJson<String>(json['mediaIdentifier']),
-      title: serializer.fromJson<String>(json['title']),
-      imageUrl: serializer.fromJson<String?>(json['imageUrl']),
-      sourceMetadata: serializer.fromJson<String?>(json['sourceMetadata']),
-      position: serializer.fromJson<int>(json['position']),
-      duration: serializer.fromJson<int>(json['duration']),
-      canDelete: serializer.fromJson<bool>(json['canDelete']),
-      canEdit: serializer.fromJson<bool>(json['canEdit']),
-      lastOpenedAt: serializer.fromJson<DateTime>(json['lastOpenedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'mediaSourceIdentifier': serializer.toJson<String>(mediaSourceIdentifier),
-      'mediaIdentifier': serializer.toJson<String>(mediaIdentifier),
-      'title': serializer.toJson<String>(title),
-      'imageUrl': serializer.toJson<String?>(imageUrl),
-      'sourceMetadata': serializer.toJson<String?>(sourceMetadata),
-      'position': serializer.toJson<int>(position),
-      'duration': serializer.toJson<int>(duration),
-      'canDelete': serializer.toJson<bool>(canDelete),
-      'canEdit': serializer.toJson<bool>(canEdit),
-      'lastOpenedAt': serializer.toJson<DateTime>(lastOpenedAt),
-    };
-  }
-
-  MediaItemRow copyWith({
-    int? id,
-    String? mediaSourceIdentifier,
-    String? mediaIdentifier,
-    String? title,
-    Value<String?> imageUrl = const Value.absent(),
-    Value<String?> sourceMetadata = const Value.absent(),
-    int? position,
-    int? duration,
-    bool? canDelete,
-    bool? canEdit,
-    DateTime? lastOpenedAt,
-  }) => MediaItemRow(
-    id: id ?? this.id,
-    mediaSourceIdentifier: mediaSourceIdentifier ?? this.mediaSourceIdentifier,
-    mediaIdentifier: mediaIdentifier ?? this.mediaIdentifier,
-    title: title ?? this.title,
-    imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
-    sourceMetadata: sourceMetadata.present
-        ? sourceMetadata.value
-        : this.sourceMetadata,
-    position: position ?? this.position,
-    duration: duration ?? this.duration,
-    canDelete: canDelete ?? this.canDelete,
-    canEdit: canEdit ?? this.canEdit,
-    lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
-  );
-  MediaItemRow copyWithCompanion(MediaItemsCompanion data) {
-    return MediaItemRow(
-      id: data.id.present ? data.id.value : this.id,
-      mediaSourceIdentifier: data.mediaSourceIdentifier.present
-          ? data.mediaSourceIdentifier.value
-          : this.mediaSourceIdentifier,
-      mediaIdentifier: data.mediaIdentifier.present
-          ? data.mediaIdentifier.value
-          : this.mediaIdentifier,
-      title: data.title.present ? data.title.value : this.title,
-      imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
-      sourceMetadata: data.sourceMetadata.present
-          ? data.sourceMetadata.value
-          : this.sourceMetadata,
-      position: data.position.present ? data.position.value : this.position,
-      duration: data.duration.present ? data.duration.value : this.duration,
-      canDelete: data.canDelete.present ? data.canDelete.value : this.canDelete,
-      canEdit: data.canEdit.present ? data.canEdit.value : this.canEdit,
-      lastOpenedAt: data.lastOpenedAt.present
-          ? data.lastOpenedAt.value
-          : this.lastOpenedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('MediaItemRow(')
-          ..write('id: $id, ')
-          ..write('mediaSourceIdentifier: $mediaSourceIdentifier, ')
-          ..write('mediaIdentifier: $mediaIdentifier, ')
-          ..write('title: $title, ')
-          ..write('imageUrl: $imageUrl, ')
-          ..write('sourceMetadata: $sourceMetadata, ')
-          ..write('position: $position, ')
-          ..write('duration: $duration, ')
-          ..write('canDelete: $canDelete, ')
-          ..write('canEdit: $canEdit, ')
-          ..write('lastOpenedAt: $lastOpenedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    mediaSourceIdentifier,
-    mediaIdentifier,
-    title,
-    imageUrl,
-    sourceMetadata,
-    position,
-    duration,
-    canDelete,
-    canEdit,
-    lastOpenedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is MediaItemRow &&
-          other.id == this.id &&
-          other.mediaSourceIdentifier == this.mediaSourceIdentifier &&
-          other.mediaIdentifier == this.mediaIdentifier &&
-          other.title == this.title &&
-          other.imageUrl == this.imageUrl &&
-          other.sourceMetadata == this.sourceMetadata &&
-          other.position == this.position &&
-          other.duration == this.duration &&
-          other.canDelete == this.canDelete &&
-          other.canEdit == this.canEdit &&
-          other.lastOpenedAt == this.lastOpenedAt);
-}
-
-class MediaItemsCompanion extends UpdateCompanion<MediaItemRow> {
+class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
   final Value<int> id;
   final Value<String> mediaSourceIdentifier;
   final Value<String> mediaIdentifier;
@@ -3101,7 +2871,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItemRow> {
        canDelete = Value(canDelete),
        canEdit = Value(canEdit),
        lastOpenedAt = Value(lastOpenedAt);
-  static Insertable<MediaItemRow> custom({
+  static Insertable<MediaItem> custom({
     Expression<int>? id,
     Expression<String>? mediaSourceIdentifier,
     Expression<String>? mediaIdentifier,
@@ -3222,7 +2992,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItemRow> {
 }
 
 class $StashItemsTable extends StashItems
-    with TableInfo<$StashItemsTable, StashItemRow> {
+    with TableInfo<$StashItemsTable, StashItem> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3370,7 +3140,7 @@ class $StashItemsTable extends StashItems
   static const String $name = 'stash_item';
   @override
   VerificationContext validateIntegrity(
-    Insertable<StashItemRow> instance, {
+    Insertable<StashItem> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3464,13 +3234,9 @@ class $StashItemsTable extends StashItems
     {mediaItemId, term, reading},
   ];
   @override
-  StashItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+  StashItem map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return StashItemRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
+    return StashItem(
       mediaItemId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}media_item_id'],
@@ -3513,6 +3279,10 @@ class $StashItemsTable extends StashItems
         DriftSqlType.dateTime,
         data['${effectivePrefix}date_added'],
       )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
     );
   }
 
@@ -3525,231 +3295,7 @@ class $StashItemsTable extends StashItems
       const StringListConverter();
 }
 
-class StashItemRow extends DataClass implements Insertable<StashItemRow> {
-  /// Assigned on insert.
-  final int id;
-
-  /// The book the word was saved from.
-  final int mediaItemId;
-
-  /// The word as written.
-  final String term;
-
-  /// The word's reading.
-  final String reading;
-
-  /// The dictionary of the entry picked when saving, if one was.
-  final String? dictionaryName;
-
-  /// The definitions shown when saving.
-  final List<String> definitions;
-
-  /// The sentence the word was found in.
-  final String sentence;
-
-  /// Where the word starts in [sentence].
-  final int wordStart;
-
-  /// How long the word is in [sentence].
-  final int wordLength;
-
-  /// Where the word is in the book, in ttu bookmark units.
-  final int position;
-
-  /// When the word was saved.
-  final DateTime dateAdded;
-  const StashItemRow({
-    required this.id,
-    required this.mediaItemId,
-    required this.term,
-    required this.reading,
-    this.dictionaryName,
-    required this.definitions,
-    required this.sentence,
-    required this.wordStart,
-    required this.wordLength,
-    required this.position,
-    required this.dateAdded,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['media_item_id'] = Variable<int>(mediaItemId);
-    map['term'] = Variable<String>(term);
-    map['reading'] = Variable<String>(reading);
-    if (!nullToAbsent || dictionaryName != null) {
-      map['dictionary_name'] = Variable<String>(dictionaryName);
-    }
-    {
-      map['definitions'] = Variable<String>(
-        $StashItemsTable.$converterdefinitions.toSql(definitions),
-      );
-    }
-    map['sentence'] = Variable<String>(sentence);
-    map['word_start'] = Variable<int>(wordStart);
-    map['word_length'] = Variable<int>(wordLength);
-    map['position'] = Variable<int>(position);
-    map['date_added'] = Variable<DateTime>(dateAdded);
-    return map;
-  }
-
-  StashItemsCompanion toCompanion(bool nullToAbsent) {
-    return StashItemsCompanion(
-      id: Value(id),
-      mediaItemId: Value(mediaItemId),
-      term: Value(term),
-      reading: Value(reading),
-      dictionaryName: dictionaryName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(dictionaryName),
-      definitions: Value(definitions),
-      sentence: Value(sentence),
-      wordStart: Value(wordStart),
-      wordLength: Value(wordLength),
-      position: Value(position),
-      dateAdded: Value(dateAdded),
-    );
-  }
-
-  factory StashItemRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return StashItemRow(
-      id: serializer.fromJson<int>(json['id']),
-      mediaItemId: serializer.fromJson<int>(json['mediaItemId']),
-      term: serializer.fromJson<String>(json['term']),
-      reading: serializer.fromJson<String>(json['reading']),
-      dictionaryName: serializer.fromJson<String?>(json['dictionaryName']),
-      definitions: serializer.fromJson<List<String>>(json['definitions']),
-      sentence: serializer.fromJson<String>(json['sentence']),
-      wordStart: serializer.fromJson<int>(json['wordStart']),
-      wordLength: serializer.fromJson<int>(json['wordLength']),
-      position: serializer.fromJson<int>(json['position']),
-      dateAdded: serializer.fromJson<DateTime>(json['dateAdded']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'mediaItemId': serializer.toJson<int>(mediaItemId),
-      'term': serializer.toJson<String>(term),
-      'reading': serializer.toJson<String>(reading),
-      'dictionaryName': serializer.toJson<String?>(dictionaryName),
-      'definitions': serializer.toJson<List<String>>(definitions),
-      'sentence': serializer.toJson<String>(sentence),
-      'wordStart': serializer.toJson<int>(wordStart),
-      'wordLength': serializer.toJson<int>(wordLength),
-      'position': serializer.toJson<int>(position),
-      'dateAdded': serializer.toJson<DateTime>(dateAdded),
-    };
-  }
-
-  StashItemRow copyWith({
-    int? id,
-    int? mediaItemId,
-    String? term,
-    String? reading,
-    Value<String?> dictionaryName = const Value.absent(),
-    List<String>? definitions,
-    String? sentence,
-    int? wordStart,
-    int? wordLength,
-    int? position,
-    DateTime? dateAdded,
-  }) => StashItemRow(
-    id: id ?? this.id,
-    mediaItemId: mediaItemId ?? this.mediaItemId,
-    term: term ?? this.term,
-    reading: reading ?? this.reading,
-    dictionaryName: dictionaryName.present
-        ? dictionaryName.value
-        : this.dictionaryName,
-    definitions: definitions ?? this.definitions,
-    sentence: sentence ?? this.sentence,
-    wordStart: wordStart ?? this.wordStart,
-    wordLength: wordLength ?? this.wordLength,
-    position: position ?? this.position,
-    dateAdded: dateAdded ?? this.dateAdded,
-  );
-  StashItemRow copyWithCompanion(StashItemsCompanion data) {
-    return StashItemRow(
-      id: data.id.present ? data.id.value : this.id,
-      mediaItemId: data.mediaItemId.present
-          ? data.mediaItemId.value
-          : this.mediaItemId,
-      term: data.term.present ? data.term.value : this.term,
-      reading: data.reading.present ? data.reading.value : this.reading,
-      dictionaryName: data.dictionaryName.present
-          ? data.dictionaryName.value
-          : this.dictionaryName,
-      definitions: data.definitions.present
-          ? data.definitions.value
-          : this.definitions,
-      sentence: data.sentence.present ? data.sentence.value : this.sentence,
-      wordStart: data.wordStart.present ? data.wordStart.value : this.wordStart,
-      wordLength: data.wordLength.present
-          ? data.wordLength.value
-          : this.wordLength,
-      position: data.position.present ? data.position.value : this.position,
-      dateAdded: data.dateAdded.present ? data.dateAdded.value : this.dateAdded,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('StashItemRow(')
-          ..write('id: $id, ')
-          ..write('mediaItemId: $mediaItemId, ')
-          ..write('term: $term, ')
-          ..write('reading: $reading, ')
-          ..write('dictionaryName: $dictionaryName, ')
-          ..write('definitions: $definitions, ')
-          ..write('sentence: $sentence, ')
-          ..write('wordStart: $wordStart, ')
-          ..write('wordLength: $wordLength, ')
-          ..write('position: $position, ')
-          ..write('dateAdded: $dateAdded')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    mediaItemId,
-    term,
-    reading,
-    dictionaryName,
-    definitions,
-    sentence,
-    wordStart,
-    wordLength,
-    position,
-    dateAdded,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is StashItemRow &&
-          other.id == this.id &&
-          other.mediaItemId == this.mediaItemId &&
-          other.term == this.term &&
-          other.reading == this.reading &&
-          other.dictionaryName == this.dictionaryName &&
-          other.definitions == this.definitions &&
-          other.sentence == this.sentence &&
-          other.wordStart == this.wordStart &&
-          other.wordLength == this.wordLength &&
-          other.position == this.position &&
-          other.dateAdded == this.dateAdded);
-}
-
-class StashItemsCompanion extends UpdateCompanion<StashItemRow> {
+class StashItemsCompanion extends UpdateCompanion<StashItem> {
   final Value<int> id;
   final Value<int> mediaItemId;
   final Value<String> term;
@@ -3795,7 +3341,7 @@ class StashItemsCompanion extends UpdateCompanion<StashItemRow> {
        wordLength = Value(wordLength),
        position = Value(position),
        dateAdded = Value(dateAdded);
-  static Insertable<StashItemRow> custom({
+  static Insertable<StashItem> custom({
     Expression<int>? id,
     Expression<int>? mediaItemId,
     Expression<String>? term,
@@ -9326,10 +8872,10 @@ typedef $$MediaItemsTableUpdateCompanionBuilder =
     });
 
 final class $$MediaItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $MediaItemsTable, MediaItemRow> {
+    extends BaseReferences<_$AppDatabase, $MediaItemsTable, MediaItem> {
   $$MediaItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$StashItemsTable, List<StashItemRow>>
+  static MultiTypedResultKey<$StashItemsTable, List<StashItem>>
   _stashItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.stashItems,
     aliasName: 'media_item__id__stash_item__media_item_id',
@@ -9586,14 +9132,14 @@ class $$MediaItemsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $MediaItemsTable,
-          MediaItemRow,
+          MediaItem,
           $$MediaItemsTableFilterComposer,
           $$MediaItemsTableOrderingComposer,
           $$MediaItemsTableAnnotationComposer,
           $$MediaItemsTableCreateCompanionBuilder,
           $$MediaItemsTableUpdateCompanionBuilder,
-          (MediaItemRow, $$MediaItemsTableReferences),
-          MediaItemRow,
+          (MediaItem, $$MediaItemsTableReferences),
+          MediaItem,
           PrefetchHooks Function({bool stashItemsRefs})
         > {
   $$MediaItemsTableTableManager(_$AppDatabase db, $MediaItemsTable table)
@@ -9662,7 +9208,7 @@ class $$MediaItemsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$MediaItemsTable, MediaItemRow>(table),
+                  e.readTable<$MediaItemsTable, MediaItem>(table),
                   $$MediaItemsTableReferences(db, table, e),
                 ),
               )
@@ -9676,9 +9222,9 @@ class $$MediaItemsTableTableManager
                 return [
                   if (stashItemsRefs)
                     await $_getPrefetchedData<
-                      MediaItemRow,
+                      MediaItem,
                       $MediaItemsTable,
-                      StashItemRow
+                      StashItem
                     >(
                       currentTable: table,
                       referencedTable: $$MediaItemsTableReferences
@@ -9707,14 +9253,14 @@ typedef $$MediaItemsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $MediaItemsTable,
-      MediaItemRow,
+      MediaItem,
       $$MediaItemsTableFilterComposer,
       $$MediaItemsTableOrderingComposer,
       $$MediaItemsTableAnnotationComposer,
       $$MediaItemsTableCreateCompanionBuilder,
       $$MediaItemsTableUpdateCompanionBuilder,
-      (MediaItemRow, $$MediaItemsTableReferences),
-      MediaItemRow,
+      (MediaItem, $$MediaItemsTableReferences),
+      MediaItem,
       PrefetchHooks Function({bool stashItemsRefs})
     >;
 typedef $$StashItemsTableCreateCompanionBuilder =
@@ -9747,7 +9293,7 @@ typedef $$StashItemsTableUpdateCompanionBuilder =
     });
 
 final class $$StashItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $StashItemsTable, StashItemRow> {
+    extends BaseReferences<_$AppDatabase, $StashItemsTable, StashItem> {
   $$StashItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $MediaItemsTable _mediaItemIdTable(_$AppDatabase db) =>
@@ -10010,14 +9556,14 @@ class $$StashItemsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $StashItemsTable,
-          StashItemRow,
+          StashItem,
           $$StashItemsTableFilterComposer,
           $$StashItemsTableOrderingComposer,
           $$StashItemsTableAnnotationComposer,
           $$StashItemsTableCreateCompanionBuilder,
           $$StashItemsTableUpdateCompanionBuilder,
-          (StashItemRow, $$StashItemsTableReferences),
-          StashItemRow,
+          (StashItem, $$StashItemsTableReferences),
+          StashItem,
           PrefetchHooks Function({bool mediaItemId})
         > {
   $$StashItemsTableTableManager(_$AppDatabase db, $StashItemsTable table)
@@ -10086,7 +9632,7 @@ class $$StashItemsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$StashItemsTable, StashItemRow>(table),
+                  e.readTable<$StashItemsTable, StashItem>(table),
                   $$StashItemsTableReferences(db, table, e),
                 ),
               )
@@ -10140,14 +9686,14 @@ typedef $$StashItemsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $StashItemsTable,
-      StashItemRow,
+      StashItem,
       $$StashItemsTableFilterComposer,
       $$StashItemsTableOrderingComposer,
       $$StashItemsTableAnnotationComposer,
       $$StashItemsTableCreateCompanionBuilder,
       $$StashItemsTableUpdateCompanionBuilder,
-      (StashItemRow, $$StashItemsTableReferences),
-      StashItemRow,
+      (StashItem, $$StashItemsTableReferences),
+      StashItem,
       PrefetchHooks Function({bool mediaItemId})
     >;
 typedef $$AnkiMappingsTableCreateCompanionBuilder =

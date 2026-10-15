@@ -43,11 +43,9 @@ final List<CollectionSchema> globalSchemas = [
   DictionaryFrequencySchema,
   DictionaryTagSchema,
   DictionarySearchResultSchema,
-  MediaItemSchema,
   AnkiMappingSchema,
   SearchHistoryItemSchema,
   MokuroCatalogSchema,
-  StashItemSchema,
 ];
 
 /// A list of fields that the app will support at runtime.
@@ -138,6 +136,9 @@ class AppModel with ChangeNotifier {
 
   /// The SQLite database. See [initialise].
   late final AppDatabase _db;
+
+  /// Synchronous reads and Drift writes over [_db]. See [initialise].
+  late final AppStore _store;
 
   /// Used to get the versioning metadata of the app. See [initialise].
   PackageInfo get packageInfo => _packageInfo;
@@ -969,6 +970,7 @@ class AppModel with ChangeNotifier {
     Database raw = openRawDatabase(databasePath);
     _db = AppDatabase.fromRaw(raw);
     await _db.customSelect('SELECT 1').get();
+    _store = AppStore(db: _db, raw: raw);
 
     /// Initialise persistent database.
     _database = await Isar.open(
@@ -2099,7 +2101,7 @@ class AppModel with ChangeNotifier {
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     if (item != null && mediaSource.implementsHistory) {
-      addMediaItem(item);
+      await addMediaItem(item);
     }
 
     if (pushReplacement) {
@@ -2520,100 +2522,40 @@ class AppModel with ChangeNotifier {
 
   /// Insert or replace [item] as the most recent entry of its source's
   /// history, without the history size limit of [addMediaItem]. For
-  /// sources whose history is a library that must not lose entries.
-  void putMediaItem(MediaItem item) {
-    _database.writeTxnSync(() {
-      _database.mediaItems.deleteByUniqueKeySync(item.uniqueKey);
-      item.id = null;
-      _database.mediaItems.putSync(item);
-    });
-  }
+  /// sources whose history is a library that must not lose entries. Sets
+  /// the item's id.
+  Future<void> putMediaItem(MediaItem item) => _store.putMediaItem(item);
 
   /// Add a [MediaItem] to history. This should be called at startup
   /// when the media item is launched.
-  void addMediaItem(MediaItem item) {
-    _database.writeTxnSync(() {
-      _database.mediaItems.deleteByUniqueKeySync(item.uniqueKey);
-      item.id = null;
-
-      _database.mediaItems.putSync(item);
-
-      int countInSameHistory = _database.mediaItems
-          .filter()
-          .mediaSourceIdentifierEqualTo(item.mediaSourceIdentifier)
-          .countSync();
-
-      if (maximumMediaHistoryItems < countInSameHistory) {
-        int surplus = countInSameHistory - maximumSearchHistoryItems;
-        _database.mediaItems
-            .filter()
-            .mediaSourceIdentifierEqualTo(item.mediaSourceIdentifier)
-            .limit(surplus)
-            .build()
-            .deleteAllSync();
-      }
-    });
-  }
+  Future<void> addMediaItem(MediaItem item) =>
+      _store.addMediaItem(item, maximum: maximumMediaHistoryItems);
 
   /// Update a media item, without performing any deletion or mutation
   /// operations. This is useful when updating constantly, for example,
   /// when a reading position needs to be persisted as the user reads.
-  void updateMediaItem(MediaItem item) {
-    _database.writeTxnSync(() {
-      _database.mediaItems.putSync(item);
-    });
-  }
+  Future<void> updateMediaItem(MediaItem item) => _store.updateMediaItem(item);
 
-  /// Deletes a [MediaItem] from history and also rids of override values.
+  /// Deletes a [MediaItem] from history, with its stash, and also rids of
+  /// override values.
   Future<void> deleteMediaItem(MediaItem item) async {
     MediaSource mediaSource = item.getMediaSource(appModel: this);
     await mediaSource.clearOverrideValues(appModel: this, item: item);
     await mediaSource.onMediaItemClear(item);
 
-    _database.writeTxnSync(() {
-      _database.mediaItems.deleteSync(item.id!);
-    });
+    await _store.deleteMediaItem(item);
   }
 
   /// Save [item] to its book's stash. Returns false, saving nothing, if the
   /// book already has this word.
-  bool putStashItem(StashItem item) {
-    return _database.writeTxnSync(() {
-      if (_database.stashItems.getByStashKeySync(item.stashKey) != null) {
-        return false;
-      }
-      _database.stashItems.putSync(item);
-      return true;
-    });
-  }
+  Future<bool> putStashItem(StashItem item) => _store.putStashItem(item);
 
   /// The stash of [mediaItem], in reading order.
-  List<StashItem> getStashItems(MediaItem mediaItem) {
-    return _database.stashItems
-        .filter()
-        .mediaSourceIdentifierEqualTo(mediaItem.mediaSourceIdentifier)
-        .mediaIdentifierEqualTo(mediaItem.mediaIdentifier)
-        .sortByPosition()
-        .findAllSync();
-  }
+  List<StashItem> getStashItems(MediaItem mediaItem) =>
+      _store.stashItems(mediaItem.id!);
 
   /// Delete the stash items with these [ids].
-  void deleteStashItems(List<int> ids) {
-    _database.writeTxnSync(() {
-      _database.stashItems.deleteAllSync(ids);
-    });
-  }
-
-  /// Delete the whole stash of [mediaItem].
-  void deleteStashForMedia(MediaItem mediaItem) {
-    _database.writeTxnSync(() {
-      _database.stashItems
-          .filter()
-          .mediaSourceIdentifierEqualTo(mediaItem.mediaSourceIdentifier)
-          .mediaIdentifierEqualTo(mediaItem.mediaIdentifier)
-          .deleteAllSync();
-    });
-  }
+  Future<void> deleteStashItems(List<int> ids) => _store.deleteStashItems(ids);
 
   /// Find [item]'s word in the dictionaries for making a card. When the
   /// heading is gone, `heading` is a stand-in with no entries; when the
@@ -2659,12 +2601,10 @@ class AppModel with ChangeNotifier {
     }
   }
 
-  /// Get the history of [MediaItem] for a particular [MediaSource].
+  /// Get the history of [MediaItem] for a particular [MediaSource], least
+  /// recently opened first.
   List<MediaItem> getMediaSourceHistory({required MediaSource mediaSource}) {
-    return _database.mediaItems
-        .filter()
-        .mediaSourceIdentifierEqualTo(mediaSource.uniqueKey)
-        .findAllSync();
+    return _store.mediaItems(mediaSource.uniqueKey);
   }
 
   /// Returns the last navigated directory the user used for picking a file for a

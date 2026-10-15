@@ -344,7 +344,7 @@ class _MokuroCatalogBrowsePageState
 
             _isMokuroPageFoundNotifier.value = true;
             _mediaItem = item;
-            appModel.addMediaItem(item);
+            await appModel.addMediaItem(item);
           }
         }
 
@@ -360,7 +360,7 @@ class _MokuroCatalogBrowsePageState
             if (_mediaItem?.sourceMetadata == null) {
               await updateOrientation();
               _mediaItem?.sourceMetadata = 'used';
-              appModel.addMediaItem(_mediaItem!);
+              await appModel.addMediaItem(_mediaItem!);
             }
 
             Future.delayed(const Duration(milliseconds: 300), () {
@@ -548,12 +548,12 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
 
       if (page2Idx != -1) {
         _mediaItem!.position = page2Idx;
-        appModel.updateMediaItem(_mediaItem!);
+        await appModel.updateMediaItem(_mediaItem!);
         return;
       }
       if (pageIdx != -1) {
         _mediaItem!.position = pageIdx;
-        appModel.updateMediaItem(_mediaItem!);
+        await appModel.updateMediaItem(_mediaItem!);
       }
     } catch (e) {
       debugPrint('Invalid data in local storage.');

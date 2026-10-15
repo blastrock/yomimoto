@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
+import 'package:yuuna/media.dart';
 
 /// Imported dictionaries.
 @UseRowClass(Dictionary)
@@ -211,7 +212,7 @@ class EntryTags extends Table {
 }
 
 /// Books in the Novels library and volumes in the mokuro history.
-@DataClassName('MediaItemRow')
+@UseRowClass(MediaItem)
 class MediaItems extends Table {
   @override
   String get tableName => 'media_item';
@@ -257,7 +258,7 @@ class MediaItems extends Table {
 }
 
 /// Words saved from books.
-@DataClassName('StashItemRow')
+@UseRowClass(StashItem)
 class StashItems extends Table {
   @override
   String get tableName => 'stash_item';

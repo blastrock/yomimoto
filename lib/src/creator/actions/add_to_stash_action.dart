@@ -36,7 +36,9 @@ class AddToStashAction extends QuickAction {
   }) async {
     MediaItem? mediaItem = appModel.getCurrentMediaItem();
     MediaSource? mediaSource = mediaItem?.getMediaSource(appModel: appModel);
+    int? mediaItemId = mediaItem?.id;
     if (mediaItem == null ||
+        mediaItemId == null ||
         mediaSource == null ||
         mediaSource.currentPosition < 0) {
       showToast(t.stash_unavailable);
@@ -47,10 +49,9 @@ class AddToStashAction extends QuickAction {
     TextRange range = sentence.range;
     bool hasWord = range.isValid && range != TextRange.empty;
 
-    bool added = appModel.putStashItem(
+    bool added = await appModel.putStashItem(
       StashItem(
-        mediaSourceIdentifier: mediaItem.mediaSourceIdentifier,
-        mediaIdentifier: mediaItem.mediaIdentifier,
+        mediaItemId: mediaItemId,
         term: heading.term,
         reading: heading.reading,
         dictionaryName: selectedEntry?.dictionary.value?.name,

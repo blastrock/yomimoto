@@ -128,8 +128,10 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
       return;
     }
 
-    appModelNoUpdate.deleteStashItems([item.id!]);
-    Navigator.pop(context);
+    await appModelNoUpdate.deleteStashItems([item.id!]);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

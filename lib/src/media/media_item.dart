@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:isar_community/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -14,7 +13,6 @@ part 'media_item.g.dart';
 /// the number and complexity of CRUD operations, as including all data in this
 /// entity is impractical to include when persisting a progress update.
 @JsonSerializable()
-@Collection()
 class MediaItem {
   /// Initialise a media item with certain details.
   MediaItem({
@@ -26,14 +24,9 @@ class MediaItem {
     required this.canDelete,
     required this.canEdit,
     this.id,
-    this.extraUrl,
-    this.extra,
-    this.base64Image,
     this.imageUrl,
-    this.audioUrl,
-    this.author,
-    this.authorIdentifier,
     this.sourceMetadata,
+    this.lastOpenedAt,
   });
 
   /// Create an instance of this class from a serialized format.
@@ -43,11 +36,11 @@ class MediaItem {
   /// Convert this into a serialized format.
   Map<String, dynamic> toJson() => _$MediaItemToJson(this);
 
-  /// A unique identifier for the purposes of database storage.
-  Id? id;
+  /// A unique identifier for the purposes of database storage. Null until
+  /// the item is saved.
+  int? id;
 
-  /// A unique identifier for the purposes of database storage.
-  @Index(unique: true, replace: true)
+  /// Identifies the item across sources: its source and media identifier.
   String get uniqueKey => '$mediaSourceIdentifier/$mediaIdentifier';
 
   /// The media identifier of this item. Using this variable alone, a media
@@ -55,7 +48,6 @@ class MediaItem {
   /// If the same item exists in history, then the item is replaced with a
   /// newer item in the addition operation. This key is also used to identify
   /// resources such as thumbnails in the cache.
-  @Index()
   String mediaIdentifier;
 
   /// The name of this item. Typically, this is the name of a book or a manga
@@ -63,33 +55,10 @@ class MediaItem {
   String title;
 
   /// The media source, and so the home tab, where this item is from.
-  @Index(type: IndexType.hash)
   String mediaSourceIdentifier;
 
-  /// If [imageUrl] is null and this is not null, this will be used as the
-  /// preview image.
-  String? base64Image;
-
-  /// This will be attempted for use as the preview image if not null,
-  /// otherwise [base64Image] will be attempted.
+  /// The preview image, if any.
   String? imageUrl;
-
-  /// Used to override the audio to be played for the media.
-  String? audioUrl;
-
-  /// This field is a convenience field as it may be common to store this
-  /// detail. For a book, it is the author.
-  String? author;
-
-  /// Used to provide any extra URL information.
-  String? extraUrl;
-
-  /// This field is a convenience field for metadata information.
-  String? extra;
-
-  /// This field is for future-proofing, and can be used to store an identifier
-  /// for an author.
-  String? authorIdentifier;
 
   /// This field may be used to store additional details that the source may
   /// require to get more details on this item.
@@ -109,6 +78,10 @@ class MediaItem {
   /// Whether or not this [MediaItem] allows overriding the display title and
   /// thumbnail.
   final bool canEdit;
+
+  /// When the item was last opened, set when it is saved through
+  /// `AppStore.putMediaItem` or `AppStore.addMediaItem`. Null until then.
+  DateTime? lastOpenedAt;
 
   @override
   operator ==(Object other) =>
@@ -135,15 +108,13 @@ class MediaItem {
     String? mediaIdentifier,
     String? title,
     String? mediaSourceIdentifier,
-    String? base64Image,
     String? imageUrl,
-    String? audioUrl,
-    String? author,
     String? sourceMetadata,
     int? position,
     int? duration,
     bool? canDelete,
     bool? canEdit,
+    DateTime? lastOpenedAt,
   }) {
     return MediaItem(
       id: id ?? this.id,
@@ -151,15 +122,13 @@ class MediaItem {
       title: title ?? this.title,
       mediaSourceIdentifier:
           mediaSourceIdentifier ?? this.mediaSourceIdentifier,
-      base64Image: base64Image ?? this.base64Image,
       imageUrl: imageUrl ?? this.imageUrl,
-      audioUrl: audioUrl ?? this.audioUrl,
-      author: author ?? this.author,
       sourceMetadata: sourceMetadata ?? this.sourceMetadata,
       position: position ?? this.position,
       duration: duration ?? this.duration,
       canDelete: canDelete ?? this.canDelete,
       canEdit: canEdit ?? this.canEdit,
+      lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
     );
   }
 }

@@ -116,7 +116,7 @@ class ReaderTtuSource extends ReaderMediaSource {
         file.writeAsBytesSync(data.contentAsBytes());
         coverPath = file.path;
       }
-      appModel.putMediaItem(
+      await appModel.putMediaItem(
         bookItem(id: book.id, title: book.title, coverPath: coverPath),
       );
     }
@@ -131,7 +131,6 @@ class ReaderTtuSource extends ReaderMediaSource {
           file.deleteSync();
         }
       }
-      appModel.deleteStashForMedia(entry.value);
       await appModel.deleteMediaItem(entry.value);
     }
 

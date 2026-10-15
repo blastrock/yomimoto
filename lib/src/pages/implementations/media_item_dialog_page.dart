@@ -83,22 +83,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
             aspectRatio: mediaSource.aspectRatio,
             child: FadeInImage(
               placeholder: MemoryImage(kTransparentImage),
-              imageErrorBuilder: (_, _, _) {
-                if (widget.item.extraUrl != null) {
-                  return FadeInImage(
-                    placeholder: MemoryImage(kTransparentImage),
-                    imageErrorBuilder: (_, _, _) => const SizedBox.expand(),
-                    image: mediaSource.getDisplayThumbnailFromMediaItem(
-                      appModel: appModel,
-                      item: widget.item,
-                      fallbackUrl: widget.item.extraUrl,
-                    ),
-                    fit: BoxFit.fitWidth,
-                  );
-                } else {
-                  return const SizedBox.expand();
-                }
-              },
+              imageErrorBuilder: (_, _, _) => const SizedBox.expand(),
               image: mediaSource.getDisplayThumbnailFromMediaItem(
                 appModel: appModel,
                 item: widget.item,

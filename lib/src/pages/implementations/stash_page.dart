@@ -87,7 +87,7 @@ class _StashPageState extends BasePageState<StashPage> {
       return;
     }
 
-    appModelNoUpdate.deleteStashItems(_selected.toList());
+    await appModelNoUpdate.deleteStashItems(_selected.toList());
     _selected.clear();
     _reload();
   }

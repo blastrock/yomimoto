@@ -472,11 +472,12 @@ class AppModel with ChangeNotifier {
           trackHeight: 2,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
         ),
-        colorScheme: ColorScheme.fromSwatch()
+        colorScheme: ColorScheme.fromSwatch(brightness: Brightness.dark)
             .copyWith(
               primary: Colors.red,
               secondary: Colors.red,
-              brightness: Brightness.dark,
+              onSecondary: Colors.white,
+              onError: Colors.white,
             )
             .copyWith(surface: Colors.black),
       );

@@ -85,3 +85,19 @@ untouched.
 **When ttu is made to follow the app's theme** (a host command pushing the
 app's colours), rework the event or remove it from both sides of the bridge
 and bump the protocol version.
+
+## Both colour schemes carry unchosen Material 3 roles
+
+**Since:** the dark colour scheme was rebuilt with
+`ColorScheme.fromSwatch(brightness: Brightness.dark)`.
+
+Both themes build their `ColorScheme` from `ColorScheme.fromSwatch`'s default
+blue swatch and override only the roles the app uses (red primary and
+secondary, black or white surface). The rest keep the swatch's leftovers:
+`primaryContainer` and `surfaceTint` are blue in both themes, and
+`secondaryContainer` and `tertiary` are blue in the light theme and teal in
+the dark one. Material 2 widgets (`useMaterial3: false`) barely read these
+roles, so nothing visible depends on them today.
+
+**When Material 3 is turned on, or a theme (e-ink) is designed from its
+scheme**, choose real colours for every role instead of inheriting them.

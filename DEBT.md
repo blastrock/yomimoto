@@ -6,7 +6,7 @@ to change when that stops being true. Remove an entry once it is paid off.
 
 ## Mokuro history trimming can delete stashes
 
-**Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
+**Since:** the Drift migration.
 
 `stash_item.media_item_id` references `media_item` with `ON DELETE CASCADE`.
 Mokuro volumes are stored as a reading history capped at the 100 most
@@ -23,7 +23,7 @@ and become a library like Novels). Do not ship mokuro stashing without this.
 
 ## Futures dropped from sync code are not linted
 
-**Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
+**Since:** the Drift migration.
 
 Moving `AppModel` from Isar's synchronous writes to Drift turned many mutators
 into `Future`s, and seven callers that dropped them were only caught in
@@ -53,7 +53,7 @@ casts they ask for.
 
 ## The dictionary import holds the write lock throughout
 
-**Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
+**Since:** the Drift migration.
 
 `depositDictionaryDataHelper` imports a dictionary in one `BEGIN IMMEDIATE`
 transaction, so nothing is written if it fails. That holds the database's

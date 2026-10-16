@@ -221,7 +221,6 @@
     "no_catalogs_listed": "No catalogs listed",
     "invalid_mokuro_file": "File is not a Mokuro generated HTML file.",
     "create_catalog": "Create Catalog",
-    "adapt_ttu_theme": "Adapt dictionary popup to theme",
     "field_locked": "$field locked and will not clear on export while Creator is active.",
     "field_unlocked": "$field unlocked and will clear on export.",
     "field_lock": "Lock Field",

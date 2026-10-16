@@ -37,13 +37,10 @@ class _RecursiveDictionaryPageState
   DictionarySearchResult? _result;
 
   bool _isSearching = false;
-  late bool _isCreatorOpen;
 
   @override
   void initState() {
     super.initState();
-
-    _isCreatorOpen = appModelNoUpdate.isCreatorOpen;
 
     _controller.query = widget.searchTerm;
 
@@ -77,47 +74,22 @@ class _RecursiveDictionaryPageState
       return const SizedBox.shrink();
     }
 
-    Color? backgroundColor = theme.colorScheme.surface;
-    if (appModel.overrideDictionaryColor != null && !_isCreatorOpen) {
-      if ((appModel.overrideDictionaryTheme ?? theme).brightness ==
-          Brightness.dark) {
-        backgroundColor =
-            JidoujishoColor.lighten(appModel.overrideDictionaryColor!, 0.025);
-      } else {
-        backgroundColor =
-            JidoujishoColor.darken(appModel.overrideDictionaryColor!, 0.025);
-      }
-    }
-
-    return Theme(
-      data: !_isCreatorOpen ? appModel.overrideDictionaryTheme ?? theme : theme,
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: backgroundColor,
-        body: SafeArea(
-          child: Padding(
-            padding: Spacing.of(context).insets.onlyTop.semiSmall,
-            child: buildFloatingSearchBar(),
-          ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: theme.colorScheme.surface,
+      body: SafeArea(
+        child: Padding(
+          padding: Spacing.of(context).insets.onlyTop.semiSmall,
+          child: buildFloatingSearchBar(),
         ),
       ),
     );
   }
 
   Widget buildFloatingSearchBar() {
-    Color? backgroundColor = appModel.isDarkMode
+    Color backgroundColor = appModel.isDarkMode
         ? const Color.fromARGB(255, 30, 30, 30)
         : const Color.fromARGB(255, 229, 229, 229);
-    if (appModel.overrideDictionaryColor != null && !_isCreatorOpen) {
-      if ((appModel.overrideDictionaryTheme ?? theme).brightness ==
-          Brightness.dark) {
-        backgroundColor =
-            JidoujishoColor.lighten(appModel.overrideDictionaryColor!, 0.05);
-      } else {
-        backgroundColor =
-            JidoujishoColor.darken(appModel.overrideDictionaryColor!, 0.05);
-      }
-    }
 
     return FloatingSearchBar(
       physics: const AlwaysScrollableScrollPhysics(
@@ -440,13 +412,7 @@ class _RecursiveDictionaryPageState
   }
 
   Widget buildSearchResult() {
-    Color? cardColor;
-    if (!_isCreatorOpen) {
-      cardColor = appModel.overrideDictionaryColor?.withValues(alpha: 1);
-    }
-
     return DictionaryResultPage(
-      cardColor: cardColor,
       onSearch: onSearch,
       onShare: onShare,
       result: _result!,

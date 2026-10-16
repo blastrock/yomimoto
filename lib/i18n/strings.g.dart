@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 216
+/// Strings: 215
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -350,7 +350,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get no_catalogs_listed => 'No catalogs listed';
 	String get invalid_mokuro_file => 'File is not a Mokuro generated HTML file.';
 	String get create_catalog => 'Create Catalog';
-	String get adapt_ttu_theme => 'Adapt dictionary popup to theme';
 	String field_locked({required Object field}) => '${field} locked and will not clear on export while Creator is active.';
 	String field_unlocked({required Object field}) => '${field} unlocked and will clear on export.';
 	String get field_lock => 'Lock Field';
@@ -574,7 +573,6 @@ extension on Translations {
 			case 'no_catalogs_listed': return 'No catalogs listed';
 			case 'invalid_mokuro_file': return 'File is not a Mokuro generated HTML file.';
 			case 'create_catalog': return 'Create Catalog';
-			case 'adapt_ttu_theme': return 'Adapt dictionary popup to theme';
 			case 'field_locked': return ({required Object field}) => '${field} locked and will not clear on export while Creator is active.';
 			case 'field_unlocked': return ({required Object field}) => '${field} unlocked and will clear on export.';
 			case 'field_lock': return 'Lock Field';

@@ -190,11 +190,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 value: ttuSource.extendPageBeyondNavigationBar,
                 toggle: ttuSource.toggleExtendPageBeyondNavigationBar,
               ),
-              buildSwitch(
-                label: t.adapt_ttu_theme,
-                value: ttuSource.adaptTtuTheme,
-                toggle: ttuSource.toggleAdaptTtuTheme,
-              ),
               buildHeader(mokuroSource.sourceName),
               buildSwitch(
                 label: t.highlight_on_tap,

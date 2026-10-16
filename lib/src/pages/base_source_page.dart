@@ -187,38 +187,35 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   /// Build a dictionary showing the result with positioning.
   /// If the result is null, show nothing.
   Widget buildDictionary() {
-    return Theme(
-      data: appModel.overrideDictionaryTheme ?? theme,
-      child: MultiValueListenableBuilder(
-        valueListenables: [
-          _popupPositionNotifier,
-        ],
-        builder: (context, result, _) {
-          if (!_isSearchingNotifier.value &&
-              _dictionaryResultNotifier.value == null) {
+    return MultiValueListenableBuilder(
+      valueListenables: [
+        _popupPositionNotifier,
+      ],
+      builder: (context, result, _) {
+        if (!_isSearchingNotifier.value &&
+            _dictionaryResultNotifier.value == null) {
+          return const SizedBox.shrink();
+        }
+
+        switch (_popupPositionNotifier.value) {
+          case null:
             return const SizedBox.shrink();
-          }
+          case JidoujishoPopupPosition.topHalf:
+            return buildTopHalfDictionary();
 
-          switch (_popupPositionNotifier.value) {
-            case null:
-              return const SizedBox.shrink();
-            case JidoujishoPopupPosition.topHalf:
-              return buildTopHalfDictionary();
+          case JidoujishoPopupPosition.bottomHalf:
+            return buildBottomHalfDictionary();
 
-            case JidoujishoPopupPosition.bottomHalf:
-              return buildBottomHalfDictionary();
+          case JidoujishoPopupPosition.leftHalf:
+            return buildLeftHalfDictionary();
 
-            case JidoujishoPopupPosition.leftHalf:
-              return buildLeftHalfDictionary();
+          case JidoujishoPopupPosition.rightHalf:
+            return buildRightHalfDictionary();
 
-            case JidoujishoPopupPosition.rightHalf:
-              return buildRightHalfDictionary();
-
-            case JidoujishoPopupPosition.topThreeFourths:
-              return buildTopThreeFourths();
-          }
-        },
-      ),
+          case JidoujishoPopupPosition.topThreeFourths:
+            return buildTopThreeFourths();
+        }
+      },
     );
   }
 
@@ -309,10 +306,9 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   /// The dictionary result unpositioned. See [buildDictionary] for the
   /// positioned version.
   Widget buildDictionaryResult() {
-    Color color = appModel.overrideDictionaryColor ?? theme.cardColor;
+    Color color = theme.cardColor;
 
-    if ((appModel.overrideDictionaryTheme ?? theme).brightness ==
-        Brightness.dark) {
+    if (theme.brightness == Brightness.dark) {
       color = JidoujishoColor.lighten(color, 0.05);
     } else {
       color = JidoujishoColor.darken(color, 0.05);
@@ -391,11 +387,9 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
             height: double.infinity,
             width: double.infinity,
             child: Card(
-              color: appModel.overrideDictionaryColor
-                      ?.withValues(alpha: dictionaryEntryOpacity) ??
-                  (Theme.of(context).brightness == Brightness.dark
-                      ? Color.fromRGBO(16, 16, 16, dictionaryEntryOpacity)
-                      : Color.fromRGBO(249, 249, 249, dictionaryEntryOpacity)),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Color.fromRGBO(16, 16, 16, dictionaryEntryOpacity)
+                  : Color.fromRGBO(249, 249, 249, dictionaryEntryOpacity),
               elevation: 0,
               shape: const RoundedRectangleBorder(),
               child: Column(
@@ -411,7 +405,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
         return DictionaryResultPage(
           scrollController: resultScrollController,
-          cardColor: appModel.overrideDictionaryColor,
           opacity: dictionaryEntryOpacity,
           onSearch: onSearch,
           onShare: onShare,

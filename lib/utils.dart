@@ -19,7 +19,7 @@ export 'src/utils/converters/quick_actions_converter.dart';
 export 'src/utils/converters/enhancements_converter.dart';
 
 
-export 'src/utils/misc/jidoujisho_color.dart';
+export 'src/utils/misc/app_colors.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';
 export 'src/utils/misc/jidoujisho_text_selection.dart';
 export 'src/utils/misc/mokuro_catalog.dart';

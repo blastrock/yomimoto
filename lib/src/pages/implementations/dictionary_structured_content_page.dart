@@ -64,9 +64,7 @@ class DictionaryHtmlWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    final textColor = Theme.of(context).colorScheme.onSurface;
     final linkColor = Theme.of(context).colorScheme.error;
     final dictionaryFontSize = ref.read(appProvider).dictionaryFontSize;
     final fontSize = FontSize(dictionaryFontSize);

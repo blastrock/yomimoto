@@ -188,9 +188,10 @@ class _DictionaryHistoryScrollableItemState
             appModel.refreshDictionaryHistory();
           },
           child: Container(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.05),
             width: double.maxFinite,
             child: Padding(
               padding: Spacing.of(context).insets.all.small,

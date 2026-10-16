@@ -61,8 +61,6 @@ class DictionaryTermPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AppModel appModel = ref.watch(appProvider);
-
     List<DictionaryEntry> entries = heading.entries
         .where(
             (entry) => !dictionaryNamesByHidden[entry.dictionary.name]!)
@@ -79,9 +77,10 @@ class DictionaryTermPage extends ConsumerWidget {
       children: [
         SliverPositioned.fill(
           child: Card(
-            color: appModel.isDarkMode
-                ? Color.fromRGBO(16, 16, 16, opacity)
-                : Color.fromRGBO(249, 249, 249, opacity),
+            color: Theme.of(context)
+                .appColors
+                .dictionaryCard
+                .withValues(alpha: opacity),
             elevation: 0,
             shape: const RoundedRectangleBorder(),
           ),
@@ -244,9 +243,7 @@ class _DictionaryTermActionsRowState
         button = const SizedBox.shrink();
       } else {
         late Color enabledColor;
-        Color defaultColor = Theme.of(context).brightness == Brightness.dark
-            ? Colors.white
-            : Colors.black;
+        Color defaultColor = Theme.of(context).colorScheme.onSurface;
         enabledColor = colors[quickAction.uniqueKey] ?? defaultColor;
         button = Padding(
           padding: Spacing.of(context).insets.onlyLeft.semiSmall,
@@ -255,9 +252,10 @@ class _DictionaryTermActionsRowState
             enabledColor: enabledColor,
             disabledColor: enabledColor.withValues(alpha: 0.5),
             shapeBorder: const RoundedRectangleBorder(),
-            backgroundColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.05),
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.05),
             size: Spacing.of(context).spaces.semiBig,
             tooltip: quickAction.label,
             icon: quickAction.icon,

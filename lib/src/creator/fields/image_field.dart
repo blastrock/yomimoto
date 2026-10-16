@@ -7,8 +7,8 @@ import 'package:spaces/spaces.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/i18n/strings.g.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/utils.dart';
 
 /// Returns audio information from context.
 class ImageField extends ImageExportField {
@@ -150,7 +150,7 @@ class ImageField extends ImageExportField {
           itemBuilder: (context, index, realIndex) {
             if (index == itemCount) {
               return Container(
-                color: appModel.isDarkMode ? Colors.white10 : Colors.black12,
+                color: Theme.of(context).appColors.imagePlaceholder,
               );
             }
 

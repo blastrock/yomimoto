@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yuuna/models.dart';
 
 /// An option to show in a bottom sheet.
 class JidoujishoBottomSheetOption {
@@ -45,8 +44,6 @@ class JidoujishoBottomSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AppModel appModel = ref.watch(appProvider);
-
     ScrollController scrollController = ScrollController();
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients && scrollToExtent) {
@@ -77,9 +74,7 @@ class JidoujishoBottomSheet extends ConsumerWidget {
             style: TextStyle(
               color: (option.active)
                   ? Colors.red
-                  : appModel.isDarkMode
-                      ? Colors.white
-                      : Colors.black,
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
           onTap: () async {

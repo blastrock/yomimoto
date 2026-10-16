@@ -397,6 +397,7 @@ class AppModel with ChangeNotifier {
               brightness: Brightness.light,
             )
             .copyWith(surface: Colors.white),
+        extensions: const [AppColors.light],
       );
 
   /// Shows when the current mode is a dark theme.
@@ -480,6 +481,7 @@ class AppModel with ChangeNotifier {
               onError: Colors.white,
             )
             .copyWith(surface: Colors.black),
+        extensions: const [AppColors.dark],
       );
 
   /// Get the sentence to be used by the [SentenceField] upon card creation.

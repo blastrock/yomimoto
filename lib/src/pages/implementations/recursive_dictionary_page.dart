@@ -87,10 +87,6 @@ class _RecursiveDictionaryPageState
   }
 
   Widget buildFloatingSearchBar() {
-    Color backgroundColor = appModel.isDarkMode
-        ? const Color.fromARGB(255, 30, 30, 30)
-        : const Color.fromARGB(255, 229, 229, 229);
-
     return FloatingSearchBar(
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
@@ -100,7 +96,7 @@ class _RecursiveDictionaryPageState
       builder: buildFloatingSearchBody,
       borderRadius: BorderRadius.zero,
       elevation: 0,
-      backgroundColor: backgroundColor,
+      backgroundColor: theme.appColors.searchBarBackground,
       backdropColor: Colors.transparent,
       accentColor: theme.colorScheme.primary,
       scrollPadding: const EdgeInsets.only(top: 6, bottom: 56),
@@ -441,9 +437,10 @@ class _RecursiveDictionaryPageState
                     );
                   },
             child: Container(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
                 padding: Spacing.of(context).insets.all.normal,

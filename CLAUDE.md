@@ -203,6 +203,12 @@ Concrete pages live in `lib/src/pages/implementations/`. Dialogs are pages too.
 
 Reusable widgets are `lib/src/utils/components/jidoujisho_*.dart`.
 
+Colours that differ between themes come from the theme, never from
+`isDarkMode` or a brightness check: a `ColorScheme` role when one fits
+(`colorScheme.onSurface` for text and icons, at 5% opacity for a tint), else
+a field of the `AppColors` theme extension (`theme.appColors`), which
+`AppModel.theme` and `darkTheme` each set.
+
 ### i18n
 
 `slang`, not `flutter_localizations` codegen. Strings live in

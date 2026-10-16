@@ -235,9 +235,7 @@ class JapaneseLanguage {
   }) {
     List<Widget> listWidgets = [];
 
-    Color color = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+    Color color = Theme.of(context).colorScheme.onSurface;
 
     Widget getAccentTop(String text) {
       return Container(

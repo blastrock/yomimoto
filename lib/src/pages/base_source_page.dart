@@ -306,14 +306,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   /// The dictionary result unpositioned. See [buildDictionary] for the
   /// positioned version.
   Widget buildDictionaryResult() {
-    Color color = theme.cardColor;
-
-    if (theme.brightness == Brightness.dark) {
-      color = JidoujishoColor.lighten(color, 0.05);
-    } else {
-      color = JidoujishoColor.darken(color, 0.05);
-    }
-
     return Dismissible(
       key: ValueKey(_dictionaryResultNotifier.value),
       onDismissed: (dismissDirection) {},
@@ -327,7 +319,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       child: Container(
         padding: Spacing.of(context).insets.all.semiSmall,
         margin: Spacing.of(context).insets.all.normal,
-        color: color.withValues(alpha: dictionaryBackgroundOpacity),
+        color: theme.appColors.dictionaryPopup
+            .withValues(alpha: dictionaryBackgroundOpacity),
         child: Stack(
           children: [
             buildSearchResult(),
@@ -387,9 +380,10 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
             height: double.infinity,
             width: double.infinity,
             child: Card(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Color.fromRGBO(16, 16, 16, dictionaryEntryOpacity)
-                  : Color.fromRGBO(249, 249, 249, dictionaryEntryOpacity),
+              color: Theme.of(context)
+                  .appColors
+                  .dictionaryCard
+                  .withValues(alpha: dictionaryEntryOpacity),
               elevation: 0,
               shape: const RoundedRectangleBorder(),
               child: Column(
@@ -440,9 +434,10 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
                     );
                   },
             child: Container(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
                 padding: Spacing.of(context).insets.all.normal,

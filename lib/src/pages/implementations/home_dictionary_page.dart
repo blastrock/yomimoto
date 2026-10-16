@@ -101,10 +101,8 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       builder: buildFloatingSearchBody,
       borderRadius: BorderRadius.zero,
       elevation: 0,
-      backgroundColor: appModel.isDarkMode
-          ? const Color.fromARGB(255, 30, 30, 30)
-          : const Color.fromARGB(255, 229, 229, 229),
-      backdropColor: appModel.isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: theme.appColors.searchBarBackground,
+      backdropColor: theme.appColors.searchBarBackdrop,
       accentColor: theme.colorScheme.primary,
       scrollPadding: const EdgeInsets.only(top: 6, bottom: 56),
       transitionDuration: Duration.zero,
@@ -422,9 +420,10 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                     );
                   },
             child: Container(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.05),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
                 padding: Spacing.of(context).insets.all.normal,

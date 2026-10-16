@@ -166,13 +166,10 @@ class PitchSvg {
     switch (typ) {
       case 's':
         delta = '$stepWidth,0';
-        break;
       case 'u':
         delta = '$stepWidth,-25';
-        break;
       case 'd':
         delta = '$stepWidth,25';
-        break;
     }
     return '<path d="m $x,$y $delta" style="fill:none;stroke:currentColor;stroke-width:1.5;" />';
   }

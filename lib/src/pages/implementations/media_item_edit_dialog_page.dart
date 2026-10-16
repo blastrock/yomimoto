@@ -87,7 +87,7 @@ class _MediaItemEditDialogPageState
                 tooltip: t.undo,
                 isWideTapArea: true,
                 icon: Icons.undo,
-                onTap: () async {
+                onTap: () {
                   _nameOverrideController.text = widget.item.title;
                   FocusScope.of(context).unfocus();
                 },
@@ -136,7 +136,7 @@ class _MediaItemEditDialogPageState
                     tooltip: t.undo,
                     isWideTapArea: true,
                     icon: Icons.undo,
-                    onTap: () async {
+                    onTap: () {
                       _newFile = null;
                       _coverImageProvider = null;
                       _clearOverrideImage = true;
@@ -172,11 +172,11 @@ class _MediaItemEditDialogPageState
     );
   }
 
-  void executeCancel() async {
+  void executeCancel() {
     Navigator.pop(context);
   }
 
-  void executeSave() async {
+  Future<void> executeSave() async {
     final navigator = Navigator.of(context);
 
     if (_nameOverrideController.text.trim().isNotEmpty) {

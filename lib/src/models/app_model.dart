@@ -77,7 +77,7 @@ final quickActionColorProvider =
     FutureProvider.family<Map<String, Color?>, DictionaryHeading>(
         (ref, heading) async {
   AppModel appModel = ref.watch(appProvider);
-  List<Future<Color?>> futures = appModel.quickActions.values.map((e) async {
+  List<Future<Color?>> futures = appModel.quickActions.values.map((e) {
     return e.getIconColor(
       appModel: appModel,
       heading: heading,
@@ -559,7 +559,7 @@ class AppModel with ChangeNotifier {
       _store.replaceCatalogs(newCatalogs);
 
   /// Populate maps for home tabs at startup to optimise performance.
-  void populateTabs() async {
+  void populateTabs() {
     /// A list of home tabs that the app will support at runtime.
     final List<HomeTab> availableTabs = List<HomeTab>.unmodifiable(
       [
@@ -579,7 +579,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Populate maps for dictionary formats at startup to optimise performance.
-  void populateDictionaryFormats() async {
+  void populateDictionaryFormats() {
     /// A list of dictionary formats that the app will support at runtime.
     final List<DictionaryFormat> availableDictionaryFormats =
         List<DictionaryFormat>.unmodifiable(
@@ -602,7 +602,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Populate maps for enhancements at startup to optimise performance.
-  void populateEnhancements() async {
+  void populateEnhancements() {
     /// A list of enhancements that the app will support at runtime.
     final Map<Field, List<Enhancement>> availableEnhancements = {
       AudioField.instance: [
@@ -707,7 +707,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Populate maps for actions at startup to optimise performance.
-  void populateQuickActions() async {
+  void populateQuickActions() {
     /// A list of actions that the app will support at runtime.
     final List<QuickAction> availableQuickActions = [
       CardCreatorAction(),
@@ -916,7 +916,7 @@ class AppModel with ChangeNotifier {
     _store = AppStore(db: _db, raw: raw);
 
     /// Preloads the search database in memory.
-    searchDictionary(
+    unawaited(searchDictionary(
       searchTerm: JapaneseLanguage.helloWorld,
       searchWithWildcards: false,
       useCache: false,
@@ -933,7 +933,7 @@ class AppModel with ChangeNotifier {
           useCache: false,
         );
       });
-    });
+    }));
   }
 
   /// Get whether or not the current theme is dark mode.
@@ -946,9 +946,9 @@ class AppModel with ChangeNotifier {
   }
 
   /// Toggle between light and dark mode.
-  void toggleDarkMode() async {
+  Future<void> toggleDarkMode() async {
     await _preferences.put('is_dark_mode', !isDarkMode);
-    Restart.restartApp();
+    await Restart.restartApp();
   }
 
   /// Get the last selected deck from persisted preferences.
@@ -1095,7 +1095,7 @@ class AppModel with ChangeNotifier {
     /// given to a user regarding the dictionary they are importing.
     ReceivePort alertReceivePort = ReceivePort();
     alertReceivePort.listen((message) {
-      Fluttertoast.showToast(
+      showToast(
         msg: message.toString(),
         toastLength: Toast.LENGTH_LONG,
       );
@@ -1267,19 +1267,20 @@ class AppModel with ChangeNotifier {
     int? overrideMaximumTerms,
     bool useCache = true,
   }) async {
-    if (_dictionarySearchCache['$searchTerm/$overrideMaximumTerms'] != null &&
-        useCache) {
-      return _dictionarySearchCache['$searchTerm/$overrideMaximumTerms']!;
-    }
-
-    searchTerm = searchTerm.replaceAll('\n', ' ');
-    searchTerm = _removeEmoji.clean(searchTerm, ' ', false);
+    String term = searchTerm.replaceAll('\n', ' ');
+    term = _removeEmoji.clean(term, ' ', false);
 
     /// Strip lone surrogates that may crash the search.
     RegExp loneSurrogate = RegExp(
       '[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]',
     );
-    searchTerm = searchTerm.replaceAll(loneSurrogate, ' ');
+    term = term.replaceAll(loneSurrogate, ' ');
+
+    String cacheKey = '$term/$searchWithWildcards/$overrideMaximumTerms';
+    DictionarySearchResult? cachedResult = _dictionarySearchCache[cacheKey];
+    if (cachedResult != null && useCache) {
+      return cachedResult;
+    }
 
     ReceivePort receivePort = ReceivePort();
     receivePort.listen((message) {
@@ -1287,7 +1288,7 @@ class AppModel with ChangeNotifier {
     });
 
     DictionarySearchParams params = DictionarySearchParams(
-      searchTerm: searchTerm,
+      searchTerm: term,
       databasePath: databasePath,
       maximumDictionarySearchResults: maximumDictionarySearchResults,
       maximumDictionaryTermsInResult: overrideMaximumTerms ?? maximumTerms,
@@ -1297,7 +1298,7 @@ class AppModel with ChangeNotifier {
     );
 
     if (params.searchTerm.trim().isEmpty) {
-      return DictionarySearchResult(searchTerm: searchTerm);
+      return DictionarySearchResult(searchTerm: term);
     }
 
     _searchOperation =
@@ -1305,10 +1306,10 @@ class AppModel with ChangeNotifier {
     DictionarySearchResult? result = await _searchOperation?.value;
 
     if (result == null || result.headings.isEmpty) {
-      return DictionarySearchResult(searchTerm: searchTerm);
+      return DictionarySearchResult(searchTerm: term);
     }
 
-    _dictionarySearchCache['$searchTerm/$overrideMaximumTerms'] = result;
+    _dictionarySearchCache[cacheKey] = result;
     return result;
   }
 
@@ -1332,7 +1333,7 @@ class AppModel with ChangeNotifier {
   /// media anywhere on the device.
   Future<void> requestExternalStoragePermissions() async {
     if (isFirstTimeSetup) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.storage_permissions,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -1405,7 +1406,7 @@ class AppModel with ChangeNotifier {
   Future<void> addDefaultModelIfMissing() async {
     List<String> models = await getModelList();
     if (!models.contains(AnkiMapping.standardModelName)) {
-      methodChannel.invokeMethod('addDefaultModel');
+      await methodChannel.invokeMethod('addDefaultModel');
 
       await showDialog(
         context: _navigatorKey.currentContext!,
@@ -1507,7 +1508,7 @@ class AppModel with ChangeNotifier {
 
       return fields;
     } catch (e) {
-      showAnkidroidApiMessage();
+      unawaited(showAnkidroidApiMessage());
       rethrow;
     }
   }
@@ -1538,7 +1539,7 @@ class AppModel with ChangeNotifier {
     required Function() onSuccess,
   }) async {
     if (mapping.isExportFieldsEmpty) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.export_profile_empty,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -1613,7 +1614,7 @@ class AppModel with ChangeNotifier {
         },
       );
 
-      Fluttertoast.showToast(
+      showToast(
         msg: t.card_exported(deck: deck),
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -1623,7 +1624,7 @@ class AppModel with ChangeNotifier {
     } on PlatformException {
       debugPrint('Failed to add note');
 
-      Fluttertoast.showToast(
+      showToast(
         msg: t.error_add_note,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -1696,7 +1697,7 @@ class AppModel with ChangeNotifier {
       return response;
     } on PlatformException {
       if (fallback) {
-        Fluttertoast.showToast(
+        showToast(
           msg: t.error_export_media_ankidroid,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
@@ -1983,7 +1984,7 @@ class AppModel with ChangeNotifier {
     DictionaryTab.instance.refreshTab();
 
     if (_shouldKillMediaOnPop) {
-      shutdown();
+      await shutdown();
     }
   }
 
@@ -2268,7 +2269,7 @@ class AppModel with ChangeNotifier {
   /// Shown when a query fails to be made to an online service. For example,
   /// when there is no internet connection.
   void showFailedToCommunicateMessage() {
-    Fluttertoast.showToast(
+    showToast(
       msg: t.failed_online_service,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
@@ -2357,7 +2358,7 @@ class AppModel with ChangeNotifier {
 
     /// Redundant to do this with the share notification on Android
     if (_androidDeviceInfo.version.sdkInt < 33) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.copied_to_clipboard,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -2428,7 +2429,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Toggle auto search option.
-  void toggleAutoSearchEnabled() async {
+  Future<void> toggleAutoSearchEnabled() async {
     await _preferences.put('auto_search', !autoSearchEnabled);
   }
 
@@ -2442,7 +2443,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Sets the debounce delay in milliseconds for searching in the app..
-  void setSearchDebounceDelay(int debounceDelay) async {
+  Future<void> setSearchDebounceDelay(int debounceDelay) async {
     await _preferences.put('auto_search_debounce_delay', debounceDelay);
   }
 
@@ -2456,7 +2457,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Sets the debounce delay in milliseconds for searching in the app..
-  void setDictionaryFontSize(double fontSize) async {
+  Future<void> setDictionaryFontSize(double fontSize) async {
     await _preferences.put('dictionary_entry_font_size', fontSize);
   }
 
@@ -2466,7 +2467,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Sets the debounce delay in milliseconds for searching in the app..
-  void toggleCloseCreatorOnExport() async {
+  Future<void> toggleCloseCreatorOnExport() async {
     await _preferences.put('close_on_export', !closeCreatorOnExport);
   }
 
@@ -2478,7 +2479,7 @@ class AppModel with ChangeNotifier {
 
   /// Sets the first time setup flag so the first time message does not show
   /// again.
-  void setFirstTimeSetupFlag() async {
+  Future<void> setFirstTimeSetupFlag() async {
     await _preferences.put('first_time_setup', false);
   }
 
@@ -2489,7 +2490,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Sets the maximum dictionary terms in a result.
-  void setMaximumTerms(int value) async {
+  Future<void> setMaximumTerms(int value) async {
     await _preferences.put('maximum_terms', value);
   }
 
@@ -2527,11 +2528,11 @@ class AppModel with ChangeNotifier {
   bool _isDatabaseOpen = true;
 
   /// Safely shutdown and stop database operations.
-  void shutdown() async {
+  Future<void> shutdown() async {
     databaseCloseNotifier.notifyListeners();
     _isDatabaseOpen = false;
     await _db.close();
-    FlutterExitApp.exitApp();
+    await FlutterExitApp.exitApp();
   }
 
   /// Get the saved value that the user has set for the [TagsField].
@@ -2540,7 +2541,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Set the saved value that the user has set for the [TagsField].
-  void setSavedTags(String value) async {
+  Future<void> setSavedTags(String value) async {
     await _preferences.put('saved_tags', value);
   }
 
@@ -2552,7 +2553,7 @@ class AppModel with ChangeNotifier {
   }
 
   /// Set the list of model names that will be checked for duplicates.
-  void setDuplicateCheckModels(List<String> value) async {
+  Future<void> setDuplicateCheckModels(List<String> value) async {
     await _preferences.put('duplicate_check_models', value);
   }
 }

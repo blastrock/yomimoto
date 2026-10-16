@@ -88,7 +88,7 @@ abstract class BaseTabPageState<T extends BaseTabPage> extends BasePageState {
 
   /// Respond to tapping to the search bar and execute an action if the source
   /// does not implement search.
-  void onFocusChanged({required bool focused}) async {
+  Future<void> onFocusChanged({required bool focused}) async {
     _isSearchBarFocused = focused;
 
     if (!_isSearchBarFocused) {

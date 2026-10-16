@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class TatoebaExampleSentencesEnhancement extends Enhancement {
       searchTerm: searchTerm,
     );
 
-    appModel.openExampleSentenceDialog(
+    unawaited(appModel.openExampleSentenceDialog(
       exampleSentences: exampleSentences,
       onSelect: (selection) {
         if (selection.isEmpty) {
@@ -68,7 +69,7 @@ class TatoebaExampleSentencesEnhancement extends Enhancement {
           creatorModel.appendSentenceAndCloze(result);
         }
       },
-    );
+    ));
   }
 
   /// Search Tatoeba for example sentences and return a list of results.

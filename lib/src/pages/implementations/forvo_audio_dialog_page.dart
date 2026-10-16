@@ -48,7 +48,7 @@ class _ForvoAudioDialogPageState extends BasePageState<ForvoAudioDialogPage> {
     super.dispose();
   }
 
-  void playCurrentAudio() async {
+  Future<void> playCurrentAudio() async {
     if (widget.results.isEmpty) {
       return;
     }
@@ -74,14 +74,14 @@ class _ForvoAudioDialogPageState extends BasePageState<ForvoAudioDialogPage> {
 
     session.becomingNoisyEventStream.listen((event) async {
       await _audioPlayer.stop();
-      session.setActive(false);
+      await session.setActive(false);
     });
 
     await _audioPlayer.stop();
     await _audioPlayer.setUrl(widget.results[_notifier.value].audioUrl);
-    session.setActive(true);
+    await session.setActive(true);
     await _audioPlayer.play();
-    session.setActive(false);
+    await session.setActive(false);
   }
 
   @override

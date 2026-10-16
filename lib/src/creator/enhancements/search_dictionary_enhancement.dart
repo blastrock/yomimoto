@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -36,14 +38,14 @@ class SearchDictionaryEnhancement extends Enhancement {
       Field fallbackField = SentenceField.instance;
       searchTerm = creatorModel.getFieldController(fallbackField).text.trim();
       if (searchTerm.isEmpty) {
-        Fluttertoast.showToast(
+        showToast(
           msg: t.no_text_to_search,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
         );
         return;
       } else {
-        Fluttertoast.showToast(
+        showToast(
           msg: t.field_fallback_used(
             field: field.label,
             secondField: fallbackField.label,
@@ -54,9 +56,9 @@ class SearchDictionaryEnhancement extends Enhancement {
       }
     }
 
-    appModel.openRecursiveDictionarySearch(
+    unawaited(appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
       killOnPop: false,
-    );
+    ));
   }
 }

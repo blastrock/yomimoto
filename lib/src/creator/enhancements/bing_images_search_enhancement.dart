@@ -68,7 +68,7 @@ class BingImagesSearchEnhancement extends ImageEnhancement {
       creatorModel: creatorModel,
       newAutoCannotOverride: false,
       searchTerm: searchTerm,
-      generateImages: () async {
+      generateImages: () {
         return fetchImages(
           appModel: appModel,
           searchTerm: searchTerm,

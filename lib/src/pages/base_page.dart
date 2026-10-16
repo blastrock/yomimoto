@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
@@ -51,7 +53,7 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
       );
 
   /// Action to perform upon using the Search context option.
-  void onSearch(String searchTerm, {String? sentence = ''}) async {
+  Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
       killOnPop: false,
@@ -59,8 +61,8 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   }
 
   /// Action to perform upon using the Share context option.
-  void onShare(String searchTerm, {String? sentence = ''}) async {
-    SharePlus.instance.share(ShareParams(text: searchTerm));
+  void onShare(String searchTerm, {String? sentence = ''}) {
+    unawaited(SharePlus.instance.share(ShareParams(text: searchTerm)));
   }
 
   @override

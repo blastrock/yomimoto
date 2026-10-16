@@ -21,23 +21,35 @@ This is harmless only because mokuro cannot stash yet: the mokuro reader calls
 must spare items that have a stash (or mokuro must stop being a capped history
 and become a library like Novels). Do not ship mokuro stashing without this.
 
-## Un-awaited futures are not linted
+## Futures dropped from sync code are not linted
 
 **Since:** the Drift migration (`docs/superpowers/specs/2026-10-14-drift-migration-design.md`).
 
 Moving `AppModel` from Isar's synchronous writes to Drift turned many mutators
-into `Future`s. Their callers were found by hand, and a review caught seven
-that had been missed: none was flagged, because `analysis_options.yaml`
-enables neither `unawaited_futures` (a Future dropped inside an `async` body)
-nor `discarded_futures` (an async call from a non-async block, such as a
-plain `onTap` closure). Neither is in `flutter_lints`.
+into `Future`s, and seven callers that dropped them were only caught in
+review. `unawaited_futures` and `avoid_void_async` are now enabled, so a
+Future dropped inside an `async` body is flagged, and deliberate
+fire-and-forget calls are marked `unawaited(...)`.
 
-**To pay it off**, go over the lint rules not yet enabled that would have
-caught this class of bug, starting with those two. Enable them, and mark the
-deliberate fire-and-forget calls with `unawaited(...)` (for instance
-`populateDefaultMapping` in `home_page.dart`, `addToSearchHistory` in the
-dictionary pages, and `putMediaItem` in `reader_ttu_source_page.dart`'s
-`initState`, already wrapped).
+A Future dropped from a *non*-async block (a plain `onTap` closure,
+`initState`, `dispose`) is still not flagged. That is `discarded_futures`,
+left off because it fires on every sync Flutter callback that starts async
+work (about 65 hits, mostly harmless). Several of the seven missed calls were
+of that shape.
+
+**To pay it off**, enable `discarded_futures` and go through its hits the same
+way: `await` (making the closure `async`) where order or errors matter,
+`unawaited(...)` otherwise.
+
+## The analyzer's strict modes are off
+
+`strict-casts`, `strict-inference` and `strict-raw-types` (under
+`analyzer: language:`) are not enabled. Together they report about 250
+diagnostics, mostly implicit `dynamic` casts and inferences that silently fell
+back to `dynamic`, so a type error there only shows at runtime.
+
+**To pay it off**, enable them one at a time and add the explicit types or
+casts they ask for.
 
 ## The dictionary import holds the write lock throughout
 

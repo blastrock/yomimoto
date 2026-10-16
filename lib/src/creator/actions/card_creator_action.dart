@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,13 +84,13 @@ class CardCreatorAction extends QuickAction {
             .getAutoFieldEnhancement(appModel: appModel, field: field);
 
         if (enhancement != null) {
-          enhancement.enhanceCreatorParams(
+          unawaited(enhancement.enhanceCreatorParams(
             context: context,
             ref: ref,
             appModel: appModel,
             creatorModel: creatorModel,
             cause: EnhancementTriggerCause.auto,
-          );
+          ));
         }
       }
 

@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
@@ -146,7 +145,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }) async {
     NavigatorState navigator = Navigator.of(context);
     bool progressShown = true;
-    showDialog(
+    unawaited(showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
@@ -158,7 +157,7 @@ class ReaderTtuSource extends ReaderMediaSource {
           ],
         ),
       ),
-    ).then((_) => progressShown = false);
+    ).then((_) => progressShown = false));
 
     try {
       return await task();
@@ -221,7 +220,7 @@ class ReaderTtuSource extends ReaderMediaSource {
             path.extension(file.name).replaceFirst('.', '').toLowerCase()))
         .toList();
     if (books.length != picked.length) {
-      Fluttertoast.showToast(msg: t.ttu_unsupported_files);
+      showToast(msg: t.ttu_unsupported_files);
     }
     if (books.isEmpty) {
       return;
@@ -447,7 +446,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Toggles the volume page turning option.
-  void toggleVolumePageTurningEnabled() async {
+  Future<void> toggleVolumePageTurningEnabled() async {
     await setPreference<bool>(
       key: 'volume_page_turning_enabled',
       value: !volumePageTurningEnabled,
@@ -461,7 +460,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Inverts the current volume button page turning direction preference.
-  void toggleVolumePageTurningInverted() async {
+  Future<void> toggleVolumePageTurningInverted() async {
     await setPreference<bool>(
       key: 'volume_page_turning_inverted',
       value: !volumePageTurningInverted,
@@ -477,7 +476,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Toggles the extend navbar option.
-  void toggleExtendPageBeyondNavigationBar() async {
+  Future<void> toggleExtendPageBeyondNavigationBar() async {
     await setPreference<bool>(
       key: 'extend_page_beyond_navbar',
       value: !extendPageBeyondNavigationBar,
@@ -490,7 +489,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Toggles whether dictionary popup should adapt to the reader's theme.
-  void toggleAdaptTtuTheme() async {
+  Future<void> toggleAdaptTtuTheme() async {
     await setPreference<bool>(
       key: 'adapt_ttu_theme',
       value: !adaptTtuTheme,
@@ -506,7 +505,7 @@ class ReaderTtuSource extends ReaderMediaSource {
   }
 
   /// Toggles whether the reader will highlight words on tap.
-  void toggleHighlightOnTap() async {
+  Future<void> toggleHighlightOnTap() async {
     await setPreference<bool>(
       key: 'highlight_on_tap',
       value: !highlightOnTap,

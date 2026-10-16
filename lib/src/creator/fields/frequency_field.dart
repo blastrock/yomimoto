@@ -74,14 +74,11 @@ class FrequencyField extends Field {
       case SortingMethod.harmonic:
         ret = frequencies.length /
             frequencies.fold(0, (prev, freq) => (1 / freq) + prev);
-        break;
       case SortingMethod.min:
         ret = frequencies.reduce((f1, f2) => f1 < f2 ? f1 : f2);
-        break;
       case SortingMethod.avg:
         ret = frequencies.fold(0, (prev, freq) => prev + freq.toInt()) /
             frequencies.length;
-        break;
     }
 
     return ret.round().toString();

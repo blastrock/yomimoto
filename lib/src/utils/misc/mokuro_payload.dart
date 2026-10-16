@@ -12,7 +12,7 @@ class MokuroPayload {
 
   @override
   String toString() {
-    return '$runtimeType(images: '
+    return 'MokuroPayload(images: '
         '[${images.map((e) => e.toString()).join(', ')}])';
   }
 }
@@ -38,7 +38,7 @@ class MokuroImage {
 
   @override
   String toString() {
-    return '$runtimeType(url: $url, size: $size, blocks: '
+    return 'MokuroImage(url: $url, size: $size, blocks: '
         '[${blocks.map((e) => e.toString()).join(', ')}])';
   }
 }
@@ -74,7 +74,7 @@ class MokuroBlock {
 
   @override
   String toString() {
-    return '$runtimeType(rectangle: $rectangle, isVertical: $isVertical, '
+    return 'MokuroBlock(rectangle: $rectangle, isVertical: $isVertical, '
         'fontSize: $fontSize, lines: '
         '[${lines.join(', ')}])';
   }

@@ -67,7 +67,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   }
 
   @override
-  void onSearch(String searchTerm, {String? sentence = ''}) async {
+  Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     _isRecursiveSearching = true;
     if (appModel.isMediaOpen) {
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -88,9 +88,9 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
   /// Hide the dictionary and dispose of the current result.
   @override
-  void clearDictionaryResult() async {
+  void clearDictionaryResult() {
     super.clearDictionaryResult();
-    unselectWebViewTextSelection(_controller);
+    unawaited(unselectWebViewTextSelection(_controller));
   }
 
   @override
@@ -236,7 +236,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           onExit: _onBridgeExit,
         );
       },
-      onLoadStop: (controller, uri) async {
+      onLoadStop: (controller, uri) {
         Future.delayed(const Duration(seconds: 1), _focusNode.requestFocus);
       },
     );
@@ -252,7 +252,8 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   Future<void> _onTap(TtuTapEvent event) async {
     FocusScope.of(context).unfocus();
     _focusNode.requestFocus();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    unawaited(
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky));
 
     if (event.isDismiss) {
       clearDictionaryResult();
@@ -469,7 +470,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     );
   }
 
-  void searchMenuAction() async {
+  Future<void> searchMenuAction() async {
     String searchTerm = await getSelectedText();
     _isRecursiveSearching = true;
 
@@ -487,7 +488,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     _focusNode.requestFocus();
   }
 
-  void creatorMenuAction() async {
+  Future<void> creatorMenuAction() async {
     String text = await getSelectedText();
 
     await unselectWebViewTextSelection(_controller);
@@ -514,15 +515,15 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     _focusNode.requestFocus();
   }
 
-  void copyMenuAction() async {
+  Future<void> copyMenuAction() async {
     String searchTerm = await getSelectedText();
-    Clipboard.setData(ClipboardData(text: searchTerm));
+    await Clipboard.setData(ClipboardData(text: searchTerm));
     await unselectWebViewTextSelection(_controller);
   }
 
-  void shareMenuAction() async {
+  Future<void> shareMenuAction() async {
     String searchTerm = await getSelectedText();
-    SharePlus.instance.share(ShareParams(text: searchTerm));
+    unawaited(SharePlus.instance.share(ShareParams(text: searchTerm)));
     await unselectWebViewTextSelection(_controller);
   }
 

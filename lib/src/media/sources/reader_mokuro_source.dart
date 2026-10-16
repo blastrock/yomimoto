@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
@@ -51,10 +51,10 @@ class ReaderMokuroSource extends ReaderMediaSource {
     required WidgetRef ref,
     required AppModel appModel,
   }) async {
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => const MokuroCatalogDialogPage(),
-    );
+    ));
   }
 
   @override
@@ -92,11 +92,11 @@ class ReaderMokuroSource extends ReaderMediaSource {
         size: Theme.of(context).textTheme.titleLarge?.fontSize,
         tooltip: t.catalogs,
         icon: Icons.collections_bookmark,
-        onTap: () async {
-          showDialog(
+        onTap: () {
+          unawaited(showDialog(
             context: context,
             builder: (context) => const MokuroCatalogDialogPage(),
-          );
+          ));
         },
       ),
     );
@@ -150,7 +150,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
         size: Theme.of(context).textTheme.titleLarge?.fontSize,
         tooltip: t.pick_file,
         icon: Icons.upload_file,
-        onTap: () async {
+        onTap: () {
           launchFilePicker(
             context: context,
             ref: ref,
@@ -162,7 +162,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
   }
 
   /// Launches a file picker and opens a media
-  void launchFilePicker(
+  Future<void> launchFilePicker(
       {required BuildContext context,
       required WidgetRef ref,
       required AppModel appModel}) async {
@@ -224,13 +224,13 @@ class ReaderMokuroSource extends ReaderMediaSource {
           controller: controller,
         );
         if (item == null) {
-          Fluttertoast.showToast(msg: t.invalid_mokuro_file);
+          showToast(msg: t.invalid_mokuro_file);
         } else {
-          appModel.openMedia(
+          unawaited(appModel.openMedia(
             item: item,
             ref: ref,
             mediaSource: this,
-          );
+          ));
         }
       },
     );
@@ -307,7 +307,7 @@ bgImage.substring(5, bgImage.length - 2);
   }
 
   /// Toggles the volume page turning option.
-  void toggleVolumePageTurningEnabled() async {
+  Future<void> toggleVolumePageTurningEnabled() async {
     await setPreference<bool>(
       key: 'volume_page_turning_enabled',
       value: !volumePageTurningEnabled,
@@ -321,7 +321,7 @@ bgImage.substring(5, bgImage.length - 2);
   }
 
   /// Inverts the current volume button page turning direction preference.
-  void toggleVolumePageTurningInverted() async {
+  Future<void> toggleVolumePageTurningInverted() async {
     await setPreference<bool>(
       key: 'volume_page_turning_inverted',
       value: !volumePageTurningInverted,
@@ -337,7 +337,7 @@ bgImage.substring(5, bgImage.length - 2);
   }
 
   /// Toggles the extend navbar option.
-  void toggleExtendPageBeyondNavigationBar() async {
+  Future<void> toggleExtendPageBeyondNavigationBar() async {
     await setPreference<bool>(
       key: 'extend_page_beyond_navbar',
       value: !extendPageBeyondNavigationBar,
@@ -353,7 +353,7 @@ bgImage.substring(5, bgImage.length - 2);
   }
 
   /// Toggles whether the reader will highlight words on tap.
-  void toggleHighlightOnTap() async {
+  Future<void> toggleHighlightOnTap() async {
     await setPreference<bool>(
       key: 'highlight_on_tap',
       value: !highlightOnTap,
@@ -369,7 +369,7 @@ bgImage.substring(5, bgImage.length - 2);
   }
 
   /// Toggles whether to inject dark mode.
-  void toggleUseDarkTheme() async {
+  Future<void> toggleUseDarkTheme() async {
     await setPreference<bool>(
       key: 'use_dark_theme',
       value: !useDarkTheme,

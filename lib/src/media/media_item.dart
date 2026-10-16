@@ -84,7 +84,7 @@ class MediaItem {
   DateTime? lastOpenedAt;
 
   @override
-  operator ==(Object other) =>
+  bool operator ==(Object other) =>
       other is MediaItem && other.uniqueKey == uniqueKey;
 
   @override

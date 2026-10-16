@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:spaces/spaces.dart';
@@ -322,7 +324,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     );
   }
 
-  void showDuplicateChecksPage() async {
+  Future<void> showDuplicateChecksPage() async {
     List<String> duplicateCheckModels = appModel.duplicateCheckModels;
     List<String> models = await appModel.getModelList();
     Map<String, bool> items = Map<String, bool>.fromEntries(
@@ -332,7 +334,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
       return;
     }
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => SwitchSettingsPage<String>(
         items: items,
@@ -349,7 +351,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
           }
         },
       ),
-    );
+    ));
   }
 
   void browseToGithub() {

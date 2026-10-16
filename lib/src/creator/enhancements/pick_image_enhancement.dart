@@ -76,7 +76,7 @@ class PickImageEnhancement extends ImageEnhancement {
   Future<List<NetworkToFileImage>> fetchImages({
     required AppModel appModel,
     String? searchTerm,
-  }) async {
+  }) {
     throw UnimplementedError();
   }
 }

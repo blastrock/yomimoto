@@ -88,7 +88,7 @@ class InstantExportAction extends QuickAction {
             searchTerm: '',
             newAutoCannotOverride: true,
             cause: EnhancementTriggerCause.manual,
-            generateImages: () async {
+            generateImages: () {
               return mediaSource.generateImages(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,

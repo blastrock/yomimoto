@@ -55,7 +55,7 @@ class _ImmersionKitSentencesDialogPageState
     super.dispose();
   }
 
-  void playCurrentAudio(int index) async {
+  Future<void> playCurrentAudio(int index) async {
     if (widget.exampleSentences.isEmpty) {
       return;
     }
@@ -81,14 +81,14 @@ class _ImmersionKitSentencesDialogPageState
 
     session.becomingNoisyEventStream.listen((event) async {
       await _audioPlayer.stop();
-      session.setActive(false);
+      await session.setActive(false);
     });
 
     await _audioPlayer.stop();
     await _audioPlayer.setUrl(widget.exampleSentences[index].audioUrl);
-    session.setActive(true);
+    await session.setActive(true);
     await _audioPlayer.play();
-    session.setActive(false);
+    await session.setActive(false);
   }
 
   @override

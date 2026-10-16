@@ -74,7 +74,7 @@ class _CropImageDialogPageState extends BasePageState<CropImageDialogPage> {
     );
   }
 
-  void executeCrop() async {
+  Future<void> executeCrop() async {
     final navigator = Navigator.of(context);
     Directory appDirDoc = await getApplicationSupportDirectory();
     String cropImagePath = '${appDirDoc.path}/crop';

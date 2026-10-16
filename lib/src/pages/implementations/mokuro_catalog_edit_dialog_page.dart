@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -79,7 +78,7 @@ class _MokuroCatalogEditDialogPageState
     );
   }
 
-  void executeSave() async {
+  Future<void> executeSave() async {
     String name = _nameController.text.trim();
     String url = _urlController.text.trim();
     if (name.isEmpty || url.isEmpty) {
@@ -93,7 +92,7 @@ class _MokuroCatalogEditDialogPageState
       id: widget.catalog?.id,
     );
     if (appModel.catalogUrlHasDuplicate(catalog)) {
-      Fluttertoast.showToast(msg: t.duplicate_catalog);
+      showToast(msg: t.duplicate_catalog);
       return;
     }
     final navigator = Navigator.of(context);

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:spaces/spaces.dart';
@@ -184,7 +186,7 @@ class _MokuroCatalogManageDialogPageState
                   buildCatalogTileTrailing(catalog)
               ],
             ),
-            onTap: () async {
+            onTap: () {
               _selectedOrder = catalog.order;
 
               for (int i = 0; i < _notifiersByCatalog.length; i++) {
@@ -304,9 +306,9 @@ class _MokuroCatalogManageDialogPageState
       ],
     );
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => alertDialog,
-    );
+    ));
   }
 }

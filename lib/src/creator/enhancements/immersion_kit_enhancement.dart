@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -328,7 +329,7 @@ class ImmersionKitEnhancement extends Enhancement {
       searchTerm: searchTerm,
     );
 
-    appModel.openImmersionKitSentenceDialog(
+    unawaited(appModel.openImmersionKitSentenceDialog(
       exampleSentences: exampleSentences,
       onSelect: (selection) async {
         if (selection.isEmpty) {
@@ -374,7 +375,7 @@ class ImmersionKitEnhancement extends Enhancement {
           isAppending: true,
         );
       },
-    );
+    ));
   }
 
   /// Handles downloading and setting/appending images and audio for a

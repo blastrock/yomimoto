@@ -9,12 +9,13 @@ extension RegExpExtension on RegExp {
   /// [RegExp].
   List<String> allMatchesWithSep(String text, [int start = 0]) {
     var result = <String>[];
+    int position = start;
     for (var match in allMatches(text, start)) {
-      result.add(text.substring(start, match.start));
+      result.add(text.substring(position, match.start));
       result.add(match[0] ?? '');
-      start = match.end;
+      position = match.end;
     }
-    result.add(text.substring(start));
+    result.add(text.substring(position));
     return result;
   }
 }

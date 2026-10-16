@@ -130,7 +130,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   }
 
   @override
-  void onFocusChanged({required bool focused}) async {
+  Future<void> onFocusChanged({required bool focused}) async {
     if (homeTab.floatingSearchBarController.isOpen != _lastOpenedState) {
       _lastOpenedState = homeTab.floatingSearchBarController.isOpen;
       if (!_lastOpenedState) {
@@ -146,7 +146,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
 
   Duration get historyDelay => const Duration(milliseconds: 500);
 
-  void onQueryChanged(String query) async {
+  void onQueryChanged(String query) {
     if (!appModel.autoSearchEnabled) {
       return;
     }
@@ -159,7 +159,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   bool _showMore = false;
   String lastQuery = '';
 
-  void search(
+  Future<void> search(
     String query, {
     int? overrideMaximumTerms,
   }) async {
@@ -194,7 +194,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
           }
           Future.delayed(historyDelay, () async {
             if (query == homeTab.floatingSearchBarController.query) {
-              appModel.addToSearchHistory(
+              await appModel.addToSearchHistory(
                 searchTerm: homeTab.floatingSearchBarController.query,
               );
               if (_result!.headings.isNotEmpty) {
@@ -280,7 +280,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     );
   }
 
-  void showDeleteSearchHistoryPrompt() async {
+  Future<void> showDeleteSearchHistoryPrompt() async {
     Widget alertDialog = AlertDialog(
       title: Text(t.clear_search_title),
       content: Text(
@@ -318,7 +318,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
     );
   }
 
-  void showDeleteDictionaryHistoryPrompt() async {
+  Future<void> showDeleteDictionaryHistoryPrompt() async {
     Widget alertDialog = AlertDialog(
       title: Text(t.clear_dictionary_title),
       content: Text(
@@ -414,7 +414,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
           child: InkWell(
             onTap: _isSearching
                 ? null
-                : () async {
+                : () {
                     search(
                       homeTab.floatingSearchBarController.query,
                       overrideMaximumTerms:

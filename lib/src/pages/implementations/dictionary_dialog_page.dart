@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:change_notifier_builder/change_notifier_builder.dart';
@@ -71,11 +72,11 @@ class _DictionaryDialogPageState extends BasePageState {
             style: TextStyle(color: theme.colorScheme.primary),
           ),
           onPressed: () async {
-            showDialog(
+            unawaited(showDialog(
               barrierDismissible: false,
               context: context,
               builder: (context) => const DictionaryDialogDeletePage(),
-            );
+            ));
 
             await appModel.deleteDictionaries();
 
@@ -98,10 +99,10 @@ class _DictionaryDialogPageState extends BasePageState {
       ],
     );
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => alertDialog,
-    );
+    ));
   }
 
   Future<void> showDictionaryDeleteDialog(Dictionary dictionary) async {
@@ -118,12 +119,12 @@ class _DictionaryDialogPageState extends BasePageState {
             style: TextStyle(color: theme.colorScheme.primary),
           ),
           onPressed: () async {
-            showDialog(
+            unawaited(showDialog(
               barrierDismissible: false,
               context: context,
               builder: (context) =>
                   DictionaryDialogDeletePage(name: dictionary.name),
-            );
+            ));
 
             await appModel.deleteDictionary(dictionary);
 
@@ -146,10 +147,10 @@ class _DictionaryDialogPageState extends BasePageState {
       ],
     );
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => alertDialog,
-    );
+    ));
   }
 
   Widget buildImportButton() {

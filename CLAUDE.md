@@ -299,6 +299,10 @@ load-bearing.
   `sort_constructors_first`, `sort_pub_dependencies`,
   `always_put_control_body_on_new_line`, `prefer_asserts_with_message`.
   Generated files and `vendor/` are excluded.
+- `unawaited_futures` is on: a Future in an `async` body is either awaited
+  or wrapped in `unawaited(...)` to say the fire-and-forget is deliberate.
+  Toasts go through `showToast` (`lib/src/utils/misc/toast.dart`), never
+  `Fluttertoast.showToast` directly.
 - Spelling in identifiers, comments and strings is **British/upstream style**
   (`initialise`, `localisation`, `customisation`). Match it.
 - Dependency and override entries in `pubspec.yaml` carry a comment explaining

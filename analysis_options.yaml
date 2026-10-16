@@ -32,6 +32,7 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
+    always_declare_return_types: true
     always_use_package_imports: true
     always_put_control_body_on_new_line: true
     always_put_required_named_parameters_first: true
@@ -45,19 +46,23 @@ linter:
     avoid_setters_without_getters: true
     avoid_slow_async_io: true
     avoid_types_on_closure_parameters: true
+    avoid_void_async: true
     cancel_subscriptions: true
     comment_references: true
     do_not_use_environment: true
+    document_ignores: true
     eol_at_end_of_file: true
     library_private_types_in_public_api: true
     literal_only_boolean_expressions: true
     leading_newlines_in_multiline_strings: true
     missing_whitespace_between_adjacent_strings: true
+    no_runtimetype_tostring: true
     noop_primitive_operations: true
     no_adjacent_strings_in_list: true
     no_default_cases: true
     one_member_abstracts: true
     only_throw_errors: true
+    parameter_assignments: true
     prefer_asserts_in_initializer_lists: true
     prefer_constructors_over_static_methods: true
     prefer_if_elements_to_conditional_expressions: true
@@ -70,7 +75,12 @@ linter:
     sort_constructors_first: true
     sort_pub_dependencies: true
     throw_in_finally: true
+    type_annotate_public_apis: true
+    unawaited_futures: true
+    unnecessary_async: true
     unnecessary_await_in_return: true
+    unnecessary_breaks: true
+    unnecessary_ignore: true
     unnecessary_lambdas: true
     unnecessary_late: true
     unnecessary_null_aware_assignments: true

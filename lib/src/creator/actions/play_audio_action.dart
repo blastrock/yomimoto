@@ -38,7 +38,10 @@ class PlayAudioAction extends QuickAction {
     required DictionaryHeading heading,
     required DictionaryEntry? selectedEntry,
   }) async {
-    _audioPlayer.stop();
+    await _audioPlayer.stop();
+    if (!context.mounted) {
+      return;
+    }
 
     List<Enhancement> audioEnhancements = [];
 
@@ -58,7 +61,7 @@ class PlayAudioAction extends QuickAction {
     );
 
     if (audioEnhancements.isEmpty) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.no_audio_enhancements,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -104,18 +107,18 @@ class PlayAudioAction extends QuickAction {
 
           session.becomingNoisyEventStream.listen((event) async {
             await _audioPlayer.stop();
-            session.setActive(false);
+            await session.setActive(false);
           });
 
-          session.setActive(true);
+          await session.setActive(true);
           await _audioPlayer.play();
-          session.setActive(false);
+          await session.setActive(false);
           return;
         }
       }
     }
 
-    Fluttertoast.showToast(
+    showToast(
       msg: t.audio_unavailable,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,

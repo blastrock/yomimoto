@@ -139,14 +139,14 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
     );
   }
 
-  void executeEdit() async {
+  Future<void> executeEdit() async {
     await showDialog(
       context: context,
       builder: (context) => MediaItemEditDialogPage(item: widget.item),
     );
   }
 
-  void executeLaunch() async {
+  Future<void> executeLaunch() async {
     Navigator.pop(context);
     await appModel.openMedia(
       mediaSource: mediaSource,
@@ -155,7 +155,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
     );
   }
 
-  void executeClear() async {
+  Future<void> executeClear() async {
     final navigator = Navigator.of(context);
     await appModel.deleteMediaItem(widget.item);
     navigator.pop();

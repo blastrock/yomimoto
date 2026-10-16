@@ -53,7 +53,8 @@ class MeaningField extends Field {
             appModel.getDictionaryFormat(entry.dictionary);
 
         if (singleDictionaryEntries.length == 1) {
-          entry.definitions.forEachIndexed((index, meaning) {
+          entry.definitions.forEachIndexed((index, definition) {
+            String meaning = definition;
             if (dictionaryFormat.shouldUseCustomDefinitionWidget(meaning)) {
               meaning = dictionaryFormat.getCustomDefinitionText(meaning);
             }
@@ -69,7 +70,8 @@ class MeaningField extends Field {
             }
           });
         } else {
-          entry.definitions.forEachIndexed((index, meaning) {
+          entry.definitions.forEachIndexed((index, definition) {
+            String meaning = definition;
             if (dictionaryFormat.shouldUseCustomDefinitionWidget(meaning)) {
               meaning = dictionaryFormat.getCustomDefinitionText(meaning);
             }

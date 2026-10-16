@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -79,7 +80,7 @@ class MassifExampleSentencesEnhancement extends Enhancement {
       searchTerm: searchTerm,
     );
 
-    appModel.openMassifSentenceDialog(
+    unawaited(appModel.openMassifSentenceDialog(
       exampleSentences: exampleSentences,
       onSelect: (selection) {
         if (selection.isEmpty) {
@@ -103,7 +104,7 @@ class MassifExampleSentencesEnhancement extends Enhancement {
           creatorModel.appendSentenceAndCloze(result.text);
         }
       },
-    );
+    ));
   }
 
   int _longestExactRangeForResult({

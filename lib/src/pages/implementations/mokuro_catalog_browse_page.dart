@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -134,8 +135,8 @@ class _MokuroCatalogBrowsePageState
     return JidoujishoIconButton(
       tooltip: t.create_catalog,
       icon: Icons.bookmark_add,
-      onTap: () async {
-        showDialog(
+      onTap: () {
+        unawaited(showDialog(
           context: context,
           builder: (context) => MokuroCatalogEditDialogPage(
             catalog: MokuroCatalog(
@@ -144,7 +145,7 @@ class _MokuroCatalogBrowsePageState
               order: appModel.nextCatalogOrder,
             ),
           ),
-        );
+        ));
       },
     );
   }
@@ -236,7 +237,7 @@ class _MokuroCatalogBrowsePageState
     );
   }
 
-  void searchMenuAction() async {
+  Future<void> searchMenuAction() async {
     String searchTerm = await getSelectedText();
     _isRecursiveSearching = true;
 
@@ -254,7 +255,7 @@ class _MokuroCatalogBrowsePageState
     _focusNode.requestFocus();
   }
 
-  void creatorMenuAction() async {
+  Future<void> creatorMenuAction() async {
     String text = (await getSelectedText()).replaceAll('\\n', '\n');
     String imageUrl = await getImageUrl();
 
@@ -283,15 +284,15 @@ class _MokuroCatalogBrowsePageState
     _focusNode.requestFocus();
   }
 
-  void copyMenuAction() async {
+  Future<void> copyMenuAction() async {
     String searchTerm = await getSelectedText();
-    Clipboard.setData(ClipboardData(text: searchTerm));
+    await Clipboard.setData(ClipboardData(text: searchTerm));
     await unselectWebViewTextSelection(_controller);
   }
 
-  void shareMenuAction() async {
+  Future<void> shareMenuAction() async {
     String searchTerm = await getSelectedText();
-    SharePlus.instance.share(ShareParams(text: searchTerm));
+    unawaited(SharePlus.instance.share(ShareParams(text: searchTerm)));
     await unselectWebViewTextSelection(_controller);
   }
 
@@ -395,7 +396,7 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
   bool _isRecursiveSearching = false;
 
   @override
-  void onSearch(String searchTerm, {String? sentence = ''}) async {
+  Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     _isRecursiveSearching = true;
     if (appModel.isMediaOpen) {
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -416,9 +417,9 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
 
   /// Hide the dictionary and dispose of the current result.
   @override
-  void clearDictionaryResult() async {
+  void clearDictionaryResult() {
     super.clearDictionaryResult();
-    unselectWebViewTextSelection(_controller);
+    unawaited(unselectWebViewTextSelection(_controller));
   }
 
   @override
@@ -560,7 +561,7 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
     }
   }
 
-  void onConsoleMessage(
+  Future<void> onConsoleMessage(
     InAppWebViewController controller,
     ConsoleMessage message,
   ) async {
@@ -583,10 +584,10 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
 
     switch (messageJson['jidoujisho-message-type']) {
       case 'save':
-        saveMediaItem();
-        break;
+        await saveMediaItem();
       case 'lookup':
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+        unawaited(
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky));
 
         FocusScope.of(context).unfocus();
         _focusNode.requestFocus();
@@ -652,7 +653,7 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
             );
           }
 
-          searchDictionaryResult(
+          unawaited(searchDictionaryResult(
             searchTerm: searchTerm,
             position: position,
           ).then((_) {
@@ -707,14 +708,12 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
                 ),
               );
             }
-          });
+          }));
 
           mediaSource.setExtraData(imageUrl);
         } catch (e) {
           clearDictionaryResult();
         }
-
-        break;
     }
   }
 

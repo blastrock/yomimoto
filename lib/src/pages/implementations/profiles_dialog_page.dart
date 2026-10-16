@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
@@ -185,8 +187,8 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             mapping.order = index;
           });
 
-          appModel.setLastSelectedMapping(item);
           updateSelectedOrder(newIndex);
+          await appModel.setLastSelectedMapping(item);
 
           await appModel.updateMappingsOrder(cloneMappings);
           if (!mounted) {
@@ -241,13 +243,16 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             ),
             onTap: () async {
               _selectedOrder = mapping.order;
-              appModel.setLastSelectedMapping(mapping, notify: false);
+              await appModel.setLastSelectedMapping(mapping, notify: false);
 
               for (int i = 0; i < _notifiersByMapping.length; i++) {
                 _notifiersByMapping.entries.elementAt(i).value.value = false;
               }
               notifier.value = true;
 
+              if (!context.mounted) {
+                return;
+              }
               await appModel.validateSelectedMapping(
                 context: context,
                 mapping: mapping,
@@ -377,10 +382,10 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
       ],
     );
 
-    showDialog(
+    unawaited(showDialog(
       context: context,
       builder: (context) => alertDialog,
-    );
+    ));
   }
 
   final _modelNotifier = ChangeNotifier();
@@ -644,7 +649,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             t.dialog_save,
           ),
           onPressed: () async {
-            addNewMapping(
+            await addNewMapping(
               name: controller.text,
               mapping: mappingClone,
             );
@@ -657,10 +662,10 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
       ],
     );
     if (mounted) {
-      showDialog(
+      unawaited(showDialog(
         context: context,
         builder: (context) => alertDialog,
-      );
+      ));
     }
   }
 

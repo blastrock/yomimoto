@@ -41,7 +41,11 @@ class AddToStashAction extends QuickAction {
         mediaItemId == null ||
         mediaSource == null ||
         mediaSource.currentPosition < 0) {
-      showToast(t.stash_unavailable);
+      showToast(
+        msg: t.stash_unavailable,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
       return;
     }
 
@@ -68,7 +72,11 @@ class AddToStashAction extends QuickAction {
       ),
     );
 
-    showToast(added ? t.stash_added : t.stash_already);
+    showToast(
+      msg: added ? t.stash_added : t.stash_already,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+    );
   }
 
   /// The definitions to snapshot as plain text: [selectedEntry]'s, or those
@@ -106,14 +114,5 @@ class AddToStashAction extends QuickAction {
     }
 
     return definitions;
-  }
-
-  /// Show a short message at the bottom of the screen.
-  void showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-    );
   }
 }

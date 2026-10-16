@@ -175,7 +175,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   }
 
   /// Hide the dictionary and dispose of the current result.
-  void clearDictionaryResult() async {
+  void clearDictionaryResult() {
     _dictionaryResultNotifier.value = null;
     _popupPositionNotifier.value = null;
     _lastSearchTerm = null;
@@ -438,7 +438,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
             onTap: _isSearchingNotifier.value
                 ? null
                 : () async {
-                    searchDictionaryResult(
+                    await searchDictionaryResult(
                       searchTerm: _lastSearchTerm!,
                       position: _popupPositionNotifier.value!,
                       overrideMaximumTerms:
@@ -484,7 +484,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
   /// Action upon selecting the Search option.
   @override
-  void onSearch(String searchTerm, {String? sentence = ''}) async {
+  Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     if (appModel.isMediaOpen) {
       await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       await Future.delayed(const Duration(milliseconds: 5), () {});

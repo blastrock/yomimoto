@@ -2,15 +2,12 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
-// ignore: depend_on_referenced_packages
 import 'package:record_mp3_plus/record_mp3_plus.dart';
 import 'package:spaces/spaces.dart';
-import 'package:yuuna/i18n/strings.g.dart';
+import 'package:yuuna/utils.dart';
 import 'package:yuuna/pages.dart';
-import 'package:yuuna/src/utils/misc/jidoujisho_time_format.dart';
 
 /// The content of the dialog used for selecting segmented units of a source
 /// text.
@@ -143,23 +140,23 @@ class _AudioRecorderDialogPageState
 
             session.becomingNoisyEventStream.listen((event) async {
               await _audioPlayer.pause();
-              session.setActive(false);
+              await session.setActive(false);
             });
 
             if (playerState == null ||
                 playerState.processingState == ProcessingState.completed) {
               await _audioPlayer.seek(Duration.zero);
 
-              session.setActive(true);
+              await session.setActive(true);
               await _audioPlayer.play();
-              session.setActive(false);
+              await session.setActive(false);
             } else if (playerState.playing) {
               await _audioPlayer.pause();
-              session.setActive(false);
+              await session.setActive(false);
             } else {
-              session.setActive(true);
+              await session.setActive(true);
               await _audioPlayer.play();
-              session.setActive(false);
+              await session.setActive(false);
             }
           },
         );
@@ -355,7 +352,7 @@ class _AudioRecorderDialogPageState
 
   void executeSave() {
     if (_audioFile == null) {
-      Fluttertoast.showToast(msg: t.no_audio_file);
+      showToast(msg: t.no_audio_file);
       return;
     }
 

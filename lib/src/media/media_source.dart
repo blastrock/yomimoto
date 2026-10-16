@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -120,10 +121,10 @@ abstract class MediaSource extends HomeTab {
     required WidgetRef ref,
     required AppModel appModel,
   }) async {
-    appModel.openMedia(
+    unawaited(appModel.openMedia(
       ref: ref,
       mediaSource: this,
-    );
+    ));
   }
 
   /// This function can be used to clean up resources associated with a

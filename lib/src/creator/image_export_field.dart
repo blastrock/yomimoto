@@ -185,7 +185,7 @@ abstract class ImageExportField extends Field with ChangeNotifier {
         String fallbackTerm =
             creatorModel.getFieldController(fallbackField).text.trim();
         if (fallbackTerm.isNotEmpty) {
-          Fluttertoast.showToast(
+          showToast(
             msg: t.field_fallback_used(
               field: label,
               secondField: fallbackField.label,
@@ -199,7 +199,7 @@ abstract class ImageExportField extends Field with ChangeNotifier {
       }
     }
 
-    Fluttertoast.showToast(
+    showToast(
       msg: t.no_text_to_search,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,

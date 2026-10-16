@@ -169,7 +169,7 @@ class _RecursiveDictionaryPageState
 
   Duration get historyDelay => Duration.zero;
 
-  void onQueryChanged(String query) async {
+  void onQueryChanged(String query) {
     if (!appModel.autoSearchEnabled) {
       return;
     }
@@ -182,7 +182,7 @@ class _RecursiveDictionaryPageState
   bool _showMore = false;
   String lastQuery = '';
 
-  void search(
+  Future<void> search(
     String query, {
     int? overrideMaximumTerms,
   }) async {
@@ -217,7 +217,7 @@ class _RecursiveDictionaryPageState
           }
           Future.delayed(historyDelay, () async {
             if (query == _controller.query) {
-              appModel.addToSearchHistory(
+              await appModel.addToSearchHistory(
                 searchTerm: _controller.query,
               );
             }
@@ -240,7 +240,7 @@ class _RecursiveDictionaryPageState
       child: JidoujishoIconButton(
         tooltip: t.back,
         icon: Icons.arrow_back,
-        onTap: () async {
+        onTap: () {
           if (widget.killOnPop) {
             appModel.shutdown();
           } else {
@@ -287,7 +287,7 @@ class _RecursiveDictionaryPageState
   }
 
   @override
-  void onSearch(String searchTerm, {String? sentence = ''}) async {
+  Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
       killOnPop: false,
@@ -359,7 +359,7 @@ class _RecursiveDictionaryPageState
     );
   }
 
-  void showDeleteSearchHistoryPrompt() async {
+  Future<void> showDeleteSearchHistoryPrompt() async {
     Widget alertDialog = AlertDialog(
       title: Text(t.clear_search_title),
       content: Text(t.clear_search_description),
@@ -467,7 +467,7 @@ class _RecursiveDictionaryPageState
           child: InkWell(
             onTap: _isSearching
                 ? null
-                : () async {
+                : () {
                     search(
                       _controller.query,
                       overrideMaximumTerms:

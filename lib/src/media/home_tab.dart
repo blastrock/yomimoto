@@ -44,7 +44,7 @@ abstract class HomeTab with ChangeNotifier {
   }
 
   @override
-  operator ==(Object other) =>
+  bool operator ==(Object other) =>
       other is HomeTab && other.uniqueKey == uniqueKey;
 
   @override

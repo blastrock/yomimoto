@@ -185,23 +185,23 @@ class AudioSentenceField extends AudioExportField {
 
             session.becomingNoisyEventStream.listen((event) async {
               await _audioPlayer.pause();
-              session.setActive(false);
+              await session.setActive(false);
             });
 
             if (playerState == null ||
                 playerState.processingState == ProcessingState.completed) {
               await _audioPlayer.seek(Duration.zero);
 
-              session.setActive(true);
+              await session.setActive(true);
               await _audioPlayer.play();
-              session.setActive(false);
+              await session.setActive(false);
             } else if (playerState.playing) {
               await _audioPlayer.pause();
-              session.setActive(false);
+              await session.setActive(false);
             } else {
-              session.setActive(true);
+              await session.setActive(true);
               await _audioPlayer.play();
-              session.setActive(false);
+              await session.setActive(false);
             }
           },
         );
@@ -317,7 +317,7 @@ class AudioSentenceField extends AudioExportField {
 
   // Executed on close of the creator screen.
   @override
-  void onCreatorClose() async {
+  Future<void> onCreatorClose() async {
     _initialised = false;
     await _audioPlayer.stop();
     await _audioPlayer.dispose();

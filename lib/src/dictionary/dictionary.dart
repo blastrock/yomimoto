@@ -42,7 +42,7 @@ class Dictionary {
   int get hashCode => Object.hash(id, name);
 
   @override
-  toString() {
+  String toString() {
     return 'Dictionary(name: $name, format: $formatKey)';
   }
 }

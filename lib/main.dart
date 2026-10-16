@@ -40,22 +40,23 @@ void main() {
     );
 
     /// Ensure no pop-in for the app icon.
-    binding.addPostFrameCallback((_) async {
+    binding.addPostFrameCallback((_) {
       final context = binding.rootElement;
       if (context != null) {
-        precacheImage(const AssetImage('assets/meta/icon.png'), context);
+        unawaited(
+            precacheImage(const AssetImage('assets/meta/icon.png'), context));
       }
     });
 
     /// Ensure the top and bottom bars are shown at launch and wake prevention
     /// is disabled if not reverted from entering a media source.
-    WakelockPlus.disable();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setPreferredOrientations([
+    unawaited(WakelockPlus.disable());
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+    unawaited(SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
-    ]);
+    ]));
 
     /// Used in order to access and initialise an [AppModel] without requiring
     /// a [WidgetRef].
@@ -121,14 +122,14 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
 
     WidgetsBinding.instance.addObserver(this);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       /// Receive all intents and parse them depending on which they are.
-      intents.ReceiveIntent.getInitialIntent().then(
+      unawaited(intents.ReceiveIntent.getInitialIntent().then(
         (intent) => handleIntent(
           intent: intent,
           isInitial: true,
         ),
-      );
+      ));
       // Attach a listener to the stream for receiving intents.
       _intentsSubscription = intents.ReceiveIntent.receivedIntentStream.listen(
         (intent) => handleIntent(
@@ -149,7 +150,7 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
   void handleIntent({
     required intents.Intent? intent,
     required bool isInitial,
-  }) async {
+  }) {
     if (intent == null) {
       return;
     }
@@ -168,7 +169,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
           textShareIntentAction(data);
         }
 
-        break;
       case 'android.intent.action.PROCESS_TEXT':
         String data = intent.extra!['android.intent.extra.PROCESS_TEXT'];
         textContextMenuAction(data);

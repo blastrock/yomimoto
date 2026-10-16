@@ -78,7 +78,7 @@ class _MokuroLinkDialogPageState extends BasePageState<MokuroLinkDialogPage> {
     );
   }
 
-  void executeRead() async {
+  void executeRead() {
     if (_controller.text.trim().isEmpty) {
       return;
     }

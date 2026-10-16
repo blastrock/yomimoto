@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -51,7 +53,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     }
 
     if (widget.killOnPop) {
-      appModel.shutdown();
+      unawaited(appModel.shutdown());
       return false;
     }
 
@@ -90,7 +92,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   }
 
   Future<void> initialiseCreator() async {
-    appModel.validateSelectedMapping(
+    await appModel.validateSelectedMapping(
       context: context,
       mapping: appModel.lastSelectedMapping,
     );
@@ -108,7 +110,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             searchTerm: '',
             newAutoCannotOverride: true,
             cause: EnhancementTriggerCause.manual,
-            generateImages: () async {
+            generateImages: () {
               return mediaSource.generateImages(
                 appModel: appModel,
                 item: appModel.getCurrentMediaItem()!,
@@ -123,13 +125,13 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                 .getAutoFieldEnhancement(appModel: appModel, field: field);
 
             if (enhancement != null && mounted) {
-              enhancement.enhanceCreatorParams(
+              unawaited(enhancement.enhanceCreatorParams(
                 context: context,
                 ref: ref,
                 appModel: appModel,
                 creatorModel: creatorModel,
                 cause: EnhancementTriggerCause.auto,
-              );
+              ));
             }
           }
           continue;
@@ -140,13 +142,13 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
           .getAutoFieldEnhancement(appModel: appModel, field: field);
 
       if (enhancement != null && mounted) {
-        enhancement.enhanceCreatorParams(
+        unawaited(enhancement.enhanceCreatorParams(
           context: context,
           ref: ref,
           appModel: appModel,
           creatorModel: creatorModel,
           cause: EnhancementTriggerCause.auto,
-        );
+        ));
       }
     }
   }
@@ -656,7 +658,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     );
   }
 
-  void showClearPrompt() async {
+  Future<void> showClearPrompt() async {
     Widget alertDialog = AlertDialog(
       title: Text(t.clear_creator_title),
       content: Text(t.clear_creator_description),
@@ -668,7 +670,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               color: theme.colorScheme.primary,
             ),
           ),
-          onPressed: () async {
+          onPressed: () {
             creatorModel.clearAll(
               overrideLocks: true,
               savedTags: appModel.savedTags,
@@ -932,7 +934,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     }
   }
 
-  void onSentenceSearch(JidoujishoTextSelection selection) async {
+  Future<void> onSentenceSearch(JidoujishoTextSelection selection) async {
     String searchTerm = selection.textInside;
     String afterSearchTerm = searchTerm;
 
@@ -951,7 +953,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       killOnPop: false,
     );
 
-    subscription.cancel();
+    await subscription.cancel();
   }
 
   MaterialTextSelectionControls get sentenceSelectionControls =>
@@ -1047,7 +1049,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             onTap: () {
               creatorModel.toggleLock(field);
 
-              Fluttertoast.showToast(
+              showToast(
                 msg: locked
                     ? t.field_unlocked(field: field.label)
                     : t.field_locked(field: field.label),
@@ -1139,7 +1141,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             appModel.toggleCloseCreatorOnExport();
             notifier.value = appModel.closeCreatorOnExport;
 
-            Fluttertoast.showToast(
+            showToast(
               msg: appModel.closeCreatorOnExport
                   ? t.close_on_export_on
                   : t.close_on_export_off,

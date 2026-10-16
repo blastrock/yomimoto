@@ -156,16 +156,12 @@ class TtuBridge {
     switch (message['type']) {
       case 'ready':
         onReady?.call(TtuReadyEvent.fromJson(message));
-        break;
       case 'tap':
         onTap?.call(TtuTapEvent.fromJson(message));
-        break;
       case 'theme':
         onTheme?.call(TtuThemeEvent.fromJson(message));
-        break;
       case 'exit':
         onExit?.call();
-        break;
       default:
         debugPrint('ttuHost: unknown event ${message['type']}');
     }

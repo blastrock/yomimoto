@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -31,7 +33,7 @@ class TextSegmentationEnhancement extends Enhancement {
     String sourceText = creatorModel.getFieldController(field).text;
 
     if (sourceText.trim().isEmpty) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.no_text,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -61,7 +63,7 @@ class TextSegmentationEnhancement extends Enhancement {
             killOnPop: false,
           );
 
-          subscription.cancel();
+          await subscription.cancel();
         },
         onSelect: (selection) {
           creatorModel.setSentenceAndCloze(selection);
@@ -72,7 +74,7 @@ class TextSegmentationEnhancement extends Enhancement {
         },
       );
     } else {
-      appModel.openTextSegmentationDialog(
+      unawaited(appModel.openTextSegmentationDialog(
         sourceText: sourceText,
         onSearch: (selection) {
           appModel.openRecursiveDictionarySearch(
@@ -86,7 +88,7 @@ class TextSegmentationEnhancement extends Enhancement {
 
           Navigator.pop(context);
         },
-      );
+      ));
     }
   }
 }

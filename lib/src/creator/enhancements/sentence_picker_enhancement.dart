@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,7 +34,7 @@ class SentencePickerEnhancement extends Enhancement {
     String sourceText = creatorModel.getFieldController(field).text;
 
     if (sourceText.trim().isEmpty) {
-      Fluttertoast.showToast(
+      showToast(
         msg: t.no_text,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
@@ -40,7 +42,7 @@ class SentencePickerEnhancement extends Enhancement {
       return;
     }
 
-    appModel.openExampleSentenceDialog(
+    unawaited(appModel.openExampleSentenceDialog(
       exampleSentences: JapaneseLanguage.instance
           .getSentences(sourceText)
           .map((e) => e.trim())
@@ -53,6 +55,6 @@ class SentencePickerEnhancement extends Enhancement {
           ),
         );
       },
-    );
+    ));
   }
 }

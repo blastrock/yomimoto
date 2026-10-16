@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// A modified copy of Flutter's SelectableText, whose asserts have no messages.
 // ignore_for_file: prefer_asserts_with_message
 
 import 'dart:ui' as ui show BoxHeightStyle, BoxWidthStyle;
@@ -92,13 +93,11 @@ class _JidoujishoSelectableTextSelectionGestureDetectorBuilder
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
           renderEditable.selectWordEdge(cause: SelectionChangedCause.tap);
-          break;
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
           renderEditable.selectPosition(cause: SelectionChangedCause.tap);
-          break;
       }
     }
     _state.widget.onTap?.call();
@@ -767,7 +766,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
         cursorRadius ??= const Radius.circular(2);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
-        break;
 
       case TargetPlatform.macOS:
         final CupertinoThemeData cupertinoTheme = CupertinoTheme.of(context);
@@ -783,7 +781,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
         cursorRadius ??= const Radius.circular(2);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
-        break;
 
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
@@ -796,7 +793,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
             theme.colorScheme.primary.withValues(alpha: 0.40);
-        break;
 
       case TargetPlatform.linux:
       case TargetPlatform.windows:
@@ -810,7 +806,6 @@ class _JidoujishoSelectableTextState extends State<JidoujishoSelectableText>
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
             theme.colorScheme.primary.withValues(alpha: 0.40);
-        break;
     }
 
     final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);

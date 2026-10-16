@@ -90,7 +90,7 @@ abstract class AudioExportField extends Field {
         String fallbackTerm =
             creatorModel.getFieldController(fallbackField).text.trim();
         if (fallbackTerm.isNotEmpty) {
-          Fluttertoast.showToast(
+          showToast(
             msg: t.field_fallback_used(
               field: label,
               secondField: fallbackField.label,
@@ -104,7 +104,7 @@ abstract class AudioExportField extends Field {
       }
     }
 
-    Fluttertoast.showToast(
+    showToast(
       msg: t.no_text_to_search,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
@@ -164,7 +164,7 @@ abstract class AudioExportField extends Field {
         );
       } else {
         if (cause == EnhancementTriggerCause.manual) {
-          Fluttertoast.showToast(
+          showToast(
             msg: t.audio_unavailable,
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,

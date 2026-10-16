@@ -31,9 +31,9 @@ class SaveTagsEnhancement extends Enhancement {
   }) async {
     String tags =
         creatorModel.getFieldController(TagsField.instance).text.trim();
-    appModel.setSavedTags(tags);
+    await appModel.setSavedTags(tags);
 
-    Fluttertoast.showToast(
+    showToast(
       msg: t.saved_tags,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,

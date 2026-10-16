@@ -82,7 +82,7 @@ class _JidoujishoIconButtonState extends State<JidoujishoIconButton> {
   late bool enabled;
 
   @override
-  void didUpdateWidget(oldWidget) {
+  void didUpdateWidget(JidoujishoIconButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     enabled = widget.enabled;
   }

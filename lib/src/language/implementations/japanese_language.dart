@@ -11,6 +11,7 @@ import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// Japanese-specific text handling: segmentation, sentence splitting,
@@ -249,7 +250,7 @@ class JapaneseLanguage {
           text,
           style: TextStyle(
             color: color,
-            fontSize: appModel.dictionaryFontSize,
+            fontSize: appModel.preferences.get(Preferences.dictionaryFontSize),
           ),
         ),
       );
@@ -268,7 +269,7 @@ class JapaneseLanguage {
           text,
           style: TextStyle(
             color: color,
-            fontSize: appModel.dictionaryFontSize,
+            fontSize: appModel.preferences.get(Preferences.dictionaryFontSize),
           ),
         ),
       );
@@ -286,7 +287,7 @@ class JapaneseLanguage {
           text,
           style: TextStyle(
             color: color,
-            fontSize: appModel.dictionaryFontSize,
+            fontSize: appModel.preferences.get(Preferences.dictionaryFontSize),
           ),
         ),
       );
@@ -336,7 +337,7 @@ class JapaneseLanguage {
         ' [$downstep]  ',
         style: TextStyle(
           color: color,
-          fontSize: appModel.dictionaryFontSize,
+          fontSize: appModel.preferences.get(Preferences.dictionaryFontSize),
         ),
       ),
     );

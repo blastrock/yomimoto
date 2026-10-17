@@ -6,6 +6,7 @@ import 'package:spaces/spaces.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// Appears at startup as the portal from which a user may select media and
@@ -29,7 +30,8 @@ class _HomePageState extends BasePageState<HomePage>
   String get appName => appModel.packageInfo.appName;
   String get appVersion => appModel.packageInfo.version;
 
-  int get currentHomeTabIndex => appModel.currentHomeTabIndex;
+  int get currentHomeTabIndex =>
+      appModel.preferences.get(Preferences.currentHomeTabIndex);
 
   @override
   void initState() {
@@ -54,8 +56,8 @@ class _HomePageState extends BasePageState<HomePage>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (appModel.isFirstTimeSetup) {
-        await appModel.setFirstTimeSetupFlag();
+      if (appModel.preferences.get(Preferences.firstTimeSetup)) {
+        await appModel.preferences.set(Preferences.firstTimeSetup, false);
       }
     });
   }
@@ -148,7 +150,7 @@ class _HomePageState extends BasePageState<HomePage>
         }
       }
     } else {
-      await appModel.setCurrentHomeTabIndex(index);
+      await appModel.preferences.set(Preferences.currentHomeTabIndex, index);
       setState(() {});
 
       if (homeTab is DictionaryTab && appModel.shouldRefreshTabs) {

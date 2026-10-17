@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// A full page listing every app-wide preference, reachable from the home
@@ -44,16 +45,19 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     super.initState();
 
     _appModel = appModelNoUpdate;
-    _initialFontSize = _appModel.dictionaryFontSize;
+    _initialFontSize =
+        _appModel.preferences.get(Preferences.dictionaryFontSize);
 
     _debounceDelayController = TextEditingController(
-      text: _appModel.searchDebounceDelay.toString(),
+      text:
+          _appModel.preferences.get(Preferences.searchDebounceDelay).toString(),
     );
     _fontSizeController = TextEditingController(
-      text: _appModel.dictionaryFontSize.toString(),
+      text:
+          _appModel.preferences.get(Preferences.dictionaryFontSize).toString(),
     );
     _maximumTermsController = TextEditingController(
-      text: _appModel.maximumTerms.toString(),
+      text: _appModel.preferences.get(Preferences.maximumTerms).toString(),
     );
   }
 
@@ -64,7 +68,8 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _fontSizeController.dispose();
     _maximumTermsController.dispose();
 
-    if (_appModel.dictionaryFontSize != _initialFontSize) {
+    if (_appModel.preferences.get(Preferences.dictionaryFontSize) !=
+        _initialFontSize) {
       _appModel.refresh();
     }
 
@@ -106,55 +111,60 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
               ),
               buildSwitch(
                 label: t.auto_search,
-                value: appModel.autoSearchEnabled,
-                toggle: appModel.toggleAutoSearchEnabled,
+                value: appModel.preferences.get(Preferences.autoSearch),
+                toggle: () =>
+                    appModel.preferences.toggle(Preferences.autoSearch),
               ),
               buildNumberField(
                 controller: _debounceDelayController,
                 label: t.auto_search_debounce_delay,
                 suffixText: t.unit_milliseconds,
-                defaultValue: appModel.defaultSearchDebounceDelay.toString(),
+                defaultValue:
+                    Preferences.searchDebounceDelay.defaultValue.toString(),
                 onChanged: (value) {
                   int delay = int.tryParse(value) ??
-                      appModel.defaultSearchDebounceDelay;
+                      Preferences.searchDebounceDelay.defaultValue;
                   if (delay.isNegative) {
-                    delay = appModel.defaultSearchDebounceDelay;
+                    delay = Preferences.searchDebounceDelay.defaultValue;
                     _debounceDelayController.text = delay.toString();
                   }
 
-                  appModel.setSearchDebounceDelay(delay);
+                  appModel.preferences
+                      .set(Preferences.searchDebounceDelay, delay);
                 },
               ),
               buildNumberField(
                 controller: _fontSizeController,
                 label: t.dictionary_font_size,
                 suffixText: t.unit_pixels,
-                defaultValue: appModel.defaultDictionaryFontSize.toString(),
+                defaultValue:
+                    Preferences.dictionaryFontSize.defaultValue.toString(),
                 onChanged: (value) {
                   double size = double.tryParse(value) ??
-                      appModel.defaultDictionaryFontSize;
+                      Preferences.dictionaryFontSize.defaultValue;
                   if (size.isNegative) {
-                    size = appModel.defaultDictionaryFontSize;
+                    size = Preferences.dictionaryFontSize.defaultValue;
                     _fontSizeController.text = size.toString();
                   }
 
-                  appModel.setDictionaryFontSize(size);
+                  appModel.preferences
+                      .set(Preferences.dictionaryFontSize, size);
                 },
               ),
               buildNumberField(
                 controller: _maximumTermsController,
                 label: t.maximum_terms,
                 defaultValue:
-                    appModel.defaultMaximumDictionaryTermsInResult.toString(),
+                    Preferences.maximumTerms.defaultValue.toString(),
                 onChanged: (value) {
                   int amount = int.tryParse(value) ??
-                      appModel.defaultMaximumDictionaryTermsInResult;
+                      Preferences.maximumTerms.defaultValue;
                   if (amount.isNegative) {
-                    amount = appModel.defaultMaximumDictionaryTermsInResult;
+                    amount = Preferences.maximumTerms.defaultValue;
                     _maximumTermsController.text = amount.toString();
                   }
 
-                  appModel.setMaximumTerms(amount);
+                  appModel.preferences.set(Preferences.maximumTerms, amount);
                   appModel.clearDictionaryResultsCache();
                 },
               ),
@@ -320,7 +330,8 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
   }
 
   Future<void> showDuplicateChecksPage() async {
-    List<String> duplicateCheckModels = appModel.duplicateCheckModels;
+    List<String> duplicateCheckModels =
+        appModel.preferences.get(Preferences.duplicateCheckModels);
     List<String> models = await appModel.getModelList();
     Map<String, bool> items = Map<String, bool>.fromEntries(
         models.map((e) => MapEntry(e, duplicateCheckModels.contains(e))));
@@ -339,7 +350,8 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
               .where((e) => e.value)
               .map((e) => e.key)
               .toList();
-          appModel.setDuplicateCheckModels(newDuplicateCheckModels);
+          appModel.preferences.set(
+              Preferences.duplicateCheckModels, newDuplicateCheckModels);
 
           if (!duplicateCheckModels.equals(newDuplicateCheckModels)) {
             appModel.refresh();

@@ -31,6 +31,7 @@ import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// A list of fields that the app will support at runtime.
@@ -118,6 +119,10 @@ class AppModel with ChangeNotifier {
 
   /// Synchronous reads and Drift writes over [_db]. See [initialise].
   late final AppStore _store;
+
+  /// The app's settings, stored in [_db]. See [initialise].
+  PreferenceStore get preferences => _preferenceStore;
+  late final PreferenceStore _preferenceStore;
 
   /// Used to get the versioning metadata of the app. See [initialise].
   PackageInfo get packageInfo => _packageInfo;
@@ -229,10 +234,6 @@ class AppModel with ChangeNotifier {
 
   /// Maximum number of dictionary search results stored in the database.
   final int maximumDictionarySearchResults = 200;
-
-  /// Maximum number of headwords in a returned dictionary result for
-  /// performance purposes.
-  final int defaultMaximumDictionaryTermsInResult = 10;
 
   /// Used to check if the dictionary tab should be refreshed on switching tabs.
   bool shouldRefreshTabs = false;
@@ -489,7 +490,8 @@ class AppModel with ChangeNotifier {
     if (isMediaOpen) {
       return _currentMediaSource!.currentSentence;
     } else {
-      HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
+      HomeTab homeTab = tabs.values
+          .toList()[_preferenceStore.get(Preferences.currentHomeTabIndex)];
       MediaSource? mediaSource = _currentMediaSource ??
           (homeTab is MediaSource ? homeTab : null);
 
@@ -790,6 +792,15 @@ class AppModel with ChangeNotifier {
     _packageInfo = await PackageInfo.fromPlatform();
     _androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
 
+    /// Open the SQLite database before anything reads a preference. The
+    /// first query creates the schema on a fresh install.
+    _databaseDirectory = await getApplicationSupportDirectory();
+    Database raw = openRawDatabase(databasePath);
+    _db = AppDatabase.fromRaw(raw);
+    await _db.customSelect('SELECT 1').get();
+    _store = AppStore(db: _db, raw: raw);
+    _preferenceStore = PreferenceStore(db: _db, raw: raw);
+
     /// Initialise persistent key-value store.
     await Hive.initFlutter();
     _preferences = await Hive.openBox('appModel');
@@ -801,7 +812,6 @@ class AppModel with ChangeNotifier {
     /// These directories will commonly be accessed.
     _temporaryDirectory = await getTemporaryDirectory();
     _appDirectory = await getApplicationDocumentsDirectory();
-    _databaseDirectory = await getApplicationSupportDirectory();
     _thumbnailsDirectory =
         Directory(path.join(appDirectory.path, 'thumbnails'));
     _hiveDirectory = Directory(path.join(appDirectory.path, 'hive'));
@@ -850,13 +860,6 @@ class AppModel with ChangeNotifier {
       await source.initialise();
     }
 
-    /// Open the SQLite database. The first query creates the schema on a
-    /// fresh install, before anything reads it.
-    Database raw = openRawDatabase(databasePath);
-    _db = AppDatabase.fromRaw(raw);
-    await _db.customSelect('SELECT 1').get();
-    _store = AppStore(db: _db, raw: raw);
-
     /// Preloads the search database in memory.
     unawaited(searchDictionary(
       searchTerm: JapaneseLanguage.helloWorld,
@@ -891,13 +894,6 @@ class AppModel with ChangeNotifier {
   Future<void> toggleDarkMode() async {
     await _preferences.put('is_dark_mode', !isDarkMode);
     await Restart.restartApp();
-  }
-
-  /// Get the last selected deck from persisted preferences.
-  String get lastSelectedDeckName {
-    String deckName =
-        _preferences.get('last_selected_deck', defaultValue: 'Default');
-    return deckName;
   }
 
   /// Get the target language from persisted preferences.
@@ -956,12 +952,6 @@ class AppModel with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Persist a new last selected deck name. This is called when the user
-  /// changes the selected deck to map in the creator.
-  Future<void> setLastSelectedDeck(String deckName) async {
-    await _preferences.put('last_selected_deck', deckName);
-  }
-
   /// Persist a new last selected model name. This is called when the user
   /// changes the selected model to map in the profiles menu.
   Future<void> setLastSelectedMapping(AnkiMapping mapping,
@@ -970,16 +960,6 @@ class AppModel with ChangeNotifier {
     if (notify) {
       notifyListeners();
     }
-  }
-
-  /// Get the current home tab index. The order of the tab indexes are based on
-  /// the ordering in [tabs].
-  int get currentHomeTabIndex =>
-      _preferences.get('current_home_tab_index', defaultValue: 0);
-
-  /// Persist the new tab after switching home tabs.
-  Future<void> setCurrentHomeTabIndex(int index) async {
-    await _preferences.put('current_home_tab_index', index);
   }
 
   /// Show the dictionary menu. This should be callable from many parts of the
@@ -1233,7 +1213,8 @@ class AppModel with ChangeNotifier {
       searchTerm: term,
       databasePath: databasePath,
       maximumDictionarySearchResults: maximumDictionarySearchResults,
-      maximumDictionaryTermsInResult: overrideMaximumTerms ?? maximumTerms,
+      maximumDictionaryTermsInResult: overrideMaximumTerms ??
+          _preferenceStore.get(Preferences.maximumTerms),
       searchWithWildcards: searchWithWildcards,
       enabledDictionaryIds: [],
       sendPort: receivePort.sendPort,
@@ -1274,7 +1255,7 @@ class AppModel with ChangeNotifier {
   /// Requests for full external storage permissions. Required to browse for
   /// media anywhere on the device.
   Future<void> requestExternalStoragePermissions() async {
-    if (isFirstTimeSetup) {
+    if (_preferenceStore.get(Preferences.firstTimeSetup)) {
       showToast(
         msg: t.storage_permissions,
         toastLength: Toast.LENGTH_SHORT,
@@ -1462,7 +1443,7 @@ class AppModel with ChangeNotifier {
       final result = await methodChannel.invokeMethod(
         'checkForDuplicates',
         <String, dynamic>{
-          'models': duplicateCheckModels,
+          'models': _preferenceStore.get(Preferences.duplicateCheckModels),
           'key': key,
         },
       );
@@ -1823,7 +1804,7 @@ class AppModel with ChangeNotifier {
     CreatorModel creatorModel = ref.watch(creatorProvider);
     creatorModel.clearAll(
       overrideLocks: true,
-      savedTags: savedTags,
+      savedTags: _preferenceStore.get(Preferences.savedTags),
     );
     if (creatorFieldValues != null) {
       creatorModel.copyContext(creatorFieldValues);
@@ -2359,78 +2340,6 @@ class AppModel with ChangeNotifier {
     return directories;
   }
 
-  /// Whether or not searching in the app is performed without hitting the
-  /// submit button.
-  bool get autoSearchEnabled {
-    return _preferences.get('auto_search', defaultValue: true);
-  }
-
-  /// Toggle auto search option.
-  Future<void> toggleAutoSearchEnabled() async {
-    await _preferences.put('auto_search', !autoSearchEnabled);
-  }
-
-  /// Search debounce delay in milliseconds by default.
-  final int defaultSearchDebounceDelay = 100;
-
-  /// The search debounce delay in milliseconds for searching in the app..
-  int get searchDebounceDelay {
-    return _preferences.get('auto_search_debounce_delay',
-        defaultValue: defaultSearchDebounceDelay);
-  }
-
-  /// Sets the debounce delay in milliseconds for searching in the app..
-  Future<void> setSearchDebounceDelay(int debounceDelay) async {
-    await _preferences.put('auto_search_debounce_delay', debounceDelay);
-  }
-
-  /// Default dictionary font size for meanings.
-  final double defaultDictionaryFontSize = 16;
-
-  /// The search debounce delay in milliseconds for searching in the app..
-  double get dictionaryFontSize {
-    return _preferences.get('dictionary_entry_font_size',
-        defaultValue: defaultDictionaryFontSize);
-  }
-
-  /// Sets the debounce delay in milliseconds for searching in the app..
-  Future<void> setDictionaryFontSize(double fontSize) async {
-    await _preferences.put('dictionary_entry_font_size', fontSize);
-  }
-
-  /// The search debounce delay in milliseconds for searching in the app..
-  bool get closeCreatorOnExport {
-    return _preferences.get('close_on_export', defaultValue: false);
-  }
-
-  /// Sets the debounce delay in milliseconds for searching in the app..
-  Future<void> toggleCloseCreatorOnExport() async {
-    await _preferences.put('close_on_export', !closeCreatorOnExport);
-  }
-
-  /// Whether or not it is the app's first time setup, used to explain the
-  /// permission requests at first launch.
-  bool get isFirstTimeSetup {
-    return _preferences.get('first_time_setup', defaultValue: true);
-  }
-
-  /// Sets the first time setup flag so the first time message does not show
-  /// again.
-  Future<void> setFirstTimeSetupFlag() async {
-    await _preferences.put('first_time_setup', false);
-  }
-
-  /// The maximum dictionary terms in a result.
-  int get maximumTerms {
-    return _preferences.get('maximum_terms',
-        defaultValue: defaultMaximumDictionaryTermsInResult);
-  }
-
-  /// Sets the maximum dictionary terms in a result.
-  Future<void> setMaximumTerms(int value) async {
-    await _preferences.put('maximum_terms', value);
-  }
-
   /// Adds a [DictionarySearchResult] to dictionary history.
   /// [searchWithWildcards] is how [result] was searched, so that the history
   /// searches it again the same way.
@@ -2438,7 +2347,8 @@ class AppModel with ChangeNotifier {
     required DictionarySearchResult result,
     required bool searchWithWildcards,
   }) async {
-    HomeTab homeTab = tabs.values.toList()[currentHomeTabIndex];
+    HomeTab homeTab = tabs.values
+        .toList()[_preferenceStore.get(Preferences.currentHomeTabIndex)];
     if (homeTab != DictionaryTab.instance) {
       shouldRefreshTabs = true;
       ScrollController scrollController =
@@ -2470,27 +2380,5 @@ class AppModel with ChangeNotifier {
     _isDatabaseOpen = false;
     await _db.close();
     await FlutterExitApp.exitApp();
-  }
-
-  /// Get the saved value that the user has set for the [TagsField].
-  String get savedTags {
-    return _preferences.get('saved_tags', defaultValue: '');
-  }
-
-  /// Set the saved value that the user has set for the [TagsField].
-  Future<void> setSavedTags(String value) async {
-    await _preferences.put('saved_tags', value);
-  }
-
-  /// Get the list of model names that will be checked for duplicates.
-  List<String> get duplicateCheckModels {
-    return _preferences.get('duplicate_check_models', defaultValue: [
-      AnkiMapping.standardModelName,
-    ]);
-  }
-
-  /// Set the list of model names that will be checked for duplicates.
-  Future<void> setDuplicateCheckModels(List<String> value) async {
-    await _preferences.put('duplicate_check_models', value);
   }
 }

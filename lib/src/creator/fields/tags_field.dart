@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/preferences.dart';
 
 /// Organise notes in a deck with space-delimited labels.
 class TagsField extends Field {
@@ -33,6 +34,6 @@ class TagsField extends Field {
     required DictionaryEntry? selectedEntry,
     required CreatorContext creatorContext,
   }) {
-    return appModel.savedTags;
+    return appModel.preferences.get(Preferences.savedTags);
   }
 }

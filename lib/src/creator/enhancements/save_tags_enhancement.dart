@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// An enhancement used to save the Tags field's last value.
@@ -31,7 +32,7 @@ class SaveTagsEnhancement extends Enhancement {
   }) async {
     String tags =
         creatorModel.getFieldController(TagsField.instance).text.trim();
-    await appModel.setSavedTags(tags);
+    await appModel.preferences.set(Preferences.savedTags, tags);
 
     showToast(
       msg: t.saved_tags,

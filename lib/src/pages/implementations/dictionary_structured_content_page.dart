@@ -10,6 +10,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:path/path.dart' as path;
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// Provides and caches the processed HTML of a [DictionaryEntry] to improve
@@ -66,7 +67,8 @@ class DictionaryHtmlWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textColor = Theme.of(context).colorScheme.onSurface;
     final linkColor = Theme.of(context).colorScheme.error;
-    final dictionaryFontSize = ref.read(appProvider).dictionaryFontSize;
+    final dictionaryFontSize =
+        ref.read(appProvider).preferences.get(Preferences.dictionaryFontSize);
     final fontSize = FontSize(dictionaryFontSize);
     const tableWidth = 0.3;
     final tableBorder = Border.all(color: textColor, width: tableWidth);

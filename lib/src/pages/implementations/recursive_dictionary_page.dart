@@ -4,6 +4,7 @@ import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// The page shown after performing a recursive dictionary lookup.
@@ -106,7 +107,9 @@ class _RecursiveDictionaryPageState
       transition: SlideFadeFloatingSearchBarTransition(),
       automaticallyImplyBackButton: false,
       isScrollControlled: true,
-      debounceDelay: Duration(milliseconds: appModel.searchDebounceDelay),
+      debounceDelay: Duration(
+          milliseconds:
+              appModel.preferences.get(Preferences.searchDebounceDelay)),
       onFocusChanged: (focused) {
         if (!focused) {
           if (widget.killOnPop) {
@@ -138,7 +141,7 @@ class _RecursiveDictionaryPageState
   Duration get historyDelay => Duration.zero;
 
   void onQueryChanged(String query) {
-    if (!appModel.autoSearchEnabled) {
+    if (!appModel.preferences.get(Preferences.autoSearch)) {
       return;
     }
 
@@ -160,7 +163,7 @@ class _RecursiveDictionaryPageState
       lastQuery = query;
     }
 
-    overrideMaximumTerms ??= appModel.maximumTerms;
+    overrideMaximumTerms ??= appModel.preferences.get(Preferences.maximumTerms);
 
     if (mounted) {
       setState(() {
@@ -433,7 +436,9 @@ class _RecursiveDictionaryPageState
                     search(
                       _controller.query,
                       overrideMaximumTerms:
-                          _result!.headings.length + appModel.maximumTerms,
+                          _result!.headings.length +
+                              appModel.preferences
+                                  .get(Preferences.maximumTerms),
                     );
                   },
             child: Container(

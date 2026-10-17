@@ -7,6 +7,7 @@ import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// A page template which assumes use of [BaseSourcePageState] by which all
@@ -143,7 +144,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
     bool notShowMore = overrideMaximumTerms == null;
 
-    overrideMaximumTerms ??= appModel.maximumTerms;
+    overrideMaximumTerms ??=
+        appModel.preferences.get<int>(Preferences.maximumTerms);
 
     late DictionarySearchResult dictionaryResult;
     _popupPositionNotifier.value = position;
@@ -430,7 +432,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
                       position: _popupPositionNotifier.value!,
                       overrideMaximumTerms:
                           _dictionaryResultNotifier.value!.headings.length +
-                              appModel.maximumTerms,
+                              appModel.preferences
+                                  .get(Preferences.maximumTerms),
                     );
                   },
             child: Container(

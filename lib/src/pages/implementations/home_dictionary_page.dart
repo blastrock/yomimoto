@@ -6,6 +6,7 @@ import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
 /// The body content for the Dictionary tab in the main menu.
@@ -34,8 +35,8 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       if (homeTab.floatingSearchBarController.isClosed) {
         if (!appModel.isMediaOpen &&
             DictionaryTab.instance ==
-                appModel.tabs.values
-                    .toList()[appModel.currentHomeTabIndex]) {
+                appModel.tabs.values.toList()[appModel.preferences
+                    .get(Preferences.currentHomeTabIndex)]) {
           if (mounted) {
             setState(() {});
           }
@@ -114,7 +115,9 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       onFocusChanged: (focused) => onFocusChanged(focused: focused),
       onQueryChanged: onQueryChanged,
       onSubmitted: search,
-      debounceDelay: Duration(milliseconds: appModel.searchDebounceDelay),
+      debounceDelay: Duration(
+          milliseconds:
+              appModel.preferences.get(Preferences.searchDebounceDelay)),
       leadingActions: [
         buildDictionaryButton(),
         buildBackButton(),
@@ -145,7 +148,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
   Duration get historyDelay => const Duration(milliseconds: 500);
 
   void onQueryChanged(String query) {
-    if (!appModel.autoSearchEnabled) {
+    if (!appModel.preferences.get(Preferences.autoSearch)) {
       return;
     }
 
@@ -167,7 +170,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       lastQuery = query;
     }
 
-    overrideMaximumTerms ??= appModel.maximumTerms;
+    overrideMaximumTerms ??= appModel.preferences.get(Preferences.maximumTerms);
 
     if (mounted) {
       setState(() {
@@ -416,7 +419,9 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                     search(
                       homeTab.floatingSearchBarController.query,
                       overrideMaximumTerms:
-                          _result!.headings.length + appModel.maximumTerms,
+                          _result!.headings.length +
+                              appModel.preferences
+                                  .get(Preferences.maximumTerms),
                     );
                   },
             child: Container(

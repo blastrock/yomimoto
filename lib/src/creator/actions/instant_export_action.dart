@@ -4,6 +4,7 @@ import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/dictionary.dart';
+import 'package:yuuna/preferences.dart';
 
 /// An enhancement used effectively as a shortcut for exporting a card.
 class InstantExportAction extends QuickAction {
@@ -117,26 +118,26 @@ class InstantExportAction extends QuickAction {
     await appModel.addNote(
       creatorFieldValues: creatorModel.getExportDetails(ref),
       mapping: appModel.lastSelectedMapping,
-      deck: appModel.lastSelectedDeckName,
+      deck: appModel.preferences.get(Preferences.lastSelectedDeck),
       onSuccess: () {
         creatorModel.clearAll(
           overrideLocks: true,
-          savedTags: appModel.savedTags,
+          savedTags: appModel.preferences.get(Preferences.savedTags),
         );
 
         /// Need to clear media as these conflict.
         CreatorModel cardCreatorModel = ref.read(creatorProvider);
         cardCreatorModel.clearField(
           ImageField.instance,
-          savedTags: appModel.savedTags,
+          savedTags: appModel.preferences.get(Preferences.savedTags),
         );
         cardCreatorModel.clearField(
           AudioField.instance,
-          savedTags: appModel.savedTags,
+          savedTags: appModel.preferences.get(Preferences.savedTags),
         );
         cardCreatorModel.clearField(
           SentenceField.instance,
-          savedTags: appModel.savedTags,
+          savedTags: appModel.preferences.get(Preferences.savedTags),
         );
       },
     );

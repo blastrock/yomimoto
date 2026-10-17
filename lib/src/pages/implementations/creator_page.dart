@@ -9,6 +9,7 @@ import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/preferences.dart';
 
 /// The page used for the Card Creator to modify a note before export. Relies
 /// on the [CreatorModel].
@@ -48,7 +49,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     if (isCardEditing) {
       creatorModel.clearAll(
         overrideLocks: true,
-        savedTags: appModel.savedTags,
+        savedTags: appModel.preferences.get(Preferences.savedTags),
       );
     }
 
@@ -273,16 +274,16 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     await appModel.addNote(
       creatorFieldValues: creatorModel.getExportDetails(ref),
       mapping: appModel.lastSelectedMapping,
-      deck: appModel.lastSelectedDeckName,
+      deck: appModel.preferences.get(Preferences.lastSelectedDeck),
       onSuccess: () {
         creatorModel.clearAll(
           overrideLocks: false,
-          savedTags: appModel.savedTags,
+          savedTags: appModel.preferences.get(Preferences.savedTags),
         );
         creatorModel.getFieldController(TagsField.instance).text =
-            appModel.savedTags;
+            appModel.preferences.get(Preferences.savedTags);
 
-        if (appModel.closeCreatorOnExport) {
+        if (appModel.preferences.get(Preferences.closeCreatorOnExport)) {
           if (widget.killOnPop) {
             appModel.shutdown();
           } else {
@@ -568,10 +569,10 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         JidoujishoDropdown<String>(
           enabled: !widget.editEnhancements,
           options: widget.decks,
-          initialOption: appModel.lastSelectedDeckName,
+          initialOption: appModel.preferences.get(Preferences.lastSelectedDeck),
           generateLabel: (deckName) => deckName,
           onChanged: (deckName) {
-            appModel.setLastSelectedDeck(deckName!);
+            appModel.preferences.set(Preferences.lastSelectedDeck, deckName!);
             setState(() {});
           },
         ),
@@ -673,7 +674,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
           onPressed: () {
             creatorModel.clearAll(
               overrideLocks: true,
-              savedTags: appModel.savedTags,
+              savedTags: appModel.preferences.get(Preferences.savedTags),
             );
             Navigator.pop(context);
           },
@@ -1127,7 +1128,8 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   /// export.
   Widget buildCloseOnExportButton() {
     ValueNotifier<bool> notifier =
-        ValueNotifier<bool>(appModel.closeCreatorOnExport);
+        ValueNotifier<bool>(
+            appModel.preferences.get(Preferences.closeCreatorOnExport));
 
     return ValueListenableBuilder<bool>(
       valueListenable: notifier,
@@ -1138,11 +1140,12 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
           enabledColor: value ? Colors.red : null,
           icon: Icons.exit_to_app,
           onTap: () {
-            appModel.toggleCloseCreatorOnExport();
-            notifier.value = appModel.closeCreatorOnExport;
+            appModel.preferences.toggle(Preferences.closeCreatorOnExport);
+            notifier.value =
+                appModel.preferences.get(Preferences.closeCreatorOnExport);
 
             showToast(
-              msg: appModel.closeCreatorOnExport
+              msg: appModel.preferences.get(Preferences.closeCreatorOnExport)
                   ? t.close_on_export_on
                   : t.close_on_export_off,
               toastLength: Toast.LENGTH_SHORT,

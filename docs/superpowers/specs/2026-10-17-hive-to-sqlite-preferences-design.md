@@ -39,9 +39,14 @@ before 1.0.
 - **Defaults are constants.** Anything that used to depend on runtime state
   is either reshaped (theme, profile id) or nullable with a `null` default
   meaning "unset".
-- **No cache.** Every `get` is a synchronous raw read, as `AppStore` does
-  for its other reads. A cache can be added inside `PreferenceStore` later
-  without touching callers.
+- **A write-through cache.** `PreferenceStore` loads every row into memory
+  when it is created; `get` reads memory, and `set` updates memory
+  synchronously, before its first `await`, then writes through Drift.
+  Callers rely on this, as they did with Hive's `put`: about 20 call sites
+  (every settings switch, the creator's deck and close-on-export toggles,
+  the dictionary format and model dropdowns) set a value without awaiting
+  and read it back straight away. The reason is written in a comment on
+  the cache.
 - **No scope column.** Per-source preferences use keys prefixed with the
   source's `uniqueKey` and `/`.
 - **A value that does not decode falls back to the default**, logged, rather
@@ -96,14 +101,20 @@ In `lib/src/preferences/`, built over the same `AppDatabase` and raw
 `sqlite3.Database` as `AppStore`:
 
 ```dart
-T get<T>(Preference<T> preference);                     // synchronous raw read
-Future<void> set<T>(Preference<T> preference, T value);  // Drift upsert
+PreferenceStore({required AppDatabase db, required Database raw});  // loads every row
+T get<T>(Preference<T> preference);                     // from memory
+Future<void> set<T>(Preference<T> preference, T value);  // memory now, then Drift
+Future<void> toggle(Preference<bool> preference);        // set to !get
 ```
 
-`get` reads the row, `jsonDecode`s it and calls `fromJson`. Any exception
-in decoding is logged with the key and the default is returned. `set` is an
-`insertOnConflictUpdate` through Drift, so main-isolate writes still all go
-through Drift. It is the only code that touches the `preference` table.
+The cache maps each key to its stored JSON text. `get` `jsonDecode`s it
+and calls `fromJson`; any exception in decoding is logged with the key and
+the default is returned. `set` stores the new JSON text in the cache before
+anything else, then does an `insertOnConflictUpdate` through Drift, so
+main-isolate writes still all go through Drift. A failed write leaves memory
+ahead of disk until restart, as with Hive. `PreferenceStore` is the only
+code that touches the `preference` table, and only the main isolate uses
+it.
 
 ### Preferences
 
@@ -127,7 +138,6 @@ through Drift. It is the only code that touches the `preference` table.
 | `reader_ttu/volume_page_turning_enabled` | `bool` | `true` | `ReaderTtuSource` getter |
 | `reader_ttu/volume_page_turning_inverted` | `bool` | `false` | `ReaderTtuSource` getter |
 | `reader_ttu/extend_page_beyond_navbar` | `bool` | `false` | `ReaderTtuSource` getter |
-| `reader_ttu/adapt_ttu_theme` | `bool` | `true` | `ReaderTtuSource` getter |
 | `reader_ttu/highlight_on_tap` | `bool` | `true` | `ReaderTtuSource` getter |
 | `reader_mokuro/volume_page_turning_enabled` | `bool` | `true` | `ReaderMokuroSource` getter |
 | `reader_mokuro/volume_page_turning_inverted` | `bool` | `false` | `ReaderMokuroSource` getter |
@@ -220,6 +230,9 @@ Unit tests, against in-memory SQLite:
 
 - `test/preferences/preference_store_test.dart`:
   - an unset key returns the default;
+  - `get` returns a value `set` was called with, before the `set` is
+    awaited; `toggle` flips a `bool`;
+  - a new store over the same database reads what an earlier one wrote;
   - round trips for `bool`, `int`, `double`, `String`, `String?` (including
     writing `null`), `List<String>` and an enum; overwriting a value;
   - invalid JSON, a wrong type (a string for an `int`) and an unknown enum
@@ -249,5 +262,4 @@ the ground rules' "the database and Hive start empty" drops Hive.
 ## Out of scope
 
 - Splitting `AppModel` beyond removing pass-through accessors.
-- Caching preference reads.
 - Settings export or backup.

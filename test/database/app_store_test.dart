@@ -156,48 +156,69 @@ void main() {
     AnkiMapping profile(String label, int order) =>
         AnkiMapping.defaultMapping(order: order).copyWith(label: label);
 
-    test('putMapping round-trips every field and sets the id', () async {
-      AnkiMapping standard = AnkiMapping.defaultMapping(order: 0);
-      await store.putMapping(standard);
+    test('a fresh database holds the Standard profile at id 1', () {
+      AnkiMapping standard = store.mappings().single;
+      AnkiMapping expected = AnkiMapping.defaultMapping(order: 0);
 
-      AnkiMapping loaded = store.mappingByLabel(standard.label)!;
-      expect(loaded.id, standard.id);
-      expect(loaded.exportFieldKeys, standard.exportFieldKeys);
-      expect(loaded.creatorFieldKeys, standard.creatorFieldKeys);
-      expect(loaded.tags, standard.tags);
-      expect(loaded.actions, standard.actions);
-      expect(loaded.enhancements, standard.enhancements);
-      expect(loaded.useBrTags, isTrue);
+      expect(standard.id, 1);
+      expect(standard.label, AnkiMapping.standardProfileName);
+      expect(standard.model, AnkiMapping.standardModelName);
+      expect(standard.order, 0);
+      expect(standard.exportFieldKeys, expected.exportFieldKeys);
+      expect(standard.creatorFieldKeys, expected.creatorFieldKeys);
+      expect(standard.tags, expected.tags);
+      expect(standard.actions, expected.actions);
+      expect(standard.enhancements, expected.enhancements);
+      expect(standard.useBrTags, isTrue);
+    });
+
+    test('the next profile added gets id 2', () async {
+      AnkiMapping mapping = profile('Mine', 1);
+      await store.putMapping(mapping);
+
+      expect(mapping.id, 2);
+    });
+
+    test('mappingById finds a profile, or nothing', () {
+      expect(store.mappingById(1)!.label, AnkiMapping.standardProfileName);
+      expect(store.mappingById(99), isNull);
     });
 
     test('putMapping on a saved profile replaces it', () async {
-      AnkiMapping mapping = profile('Mine', 0);
+      AnkiMapping mapping = profile('Mine', 1);
       await store.putMapping(mapping);
       mapping.creatorFieldKeys = ['term'];
       await store.putMapping(mapping);
 
-      expect(store.mappings().single.creatorFieldKeys, ['term']);
+      expect(store.mappings().length, 2);
+      expect(store.mappingById(mapping.id!)!.creatorFieldKeys, ['term']);
     });
 
-    test('replaceMappings swaps orders without a constraint error', () async {
-      AnkiMapping a = profile('A', 0);
-      AnkiMapping b = profile('B', 1);
+    test('replaceMappings swaps orders and keeps ids', () async {
+      AnkiMapping standard = store.mappingById(1)!;
+      AnkiMapping a = profile('A', 1);
+      AnkiMapping b = profile('B', 2);
       await store.putMapping(a);
       await store.putMapping(b);
+      int aId = a.id!;
+      int bId = b.id!;
 
-      a.order = 1;
-      b.order = 0;
-      await store.replaceMappings([b, a]);
+      a.order = 2;
+      b.order = 1;
+      await store.replaceMappings([standard, b, a]);
 
-      expect(store.mappings().map((mapping) => mapping.label), ['B', 'A']);
+      List<AnkiMapping> mappings = store.mappings();
+      expect(mappings.map((mapping) => mapping.label),
+          [AnkiMapping.standardProfileName, 'B', 'A']);
+      expect(mappings.map((mapping) => mapping.id), [1, bId, aId]);
     });
 
     test('nextMappingOrder and mappingLabelTaken', () async {
-      expect(store.nextMappingOrder(), 0);
-      await store.putMapping(profile('A', 0));
       expect(store.nextMappingOrder(), 1);
+      await store.putMapping(profile('A', 1));
+      expect(store.nextMappingOrder(), 2);
       expect(store.mappingLabelTaken(profile('A', 5)), isTrue);
-      expect(store.mappingLabelTaken(profile('A', 0)), isFalse);
+      expect(store.mappingLabelTaken(profile('A', 1)), isFalse);
     });
   });
 

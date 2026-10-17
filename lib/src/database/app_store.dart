@@ -172,6 +172,12 @@ class AppStore {
         'SELECT * FROM anki_mapping WHERE label = ?', [label]).firstOrNull;
   }
 
+  /// The profile [id], if any.
+  AnkiMapping? mappingById(int id) {
+    return _select(db.ankiMappings.map,
+        'SELECT * FROM anki_mapping WHERE id = ?', [id]).firstOrNull;
+  }
+
   /// Whether another profile, at another position, is named like [mapping].
   bool mappingLabelTaken(AnkiMapping mapping) {
     return raw.select(
@@ -192,7 +198,7 @@ class AppStore {
   /// and set its id.
   Future<void> putMapping(AnkiMapping mapping) async {
     AnkiMapping row = await db.into(db.ankiMappings).insertReturning(
-          _mappingCompanion(mapping),
+          ankiMappingCompanion(mapping),
           mode: InsertMode.insertOrReplace,
         );
     mapping.id = row.id;
@@ -204,7 +210,7 @@ class AppStore {
     await db.transaction(() async {
       await db.delete(db.ankiMappings).go();
       for (AnkiMapping mapping in mappings) {
-        await db.into(db.ankiMappings).insert(_mappingCompanion(mapping));
+        await db.into(db.ankiMappings).insert(ankiMappingCompanion(mapping));
       }
     });
   }
@@ -213,24 +219,6 @@ class AppStore {
   Future<void> deleteMapping(int id) async {
     await (db.delete(db.ankiMappings)..where((table) => table.id.equals(id)))
         .go();
-  }
-
-  AnkiMappingsCompanion _mappingCompanion(AnkiMapping mapping) {
-    return AnkiMappingsCompanion.insert(
-      id: Value.absentIfNull(mapping.id),
-      label: mapping.label,
-      model: mapping.model,
-      order: mapping.order,
-      exportFieldKeys: mapping.exportFieldKeys,
-      creatorFieldKeys: mapping.creatorFieldKeys,
-      creatorCollapsedFieldKeys: mapping.creatorCollapsedFieldKeys,
-      tags: mapping.tags,
-      actions: mapping.actions!,
-      enhancements: mapping.enhancements!,
-      exportMediaTags: Value(mapping.exportMediaTags),
-      useBrTags: Value(mapping.useBrTags),
-      prependDictionaryNames: Value(mapping.prependDictionaryNames),
-    );
   }
 
   /// The mokuro catalogs, in the user's order.
@@ -424,3 +412,22 @@ class AppStore {
 /// A Dictionary tab history item: the term searched, and whether it was
 /// searched with wildcards.
 typedef DictionaryHistoryItem = ({String searchTerm, bool searchWithWildcards});
+
+/// The row for [mapping]; its id is left to the database when unset.
+AnkiMappingsCompanion ankiMappingCompanion(AnkiMapping mapping) {
+  return AnkiMappingsCompanion.insert(
+    id: Value.absentIfNull(mapping.id),
+    label: mapping.label,
+    model: mapping.model,
+    order: mapping.order,
+    exportFieldKeys: mapping.exportFieldKeys,
+    creatorFieldKeys: mapping.creatorFieldKeys,
+    creatorCollapsedFieldKeys: mapping.creatorCollapsedFieldKeys,
+    tags: mapping.tags,
+    actions: mapping.actions!,
+    enhancements: mapping.enhancements!,
+    exportMediaTags: Value(mapping.exportMediaTags),
+    useBrTags: Value(mapping.useBrTags),
+    prependDictionaryNames: Value(mapping.prependDictionaryNames),
+  );
+}

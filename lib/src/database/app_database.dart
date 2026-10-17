@@ -51,6 +51,19 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  /// Creates the schema, then the standard profile with id
+  /// [AnkiMapping.standardProfileId]. That profile cannot be deleted, so the
+  /// id is never handed out again.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+          await into(ankiMappings).insert(ankiMappingCompanion(
+              AnkiMapping.defaultMapping(order: 0)
+                ..id = AnkiMapping.standardProfileId));
+        },
+      );
 }
 
 /// Apply the settings every connection needs: a busy timeout, incremental

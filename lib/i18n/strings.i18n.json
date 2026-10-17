@@ -228,8 +228,5 @@
     "use_dark_theme": "Use dark theme",
     "saved_tags": "Tags saved.",
     "cloze": "Cloze",
-    "info_standard_update": "New standard profile card type",
-    "info_standard_update_content":
-        "The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.",
     "manage_duplicate_checks": "Manage Duplicate Checks"
   }

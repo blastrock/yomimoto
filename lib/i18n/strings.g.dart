@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 215
+/// Strings: 213
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -357,8 +357,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get use_dark_theme => 'Use dark theme';
 	String get saved_tags => 'Tags saved.';
 	String get cloze => 'Cloze';
-	String get info_standard_update => 'New standard profile card type';
-	String get info_standard_update_content => 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
 	String get manage_duplicate_checks => 'Manage Duplicate Checks';
 }
 
@@ -580,8 +578,6 @@ extension on Translations {
 			case 'use_dark_theme': return 'Use dark theme';
 			case 'saved_tags': return 'Tags saved.';
 			case 'cloze': return 'Cloze';
-			case 'info_standard_update': return 'New standard profile card type';
-			case 'info_standard_update_content': return 'The standard profile now uses the『Yomimoto』 card type.\n\nYour legacy standard profile remains available for backwards compatibility.';
 			case 'manage_duplicate_checks': return 'Manage Duplicate Checks';
 			default: return null;
 		}

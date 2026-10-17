@@ -154,10 +154,14 @@ class AnkiMapping {
   };
 
   /// The default mapping name which cannot be deleted or reused.
-  static String standardModelName = 'Yomimoto';
+  static const String standardModelName = 'Yomimoto';
 
   /// The default mapping name which cannot be deleted or reused.
-  static String standardProfileName = 'Standard';
+  static const String standardProfileName = 'Standard';
+
+  /// The id of the standard profile, which the database creates first and
+  /// which cannot be deleted.
+  static const int standardProfileId = 1;
 
   /// A unique identifier for the purposes of database storage.
   int? id;

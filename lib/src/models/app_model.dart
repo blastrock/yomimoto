@@ -712,49 +712,6 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// Populate default mapping if it does not exist in the database.
-  Future<void> populateDefaultMapping() async {
-    if (mappings.isEmpty) {
-      await _store.putMapping(AnkiMapping.defaultMapping(order: 0));
-    } else {
-      AnkiMapping standardProfile =
-          _store.mappingByLabel(AnkiMapping.standardProfileName)!;
-      if (standardProfile.model != AnkiMapping.standardModelName) {
-        String newLabel = 'Legacy Standard';
-        int attempts = 1;
-
-        while (_store.mappingByLabel(newLabel) != null) {
-          attempts += 1;
-          newLabel = 'Legacy Standard ($attempts)';
-        }
-
-        AnkiMapping legacyProfile = standardProfile.copyWith(
-          label: newLabel,
-        );
-
-        await _store.putMapping(legacyProfile);
-        await _store.putMapping(
-            AnkiMapping.defaultMapping(order: nextMappingOrder));
-
-        await showDialog(
-          context: _navigatorKey.currentContext!,
-          builder: (context) => AlertDialog(
-            title: Text(t.info_standard_update),
-            content: Text(
-              t.info_standard_update_content,
-            ),
-            actions: [
-              TextButton(
-                child: Text(t.dialog_close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
-
   /// Return the app external directory found in the public DCIM directory.
   /// This path also initialises the folder if it does not exist, and includes
   /// a .nomedia file within the folder.

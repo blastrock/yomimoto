@@ -54,7 +54,6 @@ class _HomePageState extends BasePageState<HomePage>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await appModel.populateDefaultMapping();
       if (appModel.isFirstTimeSetup) {
         await appModel.setFirstTimeSetupFlag();
       }

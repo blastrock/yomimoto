@@ -108,6 +108,37 @@ void main() {
       expect(items.first.position, 42);
     });
 
+    test('setMediaItemOverrideTitle saves a title, and null clears it',
+        () async {
+      MediaItem book = _book('b.html?id=1');
+      await store.putMediaItem(book);
+      expect(book.overrideTitle, isNull);
+
+      await store.setMediaItemOverrideTitle(book.id!, 'Mine');
+      expect(store.mediaItems('reader_ttu').single.overrideTitle, 'Mine');
+
+      await store.setMediaItemOverrideTitle(book.id!, null);
+      expect(store.mediaItems('reader_ttu').single.overrideTitle, isNull);
+    });
+
+    test('putMediaItem and updateMediaItem keep the override title',
+        () async {
+      MediaItem book = _book('b.html?id=1');
+      await store.putMediaItem(book);
+      await store.setMediaItemOverrideTitle(book.id!, 'Mine');
+
+      MediaItem synced = _book('b.html?id=1', title: 'From ttu');
+      await store.putMediaItem(synced);
+      expect(synced.overrideTitle, 'Mine');
+
+      synced.position = 42;
+      await store.updateMediaItem(synced);
+
+      MediaItem loaded = store.mediaItems('reader_ttu').single;
+      expect(loaded.title, 'From ttu');
+      expect(loaded.overrideTitle, 'Mine');
+    });
+
     test('deleting a media item deletes its stash', () async {
       MediaItem book = _book('b.html?id=1');
       await store.putMediaItem(book);

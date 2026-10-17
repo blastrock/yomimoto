@@ -2640,6 +2640,17 @@ class $MediaItemsTable extends MediaItems
       'CHECK ("can_edit" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _overrideTitleMeta = const VerificationMeta(
+    'overrideTitle',
+  );
+  @override
+  late final GeneratedColumn<String> overrideTitle = GeneratedColumn<String>(
+    'override_title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<DateTime, int> lastOpenedAt =
       GeneratedColumn<int>(
@@ -2661,6 +2672,7 @@ class $MediaItemsTable extends MediaItems
     duration,
     canDelete,
     canEdit,
+    overrideTitle,
     lastOpenedAt,
   ];
   @override
@@ -2755,6 +2767,15 @@ class $MediaItemsTable extends MediaItems
     } else if (isInserting) {
       context.missing(_canEditMeta);
     }
+    if (data.containsKey('override_title')) {
+      context.handle(
+        _overrideTitleMeta,
+        overrideTitle.isAcceptableOrUnknown(
+          data['override_title']!,
+          _overrideTitleMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -2814,6 +2835,10 @@ class $MediaItemsTable extends MediaItems
           data['${effectivePrefix}last_opened_at'],
         )!,
       ),
+      overrideTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}override_title'],
+      ),
     );
   }
 
@@ -2837,6 +2862,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
   final Value<int> duration;
   final Value<bool> canDelete;
   final Value<bool> canEdit;
+  final Value<String?> overrideTitle;
   final Value<DateTime> lastOpenedAt;
   const MediaItemsCompanion({
     this.id = const Value.absent(),
@@ -2849,6 +2875,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
     this.duration = const Value.absent(),
     this.canDelete = const Value.absent(),
     this.canEdit = const Value.absent(),
+    this.overrideTitle = const Value.absent(),
     this.lastOpenedAt = const Value.absent(),
   });
   MediaItemsCompanion.insert({
@@ -2862,6 +2889,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
     required int duration,
     required bool canDelete,
     required bool canEdit,
+    this.overrideTitle = const Value.absent(),
     required DateTime lastOpenedAt,
   }) : mediaSourceIdentifier = Value(mediaSourceIdentifier),
        mediaIdentifier = Value(mediaIdentifier),
@@ -2882,6 +2910,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
     Expression<int>? duration,
     Expression<bool>? canDelete,
     Expression<bool>? canEdit,
+    Expression<String>? overrideTitle,
     Expression<int>? lastOpenedAt,
   }) {
     return RawValuesInsertable({
@@ -2896,6 +2925,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
       if (duration != null) 'duration': duration,
       if (canDelete != null) 'can_delete': canDelete,
       if (canEdit != null) 'can_edit': canEdit,
+      if (overrideTitle != null) 'override_title': overrideTitle,
       if (lastOpenedAt != null) 'last_opened_at': lastOpenedAt,
     });
   }
@@ -2911,6 +2941,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
     Value<int>? duration,
     Value<bool>? canDelete,
     Value<bool>? canEdit,
+    Value<String?>? overrideTitle,
     Value<DateTime>? lastOpenedAt,
   }) {
     return MediaItemsCompanion(
@@ -2925,6 +2956,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
       duration: duration ?? this.duration,
       canDelete: canDelete ?? this.canDelete,
       canEdit: canEdit ?? this.canEdit,
+      overrideTitle: overrideTitle ?? this.overrideTitle,
       lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
     );
   }
@@ -2964,6 +2996,9 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
     if (canEdit.present) {
       map['can_edit'] = Variable<bool>(canEdit.value);
     }
+    if (overrideTitle.present) {
+      map['override_title'] = Variable<String>(overrideTitle.value);
+    }
     if (lastOpenedAt.present) {
       map['last_opened_at'] = Variable<int>(
         $MediaItemsTable.$converterlastOpenedAt.toSql(lastOpenedAt.value),
@@ -2985,6 +3020,7 @@ class MediaItemsCompanion extends UpdateCompanion<MediaItem> {
           ..write('duration: $duration, ')
           ..write('canDelete: $canDelete, ')
           ..write('canEdit: $canEdit, ')
+          ..write('overrideTitle: $overrideTitle, ')
           ..write('lastOpenedAt: $lastOpenedAt')
           ..write(')'))
         .toString();
@@ -8956,6 +8992,7 @@ typedef $$MediaItemsTableCreateCompanionBuilder =
       required int duration,
       required bool canDelete,
       required bool canEdit,
+      Value<String?> overrideTitle,
       required DateTime lastOpenedAt,
     });
 typedef $$MediaItemsTableUpdateCompanionBuilder =
@@ -8970,6 +9007,7 @@ typedef $$MediaItemsTableUpdateCompanionBuilder =
       Value<int> duration,
       Value<bool> canDelete,
       Value<bool> canEdit,
+      Value<String?> overrideTitle,
       Value<DateTime> lastOpenedAt,
     });
 
@@ -9052,6 +9090,11 @@ class $$MediaItemsTableFilterComposer
 
   ColumnFilters<bool> get canEdit => $composableBuilder(
     column: $table.canEdit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get overrideTitle => $composableBuilder(
+    column: $table.overrideTitle,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -9146,6 +9189,11 @@ class $$MediaItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get overrideTitle => $composableBuilder(
+    column: $table.overrideTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get lastOpenedAt => $composableBuilder(
     column: $table.lastOpenedAt,
     builder: (column) => ColumnOrderings(column),
@@ -9196,6 +9244,11 @@ class $$MediaItemsTableAnnotationComposer
 
   GeneratedColumn<bool> get canEdit =>
       $composableBuilder(column: $table.canEdit, builder: (column) => column);
+
+  GeneratedColumn<String> get overrideTitle => $composableBuilder(
+    column: $table.overrideTitle,
+    builder: (column) => column,
+  );
 
   GeneratedColumnWithTypeConverter<DateTime, int> get lastOpenedAt =>
       $composableBuilder(
@@ -9267,6 +9320,7 @@ class $$MediaItemsTableTableManager
                 Value<int> duration = const Value.absent(),
                 Value<bool> canDelete = const Value.absent(),
                 Value<bool> canEdit = const Value.absent(),
+                Value<String?> overrideTitle = const Value.absent(),
                 Value<DateTime> lastOpenedAt = const Value.absent(),
               }) => MediaItemsCompanion(
                 id: id,
@@ -9279,6 +9333,7 @@ class $$MediaItemsTableTableManager
                 duration: duration,
                 canDelete: canDelete,
                 canEdit: canEdit,
+                overrideTitle: overrideTitle,
                 lastOpenedAt: lastOpenedAt,
               ),
           createCompanionCallback:
@@ -9293,6 +9348,7 @@ class $$MediaItemsTableTableManager
                 required int duration,
                 required bool canDelete,
                 required bool canEdit,
+                Value<String?> overrideTitle = const Value.absent(),
                 required DateTime lastOpenedAt,
               }) => MediaItemsCompanion.insert(
                 id: id,
@@ -9305,6 +9361,7 @@ class $$MediaItemsTableTableManager
                 duration: duration,
                 canDelete: canDelete,
                 canEdit: canEdit,
+                overrideTitle: overrideTitle,
                 lastOpenedAt: lastOpenedAt,
               ),
           withReferenceMapper: (p0) => p0

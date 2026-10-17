@@ -20,6 +20,7 @@ MediaItem _$MediaItemFromJson(Map<String, dynamic> json) => MediaItem(
   lastOpenedAt: json['lastOpenedAt'] == null
       ? null
       : DateTime.parse(json['lastOpenedAt'] as String),
+  overrideTitle: json['overrideTitle'] as String?,
 );
 
 Map<String, dynamic> _$MediaItemToJson(MediaItem instance) => <String, dynamic>{
@@ -34,4 +35,5 @@ Map<String, dynamic> _$MediaItemToJson(MediaItem instance) => <String, dynamic>{
   'canDelete': instance.canDelete,
   'canEdit': instance.canEdit,
   'lastOpenedAt': instance.lastOpenedAt?.toIso8601String(),
+  'overrideTitle': instance.overrideTitle,
 };

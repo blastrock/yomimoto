@@ -227,11 +227,6 @@ abstract class MediaSource extends HomeTab {
     return MemoryImage(kTransparentImage);
   }
 
-  /// The map key used to store the override title of an item.
-  String getOverrideTitleKey(MediaItem item) {
-    return 'override_title://${item.mediaSourceIdentifier}/${item.uniqueKey}';
-  }
-
   /// The map value used to store the override thumbnail of an item.
   String getOverrideThumbnailFilename({
     required AppModel appModel,
@@ -251,10 +246,7 @@ abstract class MediaSource extends HomeTab {
       return null;
     }
 
-    String key = getOverrideTitleKey(item);
-    String? overrideTitle =
-        getPreference<String?>(key: key, defaultValue: null);
-    return overrideTitle;
+    return item.overrideTitle;
   }
 
   /// Given a [MediaItem], return its override display thumbnail.
@@ -278,10 +270,10 @@ abstract class MediaSource extends HomeTab {
   /// Given a [MediaItem], set its override display title. If the title is
   /// blank, the override title is cleared.
   Future<void> setOverrideTitleFromMediaItem({
+    required AppModel appModel,
     required MediaItem item,
     required String? title,
   }) async {
-    String key = getOverrideTitleKey(item);
     String? value;
     if (title != null) {
       String trimmedTitle = title.trim();
@@ -290,7 +282,7 @@ abstract class MediaSource extends HomeTab {
       }
     }
 
-    await setPreference<String?>(key: key, value: value);
+    await appModel.setMediaItemOverrideTitle(item, value);
   }
 
   /// Given a [MediaItem], set its override display thumbnail. If null, this
@@ -320,7 +312,6 @@ abstract class MediaSource extends HomeTab {
     required AppModel appModel,
     required MediaItem item,
   }) async {
-    await deletePreference(key: getOverrideTitleKey(item));
     await setOverrideThumbnailFromMediaItem(
       appModel: appModel,
       item: item,

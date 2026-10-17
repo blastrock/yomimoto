@@ -2219,6 +2219,12 @@ class AppModel with ChangeNotifier {
   /// when a reading position needs to be persisted as the user reads.
   Future<void> updateMediaItem(MediaItem item) => _store.updateMediaItem(item);
 
+  /// Set the title the user gave [item], or clear it with null.
+  Future<void> setMediaItemOverrideTitle(MediaItem item, String? title) async {
+    await _store.setMediaItemOverrideTitle(item.id!, title);
+    item.overrideTitle = title;
+  }
+
   /// Deletes a [MediaItem] from history, with its stash, and also rids of
   /// override values.
   Future<void> deleteMediaItem(MediaItem item) async {

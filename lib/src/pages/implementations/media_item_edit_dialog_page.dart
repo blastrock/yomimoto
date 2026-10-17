@@ -181,6 +181,7 @@ class _MediaItemEditDialogPageState
 
     if (_nameOverrideController.text.trim().isNotEmpty) {
       await mediaSource.setOverrideTitleFromMediaItem(
+        appModel: appModel,
         item: widget.item,
         title: _nameOverrideController.text,
       );

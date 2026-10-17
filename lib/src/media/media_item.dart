@@ -27,6 +27,7 @@ class MediaItem {
     this.imageUrl,
     this.sourceMetadata,
     this.lastOpenedAt,
+    this.overrideTitle,
   });
 
   /// Create an instance of this class from a serialized format.
@@ -83,6 +84,10 @@ class MediaItem {
   /// `AppStore.putMediaItem` or `AppStore.addMediaItem`. Null until then.
   DateTime? lastOpenedAt;
 
+  /// The title the user gave this item, if any, shown instead of [title].
+  /// Loaded with the item; set through `AppStore.setMediaItemOverrideTitle`.
+  String? overrideTitle;
+
   @override
   bool operator ==(Object other) =>
       other is MediaItem && other.uniqueKey == uniqueKey;
@@ -115,6 +120,7 @@ class MediaItem {
     bool? canDelete,
     bool? canEdit,
     DateTime? lastOpenedAt,
+    String? overrideTitle,
   }) {
     return MediaItem(
       id: id ?? this.id,
@@ -129,6 +135,7 @@ class MediaItem {
       canDelete: canDelete ?? this.canDelete,
       canEdit: canEdit ?? this.canEdit,
       lastOpenedAt: lastOpenedAt ?? this.lastOpenedAt,
+      overrideTitle: overrideTitle ?? this.overrideTitle,
     );
   }
 }

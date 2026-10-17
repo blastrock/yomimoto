@@ -43,7 +43,8 @@ class AppStore {
   }
 
   /// Insert [item], or update the item with the same source and identifier,
-  /// marking it opened now. Sets the item's `id` and `lastOpenedAt`.
+  /// marking it opened now. Sets the item's `id` and `lastOpenedAt`, and
+  /// loads its override title, which saving leaves alone.
   Future<void> putMediaItem(MediaItem item) async {
     DateTime now = DateTime.now();
     item.lastOpenedAt = now;
@@ -71,6 +72,7 @@ class AppStore {
           ),
         );
     item.id = row.id;
+    item.overrideTitle = row.overrideTitle;
   }
 
   /// [putMediaItem], then forget the least recently opened items of the
@@ -111,6 +113,12 @@ class AppStore {
         duration: Value(item.duration),
       ),
     );
+  }
+
+  /// Set the title the user gave the media item [id], or clear it with null.
+  Future<void> setMediaItemOverrideTitle(int id, String? title) async {
+    await (db.update(db.mediaItems)..where((table) => table.id.equals(id)))
+        .write(MediaItemsCompanion(overrideTitle: Value(title)));
   }
 
   /// Delete [item], and with it its stash.

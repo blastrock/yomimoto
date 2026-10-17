@@ -647,6 +647,14 @@ class MediaItem extends Table with TableInfo {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL CHECK (can_edit IN (0, 1))',
   );
+  late final GeneratedColumn<String> overrideTitle = GeneratedColumn<String>(
+    'override_title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    $customConstraints: 'NULL',
+  );
   late final GeneratedColumn<int> lastOpenedAt = GeneratedColumn<int>(
     'last_opened_at',
     aliasedName,
@@ -667,6 +675,7 @@ class MediaItem extends Table with TableInfo {
     duration,
     canDelete,
     canEdit,
+    overrideTitle,
     lastOpenedAt,
   ];
   @override

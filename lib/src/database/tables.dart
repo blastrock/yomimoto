@@ -249,6 +249,10 @@ class MediaItems extends Table {
   /// Whether the user may override its title and cover.
   BoolColumn get canEdit => boolean()();
 
+  /// The title the user gave the item, shown instead of [title]. Saving the
+  /// item leaves it alone; only `AppStore.setMediaItemOverrideTitle` sets it.
+  TextColumn get overrideTitle => text().nullable()();
+
   /// When the item was last opened; orders the libraries.
   IntColumn get lastOpenedAt =>
       integer().map(const MicrosecondsConverter())();

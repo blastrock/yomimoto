@@ -840,6 +840,16 @@
             "dsl_features": []
           },
           {
+            "name": "override_title",
+            "getter_name": "overrideTitle",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
             "name": "last_opened_at",
             "getter_name": "lastOpenedAt",
             "moor_type": "int",
@@ -1687,7 +1697,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"media_item\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"media_source_identifier\" TEXT NOT NULL, \"media_identifier\" TEXT NOT NULL, \"title\" TEXT NOT NULL, \"image_url\" TEXT NULL, \"source_metadata\" TEXT NULL, \"position\" INTEGER NOT NULL, \"duration\" INTEGER NOT NULL, \"can_delete\" INTEGER NOT NULL CHECK (\"can_delete\" IN (0, 1)), \"can_edit\" INTEGER NOT NULL CHECK (\"can_edit\" IN (0, 1)), \"last_opened_at\" INTEGER NOT NULL, UNIQUE (\"media_source_identifier\", \"media_identifier\"));"
+          "sql": "CREATE TABLE IF NOT EXISTS \"media_item\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"media_source_identifier\" TEXT NOT NULL, \"media_identifier\" TEXT NOT NULL, \"title\" TEXT NOT NULL, \"image_url\" TEXT NULL, \"source_metadata\" TEXT NULL, \"position\" INTEGER NOT NULL, \"duration\" INTEGER NOT NULL, \"can_delete\" INTEGER NOT NULL CHECK (\"can_delete\" IN (0, 1)), \"can_edit\" INTEGER NOT NULL CHECK (\"can_edit\" IN (0, 1)), \"override_title\" TEXT NULL, \"last_opened_at\" INTEGER NOT NULL, UNIQUE (\"media_source_identifier\", \"media_identifier\"));"
         }
       ]
     },

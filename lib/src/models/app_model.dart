@@ -1102,8 +1102,13 @@ class AppModel with ChangeNotifier {
     dictionarySearchAgainNotifier.notifyListeners();
   }
 
-  /// Delete a selected mapping from the database.
+  /// Delete a selected mapping from the database. The standard profile is
+  /// never deleted: the selected profile falls back to it.
   Future<void> deleteMapping(AnkiMapping mapping) async {
+    if (mapping.id == AnkiMapping.standardProfileId) {
+      return;
+    }
+
     await _store.deleteMapping(mapping.id!);
 
     if (mapping.id == _preferences.get(Preferences.selectedMappingId)) {

@@ -225,6 +225,19 @@ void main() {
       expect(store.mappingById(mapping.id!)!.creatorFieldKeys, ['term']);
     });
 
+    test('putMapping refuses to rename a saved profile to a taken label',
+        () async {
+      AnkiMapping mapping = profile('Mine', 1);
+      await store.putMapping(mapping);
+
+      AnkiMapping renamed =
+          mapping.copyWith(label: AnkiMapping.standardProfileName);
+      await expectLater(store.putMapping(renamed), throwsA(anything));
+
+      expect(store.mappingById(1)!.label, AnkiMapping.standardProfileName);
+      expect(store.mappingById(mapping.id!)!.label, 'Mine');
+    });
+
     test('replaceMappings swaps orders and keeps ids', () async {
       AnkiMapping standard = store.mappingById(1)!;
       AnkiMapping a = profile('A', 1);

@@ -701,35 +701,35 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
       return;
     }
 
-    /// If this mapping does not already exist in the database.
+    /// If this mapping does not already exist in the database, set its order
+    /// to the next order to be added to the database.
     if (mapping.id == null) {
-      /// Set the order of this mapping to the next order to be added to the
-      /// database.
       int order = appModel.nextMappingOrder;
       newMapping = newMapping.copyWith(order: order);
+    }
 
-      /// If the name is blank or the mapping exists, error.
-      if (name.isEmpty ||
-          name.contains('%mappingName%') ||
-          appModel.mappingNameHasDuplicate(newMapping)) {
-        await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(t.error_profile_name),
-            content: Text(
-              t.error_profile_name_content,
-            ),
-            actions: [
-              TextButton(
-                child: Text(t.dialog_close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+    /// If the name is blank or another profile has it, error. This also
+    /// applies to an edit: saving would otherwise fail on the taken name.
+    if (name.isEmpty ||
+        name.contains('%mappingName%') ||
+        appModel.mappingNameHasDuplicate(newMapping)) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(t.error_profile_name),
+          content: Text(
+            t.error_profile_name_content,
           ),
-        );
+          actions: [
+            TextButton(
+              child: Text(t.dialog_close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        ),
+      );
 
-        return;
-      }
+      return;
     }
 
     await appModel.addMapping(newMapping);

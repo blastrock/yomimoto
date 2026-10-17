@@ -202,13 +202,18 @@ class AppStore {
         .first['next'] as int;
   }
 
-  /// Save [mapping], replacing the profile with its id, label or position,
-  /// and set its id.
+  /// Save [mapping]: update the profile with its id, or insert it and set its
+  /// id. Throws if another profile has its label or position, rather than
+  /// replacing that profile.
   Future<void> putMapping(AnkiMapping mapping) async {
-    AnkiMapping row = await db.into(db.ankiMappings).insertReturning(
-          ankiMappingCompanion(mapping),
-          mode: InsertMode.insertOrReplace,
-        );
+    if (mapping.id != null) {
+      await db.update(db.ankiMappings).replace(ankiMappingCompanion(mapping));
+      return;
+    }
+
+    AnkiMapping row = await db
+        .into(db.ankiMappings)
+        .insertReturning(ankiMappingCompanion(mapping));
     mapping.id = row.id;
   }
 

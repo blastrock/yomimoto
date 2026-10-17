@@ -190,6 +190,18 @@ and the permission requests read `first_time_setup` in between. New order:
 
 `Hive.initFlutter()`, `hiveDirectory` and its `createSync` are removed.
 
+## Media item title overrides
+
+Found while implementing: `MediaSource`'s Hive box also held the titles
+users give books and volumes in the library's edit dialog. They are data
+about a `media_item` row, not settings, so they become a nullable
+`override_title` column of `media_item`, mapped to `MediaItem.overrideTitle`.
+`putMediaItem` (run by every library refresh) and `updateMediaItem` leave it
+alone; `AppStore.setMediaItemOverrideTitle(id, title)` sets or clears it,
+through `AppModel.setMediaItemOverrideTitle`. Deleting the row deletes the
+title. Tests: a title is saved and cleared, and survives `putMediaItem` and
+`updateMediaItem`.
+
 ## Theme
 
 - `Preferences.themeMode`: `EnumPreference<ThemeMode>('theme_mode',

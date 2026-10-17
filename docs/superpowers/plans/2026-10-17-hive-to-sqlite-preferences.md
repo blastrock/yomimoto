@@ -267,6 +267,10 @@ Expected: `No issues found!`; all tests pass; the APK builds.
 
 ---
 
+> Added during execution, as its own commit below Task 4's: media item title overrides move from the source's Hive box to a `media_item.override_title` column (see the spec's "Media item title overrides").
+
+---
+
 ### Task 5: Device verification
 
 No code. This needs a device or emulator with AnkiDroid installed. If none is available, hand the checklist to the user and report which checks were done.

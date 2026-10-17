@@ -1144,6 +1144,52 @@ class DictionaryHistory extends Table with TableInfo {
   bool get dontWriteConstraints => true;
 }
 
+class Preference extends Table with TableInfo {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  Preference(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL',
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preference';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  Never map(Map<String, dynamic> data, {String? tablePrefix}) {
+    throw UnsupportedError('TableInfo.map in schema verification code');
+  }
+
+  @override
+  Preference createAlias(String alias) {
+    return Preference(attachedDatabase, alias);
+  }
+
+  @override
+  List<String> get customConstraints => const ['PRIMARY KEY("key")'];
+  @override
+  bool get dontWriteConstraints => true;
+}
+
 class DatabaseAtV1 extends GeneratedDatabase {
   DatabaseAtV1(QueryExecutor e) : super(e);
   late final Heading heading = Heading(this);
@@ -1160,6 +1206,7 @@ class DatabaseAtV1 extends GeneratedDatabase {
   late final MokuroCatalog mokuroCatalog = MokuroCatalog(this);
   late final SearchHistoryItem searchHistoryItem = SearchHistoryItem(this);
   late final DictionaryHistory dictionaryHistory = DictionaryHistory(this);
+  late final Preference preference = Preference(this);
   late final Index headingReading = Index(
     'heading_reading',
     'CREATE INDEX heading_reading ON heading (reading)',
@@ -1215,6 +1262,7 @@ class DatabaseAtV1 extends GeneratedDatabase {
     mokuroCatalog,
     searchHistoryItem,
     dictionaryHistory,
+    preference,
     headingReading,
     entryHeadingId,
     entryDictionaryId,

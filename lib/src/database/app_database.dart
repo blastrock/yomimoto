@@ -31,6 +31,7 @@ const String databaseFileName = 'yomimoto.sqlite';
     MokuroCatalogs,
     SearchHistoryItems,
     DictionaryHistoryItems,
+    PreferenceEntries,
   ],
   include: {'search.drift'},
 )

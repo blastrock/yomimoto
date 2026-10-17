@@ -405,3 +405,21 @@ class DictionaryHistoryItems extends Table {
   BoolColumn get searchWithWildcards =>
       boolean().withDefault(const Constant(false))();
 }
+
+/// Preferences, one row per setting that differs from its default. Read and
+/// written only through `PreferenceStore`.
+@DataClassName('PreferenceEntry')
+class PreferenceEntries extends Table {
+  @override
+  String get tableName => 'preference';
+
+  /// The setting's name. Per-source settings are prefixed with the source's
+  /// `uniqueKey` and a `/`.
+  TextColumn get key => text()();
+
+  /// The setting's value, as JSON.
+  TextColumn get value => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {key};
+}

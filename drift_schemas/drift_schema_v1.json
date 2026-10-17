@@ -1402,6 +1402,43 @@
     },
     {
       "id": 14,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "preference",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "key",
+            "getter_name": "key",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "value",
+            "getter_name": "value",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": [
+          "key"
+        ]
+      }
+    },
+    {
+      "id": 15,
       "references": [
         0
       ],
@@ -1420,7 +1457,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "references": [
         2
       ],
@@ -1439,7 +1476,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "references": [
         2
       ],
@@ -1458,7 +1495,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "references": [
         3
       ],
@@ -1477,7 +1514,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 19,
       "references": [
         3
       ],
@@ -1496,7 +1533,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 20,
       "references": [
         4
       ],
@@ -1515,7 +1552,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 21,
       "references": [
         4
       ],
@@ -1534,7 +1571,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 22,
       "references": [
         6
       ],
@@ -1553,7 +1590,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 23,
       "references": [
         7
       ],
@@ -1696,6 +1733,15 @@
         {
           "dialect": "sqlite",
           "sql": "CREATE TABLE IF NOT EXISTS \"dictionary_history\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"search_term\" TEXT NOT NULL UNIQUE, \"search_with_wildcards\" INTEGER NOT NULL DEFAULT 0 CHECK (\"search_with_wildcards\" IN (0, 1)));"
+        }
+      ]
+    },
+    {
+      "name": "preference",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"preference\" (\"key\" TEXT NOT NULL, \"value\" TEXT NOT NULL, PRIMARY KEY (\"key\"));"
         }
       ]
     },

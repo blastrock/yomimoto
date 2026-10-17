@@ -4674,6 +4674,218 @@ class DictionaryHistoryItemsCompanion
   }
 }
 
+class $PreferenceEntriesTable extends PreferenceEntries
+    with TableInfo<$PreferenceEntriesTable, PreferenceEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PreferenceEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preference';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PreferenceEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  PreferenceEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PreferenceEntry(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $PreferenceEntriesTable createAlias(String alias) {
+    return $PreferenceEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class PreferenceEntry extends DataClass implements Insertable<PreferenceEntry> {
+  /// The setting's name. Per-source settings are prefixed with the source's
+  /// `uniqueKey` and a `/`.
+  final String key;
+
+  /// The setting's value, as JSON.
+  final String value;
+  const PreferenceEntry({required this.key, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  PreferenceEntriesCompanion toCompanion(bool nullToAbsent) {
+    return PreferenceEntriesCompanion(key: Value(key), value: Value(value));
+  }
+
+  factory PreferenceEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PreferenceEntry(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  PreferenceEntry copyWith({String? key, String? value}) =>
+      PreferenceEntry(key: key ?? this.key, value: value ?? this.value);
+  PreferenceEntry copyWithCompanion(PreferenceEntriesCompanion data) {
+    return PreferenceEntry(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenceEntry(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PreferenceEntry &&
+          other.key == this.key &&
+          other.value == this.value);
+}
+
+class PreferenceEntriesCompanion extends UpdateCompanion<PreferenceEntry> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> rowid;
+  const PreferenceEntriesCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PreferenceEntriesCompanion.insert({
+    required String key,
+    required String value,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<PreferenceEntry> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PreferenceEntriesCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
+    return PreferenceEntriesCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenceEntriesCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4693,6 +4905,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $SearchHistoryItemsTable(this);
   late final $DictionaryHistoryItemsTable dictionaryHistoryItems =
       $DictionaryHistoryItemsTable(this);
+  late final $PreferenceEntriesTable preferenceEntries =
+      $PreferenceEntriesTable(this);
   late final Index headingReading = Index(
     'heading_reading',
     'CREATE INDEX heading_reading ON heading (reading)',
@@ -4978,6 +5192,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     mokuroCatalogs,
     searchHistoryItems,
     dictionaryHistoryItems,
+    preferenceEntries,
     headingReading,
     entryHeadingId,
     entryDictionaryId,
@@ -10503,6 +10718,167 @@ typedef $$DictionaryHistoryItemsTableProcessedTableManager =
       DictionaryHistoryRow,
       PrefetchHooks Function()
     >;
+typedef $$PreferenceEntriesTableCreateCompanionBuilder =
+    PreferenceEntriesCompanion Function({
+      required String key,
+      required String value,
+      Value<int> rowid,
+    });
+typedef $$PreferenceEntriesTableUpdateCompanionBuilder =
+    PreferenceEntriesCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> rowid,
+    });
+
+class $$PreferenceEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PreferenceEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PreferenceEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$PreferenceEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PreferenceEntriesTable,
+          PreferenceEntry,
+          $$PreferenceEntriesTableFilterComposer,
+          $$PreferenceEntriesTableOrderingComposer,
+          $$PreferenceEntriesTableAnnotationComposer,
+          $$PreferenceEntriesTableCreateCompanionBuilder,
+          $$PreferenceEntriesTableUpdateCompanionBuilder,
+          (
+            PreferenceEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $PreferenceEntriesTable,
+              PreferenceEntry
+            >,
+          ),
+          PreferenceEntry,
+          PrefetchHooks Function()
+        > {
+  $$PreferenceEntriesTableTableManager(
+    _$AppDatabase db,
+    $PreferenceEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PreferenceEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PreferenceEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PreferenceEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenceEntriesCompanion(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenceEntriesCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PreferenceEntriesTable, PreferenceEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PreferenceEntriesTable,
+                    PreferenceEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PreferenceEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PreferenceEntriesTable,
+      PreferenceEntry,
+      $$PreferenceEntriesTableFilterComposer,
+      $$PreferenceEntriesTableOrderingComposer,
+      $$PreferenceEntriesTableAnnotationComposer,
+      $$PreferenceEntriesTableCreateCompanionBuilder,
+      $$PreferenceEntriesTableUpdateCompanionBuilder,
+      (
+        PreferenceEntry,
+        BaseReferences<_$AppDatabase, $PreferenceEntriesTable, PreferenceEntry>,
+      ),
+      PreferenceEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -10537,6 +10913,8 @@ class $AppDatabaseManager {
         _db,
         _db.dictionaryHistoryItems,
       );
+  $$PreferenceEntriesTableTableManager get preferenceEntries =>
+      $$PreferenceEntriesTableTableManager(_db, _db.preferenceEntries);
 }
 
 class HeadingTagsByHeadingsResult {

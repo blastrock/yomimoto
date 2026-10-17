@@ -713,7 +713,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                 style: TextStyle(fontSize: textTheme.labelSmall?.fontSize),
               ),
               JidoujishoMarquee(
-                text: appModel.lastSelectedMappingName,
+                text: appModel.lastSelectedMapping.label,
                 style: TextStyle(fontSize: textTheme.titleMedium?.fontSize),
               ),
             ],

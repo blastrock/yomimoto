@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 import 'package:path/path.dart' as path;
 
@@ -53,38 +53,24 @@ abstract class MediaSource extends HomeTab {
   /// See [generateImages].
   final bool overridesAutoImage;
 
-  /// Used for accessing persistent key-value data specific to this source.
-  /// See [initialise].
-  late final Box _preferences;
+  /// The app's settings, for this source's own preferences. See
+  /// [initialise].
+  late final PreferenceStore preferences;
 
   /// Whether or not [initialise] has been called for this source.
   bool _initialised = false;
 
-  /// This function is run at startup. It is not called again if already run.
-  Future<void> initialise() async {
+  /// This function is run at startup with the app's [preferences]. It is not
+  /// called again if already run.
+  Future<void> initialise(PreferenceStore preferences) async {
     if (_initialised) {
       return;
     } else {
-      _preferences = await Hive.openBox(uniqueKey);
+      this.preferences = preferences;
 
       await prepareResources();
       _initialised = true;
     }
-  }
-
-  /// Get the preference value for a certain parameter [key] for this source.
-  T getPreference<T>({required String key, required T defaultValue}) {
-    return _preferences.get(key, defaultValue: defaultValue) as T;
-  }
-
-  /// Set the preference [value] for a certain parameter [key] for this source.
-  Future<void> setPreference<T>({required String key, required T value}) async {
-    await _preferences.put(key, value);
-  }
-
-  /// Set the preference for a certain parameter [key] for this source.
-  Future<void> deletePreference({required String key}) async {
-    await _preferences.delete(key);
   }
 
   /// If a media source requires resources to function, they can be prepared

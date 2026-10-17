@@ -93,10 +93,16 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
             padding: Spacing.of(context).insets.onlyBottom.big,
             children: [
               buildHeader(t.settings_appearance),
-              buildSwitch(
-                label: t.settings_dark_theme,
-                value: appModel.isDarkMode,
-                toggle: appModel.toggleDarkMode,
+              buildChoice<ThemeMode>(
+                label: t.settings_theme,
+                options: ThemeMode.values,
+                value: appModel.themeMode,
+                generateLabel: (mode) => switch (mode) {
+                  ThemeMode.system => t.theme_system,
+                  ThemeMode.light => t.theme_light,
+                  ThemeMode.dark => t.theme_dark,
+                },
+                onChanged: appModel.setThemeMode,
               ),
               buildHeader(t.dictionaries),
               buildAction(
@@ -276,6 +282,33 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
         setState(() {});
       },
       contentPadding: Spacing.of(context).insets.horizontal.normal,
+    );
+  }
+
+  /// [onChanged] persists the picked option; the dropdown shows it at once.
+  Widget buildChoice<T>({
+    required String label,
+    required List<T> options,
+    required T value,
+    required String Function(T) generateLabel,
+    required Future<void> Function(T) onChanged,
+  }) {
+    return Padding(
+      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
+            top: Spacing.of(context).spaces.small,
+          ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: textTheme.bodyMedium),
+          JidoujishoDropdown<T>(
+            options: options,
+            initialOption: value,
+            generateLabel: generateLabel,
+            onChanged: (option) => onChanged(option as T),
+          ),
+        ],
+      ),
     );
   }
 

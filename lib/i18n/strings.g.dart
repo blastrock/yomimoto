@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 213
+/// Strings: 216
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -319,7 +319,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get text_segmentation => 'Text Segmentation';
 	String get settings => 'Settings';
 	String get settings_appearance => 'Appearance';
-	String get settings_dark_theme => 'Dark theme';
+	String get settings_theme => 'Theme';
+	String get theme_system => 'System';
+	String get theme_light => 'Light';
+	String get theme_dark => 'Dark';
 	String get settings_about => 'About';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
@@ -540,7 +543,10 @@ extension on Translations {
 			case 'text_segmentation': return 'Text Segmentation';
 			case 'settings': return 'Settings';
 			case 'settings_appearance': return 'Appearance';
-			case 'settings_dark_theme': return 'Dark theme';
+			case 'settings_theme': return 'Theme';
+			case 'theme_system': return 'System';
+			case 'theme_light': return 'Light';
+			case 'theme_dark': return 'Dark';
 			case 'settings_about': return 'About';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';

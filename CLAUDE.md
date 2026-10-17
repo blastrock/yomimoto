@@ -19,8 +19,8 @@ remains is deliberately three things:
 ### Fork ground rules
 
 - **No backward compatibility is owed.** The fork ships under its own
-  Android `applicationId`, so every install is fresh: the database and Hive
-  start empty. Do not write migration code, orphan cleanup, index clamping,
+  Android `applicationId`, so every install is fresh: the database starts
+  empty. Do not write migration code, orphan cleanup, index clamping,
   or defensive nullable-ing for things that were removed. Changing schema
   version 1 is free until 1.0.
 - **The rename is external only.** The `applicationId` is
@@ -106,12 +106,13 @@ Add an entry when you take one.
 
 ### Barrel imports
 
-`lib/` has eight barrel files — `creator.dart`, `database.dart`,
+`lib/` has nine barrel files — `creator.dart`, `database.dart`,
 `dictionary.dart`, `language.dart`, `media.dart`, `models.dart`, `pages.dart`,
-`utils.dart` — re-exporting everything under `lib/src/<name>/`. **Always import
-the barrel** (`package:yuuna/media.dart`), never a file under `lib/src/`
-directly, and always `package:` imports (`always_use_package_imports` is
-enforced). Adding a file means adding an `export` line to its barrel.
+`preferences.dart`, `utils.dart` — re-exporting everything under
+`lib/src/<name>/`. **Always import the barrel** (`package:yuuna/media.dart`),
+never a file under `lib/src/` directly, and always `package:` imports
+(`always_use_package_imports` is enforced). Adding a file means adding an
+`export` line to its barrel.
 
 ### Everything is a registered singleton
 
@@ -145,8 +146,8 @@ file.
 
 `lib/src/models/app_model.dart` (~3200 lines) is the god object: a
 `ChangeNotifier` behind a Riverpod `appProvider`, holding every registry, every
-directory path, the database handles, the Hive preference boxes, dictionary search,
-Anki export, and a navigator key so dialogs can be opened without a
+directory path, the database handles and the preference store, dictionary
+search, Anki export, and a navigator key so dialogs can be opened without a
 `BuildContext`. `AppModel.initialise()` in `main()` runs the whole startup
 sequence and must complete before `runApp`.
 
@@ -158,10 +159,9 @@ its size — but splitting it is its own project, not a side effect of a feature
 
 ### Persistence
 
-- **Hive** — key-value preferences. `Box('appModel')` for app-wide settings
-  (accessed through typed getter/setter pairs on `AppModel`, e.g. `isDarkMode`,
-  `maximumTerms`), plus a per-`MediaSource` box for source-specific settings.
-- **SQLite** — the real database, through Drift over `sqlite3` (FFI; the
+Everything persisted lives in SQLite; there is no other store.
+
+- **SQLite** — the database, through Drift over `sqlite3` (FFI; the
   package's build hook bundles SQLite): dictionary entries, headings,
   pitches, frequencies, tags, media items, Anki mappings, mokuro catalogs,
   stash items, the search history, and the dictionary history
@@ -176,7 +176,24 @@ its size — but splitting it is its own project, not a side effect of a feature
   `DictionaryImportWriter`, deletion) open their own connections, and the
   import writer is the one raw writer. `loadHeadings` produces fully loaded
   headings. A `MediaItem` names its origin with a single
-  `mediaSourceIdentifier` — the source and the tab are the same object.
+  `mediaSourceIdentifier` — the source and the tab are the same object; a
+  title the user gave it is its `override_title` column, which saving the
+  item leaves alone. The database creates the Standard profile with id 1
+  (`AnkiMapping.standardProfileId`) and it cannot be deleted, so the
+  selected profile is stored by id and always resolves.
+- **Preferences** — the `preference` table, key to JSON value, read and
+  written only through `PreferenceStore` (`lib/src/preferences/`,
+  `AppModel.preferences`). Each setting is a constant `Preference<T>`
+  descriptor naming its key and constant default: app-wide ones in
+  `Preferences`, a reader's own as private constants in its source, keyed
+  `<uniqueKey>/<name>`. Callers use the descriptors directly
+  (`appModel.preferences.get(Preferences.maximumTerms)`); `AppModel` keeps
+  accessors only where it adds logic (the theme mode, the selected profile,
+  the dictionary format). `PreferenceStore` loads every row at startup and
+  `set` updates memory before writing through Drift: callers set without
+  awaiting and read back at once, so do not remove that cache. Adding a
+  setting needs no schema change; after 1.0, renaming a key or changing a
+  value's type or meaning is a data migration in a `schemaVersion` bump.
 
   Schema version 1 is the 1.0 baseline. Until 1.0 ships, schema edits change
   version 1 and re-dump it (`drift_schemas/`). After 1.0, every change bumps
@@ -203,11 +220,11 @@ Concrete pages live in `lib/src/pages/implementations/`. Dialogs are pages too.
 
 Reusable widgets are `lib/src/utils/components/jidoujisho_*.dart`.
 
-Colours that differ between themes come from the theme, never from
-`isDarkMode` or a brightness check: a `ColorScheme` role when one fits
-(`colorScheme.onSurface` for text and icons, at 5% opacity for a tint), else
-a field of the `AppColors` theme extension (`theme.appColors`), which
-`AppModel.theme` and `darkTheme` each set.
+Colours that differ between themes come from the theme, never from a
+brightness check: a `ColorScheme` role when one fits (`colorScheme.onSurface`
+for text and icons, at 5% opacity for a tint), else a field of the `AppColors`
+theme extension (`theme.appColors`), which `AppModel.theme` and `darkTheme`
+each set.
 
 ### i18n
 

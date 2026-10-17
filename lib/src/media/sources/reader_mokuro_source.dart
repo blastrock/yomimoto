@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 import 'package:path/path.dart' as path;
 import 'package:collection/collection.dart';
@@ -38,6 +39,25 @@ class ReaderMokuroSource extends ReaderMediaSource {
 
   static final ReaderMokuroSource _instance =
       ReaderMokuroSource._privateConstructor();
+
+  // This source's preferences, prefixed with its uniqueKey.
+  static const Preference<bool> _volumePageTurningEnabled =
+      Preference('reader_mokuro/volume_page_turning_enabled',
+          defaultValue: true);
+
+  static const Preference<bool> _volumePageTurningInverted =
+      Preference('reader_mokuro/volume_page_turning_inverted',
+          defaultValue: false);
+
+  static const Preference<bool> _extendPageBeyondNavigationBar =
+      Preference('reader_mokuro/extend_page_beyond_navbar',
+          defaultValue: false);
+
+  static const Preference<bool> _highlightOnTap =
+      Preference('reader_mokuro/highlight_on_tap', defaultValue: true);
+
+  static const Preference<bool> _useDarkTheme =
+      Preference('reader_mokuro/use_dark_theme', defaultValue: false);
 
   @override
   Widget get home => const HomeMangaPage();
@@ -301,80 +321,44 @@ bgImage.substring(5, bgImage.length - 2);
 
   /// Whether or not using the volume buttons in the Reader should turn the
   /// page.
-  bool get volumePageTurningEnabled {
-    return getPreference<bool>(
-        key: 'volume_page_turning_enabled', defaultValue: true);
-  }
+  bool get volumePageTurningEnabled =>
+      preferences.get(_volumePageTurningEnabled);
 
   /// Toggles the volume page turning option.
-  Future<void> toggleVolumePageTurningEnabled() async {
-    await setPreference<bool>(
-      key: 'volume_page_turning_enabled',
-      value: !volumePageTurningEnabled,
-    );
-  }
+  Future<void> toggleVolumePageTurningEnabled() =>
+      preferences.toggle(_volumePageTurningEnabled);
 
   /// Controls which direction is up or down for volume button page turning.
-  bool get volumePageTurningInverted {
-    return getPreference<bool>(
-        key: 'volume_page_turning_inverted', defaultValue: false);
-  }
+  bool get volumePageTurningInverted =>
+      preferences.get(_volumePageTurningInverted);
 
   /// Inverts the current volume button page turning direction preference.
-  Future<void> toggleVolumePageTurningInverted() async {
-    await setPreference<bool>(
-      key: 'volume_page_turning_inverted',
-      value: !volumePageTurningInverted,
-    );
-  }
+  Future<void> toggleVolumePageTurningInverted() =>
+      preferences.toggle(_volumePageTurningInverted);
 
   /// Whether or not to add to extend the webpage beyond the navigation bar.
   /// This may be helpful for devices that don't have difficulty accessing the
   /// top bar (i.e. don't have a teardrop notch).
-  bool get extendPageBeyondNavigationBar {
-    return getPreference<bool>(
-        key: 'extend_page_beyond_navbar', defaultValue: false);
-  }
+  bool get extendPageBeyondNavigationBar =>
+      preferences.get(_extendPageBeyondNavigationBar);
 
   /// Toggles the extend navbar option.
-  Future<void> toggleExtendPageBeyondNavigationBar() async {
-    await setPreference<bool>(
-      key: 'extend_page_beyond_navbar',
-      value: !extendPageBeyondNavigationBar,
-    );
-  }
+  Future<void> toggleExtendPageBeyondNavigationBar() =>
+      preferences.toggle(_extendPageBeyondNavigationBar);
 
   /// Whether the reader will highlight words on tap.
-  bool get highlightOnTap {
-    return getPreference<bool>(
-      key: 'highlight_on_tap',
-      defaultValue: true,
-    );
-  }
+  bool get highlightOnTap => preferences.get(_highlightOnTap);
 
   /// Toggles whether the reader will highlight words on tap.
-  Future<void> toggleHighlightOnTap() async {
-    await setPreference<bool>(
-      key: 'highlight_on_tap',
-      value: !highlightOnTap,
-    );
-  }
+  Future<void> toggleHighlightOnTap() =>
+      preferences.toggle(_highlightOnTap);
 
   /// Whether the reader will inject dark theme.
-  bool get useDarkTheme {
-    return getPreference<bool>(
-      key: 'use_dark_theme',
-      defaultValue: false,
-    );
-  }
+  bool get useDarkTheme => preferences.get(_useDarkTheme);
 
   /// Toggles whether to inject dark mode.
-  Future<void> toggleUseDarkTheme() async {
-    await setPreference<bool>(
-      key: 'use_dark_theme',
-      value: !useDarkTheme,
-    );
-  }
+  Future<void> toggleUseDarkTheme() =>
+      preferences.toggle(_useDarkTheme);
 
   /// If this source is non-null, this will be used as the initial function
   /// for the image field over the auto enhancement. Extra durations can be

@@ -235,10 +235,8 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
   /// The application will open to this page upon startup.
   Widget get home => _isMainIntent ? const HomePage() : const Scaffold();
 
-  /// The current theme mode, which by default is based on system setting
-  /// and toggleable.
-  ThemeMode get themeMode =>
-      appModel.isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  /// The current theme mode: light, dark or following the system.
+  ThemeMode get themeMode => appModel.themeMode;
 }
 
 /// Used to override certain strings.

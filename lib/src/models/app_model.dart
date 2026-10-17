@@ -14,14 +14,12 @@ import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:path/path.dart' as path;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:remove_emoji/remove_emoji.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
@@ -111,9 +109,6 @@ class AppModel with ChangeNotifier {
   late final GlobalKey<NavigatorState> _navigatorKey =
       GlobalKey<NavigatorState>();
 
-  /// Used for accessing persistent key-value data. See [initialise].
-  late final Box _preferences;
-
   /// The SQLite database. See [initialise].
   late final AppDatabase _db;
 
@@ -121,8 +116,8 @@ class AppModel with ChangeNotifier {
   late final AppStore _store;
 
   /// The app's settings, stored in [_db]. See [initialise].
-  PreferenceStore get preferences => _preferenceStore;
-  late final PreferenceStore _preferenceStore;
+  PreferenceStore get preferences => _preferences;
+  late final PreferenceStore _preferences;
 
   /// Used to get the versioning metadata of the app. See [initialise].
   PackageInfo get packageInfo => _packageInfo;
@@ -182,9 +177,6 @@ class AppModel with ChangeNotifier {
   Directory get thumbnailsDirectory => _thumbnailsDirectory;
   late final Directory _thumbnailsDirectory;
 
-  /// Directory where Hive key-value data is stored.
-  Directory get hiveDirectory => _hiveDirectory;
-  late final Directory _hiveDirectory;
 
   /// Directory where media for export is stored for communication with
   /// third-party APIs.
@@ -491,7 +483,7 @@ class AppModel with ChangeNotifier {
       return _currentMediaSource!.currentSentence;
     } else {
       HomeTab homeTab = tabs.values
-          .toList()[_preferenceStore.get(Preferences.currentHomeTabIndex)];
+          .toList()[_preferences.get(Preferences.currentHomeTabIndex)];
       MediaSource? mediaSource = _currentMediaSource ??
           (homeTab is MediaSource ? homeTab : null);
 
@@ -799,11 +791,7 @@ class AppModel with ChangeNotifier {
     _db = AppDatabase.fromRaw(raw);
     await _db.customSelect('SELECT 1').get();
     _store = AppStore(db: _db, raw: raw);
-    _preferenceStore = PreferenceStore(db: _db, raw: raw);
-
-    /// Initialise persistent key-value store.
-    await Hive.initFlutter();
-    _preferences = await Hive.openBox('appModel');
+    _preferences = PreferenceStore(db: _db, raw: raw);
 
     /// Perform startup activities unnecessary to further initialisation here.
     await requestExternalStoragePermissions();
@@ -814,7 +802,6 @@ class AppModel with ChangeNotifier {
     _appDirectory = await getApplicationDocumentsDirectory();
     _thumbnailsDirectory =
         Directory(path.join(appDirectory.path, 'thumbnails'));
-    _hiveDirectory = Directory(path.join(appDirectory.path, 'hive'));
 
     _dictionaryResourceDirectory =
         Directory(path.join(appDirectory.path, 'dictionaryResources'));
@@ -825,7 +812,6 @@ class AppModel with ChangeNotifier {
     _alternateExportDirectory = await prepareFallbackJidoujishoDirectory();
 
     thumbnailsDirectory.createSync();
-    hiveDirectory.createSync();
     dictionaryImportWorkingDirectory.createSync();
     dictionaryResourceDirectory.createSync();
 
@@ -857,7 +843,7 @@ class AppModel with ChangeNotifier {
 
     /// Ready all media sources for use.
     for (MediaSource source in tabs.values.whereType<MediaSource>()) {
-      await source.initialise();
+      await source.initialise(_preferences);
     }
 
     /// Preloads the search database in memory.
@@ -881,74 +867,41 @@ class AppModel with ChangeNotifier {
     }));
   }
 
-  /// Get whether or not the current theme is dark mode.
-  bool get isDarkMode {
-    bool isDarkMode = _preferences.get('is_dark_mode',
-        defaultValue:
-            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-                Brightness.dark);
-    return isDarkMode;
+  /// Whether the app is light, dark or follows the system.
+  ThemeMode get themeMode => _preferences.get(Preferences.themeMode);
+
+  /// Switch the app to [mode]; the app recolours without a restart.
+  Future<void> setThemeMode(ThemeMode mode) async {
+    await _preferences.set(Preferences.themeMode, mode);
+    notifyListeners();
   }
 
-  /// Toggle between light and dark mode.
-  Future<void> toggleDarkMode() async {
-    await _preferences.put('is_dark_mode', !isDarkMode);
-    await Restart.restartApp();
-  }
+  /// The format dictionaries are imported as, last picked in the dictionary
+  /// menu.
+  DictionaryFormat get lastSelectedDictionaryFormat => dictionaryFormats[
+      _preferences.get(Preferences.lastSelectedDictionaryFormat)]!;
 
-  /// Get the target language from persisted preferences.
-  DictionaryFormat get lastSelectedDictionaryFormat {
-    String firstDictionaryFormatName = dictionaryFormats.values.first.uniqueKey;
-    String lastDictionaryFormatName = _preferences.get(
-      'last_selected_dictionary_format',
-      defaultValue: firstDictionaryFormatName,
-    );
+  /// The AnkiDroid note type last picked for a new profile, if any.
+  String? get lastSelectedModel =>
+      _preferences.get(Preferences.lastSelectedModel);
 
-    return dictionaryFormats[lastDictionaryFormatName]!;
-  }
-
-  /// Get the last selected model from persisted preferences.
-  String? get lastSelectedModel {
-    String? modelName = _preferences.get('last_selected_model');
-    return modelName;
-  }
-
-  /// Get the last selected mapping from persisted preferences. This should
-  /// always be guaranteed to have a result, as it is impossible to delete the
-  /// default mapping.
-  AnkiMapping get lastSelectedMapping {
-    String mappingName = _preferences.get(
-      'last_selected_mapping',
-      defaultValue: mappings.first.label,
-    );
-
-    AnkiMapping mapping = _store.mappingByLabel(mappingName) ??
-        _store.mappingByLabel(mappings.first.label)!;
-
-    return mapping;
-  }
-
-  /// Get the last selected mapping's name from persisted preferences. This is
-  /// faster than getting the mapping specifically from the database.
-  String get lastSelectedMappingName {
-    String mappingName = _preferences.get('last_selected_mapping',
-        defaultValue: mappings.first.label);
-    return mappingName;
-  }
+  /// The card creation profile in use. Deleting it selects the standard
+  /// profile, which cannot be deleted, so it always exists.
+  AnkiMapping get lastSelectedMapping => _store
+      .mappingById(_preferences.get(Preferences.selectedMappingId))!;
 
   /// Persist a new last selected dictionary format. This is called when the
   /// user changes the import format in the dictionary menu.
   Future<void> setLastSelectedDictionaryFormat(
       DictionaryFormat dictionaryFormat) async {
-    String lastDictionaryFormatName = dictionaryFormat.uniqueKey;
-    await _preferences.put(
-        'last_selected_dictionary_format', lastDictionaryFormatName);
+    await _preferences.set(
+        Preferences.lastSelectedDictionaryFormat, dictionaryFormat.uniqueKey);
   }
 
   /// Persist a new last selected model name. This is called when the user
   /// changes the selected model to map in the profiles menu.
   Future<void> setLastSelectedModelName(String modelName) async {
-    await _preferences.put('last_selected_model', modelName);
+    await _preferences.set(Preferences.lastSelectedModel, modelName);
     notifyListeners();
   }
 
@@ -956,7 +909,7 @@ class AppModel with ChangeNotifier {
   /// changes the selected model to map in the profiles menu.
   Future<void> setLastSelectedMapping(AnkiMapping mapping,
       {bool notify = true}) async {
-    await _preferences.put('last_selected_mapping', mapping.label);
+    await _preferences.set(Preferences.selectedMappingId, mapping.id!);
     if (notify) {
       notifyListeners();
     }
@@ -1153,8 +1106,8 @@ class AppModel with ChangeNotifier {
   Future<void> deleteMapping(AnkiMapping mapping) async {
     await _store.deleteMapping(mapping.id!);
 
-    if (mapping.label == lastSelectedMappingName) {
-      await setLastSelectedMapping(mappings.first);
+    if (mapping.id == _preferences.get(Preferences.selectedMappingId)) {
+      await selectStandardProfile();
     }
   }
 
@@ -1214,7 +1167,7 @@ class AppModel with ChangeNotifier {
       databasePath: databasePath,
       maximumDictionarySearchResults: maximumDictionarySearchResults,
       maximumDictionaryTermsInResult: overrideMaximumTerms ??
-          _preferenceStore.get(Preferences.maximumTerms),
+          _preferences.get(Preferences.maximumTerms),
       searchWithWildcards: searchWithWildcards,
       enabledDictionaryIds: [],
       sendPort: receivePort.sendPort,
@@ -1255,7 +1208,7 @@ class AppModel with ChangeNotifier {
   /// Requests for full external storage permissions. Required to browse for
   /// media anywhere on the device.
   Future<void> requestExternalStoragePermissions() async {
-    if (_preferenceStore.get(Preferences.firstTimeSetup)) {
+    if (_preferences.get(Preferences.firstTimeSetup)) {
       showToast(
         msg: t.storage_permissions,
         toastLength: Toast.LENGTH_SHORT,
@@ -1443,7 +1396,7 @@ class AppModel with ChangeNotifier {
       final result = await methodChannel.invokeMethod(
         'checkForDuplicates',
         <String, dynamic>{
-          'models': _preferenceStore.get(Preferences.duplicateCheckModels),
+          'models': _preferences.get(Preferences.duplicateCheckModels),
           'key': key,
         },
       );
@@ -1704,8 +1657,8 @@ class AppModel with ChangeNotifier {
 
   /// Persist the standard profile as the last selected mapping.
   Future<void> selectStandardProfile() async {
-    await _preferences.put(
-        'last_selected_mapping', AnkiMapping.standardProfileName);
+    await _preferences.set(
+        Preferences.selectedMappingId, AnkiMapping.standardProfileId);
     notifyListeners();
   }
 
@@ -1804,7 +1757,7 @@ class AppModel with ChangeNotifier {
     CreatorModel creatorModel = ref.watch(creatorProvider);
     creatorModel.clearAll(
       overrideLocks: true,
-      savedTags: _preferenceStore.get(Preferences.savedTags),
+      savedTags: _preferences.get(Preferences.savedTags),
     );
     if (creatorFieldValues != null) {
       creatorModel.copyContext(creatorFieldValues);
@@ -2299,9 +2252,9 @@ class AppModel with ChangeNotifier {
   /// Returns the last navigated directory the user used for picking a file for a
   /// certain media source.
   Directory? getLastPickedDirectory(MediaSource mediaSource) {
-    String path = _preferences.get('${mediaSource.uniqueKey}/last_picked_file',
-        defaultValue: '');
-    if (path.isEmpty) {
+    String? path = _preferences
+        .get(Preferences.lastPickedDirectory(mediaSource.uniqueKey));
+    if (path == null) {
       return null;
     }
 
@@ -2318,8 +2271,9 @@ class AppModel with ChangeNotifier {
     required MediaSource mediaSource,
     required Directory directory,
   }) {
-    _preferences.put(
-        '${mediaSource.uniqueKey}/last_picked_file', directory.path);
+    unawaited(_preferences.set(
+        Preferences.lastPickedDirectory(mediaSource.uniqueKey),
+        directory.path));
   }
 
   /// Returns valid file picker directories. If there is a last picked directory for
@@ -2354,7 +2308,7 @@ class AppModel with ChangeNotifier {
     required bool searchWithWildcards,
   }) async {
     HomeTab homeTab = tabs.values
-        .toList()[_preferenceStore.get(Preferences.currentHomeTabIndex)];
+        .toList()[_preferences.get(Preferences.currentHomeTabIndex)];
     if (homeTab != DictionaryTab.instance) {
       shouldRefreshTabs = true;
       ScrollController scrollController =

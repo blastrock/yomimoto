@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/preferences.dart';
 
@@ -5,6 +6,11 @@ import 'package:yuuna/preferences.dart';
 /// getters that use them.
 abstract final class Preferences {
   // App.
+
+  /// Whether the app is light, dark or follows the system.
+  static const EnumPreference<ThemeMode> themeMode = EnumPreference(
+      'theme_mode', ThemeMode.values,
+      defaultValue: ThemeMode.system);
 
   /// The index of the home tab shown, in the order of `AppModel.tabs`.
   static const Preference<int> currentHomeTabIndex =
@@ -29,11 +35,24 @@ abstract final class Preferences {
   static const Preference<double> dictionaryFontSize =
       Preference('dictionary_entry_font_size', defaultValue: 16);
 
+  /// The `uniqueKey` of the format dictionaries are imported as.
+  static const Preference<String> lastSelectedDictionaryFormat =
+      Preference('last_selected_dictionary_format', defaultValue: 'yomichan');
+
   /// The maximum number of terms in a search result.
   static const Preference<int> maximumTerms =
       Preference('maximum_terms', defaultValue: 10);
 
   // Card creation.
+
+  /// The id of the card creation profile in use.
+  static const Preference<int> selectedMappingId = Preference(
+      'selected_mapping_id',
+      defaultValue: AnkiMapping.standardProfileId);
+
+  /// The AnkiDroid note type last picked for a new profile, if any.
+  static const Preference<String?> lastSelectedModel =
+      Preference('last_selected_model', defaultValue: null);
 
   /// The AnkiDroid deck cards are exported to.
   static const Preference<String> lastSelectedDeck =
@@ -51,4 +70,11 @@ abstract final class Preferences {
   static const StringListPreference duplicateCheckModels =
       StringListPreference('duplicate_check_models',
           defaultValue: [AnkiMapping.standardModelName]);
+
+  // Files.
+
+  /// The directory a file was last picked from for the source [sourceKey], if
+  /// any.
+  static Preference<String?> lastPickedDirectory(String sourceKey) =>
+      Preference('$sourceKey/last_picked_directory', defaultValue: null);
 }

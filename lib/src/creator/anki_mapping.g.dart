@@ -32,9 +32,6 @@ AnkiMapping _$AnkiMappingFromJson(Map<String, dynamic> json) => AnkiMapping(
       ),
     ),
   ),
-  actions: (json['actions'] as Map<String, dynamic>?)?.map(
-    (k, e) => MapEntry(int.parse(k), e as String),
-  ),
   id: (json['id'] as num?)?.toInt(),
 );
 
@@ -47,7 +44,6 @@ Map<String, dynamic> _$AnkiMappingToJson(AnkiMapping instance) =>
       'creatorFieldKeys': instance.creatorFieldKeys,
       'creatorCollapsedFieldKeys': instance.creatorCollapsedFieldKeys,
       'tags': instance.tags,
-      'actions': instance.actions?.map((k, e) => MapEntry(k.toString(), e)),
       'enhancements': instance.enhancements?.map(
         (k, e) => MapEntry(k, e.map((k, e) => MapEntry(k.toString(), e))),
       ),

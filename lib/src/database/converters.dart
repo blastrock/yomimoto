@@ -30,20 +30,6 @@ class NullableStringListConverter
   String toSql(List<String?> value) => jsonEncode(value);
 }
 
-/// Stores a profile's quick actions, slot to action key, as JSON.
-class QuickActionsColumnConverter
-    extends TypeConverter<Map<int, String>, String> {
-  /// Create the converter.
-  const QuickActionsColumnConverter();
-
-  @override
-  Map<int, String> fromSql(String fromDb) =>
-      QuickActionsConverter.decode(fromDb);
-
-  @override
-  String toSql(Map<int, String> value) => QuickActionsConverter.encode(value);
-}
-
 /// Stores a profile's enhancements, field to slot to enhancement key, as JSON.
 class EnhancementsColumnConverter
     extends TypeConverter<Map<String, Map<int, String>>, String> {

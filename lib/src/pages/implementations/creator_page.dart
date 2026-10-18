@@ -334,42 +334,9 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     );
   }
 
-  Widget buildEditActionsButton() {
-    return Padding(
-      padding: Spacing.of(context).insets.all.normal,
-      child: InkWell(
-        onTap: showQuickActionsPage,
-        child: Container(
-          padding: Spacing.of(context).insets.vertical.normal,
-          alignment: Alignment.center,
-          width: double.infinity,
-          color: activeButtonColor,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.electric_bolt,
-                size: textTheme.titleSmall?.fontSize,
-                color: activeTextColor,
-              ),
-              const Space.small(),
-              Text(
-                t.edit_actions,
-                style: textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: activeTextColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget buildEditFieldsButton() {
     return Padding(
-      padding: Spacing.of(context).insets.exceptBottom.normal,
+      padding: Spacing.of(context).insets.all.normal,
       child: InkWell(
         onTap: () async {
           await appModel.openCreatorFieldsEditor();
@@ -400,13 +367,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
           ),
         ),
       ),
-    );
-  }
-
-  void showQuickActionsPage() {
-    showDialog(
-      context: context,
-      builder: (context) => const CreatorQuickActionsPage(),
     );
   }
 
@@ -485,7 +445,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               children: [
                 Expanded(child: buildFields(isPortrait: false)),
                 if (widget.editEnhancements) buildEditFieldsButton(),
-                if (widget.editEnhancements) buildEditActionsButton(),
                 if (isCardEditing) buildExportButton(),
               ],
             ),
@@ -502,7 +461,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
         children: [
           Expanded(child: buildFields(isPortrait: true)),
           if (widget.editEnhancements) buildEditFieldsButton(),
-          if (widget.editEnhancements) buildEditActionsButton(),
           if (isCardEditing) buildExportButton(),
         ],
       ),

@@ -1157,20 +1157,6 @@
             }
           },
           {
-            "name": "actions",
-            "getter_name": "actions",
-            "moor_type": "string",
-            "nullable": false,
-            "customConstraints": null,
-            "default_dart": null,
-            "default_client_dart": null,
-            "dsl_features": [],
-            "type_converter": {
-              "dart_expr": "const QuickActionsColumnConverter()",
-              "dart_type_name": "Map<int, String>"
-            }
-          },
-          {
             "name": "enhancements",
             "getter_name": "enhancements",
             "moor_type": "string",
@@ -1715,7 +1701,7 @@
       "sql": [
         {
           "dialect": "sqlite",
-          "sql": "CREATE TABLE IF NOT EXISTS \"anki_mapping\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"label\" TEXT NOT NULL UNIQUE, \"model\" TEXT NOT NULL, \"order\" INTEGER NOT NULL UNIQUE, \"export_field_keys\" TEXT NOT NULL, \"creator_field_keys\" TEXT NOT NULL, \"creator_collapsed_field_keys\" TEXT NOT NULL, \"tags\" TEXT NOT NULL, \"actions\" TEXT NOT NULL, \"enhancements\" TEXT NOT NULL, \"export_media_tags\" INTEGER NULL CHECK (\"export_media_tags\" IN (0, 1)), \"use_br_tags\" INTEGER NULL CHECK (\"use_br_tags\" IN (0, 1)), \"prepend_dictionary_names\" INTEGER NULL CHECK (\"prepend_dictionary_names\" IN (0, 1)));"
+          "sql": "CREATE TABLE IF NOT EXISTS \"anki_mapping\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"label\" TEXT NOT NULL UNIQUE, \"model\" TEXT NOT NULL, \"order\" INTEGER NOT NULL UNIQUE, \"export_field_keys\" TEXT NOT NULL, \"creator_field_keys\" TEXT NOT NULL, \"creator_collapsed_field_keys\" TEXT NOT NULL, \"tags\" TEXT NOT NULL, \"enhancements\" TEXT NOT NULL, \"export_media_tags\" INTEGER NULL CHECK (\"export_media_tags\" IN (0, 1)), \"use_br_tags\" INTEGER NULL CHECK (\"use_br_tags\" IN (0, 1)), \"prepend_dictionary_names\" INTEGER NULL CHECK (\"prepend_dictionary_names\" IN (0, 1)));"
         }
       ]
     },

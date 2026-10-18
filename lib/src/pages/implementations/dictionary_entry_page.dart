@@ -2,7 +2,6 @@ import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:spaces/spaces.dart';
-import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
@@ -49,16 +48,10 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
       ),
       child: ExpandablePanel(
         theme: ExpandableThemeData(
-          iconPadding: EdgeInsets.zero,
-          iconSize: Theme.of(context).textTheme.titleLarge?.fontSize,
-          iconRotationAngle: 0,
-          expandIcon: Icons.arrow_drop_down,
-          collapseIcon: Icons.arrow_drop_down,
-          iconColor: Theme.of(context).unselectedWidgetColor,
-          headerAlignment: ExpandablePanelHeaderAlignment.center,
+          hasIcon: false,
         ),
         controller: widget.expandableController,
-        header: _DictionaryEntryTagsWrap(entry: widget.entry),
+        header: _DictionaryEntryHeader(entry: widget.entry),
         collapsed: const SizedBox.shrink(),
         expanded: Padding(
           padding: EdgeInsets.only(
@@ -117,8 +110,8 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
   }
 }
 
-class _DictionaryEntryTagsWrap extends ConsumerWidget {
-  const _DictionaryEntryTagsWrap({
+class _DictionaryEntryHeader extends ConsumerWidget {
+  const _DictionaryEntryHeader({
     required this.entry,
   });
 
@@ -126,6 +119,7 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    AppModel appModel = ref.read(appProvider);
     Dictionary dictionary = entry.dictionary;
     List<Widget> children = [
       JidoujishoTag(
@@ -143,83 +137,35 @@ class _DictionaryEntryTagsWrap extends ConsumerWidget {
 
     Widget last = children.removeLast();
 
+    /// The panel's own icon would sit right of the buttons; it never rotates,
+    /// so a plain icon after the tags looks the same.
     children.add(
       Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(child: last),
-          SizedBox(
-            height: 22,
-            width: 22,
-            child: PopupMenuButton<VoidCallback>(
-              iconSize: 16,
-              padding: EdgeInsets.zero,
-              icon: Icon(
-                Icons.more_vert,
-                color: Theme.of(context).unselectedWidgetColor,
-              ),
-              color: Theme.of(context).popupMenuTheme.color,
-              tooltip: t.show_options,
-              onSelected: (value) => value(),
-              itemBuilder: (context) => getMenuItems(
-                context: context,
-                ref: ref,
-                heading: entry.heading,
-              ),
-            ),
-          )
+          Icon(
+            Icons.arrow_drop_down,
+            size: Theme.of(context).textTheme.titleLarge?.fontSize,
+            color: Theme.of(context).unselectedWidgetColor,
+          ),
         ],
       ),
     );
 
-    return Wrap(
-      children: children,
-    );
-  }
-
-  List<PopupMenuEntry<VoidCallback>> getMenuItems({
-    required BuildContext context,
-    required WidgetRef ref,
-    required DictionaryHeading heading,
-  }) {
-    AppModel appModel = ref.read(appProvider);
-    CreatorModel creatorModel = ref.read(creatorProvider);
-
-    List<QuickAction> filteredActions = appModel.lastSelectedMapping
-        .getActions(appModel: appModel)
-        .where((e) => e.showInSingleDictionary)
-        .toList();
-
-    return [
-      ...filteredActions.map((quickAction) {
-        return PopupMenuItem<VoidCallback>(
-          value: () async {
-            await quickAction.executeAction(
-              context: context,
-              ref: ref,
-              appModel: appModel,
-              creatorModel: creatorModel,
-              heading: heading,
-              selectedEntry: entry,
-            );
-
-            ref.invalidate(quickActionColorProvider(heading));
-          },
-          child: Row(
-            children: [
-              Icon(
-                quickAction.icon,
-                size: Theme.of(context).textTheme.bodyMedium?.fontSize,
-              ),
-              const Space.normal(),
-              Text(
-                quickAction.label,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
+    return Row(
+      children: [
+        Expanded(
+          child: Wrap(
+            children: children,
           ),
-        );
-      }),
-    ];
+        ),
+        DictionaryQuickActionsRow(
+          heading: entry.heading,
+          actions: appModel.entryQuickActions,
+          selectedEntry: entry,
+        ),
+      ],
+    );
   }
 }

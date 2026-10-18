@@ -198,7 +198,6 @@ void main() {
       expect(standard.exportFieldKeys, expected.exportFieldKeys);
       expect(standard.creatorFieldKeys, expected.creatorFieldKeys);
       expect(standard.tags, expected.tags);
-      expect(standard.actions, expected.actions);
       expect(standard.enhancements, expected.enhancements);
       expect(standard.useBrTags, isTrue);
     });

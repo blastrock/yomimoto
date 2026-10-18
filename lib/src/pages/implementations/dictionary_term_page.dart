@@ -146,21 +146,34 @@ class DictionaryTermPage extends ConsumerWidget {
   }
 }
 
-class _DictionaryTermActionsRow extends ConsumerStatefulWidget {
-  const _DictionaryTermActionsRow({
+/// A row of quick action buttons on a dictionary result: the heading's, or
+/// those of one of its definitions.
+class DictionaryQuickActionsRow extends ConsumerStatefulWidget {
+  /// Create the row of [actions] for [heading], acting on [selectedEntry]
+  /// when given.
+  const DictionaryQuickActionsRow({
     required this.heading,
+    required this.actions,
+    this.selectedEntry,
+    super.key,
   });
 
   /// The result made from a dictionary database search.
   final DictionaryHeading heading;
 
+  /// The actions to show, left to right.
+  final List<QuickAction> actions;
+
+  /// The definition the actions act on, or null for the whole [heading].
+  final DictionaryEntry? selectedEntry;
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _DictionaryTermActionsRowState();
+      _DictionaryQuickActionsRowState();
 }
 
-class _DictionaryTermActionsRowState
-    extends ConsumerState<_DictionaryTermActionsRow> {
+class _DictionaryQuickActionsRowState
+    extends ConsumerState<DictionaryQuickActionsRow> {
   VisibilityInfo? visibilityInfo;
 
   @override
@@ -230,22 +243,11 @@ class _DictionaryTermActionsRowState
     required Map<String, Color?> colors,
   }) {
     List<Widget> buttons = [];
-    for (int i = 0; i < appModel.maximumQuickActions; i++) {
-      String? actionName = appModel.lastSelectedMapping.actions![i];
-      QuickAction? quickAction;
-
-      if (actionName != null) {
-        quickAction = appModel.quickActions[actionName];
-      }
-      late Widget button;
-
-      if (quickAction == null) {
-        button = const SizedBox.shrink();
-      } else {
-        late Color enabledColor;
-        Color defaultColor = Theme.of(context).colorScheme.onSurface;
-        enabledColor = colors[quickAction.uniqueKey] ?? defaultColor;
-        button = Padding(
+    for (QuickAction quickAction in widget.actions) {
+      Color defaultColor = Theme.of(context).colorScheme.onSurface;
+      Color enabledColor = colors[quickAction.uniqueKey] ?? defaultColor;
+      buttons.add(
+        Padding(
           padding: Spacing.of(context).insets.onlyLeft.semiSmall,
           child: JidoujishoIconButton(
             busy: true,
@@ -260,29 +262,27 @@ class _DictionaryTermActionsRowState
             tooltip: quickAction.label,
             icon: quickAction.icon,
             onTap: () async {
-              await quickAction!.executeAction(
+              await quickAction.executeAction(
                 context: context,
                 ref: ref,
                 appModel: appModel,
                 creatorModel: creatorModel,
                 heading: widget.heading,
-                selectedEntry: null,
+                selectedEntry: widget.selectedEntry,
               );
 
               ref.invalidate(quickActionColorProvider(widget.heading));
             },
           ),
-        );
-      }
-
-      buttons.add(button);
+        ),
+      );
     }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
-      children: buttons.reversed.toList(),
+      children: buttons,
     );
   }
 }
@@ -484,8 +484,9 @@ class _DictionaryTermTopRow extends ConsumerWidget {
             right: Spacing.of(context).spaces.small,
             bottom: Spacing.of(context).spaces.small,
           ),
-          child: _DictionaryTermActionsRow(
+          child: DictionaryQuickActionsRow(
             heading: heading,
+            actions: appModel.headingQuickActions,
           ),
         ),
         Floatable(

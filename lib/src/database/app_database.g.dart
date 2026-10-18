@@ -3581,15 +3581,6 @@ class $AnkiMappingsTable extends AnkiMappings
         requiredDuringInsert: true,
       ).withConverter<List<String>>($AnkiMappingsTable.$convertertags);
   @override
-  late final GeneratedColumnWithTypeConverter<Map<int, String>, String>
-  actions = GeneratedColumn<String>(
-    'actions',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  ).withConverter<Map<int, String>>($AnkiMappingsTable.$converteractions);
-  @override
   late final GeneratedColumnWithTypeConverter<
     Map<String, Map<int, String>>,
     String
@@ -3656,7 +3647,6 @@ class $AnkiMappingsTable extends AnkiMappings
     creatorFieldKeys,
     creatorCollapsedFieldKeys,
     tags,
-    actions,
     enhancements,
     exportMediaTags,
     useBrTags,
@@ -3790,12 +3780,6 @@ class $AnkiMappingsTable extends AnkiMappings
           data['${effectivePrefix}enhancements'],
         )!,
       ),
-      actions: $AnkiMappingsTable.$converteractions.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}actions'],
-        )!,
-      ),
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}id'],
@@ -3816,8 +3800,6 @@ class $AnkiMappingsTable extends AnkiMappings
   $convertercreatorCollapsedFieldKeys = const StringListConverter();
   static TypeConverter<List<String>, String> $convertertags =
       const StringListConverter();
-  static TypeConverter<Map<int, String>, String> $converteractions =
-      const QuickActionsColumnConverter();
   static TypeConverter<Map<String, Map<int, String>>, String>
   $converterenhancements = const EnhancementsColumnConverter();
 }
@@ -3831,7 +3813,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
   final Value<List<String>> creatorFieldKeys;
   final Value<List<String>> creatorCollapsedFieldKeys;
   final Value<List<String>> tags;
-  final Value<Map<int, String>> actions;
   final Value<Map<String, Map<int, String>>> enhancements;
   final Value<bool?> exportMediaTags;
   final Value<bool?> useBrTags;
@@ -3845,7 +3826,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
     this.creatorFieldKeys = const Value.absent(),
     this.creatorCollapsedFieldKeys = const Value.absent(),
     this.tags = const Value.absent(),
-    this.actions = const Value.absent(),
     this.enhancements = const Value.absent(),
     this.exportMediaTags = const Value.absent(),
     this.useBrTags = const Value.absent(),
@@ -3860,7 +3840,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
     required List<String> creatorFieldKeys,
     required List<String> creatorCollapsedFieldKeys,
     required List<String> tags,
-    required Map<int, String> actions,
     required Map<String, Map<int, String>> enhancements,
     this.exportMediaTags = const Value.absent(),
     this.useBrTags = const Value.absent(),
@@ -3872,7 +3851,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
        creatorFieldKeys = Value(creatorFieldKeys),
        creatorCollapsedFieldKeys = Value(creatorCollapsedFieldKeys),
        tags = Value(tags),
-       actions = Value(actions),
        enhancements = Value(enhancements);
   static Insertable<AnkiMapping> custom({
     Expression<int>? id,
@@ -3883,7 +3861,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
     Expression<String>? creatorFieldKeys,
     Expression<String>? creatorCollapsedFieldKeys,
     Expression<String>? tags,
-    Expression<String>? actions,
     Expression<String>? enhancements,
     Expression<bool>? exportMediaTags,
     Expression<bool>? useBrTags,
@@ -3899,7 +3876,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
       if (creatorCollapsedFieldKeys != null)
         'creator_collapsed_field_keys': creatorCollapsedFieldKeys,
       if (tags != null) 'tags': tags,
-      if (actions != null) 'actions': actions,
       if (enhancements != null) 'enhancements': enhancements,
       if (exportMediaTags != null) 'export_media_tags': exportMediaTags,
       if (useBrTags != null) 'use_br_tags': useBrTags,
@@ -3917,7 +3893,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
     Value<List<String>>? creatorFieldKeys,
     Value<List<String>>? creatorCollapsedFieldKeys,
     Value<List<String>>? tags,
-    Value<Map<int, String>>? actions,
     Value<Map<String, Map<int, String>>>? enhancements,
     Value<bool?>? exportMediaTags,
     Value<bool?>? useBrTags,
@@ -3933,7 +3908,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
       creatorCollapsedFieldKeys:
           creatorCollapsedFieldKeys ?? this.creatorCollapsedFieldKeys,
       tags: tags ?? this.tags,
-      actions: actions ?? this.actions,
       enhancements: enhancements ?? this.enhancements,
       exportMediaTags: exportMediaTags ?? this.exportMediaTags,
       useBrTags: useBrTags ?? this.useBrTags,
@@ -3983,11 +3957,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
         $AnkiMappingsTable.$convertertags.toSql(tags.value),
       );
     }
-    if (actions.present) {
-      map['actions'] = Variable<String>(
-        $AnkiMappingsTable.$converteractions.toSql(actions.value),
-      );
-    }
     if (enhancements.present) {
       map['enhancements'] = Variable<String>(
         $AnkiMappingsTable.$converterenhancements.toSql(enhancements.value),
@@ -4018,7 +3987,6 @@ class AnkiMappingsCompanion extends UpdateCompanion<AnkiMapping> {
           ..write('creatorFieldKeys: $creatorFieldKeys, ')
           ..write('creatorCollapsedFieldKeys: $creatorCollapsedFieldKeys, ')
           ..write('tags: $tags, ')
-          ..write('actions: $actions, ')
           ..write('enhancements: $enhancements, ')
           ..write('exportMediaTags: $exportMediaTags, ')
           ..write('useBrTags: $useBrTags, ')
@@ -9865,7 +9833,6 @@ typedef $$AnkiMappingsTableCreateCompanionBuilder =
       required List<String> creatorFieldKeys,
       required List<String> creatorCollapsedFieldKeys,
       required List<String> tags,
-      required Map<int, String> actions,
       required Map<String, Map<int, String>> enhancements,
       Value<bool?> exportMediaTags,
       Value<bool?> useBrTags,
@@ -9881,7 +9848,6 @@ typedef $$AnkiMappingsTableUpdateCompanionBuilder =
       Value<List<String>> creatorFieldKeys,
       Value<List<String>> creatorCollapsedFieldKeys,
       Value<List<String>> tags,
-      Value<Map<int, String>> actions,
       Value<Map<String, Map<int, String>>> enhancements,
       Value<bool?> exportMediaTags,
       Value<bool?> useBrTags,
@@ -9940,12 +9906,6 @@ class $$AnkiMappingsTableFilterComposer
         column: $table.tags,
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
-
-  ColumnWithTypeConverterFilters<Map<int, String>, Map<int, String>, String>
-  get actions => $composableBuilder(
-    column: $table.actions,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
 
   ColumnWithTypeConverterFilters<
     Map<String, Map<int, String>>,
@@ -10022,11 +9982,6 @@ class $$AnkiMappingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get actions => $composableBuilder(
-    column: $table.actions,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<String> get enhancements => $composableBuilder(
     column: $table.enhancements,
     builder: (column) => ColumnOrderings(column),
@@ -10090,9 +10045,6 @@ class $$AnkiMappingsTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get tags =>
       $composableBuilder(column: $table.tags, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<Map<int, String>, String> get actions =>
-      $composableBuilder(column: $table.actions, builder: (column) => column);
-
   GeneratedColumnWithTypeConverter<Map<String, Map<int, String>>, String>
   get enhancements => $composableBuilder(
     column: $table.enhancements,
@@ -10153,7 +10105,6 @@ class $$AnkiMappingsTableTableManager
                 Value<List<String>> creatorCollapsedFieldKeys =
                     const Value.absent(),
                 Value<List<String>> tags = const Value.absent(),
-                Value<Map<int, String>> actions = const Value.absent(),
                 Value<Map<String, Map<int, String>>> enhancements =
                     const Value.absent(),
                 Value<bool?> exportMediaTags = const Value.absent(),
@@ -10168,7 +10119,6 @@ class $$AnkiMappingsTableTableManager
                 creatorFieldKeys: creatorFieldKeys,
                 creatorCollapsedFieldKeys: creatorCollapsedFieldKeys,
                 tags: tags,
-                actions: actions,
                 enhancements: enhancements,
                 exportMediaTags: exportMediaTags,
                 useBrTags: useBrTags,
@@ -10184,7 +10134,6 @@ class $$AnkiMappingsTableTableManager
                 required List<String> creatorFieldKeys,
                 required List<String> creatorCollapsedFieldKeys,
                 required List<String> tags,
-                required Map<int, String> actions,
                 required Map<String, Map<int, String>> enhancements,
                 Value<bool?> exportMediaTags = const Value.absent(),
                 Value<bool?> useBrTags = const Value.absent(),
@@ -10198,7 +10147,6 @@ class $$AnkiMappingsTableTableManager
                 creatorFieldKeys: creatorFieldKeys,
                 creatorCollapsedFieldKeys: creatorCollapsedFieldKeys,
                 tags: tags,
-                actions: actions,
                 enhancements: enhancements,
                 exportMediaTags: exportMediaTags,
                 useBrTags: useBrTags,

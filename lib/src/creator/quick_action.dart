@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
 
-/// An entity that executes an action when selected on the upper-right of a
-/// dictionary entry widget. An action is initialised at runtime in the
-/// initialisation step, and can be assigned to a quick action slot.
-/// When dictionary search results are displayed, the user can then tap on the
-/// icon representing the action to execute its functionality for a certain
-/// dictionary entry.
+/// An entity that executes an action when its icon is tapped on a dictionary
+/// result, either on the heading ([AppModel.headingQuickActions]) or on each
+/// of its definitions ([AppModel.entryQuickActions]). An action is initialised
+/// at runtime in the initialisation step.
 abstract class QuickAction {
   /// Initialise this action with the predetermined and hardset values.
   QuickAction({
@@ -16,7 +14,6 @@ abstract class QuickAction {
     required this.label,
     required this.description,
     required this.icon,
-    this.showInSingleDictionary = false,
   });
 
   /// A unique name that allows distinguishing this type from others,
@@ -34,10 +31,6 @@ abstract class QuickAction {
   /// An icon that will show the action if activated by the user in the
   /// quick menu.
   final IconData icon;
-
-  /// Whether or not to show this action in the single dictionary dropdown
-  /// options.
-  final bool showInSingleDictionary;
 
   /// Whether or not [initialise] has been called for this action.
   bool _initialised = false;

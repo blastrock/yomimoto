@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 214
+/// Strings: 209
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -245,18 +245,13 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get creator_exporting_as_enhancements_editing => 'Editing enhancements for profile';
 	String get creator_export_card => 'Create Card';
 	String get info_enhancements => 'Enhancements enable the automation of field editing prior to card creation. Pick a slot on the right of a field to allow use of an enhancement. Up to five right slots may be utilised for each field. The enhancement in the left slot of a field will be automatically applied in instant card creation or upon launch of the Card Creator.';
-	String get info_actions => 'Quick actions allow for instant card creation and other automations to be used on dictionary search results. Actions can be assigned via the slots below. Up to six slots may be utilised.';
 	String get no_more_available_enhancements => 'No more available enhancements for this field';
-	String get no_more_available_quick_actions => 'No more available quick actions';
 	String get assign_auto_enhancement => 'Assign Auto Enhancement';
 	String get assign_manual_enhancement => 'Assign Manual Enhancement';
 	String get remove_enhancement => 'Remove Enhancement';
 	String copy_of_mapping({required Object name}) => 'Copy of ${name}';
 	String get enter_search_term => 'Enter a search term...';
 	String get no_search_results => 'No search results found.';
-	String get edit_actions => 'Edit Dictionary Quick Actions';
-	String get remove_action => 'Remove Action';
-	String get assign_action => 'Assign Action';
 	String get no_sentences_found => 'No sentences found';
 	String get failed_online_service => 'Failed to communicate with online service';
 	String get search_label_before => 'Show all ';
@@ -467,18 +462,13 @@ extension on Translations {
 			case 'creator_exporting_as_enhancements_editing': return 'Editing enhancements for profile';
 			case 'creator_export_card': return 'Create Card';
 			case 'info_enhancements': return 'Enhancements enable the automation of field editing prior to card creation. Pick a slot on the right of a field to allow use of an enhancement. Up to five right slots may be utilised for each field. The enhancement in the left slot of a field will be automatically applied in instant card creation or upon launch of the Card Creator.';
-			case 'info_actions': return 'Quick actions allow for instant card creation and other automations to be used on dictionary search results. Actions can be assigned via the slots below. Up to six slots may be utilised.';
 			case 'no_more_available_enhancements': return 'No more available enhancements for this field';
-			case 'no_more_available_quick_actions': return 'No more available quick actions';
 			case 'assign_auto_enhancement': return 'Assign Auto Enhancement';
 			case 'assign_manual_enhancement': return 'Assign Manual Enhancement';
 			case 'remove_enhancement': return 'Remove Enhancement';
 			case 'copy_of_mapping': return ({required Object name}) => 'Copy of ${name}';
 			case 'enter_search_term': return 'Enter a search term...';
 			case 'no_search_results': return 'No search results found.';
-			case 'edit_actions': return 'Edit Dictionary Quick Actions';
-			case 'remove_action': return 'Remove Action';
-			case 'assign_action': return 'Assign Action';
 			case 'no_sentences_found': return 'No sentences found';
 			case 'failed_online_service': return 'Failed to communicate with online service';
 			case 'search_label_before': return 'Show all ';

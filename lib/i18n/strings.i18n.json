@@ -106,20 +106,14 @@
     "creator_export_card": "Create Card",
     "info_enhancements":
         "Enhancements enable the automation of field editing prior to card creation. Pick a slot on the right of a field to allow use of an enhancement. Up to five right slots may be utilised for each field. The enhancement in the left slot of a field will be automatically applied in instant card creation or upon launch of the Card Creator.",
-    "info_actions":
-        "Quick actions allow for instant card creation and other automations to be used on dictionary search results. Actions can be assigned via the slots below. Up to six slots may be utilised.",
     "no_more_available_enhancements":
         "No more available enhancements for this field",
-    "no_more_available_quick_actions": "No more available quick actions",
     "assign_auto_enhancement": "Assign Auto Enhancement",
     "assign_manual_enhancement": "Assign Manual Enhancement",
     "remove_enhancement": "Remove Enhancement",
     "copy_of_mapping": "Copy of $name",
     "enter_search_term": "Enter a search term...",
     "no_search_results": "No search results found.",
-    "edit_actions": "Edit Dictionary Quick Actions",
-    "remove_action": "Remove Action",
-    "assign_action": "Assign Action",
     "no_sentences_found": "No sentences found",
     "failed_online_service": "Failed to communicate with online service",
     "search_label_before": "Show all ",

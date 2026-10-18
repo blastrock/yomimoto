@@ -437,7 +437,6 @@ AnkiMappingsCompanion ankiMappingCompanion(AnkiMapping mapping) {
     creatorFieldKeys: mapping.creatorFieldKeys,
     creatorCollapsedFieldKeys: mapping.creatorCollapsedFieldKeys,
     tags: mapping.tags,
-    actions: mapping.actions!,
     enhancements: mapping.enhancements!,
     exportMediaTags: Value(mapping.exportMediaTags),
     useBrTags: Value(mapping.useBrTags),

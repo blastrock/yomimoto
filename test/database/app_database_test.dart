@@ -122,10 +122,6 @@ void main() {
           NullableStringListConverter();
       expect(nullable.fromSql(nullable.toSql(['term', null])), ['term', null]);
 
-      const QuickActionsColumnConverter actions = QuickActionsColumnConverter();
-      expect(actions.fromSql(actions.toSql({0: 'card_creator'})),
-          {0: 'card_creator'});
-
       const EnhancementsColumnConverter enhancements =
           EnhancementsColumnConverter();
       expect(

@@ -209,11 +209,17 @@ class AppModel with ChangeNotifier {
   /// time performance. Initialised with [populateQuickActions] at startup.
   late final Map<String, QuickAction> quickActions;
 
+  /// The actions shown on a dictionary result's heading, left to right. They
+  /// apply to the whole term. Initialised with [populateQuickActions].
+  late final List<QuickAction> headingQuickActions;
+
+  /// The actions shown on each definition of a dictionary result, left to
+  /// right. They apply to that definition only. Initialised with
+  /// [populateQuickActions].
+  late final List<QuickAction> entryQuickActions;
+
   /// Maximum number of manual enhancements in a field.
   final int maximumFieldEnhancements = 5;
-
-  /// Maximum number of quick actions.
-  final int maximumQuickActions = 6;
 
   /// Maximum number of search history items.
   final int maximumSearchHistoryItems = 60;
@@ -687,19 +693,20 @@ class AppModel with ChangeNotifier {
 
   /// Populate maps for actions at startup to optimise performance.
   void populateQuickActions() {
-    /// A list of actions that the app will support at runtime.
-    final List<QuickAction> availableQuickActions = [
+    headingQuickActions = List<QuickAction>.unmodifiable([
+      CopyToClipboardAction(),
+      PlayAudioAction(),
+    ]);
+    entryQuickActions = List<QuickAction>.unmodifiable([
+      ShareAction(),
       CardCreatorAction(),
       InstantExportAction(),
-      CopyToClipboardAction(),
-      ShareAction(),
-      PlayAudioAction(),
       AddToStashAction(),
-    ];
+    ]);
 
     quickActions = Map<String, QuickAction>.unmodifiable(
       Map<String, QuickAction>.fromEntries(
-        availableQuickActions.map(
+        [...headingQuickActions, ...entryQuickActions].map(
           (quickAction) => MapEntry(quickAction.uniqueKey, quickAction),
         ),
       ),
@@ -2082,28 +2089,6 @@ class AppModel with ChangeNotifier {
     required int slotNumber,
   }) async {
     mapping.enhancements![field.uniqueKey]!.remove(slotNumber);
-
-    await _store.putMapping(mapping);
-  }
-
-  /// Updates a given [mapping]'s persisted action for a given [slotNumber].
-  Future<void> setQuickAction(
-      {required AnkiMapping mapping,
-      required int slotNumber,
-      required QuickAction quickAction}) async {
-    mapping.actions![slotNumber] = quickAction.uniqueKey;
-
-    await _store.putMapping(mapping);
-
-    notifyListeners();
-  }
-
-  /// Removes a given [mapping]'s persisted action for a given [slotNumber].
-  Future<void> removeQuickAction({
-    required AnkiMapping mapping,
-    required int slotNumber,
-  }) async {
-    mapping.actions!.remove(slotNumber);
 
     await _store.putMapping(mapping);
   }

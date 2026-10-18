@@ -15,7 +15,6 @@ export 'src/utils/components/jidoujisho_popup_position.dart';
 export 'src/utils/components/jidoujisho_selectable_text.dart';
 export 'src/utils/components/jidoujisho_list_tile.dart';
 
-export 'src/utils/converters/quick_actions_converter.dart';
 export 'src/utils/converters/enhancements_converter.dart';
 
 

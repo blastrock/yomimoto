@@ -342,9 +342,6 @@ class AnkiMappings extends Table {
   /// Tags added to every exported card.
   TextColumn get tags => text().map(const StringListConverter())();
 
-  /// Quick actions on dictionary results, slot to action key.
-  TextColumn get actions => text().map(const QuickActionsColumnConverter())();
-
   /// Enhancements per field, slot to enhancement key.
   TextColumn get enhancements =>
       text().map(const EnhancementsColumnConverter())();

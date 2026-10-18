@@ -91,7 +91,6 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
           tags: [],
           order: 0,
           enhancements: AnkiMapping.defaultEnhancements,
-          actions: AnkiMapping.defaultActions,
           exportMediaTags: true,
           useBrTags: true,
           prependDictionaryNames: true,

@@ -130,7 +130,7 @@ freely, the `uniqueKey` cannot.
 | `DictionaryFormat` | `AppModel.populateDictionaryFormats` | `YomichanFormat`, `MigakuFormat` |
 | `Field` | `globalFields` (top of `app_model.dart`) | `SentenceField`, `TermField`, … 19 creator fields |
 | `Enhancement` | `AppModel.populateEnhancements` | per-field: Forvo audio, Massif/Tatoeba/ImmersionKit sentences, image pickers, … |
-| `QuickAction` | `AppModel.populateQuickActions` | the icon buttons on a dictionary result |
+| `QuickAction` | `AppModel.populateQuickActions` | the icon buttons on a dictionary result, in a fixed order: `headingQuickActions` on the term, `entryQuickActions` on each definition |
 
 To add or remove any of these, edit the corresponding `populate*` list in
 `lib/src/models/app_model.dart` — that is the single registry. Registration

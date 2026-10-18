@@ -22,7 +22,6 @@ class AnkiMapping {
     required this.useBrTags,
     required this.prependDictionaryNames,
     this.enhancements,
-    this.actions,
     this.id,
   });
 
@@ -58,7 +57,6 @@ class AnkiMapping {
       order: order,
       tags: [standardModelName],
       enhancements: defaultEnhancements,
-      actions: defaultActions,
       exportMediaTags: true,
       useBrTags: true,
       prependDictionaryNames: true,
@@ -143,16 +141,6 @@ class AnkiMapping {
     PitchAccentField.key,
   ];
 
-  /// A default map of quick actions to use for new mappings.
-  static const Map<int, String> defaultActions = {
-    0: CardCreatorAction.key,
-    1: InstantExportAction.key,
-    2: CopyToClipboardAction.key,
-    3: ShareAction.key,
-    4: PlayAudioAction.key,
-    5: AddToStashAction.key,
-  };
-
   /// The default mapping name which cannot be deleted or reused.
   static const String standardModelName = 'Yomimoto';
 
@@ -190,9 +178,6 @@ class AnkiMapping {
   /// Whether or not this mapping has any non-empty fields set.
   bool get isExportFieldsEmpty =>
       exportFieldKeys.where((e) => e != null).isEmpty;
-
-  /// Used to keep track of actions used in dictionary results.
-  Map<int, String>? actions;
 
   /// Used to keep track of enhancements used in the creator per field.
   late Map<String, Map<int, String>>? enhancements;
@@ -267,7 +252,6 @@ class AnkiMapping {
     int? order,
     int? id,
     Map<String, Map<int, String>>? enhancements,
-    Map<int, String>? actions,
     bool? exportMediaTags,
     bool? useBrTags,
     bool? prependDictionaryNames,
@@ -283,7 +267,6 @@ class AnkiMapping {
       order: order ?? this.order,
       id: id ?? this.id,
       enhancements: enhancements ?? this.enhancements,
-      actions: actions ?? this.actions,
       exportMediaTags: exportMediaTags ?? this.exportMediaTags,
       useBrTags: useBrTags ?? this.useBrTags,
       prependDictionaryNames:
@@ -305,11 +288,6 @@ class AnkiMapping {
   /// enhancements map.
   String? getAutoFieldEnhancementName({required Field field}) {
     return (enhancements![field.uniqueKey] ?? {})[autoModeSlotNumber];
-  }
-
-  /// Returns a list of action names active in the persisted actions map.
-  List<String> getActionNames() {
-    return actions!.values.toList();
   }
 
   /// Returns a list of enhancements active for a certain field in the
@@ -337,16 +315,6 @@ class AnkiMapping {
 
     Enhancement? enhancement = appModel.enhancements[field]![enhancementName];
     return enhancement;
-  }
-
-  /// Returns a list of actions active for the persisted actions map.
-  List<QuickAction> getActions({required AppModel appModel}) {
-    List<String> actionNames = getActionNames();
-    List<QuickAction> actions = actionNames
-        .map((enhancementName) => appModel.quickActions[enhancementName]!)
-        .toList();
-
-    return actions;
   }
 
   @override

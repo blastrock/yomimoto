@@ -915,14 +915,6 @@ class AnkiMapping extends Table with TableInfo {
     requiredDuringInsert: true,
     $customConstraints: 'NOT NULL',
   );
-  late final GeneratedColumn<String> actions = GeneratedColumn<String>(
-    'actions',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
-  );
   late final GeneratedColumn<String> enhancements = GeneratedColumn<String>(
     'enhancements',
     aliasedName,
@@ -965,7 +957,6 @@ class AnkiMapping extends Table with TableInfo {
     creatorFieldKeys,
     creatorCollapsedFieldKeys,
     tags,
-    actions,
     enhancements,
     exportMediaTags,
     useBrTags,

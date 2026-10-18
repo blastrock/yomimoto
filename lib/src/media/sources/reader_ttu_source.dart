@@ -271,11 +271,15 @@ class ReaderTtuSource extends ReaderMediaSource {
         message: t.ttu_importing,
         task: () => TtuHostOperations.run(
           (bridge) async {
-            await bridge.importBooks(
-              urls,
-              timeout: Duration(seconds: 60 + totalBytes ~/ (256 * 1024)),
-            );
-            await syncLibrary(appModel: appModel, bridge: bridge);
+            try {
+              await bridge.importBooks(
+                urls,
+                timeout: Duration(seconds: 60 + totalBytes ~/ (256 * 1024)),
+              );
+            } finally {
+              // A failed import may still have stored some of the books.
+              await syncLibrary(appModel: appModel, bridge: bridge);
+            }
           },
           importDirectory: staging,
         ),

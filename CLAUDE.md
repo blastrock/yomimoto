@@ -58,7 +58,7 @@ suppressing them; `dart fix --apply` handles most of the mechanical ones.
 
 `flutter test` runs the unit tests in `test/`, which mirrors `lib/src/`. They
 cover pure code (text selection, stash item, sentence splitting, the ttu
-bridge's event parsing) and the database layer (schema, queries, `AppStore`,
+bridge's event parsing, the import handler's path resolution) and the database layer (schema, queries, `AppStore`,
 dictionary import and deletion), which runs against in-memory or temp-file
 SQLite: no device, no mocks. They characterise current behaviour, oddities
 included, rather than prescribe it. The strict lint set applies to them too.

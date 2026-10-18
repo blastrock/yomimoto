@@ -17,12 +17,16 @@ class TtuImportPathHandler extends CustomPathHandler {
 
   /// The file in [directory] that [path], relative to `/import/`, names, or
   /// null if it names none.
+  ///
+  /// The asset loader passes the URL's path already decoded and without its
+  /// query, so [path] holds the file name as is: decoding it again fails on
+  /// any non-ASCII character or `%`.
   static File? stagedFile(Directory directory, String path) {
-    List<String> segments = path.split('?').first.split('/');
+    List<String> segments = path.split('/');
     if (segments.length != 2 || int.tryParse(segments[0]) == null) {
       return null;
     }
-    String name = Uri.decodeComponent(segments[1]);
+    String name = segments[1];
     if (name.isEmpty || name.contains('/') || name == '..' || name == '.') {
       return null;
     }

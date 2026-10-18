@@ -99,19 +99,13 @@ abstract class MediaSource extends HomeTab {
   /// can be supplied as a launch parameter.
   BaseSourcePage buildLaunchPage({MediaItem? item});
 
-  /// If this is not null, this action is executed when the user taps on the
-  /// search bar. Sources that do not have a search action should have this
-  /// defined.
+  /// Executed when the user taps on the search bar of a source that does not
+  /// implement search. Does nothing unless overridden.
   Future<void> onSearchBarTap({
     required BuildContext context,
     required WidgetRef ref,
     required AppModel appModel,
-  }) async {
-    unawaited(appModel.openMedia(
-      ref: ref,
-      mediaSource: this,
-    ));
-  }
+  }) async {}
 
   /// This function can be used to clean up resources associated with a
   /// media item upon clearing it.

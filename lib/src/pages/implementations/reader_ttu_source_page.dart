@@ -14,7 +14,7 @@ import 'package:yuuna/utils.dart';
 class ReaderTtuSourcePage extends BaseSourcePage {
   /// Create an instance of this page.
   const ReaderTtuSourcePage({
-    super.item,
+    required MediaItem super.item,
     this.peekPosition,
     super.key,
   });
@@ -44,8 +44,8 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    MediaItem? item = widget.item;
-    if (item != null && mediaSource.bookIdOf(item) != null) {
+    MediaItem item = widget.item!;
+    if (mediaSource.bookIdOf(item) != null) {
       unawaited(appModelNoUpdate.putMediaItem(item));
     }
   }
@@ -189,11 +189,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
   /// The reader page to load: the book, at the peek position if any.
   String get initialPath {
-    MediaItem? item = widget.item;
-    if (item == null) {
-      return 'manage.html';
-    }
-
+    MediaItem item = widget.item!;
     int? peekPosition = widget.peekPosition;
     return peekPosition == null
         ? item.mediaIdentifier

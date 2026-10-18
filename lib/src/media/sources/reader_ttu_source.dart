@@ -390,7 +390,9 @@ class ReaderTtuSource extends ReaderMediaSource {
   BaseSourcePage buildLaunchPage({
     MediaItem? item,
   }) {
-    return ReaderTtuSourcePage(item: item, peekPosition: _peekPosition);
+    // ttu's own library is not reachable from the app: every launch names a
+    // book or a page of the reader.
+    return ReaderTtuSourcePage(item: item!, peekPosition: _peekPosition);
   }
 
   @override

@@ -4,8 +4,8 @@ Migrated from Flutter 3.13.5 / Dart 3.0 / JDK 11 / AGP 7.1.2 in August 2026.
 
 | | |
 |---|---|
-| Flutter | 3.44.8 (Dart 3.12.2) |
-| JDK | 21 (Flutter's floor for 3.44 is 17) |
+| Flutter | 3.47.7 (Dart 3.13.5) |
+| JDK | 21 (Flutter's floor for 3.47 is 17) |
 | Gradle | 8.14.3 |
 | AGP | 8.11.1 |
 | Kotlin Gradle Plugin | 2.2.20 |
@@ -34,10 +34,14 @@ published APK with `apksigner verify --print-certs`.
 
 ## Why AGP 8, not AGP 9
 
-`flutter create` on 3.44 emits Gradle 9.1.0 / AGP 9.0.1. We are on the versions
-Flutter's own `DependencyVersionChecker` treats as current instead (it warns
-below AGP 8.11.1 / Gradle 8.14 / KGP 2.2.20 and errors below AGP 8.6 / Gradle
-8.7 / Java 17). Two things in this project depend on staying below 9:
+`flutter create` on 3.47 emits Gradle 9.3.1 / AGP 9.1.0 / KGP 2.4.0. Flutter's
+own `DependencyVersionChecker` warns below AGP 9.0.1 / Gradle 9.1.0 / KGP
+2.3.20 ("support … will soon be dropped", printed on every build) and errors
+below AGP 8.11.1 / Gradle 8.14 / KGP 2.2.20 / Java 17. **We are exactly on that
+error floor**: the next Flutter release that raises it breaks the build, short
+of `--android-skip-build-dependency-validation`. Check its thresholds
+(`packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt`)
+before upgrading Flutter. Two things in this project depend on staying below 9:
 
 - `android/app/build.gradle` renames APK outputs and offsets per-ABI version
   codes through the **legacy variant API** (`applicationVariants.all`), which
@@ -74,7 +78,6 @@ at the constraint itself:
 | `targetSdk` | 32 | Raising it changes runtime behaviour, not just the build | granular media permissions, predictive back, edge-to-edge, 16 KB page-size audit |
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
-| `sqlite3` | 3.5.x | 3.6+ needs `hooks` ^2.2 → `record_use` → `meta` ^1.19, and Flutter 3.44 pins `meta` 1.18 | A Flutter release pinning `meta` ≥ 1.19 |
 | `dependency_validator` | removed | Needs analyzer < 13; drift_dev and dart_mappable_builder need ≥ 13 | A dependency_validator release supporting analyzer ≥ 13 |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |
 

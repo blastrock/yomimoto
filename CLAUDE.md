@@ -75,7 +75,7 @@ freshness check is deterministic.
 ## Toolchain
 
 Read **`docs/TOOLCHAIN.md`** before touching `pubspec.yaml` or anything under
-`android/`. It records the versions (Flutter 3.44.8 / JDK 21 / AGP 8.11.1,
+`android/`. It records the versions (Flutter 3.47.7 / JDK 21 / AGP 8.11.1,
 compileSdk 36 / targetSdk 32 / minSdk 24), and — more importantly — *what is
 pinned below latest and why*: AGP stays on 8 because `app/build.gradle` uses the
 legacy variant API and plugins still call `jcenter()`; `targetSdk` stays at 32;

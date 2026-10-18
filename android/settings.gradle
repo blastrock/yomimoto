@@ -18,9 +18,9 @@ pluginManagement {
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    // Held at the versions Flutter 3.44 considers current (its
-    // DependencyVersionChecker warns below AGP 8.11.1 / KGP 2.2.20 and errors
-    // below AGP 8.6 / Gradle 8.7). Deliberately NOT the 9.x line the
+    // Held at the lowest versions Flutter 3.47 accepts (its
+    // DependencyVersionChecker errors below AGP 8.11.1 / Gradle 8.14 / KGP
+    // 2.2.20, and warns below 9.x). Deliberately NOT the 9.x line the
     // `flutter create` template emits: AGP 9 drops the legacy variant API that
     // app/build.gradle uses to rename APKs and offset per-ABI version codes,
     // and Gradle 9 removes `jcenter()`, which several plugins in this graph

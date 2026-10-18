@@ -3,8 +3,8 @@ description: A book reader, dictionary and card creation toolkit for e-ink Andro
 publish_to: 'none'
 version: 1.0.0+1
 environment:
-  sdk: ^3.12.0
-  flutter: ^3.44.0
+  sdk: ^3.13.0
+  flutter: ^3.47.0
 
 dependencies:
   async_zip: ^0.1.0
@@ -94,10 +94,9 @@ dependencies:
     git:
       url: https://github.com/arianneorpilla/spaces
       ref: master
-  # Held at 3.5: sqlite3 3.6+ needs hooks ^2.2, whose record_use needs meta
-  # ^1.19, and Flutter 3.44 pins meta 1.18. Bundles SQLite through its build
-  # hook; sqlite3_flutter_libs is end-of-life and not needed.
-  sqlite3: ^3.5.2
+  # Bundles SQLite through its build hook; sqlite3_flutter_libs is end-of-life
+  # and not needed.
+  sqlite3: ^3.7.1
   stack_trace: ^1.11.1
   transparent_image: ^2.0.1
   url_launcher: ^6.0.20

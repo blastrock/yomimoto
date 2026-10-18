@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
@@ -14,8 +15,9 @@ class TtuImportPathHandler extends CustomPathHandler {
   /// Directory holding the staged files, one numbered subdirectory per file.
   final Directory directory;
 
-  @override
-  Future<WebResourceResponse?> handle(String path) async {
+  /// The file in [directory] that [path], relative to `/import/`, names, or
+  /// null if it names none.
+  static File? stagedFile(Directory directory, String path) {
     List<String> segments = path.split('?').first.split('/');
     if (segments.length != 2 || int.tryParse(segments[0]) == null) {
       return null;
@@ -25,14 +27,36 @@ class TtuImportPathHandler extends CustomPathHandler {
       return null;
     }
 
-    File file = File(p.join(directory.path, segments[0], name));
-    if (!file.existsSync()) {
-      return null;
-    }
-
-    return WebResourceResponse(
-      contentType: lookupMimeType(name) ?? 'application/octet-stream',
-      data: await file.readAsBytes(),
-    );
+    return File(p.join(directory.path, segments[0], name));
   }
+
+  // Returning null would send the request on to the network, where the
+  // origin does not exist, and ttu would only see a `TypeError` from
+  // `fetch`. Every path under /import/ is answered here instead.
+  @override
+  Future<WebResourceResponse?> handle(String path) async {
+    try {
+      File? file = stagedFile(directory, path);
+      if (file == null || !file.existsSync()) {
+        debugPrint('ttu import: no staged file for $path');
+        return _error(404, 'Not Found');
+      }
+
+      return WebResourceResponse(
+        contentType: lookupMimeType(file.path) ?? 'application/octet-stream',
+        data: await file.readAsBytes(),
+      );
+    } catch (error) {
+      debugPrint('ttu import: cannot serve $path: $error');
+      return _error(500, 'Internal Server Error');
+    }
+  }
+
+  WebResourceResponse _error(int statusCode, String reasonPhrase) =>
+      WebResourceResponse(
+        contentType: 'text/plain',
+        statusCode: statusCode,
+        reasonPhrase: reasonPhrase,
+        data: Uint8List(0),
+      );
 }

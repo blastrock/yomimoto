@@ -28,7 +28,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
 
   final ScrollController _scrollController = ScrollController();
 
-  late final TextEditingController _debounceDelayController;
   late final TextEditingController _fontSizeController;
   late final TextEditingController _maximumTermsController;
 
@@ -48,10 +47,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _initialFontSize =
         _appModel.preferences.get(Preferences.dictionaryFontSize);
 
-    _debounceDelayController = TextEditingController(
-      text:
-          _appModel.preferences.get(Preferences.searchDebounceDelay).toString(),
-    );
     _fontSizeController = TextEditingController(
       text:
           _appModel.preferences.get(Preferences.dictionaryFontSize).toString(),
@@ -64,7 +59,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _debounceDelayController.dispose();
     _fontSizeController.dispose();
     _maximumTermsController.dispose();
 
@@ -120,24 +114,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 value: appModel.preferences.get(Preferences.autoSearch),
                 toggle: () =>
                     appModel.preferences.toggle(Preferences.autoSearch),
-              ),
-              buildNumberField(
-                controller: _debounceDelayController,
-                label: t.auto_search_debounce_delay,
-                suffixText: t.unit_milliseconds,
-                defaultValue:
-                    Preferences.searchDebounceDelay.defaultValue.toString(),
-                onChanged: (value) {
-                  int delay = int.tryParse(value) ??
-                      Preferences.searchDebounceDelay.defaultValue;
-                  if (delay.isNegative) {
-                    delay = Preferences.searchDebounceDelay.defaultValue;
-                    _debounceDelayController.text = delay.toString();
-                  }
-
-                  appModel.preferences
-                      .set(Preferences.searchDebounceDelay, delay);
-                },
               ),
               buildNumberField(
                 controller: _fontSizeController,

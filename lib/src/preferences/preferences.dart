@@ -27,10 +27,6 @@ abstract final class Preferences {
   static const Preference<bool> autoSearch =
       Preference('auto_search', defaultValue: true);
 
-  /// The delay in milliseconds between typing and an automatic search.
-  static const Preference<int> searchDebounceDelay =
-      Preference('auto_search_debounce_delay', defaultValue: 100);
-
   /// The font size of dictionary meanings.
   static const Preference<double> dictionaryFontSize =
       Preference('dictionary_entry_font_size', defaultValue: 16);

@@ -41,6 +41,10 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   /// Shortcut for accessing the app-wide theme.
   ThemeData get theme => Theme.of(context);
 
+  /// The delay between typing in a dictionary search bar and the automatic
+  /// search.
+  Duration get searchDebounceDelay => const Duration(milliseconds: 250);
+
   /// Get the selection controls for a [SelectableText].
   MaterialTextSelectionControls get selectionControls =>
       JidoujishoTextSelectionControls(

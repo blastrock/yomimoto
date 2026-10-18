@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 216
+/// Strings: 214
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -327,10 +327,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
-	String get unit_milliseconds => 'ms';
 	String get unit_pixels => 'px';
 	String get auto_search => 'Auto search';
-	String get auto_search_debounce_delay => 'Auto search debounce delay';
 	String get dictionary_font_size => 'Dictionary font size';
 	String get close_on_export => 'Close on Export';
 	String get close_on_export_on => 'The Card Creator will now automatically close upon card export.';
@@ -551,10 +549,8 @@ extension on Translations {
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';
-			case 'unit_milliseconds': return 'ms';
 			case 'unit_pixels': return 'px';
 			case 'auto_search': return 'Auto search';
-			case 'auto_search_debounce_delay': return 'Auto search debounce delay';
 			case 'dictionary_font_size': return 'Dictionary font size';
 			case 'close_on_export': return 'Close on Export';
 			case 'close_on_export_on': return 'The Card Creator will now automatically close upon card export.';

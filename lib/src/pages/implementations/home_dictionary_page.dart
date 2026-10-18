@@ -115,9 +115,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       onFocusChanged: (focused) => onFocusChanged(focused: focused),
       onQueryChanged: onQueryChanged,
       onSubmitted: search,
-      debounceDelay: Duration(
-          milliseconds:
-              appModel.preferences.get(Preferences.searchDebounceDelay)),
+      debounceDelay: searchDebounceDelay,
       leadingActions: [
         buildDictionaryButton(),
         buildBackButton(),

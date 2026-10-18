@@ -107,9 +107,7 @@ class _RecursiveDictionaryPageState
       transition: SlideFadeFloatingSearchBarTransition(),
       automaticallyImplyBackButton: false,
       isScrollControlled: true,
-      debounceDelay: Duration(
-          milliseconds:
-              appModel.preferences.get(Preferences.searchDebounceDelay)),
+      debounceDelay: searchDebounceDelay,
       onFocusChanged: (focused) {
         if (!focused) {
           if (widget.killOnPop) {

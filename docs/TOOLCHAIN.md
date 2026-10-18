@@ -16,6 +16,22 @@ Build: `flutter build apk --release --split-per-abi`. Outputs land in
 `build/app/outputs/apk/release/` as `yomimoto_<version>-<abi>.apk`, with
 version codes `100 * pubspecBuildNumber + {armeabi 1, arm64 2, x86_64 3}`.
 
+Signed release builds go through `tool/build_release.sh`, which prompts for
+the keystore password and passes it to Gradle as `KEYSTORE_PASSWORD` (set it
+beforehand to skip the prompt); the password is never stored. The keystore
+must be PKCS12, with one password for the store and the key. Its location
+and alias come from `android/key.properties`, which is gitignored and never
+committed:
+
+```properties
+storeFile=/absolute/path/to/release.keystore
+keyAlias=yomimoto
+```
+
+A relative `storeFile` resolves against `android/app/`. Without the file or
+the password, release builds fail; debug builds are unaffected. Check a
+published APK with `apksigner verify --print-certs`.
+
 ## Why AGP 8, not AGP 9
 
 `flutter create` on 3.44 emits Gradle 9.1.0 / AGP 9.0.1. We are on the versions

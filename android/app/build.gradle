@@ -6,6 +6,16 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// Release signing reads the keystore path and alias from android/key.properties
+// (gitignored, see docs/TOOLCHAIN.md) and the password from KEYSTORE_PASSWORD,
+// which tool/build_release.sh prompts for. Without the file, release builds
+// fail rather than being signed with another key.
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withReader("UTF-8") { keystoreProperties.load(it) }
+}
+
 android {
     namespace "app.arianneorpilla.yuuna"
     compileSdk 36
@@ -54,10 +64,21 @@ android {
         versionName flutter.versionName
     }
 
+    signingConfigs {
+        release {
+            // PKCS12 keystores have a single password for the store and its
+            // keys.
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword System.getenv("KEYSTORE_PASSWORD")
+            storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
 
         debug {

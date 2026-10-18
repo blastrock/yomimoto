@@ -49,6 +49,7 @@ dart run slang                                             # regenerate lib/i18n
 flutter analyze                                            # must report no issues, infos included
 flutter test                                               # unit tests in test/
 flutter build apk --release --split-per-abi
+tool/build_release.sh                                      # the same, signed: prompts for the keystore password
 ```
 
 `flutter analyze` is clean and must stay clean: it exits non-zero on any

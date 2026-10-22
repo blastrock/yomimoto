@@ -188,6 +188,26 @@ void main() {
     });
   }
 
+  for (var (label, definitions, stored) in [
+    ('an empty list', '[]', '[]'),
+    ('a text element without text', '[{"type":"text"}]', '[]'),
+    ('a text element with null text', '[{"type":"text","text":null}]', '[]'),
+    (
+      'structured content that is a string',
+      '[{"type":"structured-content","content":"plain"}]',
+      '["\\"plain\\""]'
+    ),
+  ]) {
+    test('stores definitions of $label', () {
+      importBanks(raw, 'D', [
+        bank('term_bank_1.json',
+            '[["猫","ねこ","","",1,$definitions,1,""]]'),
+      ]);
+      expect(raw.select('SELECT definitions FROM entry').single['definitions'],
+          stored);
+    });
+  }
+
   test('a tag sorting order that is not an integer fails the import', () {
     expect(
       () => importBanks(raw, 'D', [

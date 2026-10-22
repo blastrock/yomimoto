@@ -219,8 +219,8 @@ const String _stageTermsSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
 SELECT r.value->>0, r.value->>1, r.value->>2, r.value->>4,
   CASE WHEN json_type(r.value->5) = 'array' THEN (
-    SELECT CASE WHEN min(bad) = 0 THEN json_group_array(d) FILTER (
-        WHERE d IS NOT NULL) END
+    SELECT CASE WHEN max(bad) THEN NULL
+      ELSE json_group_array(d) FILTER (WHERE d IS NOT NULL) END
     FROM (
       SELECT CASE
         WHEN e.type = 'text' THEN e.atom
@@ -231,7 +231,8 @@ SELECT r.value->>0, r.value->>1, r.value->>2, r.value->>4,
           THEN COALESCE(json(e.value->'content'), 'null') || ''
       END AS d,
       CASE WHEN e.type = 'object' AND e.value->>'type' = 'text'
-        THEN json_type(e.value, '\$.text') NOT IN ('text', 'null')
+        THEN COALESCE(
+          json_type(e.value, '\$.text') NOT IN ('text', 'null'), 0)
         ELSE 0 END AS bad
       FROM json_each(r.value->5) e
       ORDER BY e.id

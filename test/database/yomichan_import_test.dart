@@ -155,6 +155,46 @@ void main() {
     importBanks(raw, 'D', [], progress: progress);
     expect(progress, isEmpty);
     expect(countRows(raw, 'entry'), 0);
+    for (String row in [
+      '["犬","a","",""]',
+      '["犬","a","","",["x",null],{}]',
+      '["犬","a","","",[{"a":1}],{}]',
+      '["犬","a","","",[true],{}]',
+      '["犬",{},"","",[],{}]',
+      '["犬","",[],"",[],{}]',
+      '["犬","","",{},[],{}]',
+      '[{},"","",""]',
+    ]) {
+      expect(
+          () => importBanks(
+              raw, 'K', [bank('kanji_bank_1.json', '[$row]')]),
+          throwsA(isA<SqliteException>()),
+          reason: row);
+    }
+  });
+
+  test('fails the import on wrongly typed term fields', () {
+    for (String row in [
+      '[{},"ね","","",0,[],1,""]',
+      '["猫",[],"","",0,[],1,""]',
+      '["猫","ね","","",true,[],1,""]',
+      '["猫","ね","","",0,[],1,{}]',
+      '["猫","ね",{},"",0,[],1,""]',
+    ]) {
+      expect(
+          () => importBanks(
+              raw, 'T', [bank('term_bank_1.json', '[$row]')]),
+          throwsA(isA<SqliteException>()),
+          reason: row);
+    }
+    expect(countRows(raw, 'entry'), 0);
+  });
+
+  test('null definition tags still import', () {
+    importBanks(raw, 'T', [
+      bank('term_bank_1.json', '[["猫","ね",null,"",0,[],1,""]]'),
+    ]);
+    expect(countRows(raw, 'entry'), 1);
   });
 
   test('popularity given as a numeric string is accepted', () {

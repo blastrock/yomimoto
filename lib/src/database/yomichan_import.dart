@@ -210,7 +210,19 @@ ON CONFLICT (dictionary_id, name) DO UPDATE SET
   category = excluded.category, sorting_order = excluded.sorting_order,
   notes = excluded.notes, popularity = excluded.popularity''';
 
-/// Stage a term bank (`?1`: its bytes). Definitions are converted as
+/// SQL giving [value], the element [index] of the JSON array [row], when that
+/// element is a string or a number, which SQLite converts to text or real
+/// without loss, and NULL otherwise: a missing element, `null`, a boolean, an
+/// object or an array. The staging columns reject NULL.
+String _scalar(String row, int index, String value) =>
+    "CASE WHEN json_type($row, '\$[$index]') IN ('text', 'integer', 'real') "
+    'THEN $value END';
+
+/// Stage a term bank (`?1`: its bytes). The term, the reading, the popularity
+/// and the term tags must be strings or numbers, and the definition tags a
+/// string, a number or `null`; a row with anything else, or with a missing
+/// element, fails the import (the definitions column is made NULL for a bad
+/// definition tags, which the column rejects). Definitions are converted as
 /// `YomichanFormat.processDefinition` does: a string as is, a text element's
 /// text, the content of structured content and images as JSON, anything else
 /// dropped. The outer row is aliased `r` because inside the subquery a bare
@@ -218,10 +230,14 @@ ON CONFLICT (dictionary_id, name) DO UPDATE SET
 /// string, or definitions that are not a list, make the value NULL, which the
 /// column rejects. `|| ''` strips the JSON subtype, so the content is added to
 /// the array as a string.
-const String _stageTermsSql = '''
+final String _stageTermsSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
-SELECT r.value->>0, r.value->>1, r.value->>2, r.value->>4,
-  CASE WHEN json_type(r.value->5) = 'array' THEN (
+SELECT ${_scalar('r.value', 0, 'r.value->>0')},
+  ${_scalar('r.value', 1, 'r.value->>1')}, r.value->>2,
+  ${_scalar('r.value', 4, 'r.value->>4')},
+  CASE WHEN json_type(r.value->5) = 'array'
+      AND json_type(r.value, '\$[2]') IN ('null', 'text', 'integer', 'real')
+    THEN (
     SELECT CASE WHEN max(bad) THEN NULL
       ELSE json_group_array(d) FILTER (WHERE d IS NOT NULL) END
     FROM (
@@ -240,7 +256,7 @@ SELECT r.value->>0, r.value->>1, r.value->>2, r.value->>4,
       FROM json_each(r.value->5) e
       ORDER BY e.id
     )) END,
-  r.value->>7
+  ${_scalar('r.value', 7, 'r.value->>7')}
 FROM json_each(CAST(?1 AS TEXT)) r''';
 
 /// The characters trimmed from kanji definitions: the whitespace Dart's `trim`
@@ -272,14 +288,19 @@ String _kanjiHasReading(String text) =>
 /// `prepareEntriesYomichanFormat` builds it: a section for the on'yomi (音読み)
 /// and one for the kun'yomi (訓読み) unless blank, one for the meanings (意味)
 /// unless there are none, and the whole trimmed. A kanji whose definition is
-/// empty is left out. A reading that is not a string, or meanings that are not
-/// a list, make the definition NULL, which the column rejects.
+/// empty is left out. The term, the readings and the tags must be strings or
+/// numbers and the meanings a list of them; a kanji with anything else, or
+/// with a missing element, fails the import (its definition is NULL, which the
+/// column rejects).
 final String _stageKanjiSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
 SELECT term, '', NULL, 0, CASE WHEN definition IS NOT NULL
   THEN json_array(definition) END, term_tags FROM (
   SELECT term, term_tags, CASE
-    WHEN onyomi IS NULL OR kunyomi IS NULL OR json_type(meanings) <> 'array'
+    WHEN term IS NULL OR term_tags IS NULL OR onyomi IS NULL
+        OR kunyomi IS NULL OR json_type(meanings) IS NOT 'array'
+        OR EXISTS (SELECT 1 FROM json_each(meanings)
+          WHERE type NOT IN ('text', 'integer', 'real'))
       THEN NULL
     ELSE trim(
       ${_kanjiSection('音読み', _kanjiPieces('onyomi'), _kanjiHasReading('onyomi'))} ||
@@ -287,8 +308,11 @@ SELECT term, '', NULL, 0, CASE WHEN definition IS NOT NULL
       ${_kanjiSection('意味', 'meanings', 'json_array_length(meanings) > 0')},
       $_kanjiTrimmed) END AS definition
   FROM (
-    SELECT r.value->>0 AS term, r.value->>1 AS onyomi, r.value->>2 AS kunyomi,
-      r.value->>3 AS term_tags, r.value->4 AS meanings
+    SELECT ${_scalar('r.value', 0, 'r.value->>0')} AS term,
+      ${_scalar('r.value', 1, 'r.value->>1')} AS onyomi,
+      ${_scalar('r.value', 2, 'r.value->>2')} AS kunyomi,
+      ${_scalar('r.value', 3, 'r.value->>3')} AS term_tags,
+      r.value->4 AS meanings
     FROM json_each(CAST(?1 AS TEXT)) r))
 WHERE definition IS NULL OR definition <> ''
 ''';

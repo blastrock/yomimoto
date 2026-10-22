@@ -228,4 +228,61 @@ void main() {
     ]);
     expect(countRows(raw, 'entry'), 1);
   });
+
+  test('imports a kanji with its readings and meanings', () {
+    importBanks(raw, 'K', [
+      bank('tag_bank_1.json', '[["jouyou","misc",0,"常用",0]]'),
+      bank('kanji_bank_1.json',
+          '[["猫","ビョウ ミョウ","ねこ","jouyou",["cat","feline"],{}]]'),
+    ]);
+    expect(raw.select('SELECT term, reading FROM heading').single,
+        {'term': '猫', 'reading': ''});
+    expect(
+        jsonDecode(raw.select('SELECT definitions FROM entry').single[
+            'definitions'] as String),
+        ['音読み\n  • ビョウ\n  • ミョウ\n\n訓読み\n  • ねこ\n\n意味\n  • cat\n  • feline']);
+    expect(countRows(raw, 'heading_tag'), 1);
+  });
+
+  test('skips empty kanji sections', () {
+    importBanks(raw, 'K', [
+      bank('kanji_bank_1.json', '[["犬","","いぬ","",[],{}]]'),
+    ]);
+    expect(
+        jsonDecode(raw.select('SELECT definitions FROM entry').single[
+            'definitions'] as String),
+        ['訓読み\n  • いぬ']);
+  });
+
+  test('keeps empty kanji reading pieces as bullets', () {
+    importBanks(raw, 'K', [
+      bank('kanji_bank_1.json', r'[["犬","a  b","","",["\"q\""],{}]]'),
+    ]);
+    expect(
+        jsonDecode(raw.select('SELECT definitions FROM entry').single[
+            'definitions'] as String),
+        ['音読み\n  • a\n  • \n  • b\n\n意味\n  • "q"']);
+  });
+
+  test('skips a kanji with nothing to say', () {
+    importBanks(raw, 'K', [
+      bank('kanji_bank_1.json', '[["丶","","","",[],{}]]'),
+    ]);
+    expect(countRows(raw, 'heading'), 0);
+    expect(countRows(raw, 'entry'), 0);
+  });
+
+  test('fails the import on a kanji with wrongly typed fields', () {
+    expect(
+        () => importBanks(raw, 'K', [
+              bank('kanji_bank_1.json', '[["犬",null,"いぬ","",[],{}]]'),
+            ]),
+        throwsA(isA<SqliteException>()));
+    expect(
+        () => importBanks(raw, 'K', [
+              bank('kanji_bank_1.json', '[["犬","","","","cat",{}]]'),
+            ]),
+        throwsA(isA<SqliteException>()));
+    expect(countRows(raw, 'entry'), 0);
+  });
 }

@@ -79,6 +79,7 @@ class _YomichanImport {
     _stageTags = database.prepare(_stageTagsSql);
     _insertTags = database.prepare(_insertTagsSql);
     _stageTerms = database.prepare(_stageTermsSql);
+    _stageKanji = database.prepare(_stageKanjiSql);
     _insertHeadings = database.prepare(_insertHeadingsSql);
     _resolveHeadings = database.prepare(_resolveHeadingsSql);
     _insertEntries = database.prepare(_insertEntriesSql);
@@ -97,6 +98,7 @@ class _YomichanImport {
   late final PreparedStatement _stageTags;
   late final PreparedStatement _insertTags;
   late final PreparedStatement _stageTerms;
+  late final PreparedStatement _stageKanji;
   late final PreparedStatement _insertHeadings;
   late final PreparedStatement _resolveHeadings;
   late final PreparedStatement _insertEntries;
@@ -114,10 +116,7 @@ class _YomichanImport {
 
   void importTerms(Iterable<YomichanBank> banks) {
     for (YomichanBank bank in banks) {
-      // Kanji banks come with a later change.
-      if (bank.name.startsWith('term_bank')) {
-        _importTermBank(bank);
-      }
+      _importTermBank(bank);
       _finish(bank);
     }
   }
@@ -127,9 +126,12 @@ class _YomichanImport {
     banks.forEach(_finish);
   }
 
+  /// Import a term bank or a kanji bank: both are staged, and the same
+  /// statements insert them.
   void _importTermBank(YomichanBank bank) {
     database.execute('DELETE FROM stage');
-    _stageTerms.execute([bank.read()]);
+    (bank.name.startsWith('kanji_bank') ? _stageKanji : _stageTerms)
+        .execute([bank.read()]);
     int rows = _scalar('SELECT COALESCE(MAX(n), 0) FROM stage');
     int offset = _scalar('SELECT COALESCE(MAX(id), 0) FROM entry');
     for (int first = 1; first <= rows; first += _chunkSize) {
@@ -155,6 +157,7 @@ class _YomichanImport {
       _stageTags,
       _insertTags,
       _stageTerms,
+      _stageKanji,
       _insertHeadings,
       _resolveHeadings,
       _insertEntries,
@@ -239,6 +242,56 @@ SELECT r.value->>0, r.value->>1, r.value->>2, r.value->>4,
     )) END,
   r.value->>7
 FROM json_each(CAST(?1 AS TEXT)) r''';
+
+/// The characters trimmed from kanji definitions: the whitespace Dart's `trim`
+/// removes from them, ASCII and U+3000.
+const String _kanjiTrimmed = "' \t\n\r　'";
+
+/// SQL building the section [title] of a kanji definition when the condition
+/// [include] holds: the title, then a bullet for each string of the JSON array
+/// [items].
+String _kanjiSection(String title, String items, String include) => '''
+CASE WHEN $include THEN '$title' || char(10) || (
+    SELECT group_concat('  • ' || value || char(10), '' ORDER BY key)
+    FROM json_each($items)) || char(10)
+  ELSE '' END''';
+
+/// SQL turning the space separated [text] into a JSON array of strings, empty
+/// pieces included as `split(' ')` keeps them.
+String _kanjiPieces(String text) => '''
+'["' || replace(replace(replace($text,
+    '\\', '\\\\'), '"', '\\"'), ' ', '","') || '"]\'''';
+
+/// SQL telling whether the readings [text] have something to show: they do
+/// unless they are blank once their spaces are gone.
+String _kanjiHasReading(String text) =>
+    "trim(replace($text, ' ', ''), $_kanjiTrimmed) <> ''";
+
+/// Stage a kanji bank (`?1`: its bytes) like a term bank, with an empty
+/// reading, no definition tags and no popularity. The definition is built as
+/// `prepareEntriesYomichanFormat` builds it: a section for the on'yomi (音読み)
+/// and one for the kun'yomi (訓読み) unless blank, one for the meanings (意味)
+/// unless there are none, and the whole trimmed. A kanji whose definition is
+/// empty is left out. A reading that is not a string, or meanings that are not
+/// a list, make the definition NULL, which the column rejects.
+final String _stageKanjiSql = '''
+INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
+SELECT term, '', NULL, 0, CASE WHEN definition IS NOT NULL
+  THEN json_array(definition) END, term_tags FROM (
+  SELECT term, term_tags, CASE
+    WHEN onyomi IS NULL OR kunyomi IS NULL OR json_type(meanings) <> 'array'
+      THEN NULL
+    ELSE trim(
+      ${_kanjiSection('音読み', _kanjiPieces('onyomi'), _kanjiHasReading('onyomi'))} ||
+      ${_kanjiSection('訓読み', _kanjiPieces('kunyomi'), _kanjiHasReading('kunyomi'))} ||
+      ${_kanjiSection('意味', 'meanings', 'json_array_length(meanings) > 0')},
+      $_kanjiTrimmed) END AS definition
+  FROM (
+    SELECT r.value->>0 AS term, r.value->>1 AS onyomi, r.value->>2 AS kunyomi,
+      r.value->>3 AS term_tags, r.value->4 AS meanings
+    FROM json_each(CAST(?1 AS TEXT)) r))
+WHERE definition IS NULL OR definition <> ''
+''';
 
 /// Insert the headings of the chunk `?1` to `?2` of the stage.
 const String _insertHeadingsSql = '''

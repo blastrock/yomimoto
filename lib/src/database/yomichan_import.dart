@@ -262,10 +262,9 @@ String _scalar(String row, int index, String value) =>
 /// and the term tags must be strings or numbers, and the definition tags a
 /// string, a number or `null`; a row with anything else, or with a missing
 /// element, fails the import (the definitions column is made NULL for a bad
-/// definition tags, which the column rejects). Definitions are converted as
-/// `YomichanFormat.processDefinition` does: a string as is, a text element's
-/// text, the content of structured content and images as JSON, anything else
-/// dropped. The outer row is aliased `r` because inside the subquery a bare
+/// definition tags, which the column rejects). Definitions are converted
+/// as follows: a string as is, a text element's text, the content of
+/// structured content and images as JSON, anything else dropped. The outer row is aliased `r` because inside the subquery a bare
 /// `value` is the inner `json_each`'s. A text element whose text is not a
 /// string, or definitions that are not a list, make the value NULL, which the
 /// column rejects. `|| ''` strips the JSON subtype, so the content is added to

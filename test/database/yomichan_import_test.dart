@@ -36,6 +36,14 @@ int importBanks(
 }
 
 void main() {
+  test('isYomichanBank accepts root bank files only', () {
+    expect(isYomichanBank('term_bank_1.json'), isTrue);
+    expect(isYomichanBank('term_meta_bank_3.json'), isTrue);
+    expect(isYomichanBank('sub/term_bank_1.json'), isFalse);
+    expect(isYomichanBank('index.json'), isFalse);
+    expect(isYomichanBank('img/a.png'), isFalse);
+  });
+
   late TestDatabase database;
   late Database raw;
 

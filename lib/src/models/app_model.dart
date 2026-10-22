@@ -1002,15 +1002,15 @@ class AppModel with ChangeNotifier {
         sendPort: receivePort.sendPort,
       );
 
-      progressNotifier.value = t.import_extract;
-      await dictionaryFormat.prepareDirectory(prepareDirectoryParams);
-
       String name = await dictionaryFormat.prepareName(prepareDirectoryParams);
       progressNotifier.value = t.import_name(name: name);
 
       if (dictionaries.any((dictionary) => dictionary.name == name)) {
         throw Exception(t.import_duplicate(name: name));
       }
+
+      progressNotifier.value = t.import_extract;
+      await dictionaryFormat.prepareDirectory(prepareDirectoryParams);
 
       PrepareDictionaryParams prepareDictionaryParams = PrepareDictionaryParams(
         dictionaryName: name,

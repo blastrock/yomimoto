@@ -11,6 +11,7 @@ class DictionaryDialogImportPage extends BasePage {
   /// Create an instance of this page.
   const DictionaryDialogImportPage({
     required this.progressNotifier,
+    required this.fractionNotifier,
     required this.countNotifier,
     required this.totalNotifier,
     super.key,
@@ -19,6 +20,10 @@ class DictionaryDialogImportPage extends BasePage {
   /// A notifier for reporting text updates for the current progress text in
   /// the dialog.
   final ValueNotifier<String> progressNotifier;
+
+  /// A notifier for the fraction (0 to 1) of the current dictionary that has
+  /// been imported, or null while it is unknown.
+  final ValueNotifier<double?> fractionNotifier;
 
   /// A notifier for reporting text updates for the current progress text in
   /// the dialog.
@@ -39,67 +44,76 @@ class _DictionaryDialogImportPageState
       canPop: false,
       child: AlertDialog(
         contentPadding: Spacing.of(context).insets.all.big,
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            buildProgressSpinner(),
-            const Space.semiBig(),
-            buildProgressMessage(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildProgressSpinner() {
-    return CircularProgressIndicator(
-      valueColor: AlwaysStoppedAnimation<Color>(
-        theme.colorScheme.primary,
+        content: buildProgressMessage(),
       ),
     );
   }
 
   Widget buildProgressMessage() {
-    return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Space.extraSmall(),
-          Padding(
-            padding: const EdgeInsets.only(left: 0.5),
-            child: MultiValueListenableBuilder(
-                valueListenables: [widget.countNotifier, widget.totalNotifier],
-                builder: (context, values, _) {
-                  int? currentCount = values.elementAt(0);
-                  int? totalCount = values.elementAt(1);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Space.extraSmall(),
+        Padding(
+          padding: const EdgeInsets.only(left: 0.5),
+          child: MultiValueListenableBuilder(
+              valueListenables: [widget.countNotifier, widget.totalNotifier],
+              builder: (context, values, _) {
+                int? currentCount = values.elementAt(0);
+                int? totalCount = values.elementAt(1);
 
-                  return Text(
-                    currentCount != null &&
-                            totalCount != null &&
-                            totalCount != 1
-                        ? '${t.import_in_progress}\n$currentCount / $totalCount'
-                        : t.import_in_progress,
-                    style: TextStyle(
-                      fontSize: textTheme.bodySmall?.fontSize,
-                      color: theme.unselectedWidgetColor,
-                    ),
-                  );
-                }),
-          ),
-          const Space.small(),
-          ValueListenableBuilder<String>(
-            valueListenable: widget.progressNotifier,
-            builder: (context, progressNotification, _) {
-              return Text(
-                widget.progressNotifier.value,
-                maxLines: 10,
-                overflow: TextOverflow.ellipsis,
-              );
-            },
-          ),
-        ],
-      ),
+                return Text(
+                  currentCount != null &&
+                          totalCount != null &&
+                          totalCount != 1
+                      ? '${t.import_in_progress}\n$currentCount / $totalCount'
+                      : t.import_in_progress,
+                  style: TextStyle(
+                    fontSize: textTheme.bodySmall?.fontSize,
+                    color: theme.unselectedWidgetColor,
+                  ),
+                );
+              }),
+        ),
+        const Space.small(),
+        ValueListenableBuilder<String>(
+          valueListenable: widget.progressNotifier,
+          builder: (context, progressNotification, _) {
+            return Text(
+              widget.progressNotifier.value,
+              maxLines: 10,
+              overflow: TextOverflow.ellipsis,
+            );
+          },
+        ),
+        const Space.small(),
+        buildProgressBar(),
+      ],
+    );
+  }
+
+  /// A determinate bar with the percentage next to it. It never animates by
+  /// itself, which matters on e-ink.
+  Widget buildProgressBar() {
+    return ValueListenableBuilder<double?>(
+      valueListenable: widget.fractionNotifier,
+      builder: (context, fraction, _) {
+        return Row(
+          children: [
+            Expanded(
+              child: LinearProgressIndicator(
+                value: fraction ?? 0,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            if (fraction != null) ...[
+              const Space.small(),
+              Text(t.import_percent(percent: (fraction * 100).floor())),
+            ],
+          ],
+        );
+      },
     );
   }
 }

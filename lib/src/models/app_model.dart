@@ -957,6 +957,7 @@ class AppModel with ChangeNotifier {
   Future<void> importDictionary({
     required File file,
     required ValueNotifier<String> progressNotifier,
+    required ValueNotifier<double?> fractionNotifier,
     required Function() onImportSuccess,
   }) async {
     /// New results may be wrong after dictionary is added so this has to be
@@ -965,12 +966,19 @@ class AppModel with ChangeNotifier {
 
     DictionaryFormat dictionaryFormat = lastSelectedDictionaryFormat;
 
+    /// Each dictionary starts without a known fraction.
+    fractionNotifier.value = null;
+
     /// Importing makes heavy use of isolates as it is very performance
     /// intensive to work with files. In order to ensure the UI isolate isn't
     /// blocked, a [ReceivePort] is necessary to receive UI updates.
     ReceivePort receivePort = ReceivePort();
     receivePort.listen((message) {
-      progressNotifier.value = '$message';
+      if (message is double) {
+        fractionNotifier.value = message;
+      } else {
+        progressNotifier.value = '$message';
+      }
     });
 
     /// Used to show an [AlertDialog] if critical information needs to be

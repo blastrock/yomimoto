@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 209
+/// Strings: 203
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -209,13 +209,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get import_extract => 'Extracting files...';
 	String import_name({required Object name}) => 'Importing 『${name}』...';
 	String import_found_entry({required Object count}) => 'Found ${count} entries...';
-	String import_found_tag({required Object count}) => 'Found ${count} tags...';
-	String import_found_frequency({required Object count}) => 'Found ${count} frequency entries...';
-	String import_found_pitch({required Object count}) => 'Found ${count} pitch accent entries...';
-	String import_write_entry({required Object count, required Object total}) => 'Writing entries:\n${count} / ${total}';
-	String import_write_tag({required Object count, required Object total}) => 'Writing tags:\n${count} / ${total}';
-	String import_write_frequency({required Object count, required Object total}) => 'Writing frequency entries:\n${count} / ${total}';
-	String import_write_pitch({required Object count, required Object total}) => 'Writing pitch accent entries:\n${count} / ${total}';
+	String import_percent({required Object percent}) => '${percent}%';
 	String get import_failed => 'Dictionary import failed.';
 	String get import_complete => 'Dictionary import complete.';
 	String import_duplicate({required Object name}) => 'A dictionary with the name『${name}』is already imported.';
@@ -426,13 +420,7 @@ extension on Translations {
 			case 'import_extract': return 'Extracting files...';
 			case 'import_name': return ({required Object name}) => 'Importing 『${name}』...';
 			case 'import_found_entry': return ({required Object count}) => 'Found ${count} entries...';
-			case 'import_found_tag': return ({required Object count}) => 'Found ${count} tags...';
-			case 'import_found_frequency': return ({required Object count}) => 'Found ${count} frequency entries...';
-			case 'import_found_pitch': return ({required Object count}) => 'Found ${count} pitch accent entries...';
-			case 'import_write_entry': return ({required Object count, required Object total}) => 'Writing entries:\n${count} / ${total}';
-			case 'import_write_tag': return ({required Object count, required Object total}) => 'Writing tags:\n${count} / ${total}';
-			case 'import_write_frequency': return ({required Object count, required Object total}) => 'Writing frequency entries:\n${count} / ${total}';
-			case 'import_write_pitch': return ({required Object count, required Object total}) => 'Writing pitch accent entries:\n${count} / ${total}';
+			case 'import_percent': return ({required Object percent}) => '${percent}%';
 			case 'import_failed': return 'Dictionary import failed.';
 			case 'import_complete': return 'Dictionary import complete.';
 			case 'import_duplicate': return ({required Object name}) => 'A dictionary with the name『${name}』is already imported.';

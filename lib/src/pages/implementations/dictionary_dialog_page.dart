@@ -162,6 +162,7 @@ class _DictionaryDialogPageState extends BasePageState {
         /// [DictionaryImportProgressPage].
         ValueNotifier<String> progressNotifier =
             ValueNotifier<String>(t.import_start);
+        ValueNotifier<double?> fractionNotifier = ValueNotifier<double?>(null);
         ValueNotifier<int?> countNotifier = ValueNotifier<int?>(null);
         ValueNotifier<int?> totalNotifier = ValueNotifier<int?>(null);
         progressNotifier.addListener(() {
@@ -184,6 +185,7 @@ class _DictionaryDialogPageState extends BasePageState {
                 barrierDismissible: false,
                 builder: (context) => DictionaryDialogImportPage(
                   progressNotifier: progressNotifier,
+                  fractionNotifier: fractionNotifier,
                   countNotifier: countNotifier,
                   totalNotifier: totalNotifier,
                 ),
@@ -207,6 +209,7 @@ class _DictionaryDialogPageState extends BasePageState {
 
           await appModel.importDictionary(
             progressNotifier: progressNotifier,
+            fractionNotifier: fractionNotifier,
             file: file,
             onImportSuccess: () {
               _selectedOrder = appModel.dictionaries.last.order;

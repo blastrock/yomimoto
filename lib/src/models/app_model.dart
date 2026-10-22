@@ -975,7 +975,14 @@ class AppModel with ChangeNotifier {
     ReceivePort receivePort = ReceivePort();
     receivePort.listen((message) {
       if (message is double) {
-        fractionNotifier.value = message;
+        /// The bar is only repainted when its percentage changes, which
+        /// matters on e-ink; the end is always delivered.
+        double? last = fractionNotifier.value;
+        if (message >= 1.0 ||
+            last == null ||
+            (message * 100).floor() != (last * 100).floor()) {
+          fractionNotifier.value = message;
+        }
       } else {
         progressNotifier.value = '$message';
       }
@@ -1019,6 +1026,7 @@ class AppModel with ChangeNotifier {
 
       progressNotifier.value = t.import_extract;
       await dictionaryFormat.prepareDirectory(prepareDirectoryParams);
+      progressNotifier.value = t.import_name(name: name);
 
       PrepareDictionaryParams prepareDictionaryParams = PrepareDictionaryParams(
         dictionaryName: name,

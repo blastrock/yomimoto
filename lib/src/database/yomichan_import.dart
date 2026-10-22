@@ -430,6 +430,17 @@ CASE WHEN COALESCE(json_type(d, '$path'), 'null')
     IN ('null', 'integer', 'real')
   THEN COALESCE(d->>'$path', 0) END''';
 
+/// SQL giving the string at the JSON [path] of the JSONB `d`, NULL when it is
+/// absent or `null`, and an empty blob when it is a boolean, an object or an
+/// array: the stage's TEXT columns reject a blob, as Dart's cast rejects such a
+/// value, where `->>` would convert it. Numbers are converted to text.
+String _metaText(String path) => '''
+CASE WHEN json_type(d, '$path') IN ('array', 'object', 'true', 'false')
+  THEN x'' ELSE d->>'$path' END''';
+
+/// The `reading` of a meta row, see [_metaText].
+final String _metaReading = _metaText('\$.reading');
+
 /// Stage a term meta bank (`?1`: its bytes), keeping its frequency and pitch
 /// rows. For a frequency the heading reading, the value and the display value
 /// are computed as `prepareFrequenciesYomichanFormat` does, its cases in its
@@ -444,23 +455,24 @@ INSERT INTO meta_stage (term, type, reading, value, display_value, data)
 SELECT CASE WHEN t IS NULL AND type IN ('freq', 'pitch') THEN NULL
     ELSE term END, type,
   CASE
-    WHEN type <> 'freq' THEN COALESCE(d->>'reading', '')
+    WHEN type <> 'freq' THEN COALESCE($_metaReading, '')
     WHEN t <> 'object' THEN ''
-    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
-      THEN d->>'reading'
+    WHEN $_metaReading IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+      THEN $_metaReading
     WHEN d->>'displayValue' IS NOT NULL OR d->>'value' IS NOT NULL
         OR json_type(d, '\$.frequency') IN ('integer', 'real')
-      THEN COALESCE(d->>'reading', '')
+      THEN COALESCE($_metaReading, '')
   END,
   CASE
     WHEN type <> 'freq' THEN NULL
     WHEN t IN ('integer', 'real') THEN d->>'\$'
     WHEN t <> 'object' THEN 0
-    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+    WHEN $_metaReading IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
       THEN ${_metaNumber('\$.frequency.value')}
     WHEN d->>'displayValue' IS NOT NULL OR d->>'value' IS NOT NULL
       THEN ${_metaNumber('\$.value')}
-    ELSE d->>'frequency'
+    WHEN json_type(d, '\$.frequency') IN ('integer', 'real')
+      THEN d->>'frequency'
   END,
   CASE
     WHEN type <> 'freq' THEN NULL
@@ -469,9 +481,10 @@ SELECT CASE WHEN t IS NULL AND type IN ('freq', 'pitch') THEN NULL
       CAST(CAST(d->>'\$' AS INTEGER) AS TEXT), d->>'\$')
     WHEN t IN ('true', 'false', 'null') THEN t
     WHEN t <> 'object' THEN d->>'\$'
-    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
-      THEN COALESCE(d->'frequency'->>'displayValue', '')
-    WHEN d->>'displayValue' IS NOT NULL THEN d->>'displayValue'
+    WHEN $_metaReading IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+      THEN COALESCE(${_metaText('\$.frequency.displayValue')}, '')
+    WHEN d->>'displayValue' IS NOT NULL
+      THEN ${_metaText('\$.displayValue')}
     WHEN d->>'value' IS NOT NULL THEN CAST(CAST(d->>'value' AS INTEGER) AS TEXT)
     WHEN json_type(d, '\$.frequency') = 'integer' THEN d->>'frequency'
     ELSE iif(d->>'frequency' = floor(d->>'frequency'),
@@ -515,7 +528,8 @@ ORDER BY n''';
 /// stage, which rejects a position that is not an integer.
 const String _stagePitchesSql = '''
 INSERT INTO pitch_stage (heading_id, downstep)
-SELECT m.heading_id, p.value->>'position'
+SELECT m.heading_id, CASE WHEN json_type(p.value, '\$.position')
+  IN ('integer', 'real', 'text') THEN p.value->>'position' END
 FROM meta_stage m CROSS JOIN json_each(m.data) p
 WHERE m.n BETWEEN ?1 AND ?2 AND m.type = 'pitch'
 ORDER BY m.n, p.id''';

@@ -417,6 +417,13 @@ void main() {
       '["a","freq",{"value":"x","displayValue":"y"}]',
       '["a","freq",{"reading":"r","frequency":{"value":"x"}}]',
       '["a","freq",{"frequency":4,"value":true}]',
+      '["a","freq",{"reading":{"x":1},"value":3}]',
+      '["a","freq",{"reading":true,"value":3}]',
+      '["a","pitch",{"reading":[1],"pitches":[]}]',
+      '["a","freq",{"value":3,"displayValue":{"x":1}}]',
+      '["a","freq",{"value":3,"displayValue":false}]',
+      '["a","freq",{"reading":"r","frequency":{"value":3,"displayValue":[1]}}]',
+      '["a","pitch",{"pitches":[{"position":true}]}]',
     ]) {
       expect(
           () => importBanks(raw, 'F', [
@@ -426,5 +433,35 @@ void main() {
           reason: row);
     }
     expect(countRows(raw, 'frequency'), 0);
+  });
+
+  test('skips frequency shapes that no case handles', () {
+    importBanks(raw, 'F', [
+      bank('term_meta_bank_1.json', '['
+          '["a","freq",{"reading":"r","frequency":"rare"}],'
+          '["b","freq",{"frequency":{"value":7}}],'
+          '["c","freq",{"reading":true}],'
+          '["d","freq",2]]'),
+    ]);
+    expect(raw.select('SELECT h.term FROM frequency f '
+        'JOIN heading h ON h.id = f.heading_id'), [
+      {'term': 'd'},
+    ]);
+    expect(countRows(raw, 'heading'), 1);
+  });
+
+  test('accepts numeric readings and display values', () {
+    importBanks(raw, 'F', [
+      bank('term_meta_bank_1.json', '['
+          '["a","freq",{"reading":12,"value":3,"displayValue":4}],'
+          '["b","freq",{"value":3,"displayValue":"x"}]]'),
+    ]);
+    expect(
+        raw.select('SELECT h.term, h.reading, f.display_value FROM frequency f '
+            'JOIN heading h ON h.id = f.heading_id ORDER BY f.id'),
+        [
+          {'term': 'a', 'reading': '12', 'display_value': '4'},
+          {'term': 'b', 'reading': '', 'display_value': 'x'},
+        ]);
   });
 }

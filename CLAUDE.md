@@ -173,15 +173,20 @@ Everything persisted lives in SQLite; there is no other store.
   (`tables.dart`) and the search and loader queries (`search.drift`).
   `AppStore` holds app data: synchronous raw `sqlite3` reads and Drift writes
   over one shared connection. On the main isolate raw SQL is for reads only;
-  every write goes through Drift. The isolates (`search`, import with
-  `DictionaryImportWriter`, deletion) open their own connections, and the
-  import writer is the one raw writer. `loadHeadings` produces fully loaded
-  headings. A `MediaItem` names its origin with a single
-  `mediaSourceIdentifier` — the source and the tab are the same object; a
-  title the user gave it is its `override_title` column, which saving the
-  item leaves alone. The database creates the Standard profile with id 1
-  (`AnkiMapping.standardProfileId`) and it cannot be deleted, so the
-  selected profile is stored by id and always resolves.
+  every write goes through Drift. The isolates (`search`, import,
+  deletion) open their own connections, and the import isolate is the one
+  raw writer. A Yomichan dictionary goes through `importYomichanBanks`
+  (`yomichan_import.dart`): each bank file's bytes, read straight from the
+  archive, are parsed by SQLite with `json_each` and inserted set-based.
+  Every bank is staged first in a `STRICT` temporary table, which is the
+  import's type check: a wrongly typed value fails the whole import. A
+  Migaku dictionary goes through `DictionaryImportWriter`, row by row.
+  `loadHeadings` produces fully loaded headings. A `MediaItem` names its
+  origin with a single `mediaSourceIdentifier` — the source and the tab are
+  the same object; a title the user gave it is its `override_title` column,
+  which saving the item leaves alone. The database creates the Standard
+  profile with id 1 (`AnkiMapping.standardProfileId`) and it cannot be
+  deleted, so the selected profile is stored by id and always resolves.
 - **Preferences** — the `preference` table, key to JSON value, read and
   written only through `PreferenceStore` (`lib/src/preferences/`,
   `AppModel.preferences`). Each setting is a constant `Preference<T>`

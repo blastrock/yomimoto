@@ -5,3 +5,4 @@ export 'src/database/dictionary_deletion.dart';
 export 'src/database/dictionary_import_writer.dart';
 export 'src/database/heading_loader.dart';
 export 'src/database/tables.dart';
+export 'src/database/yomichan_import.dart';

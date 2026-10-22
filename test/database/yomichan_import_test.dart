@@ -36,14 +36,6 @@ int importBanks(
 }
 
 void main() {
-  test('isYomichanBank accepts root bank files only', () {
-    expect(isYomichanBank('term_bank_1.json'), isTrue);
-    expect(isYomichanBank('term_meta_bank_3.json'), isTrue);
-    expect(isYomichanBank('sub/term_bank_1.json'), isFalse);
-    expect(isYomichanBank('index.json'), isFalse);
-    expect(isYomichanBank('img/a.png'), isFalse);
-  });
-
   late TestDatabase database;
   late Database raw;
 
@@ -163,6 +155,9 @@ void main() {
     importBanks(raw, 'D', [], progress: progress);
     expect(progress, isEmpty);
     expect(countRows(raw, 'entry'), 0);
+  });
+
+  test('fails the import on a kanji with missing or wrongly typed fields', () {
     for (String row in [
       '["犬","a","",""]',
       '["犬","a","","",["x",null],{}]',
@@ -179,6 +174,7 @@ void main() {
           throwsA(isA<SqliteException>()),
           reason: row);
     }
+    expect(countRows(raw, 'entry'), 0);
   });
 
   test('fails the import on wrongly typed term fields', () {
@@ -255,6 +251,50 @@ void main() {
           stored);
     });
   }
+
+  test('fails the import on wrongly typed tag fields', () {
+    for (String row in [
+      '[true,"c",0,"",0]',
+      '["n",{},0,"",0]',
+      '["n","c",0,[],0]',
+      '["n","c",0,"",false]',
+      '["n","c",[1],"",0]',
+      '["n","c",0,""]',
+      '["n","c",0,null,0]',
+    ]) {
+      expect(
+          () => importBanks(raw, 'T', [bank('tag_bank_1.json', '[$row]')]),
+          throwsA(isA<SqliteException>()),
+          reason: row);
+    }
+    expect(countRows(raw, 'tag'), 0);
+  });
+
+  test('numeric tag fields are accepted', () {
+    importBanks(raw, 'T', [
+      bank('tag_bank_1.json', '[[1,2,"3",4,"5"]]'),
+    ]);
+    expect(raw.select('SELECT name, category, sorting_order, notes FROM tag')
+        .single, {'name': '1', 'category': '2', 'sorting_order': 3, 'notes': '4'});
+  });
+
+  test('a bank with invalid UTF-8 fails the import and writes nothing', () {
+    List<int> bytes = [
+      ...utf8.encode('[["猫","ねこ","","",1,["ca'),
+      0xff,
+      ...utf8.encode('t"],1,""]]'),
+    ];
+    Uint8List invalid = Uint8List.fromList(bytes);
+    expect(
+      () => importBanks(raw, 'D', [
+        (name: 'term_bank_1.json', size: invalid.length, read: () => invalid),
+      ]),
+      throwsA(isA<FormatException>()),
+    );
+    expect(countRows(raw, 'dictionary'), 0);
+    expect(countRows(raw, 'heading'), 0);
+    expect(countRows(raw, 'entry'), 0);
+  });
 
   test('a tag sorting order that is not an integer fails the import', () {
     expect(
@@ -343,6 +383,8 @@ void main() {
           '["f","freq",{"reading":"えふ","value":9.7}],'
           '["g","freq",{"frequency":4}],["h","freq",{"frequency":4.5}],'
           '["i","freq",{"reading":"あい"}],["j","freq","rare"],'
+          '["m","freq",{"reading":"r","frequency":{}}],'
+          '["n","freq",true],["o","freq",null],'
           '["l","ipa",{}]]'),
     ]);
     expect(
@@ -359,8 +401,11 @@ void main() {
           {'term': 'g', 'reading': '', 'value': 4.0, 'display_value': '4'},
           {'term': 'h', 'reading': '', 'value': 4.5, 'display_value': '4.5'},
           {'term': 'j', 'reading': '', 'value': 0.0, 'display_value': 'rare'},
+          {'term': 'm', 'reading': 'r', 'value': 0.0, 'display_value': ''},
+          {'term': 'n', 'reading': '', 'value': 0.0, 'display_value': 'true'},
+          {'term': 'o', 'reading': '', 'value': 0.0, 'display_value': 'null'},
         ]);
-    expect(countRows(raw, 'heading'), 9); // 'i' and 'l' create none
+    expect(countRows(raw, 'heading'), 12); // 'i' and 'l' create none
   });
 
   test('imports pitches with their reading', () {

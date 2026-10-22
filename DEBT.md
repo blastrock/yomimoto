@@ -81,3 +81,21 @@ roles, so nothing visible depends on them today.
 
 **When Material 3 is turned on, or a theme (e-ink) is designed from its
 scheme**, choose real colours for every role instead of inheriting them.
+
+## Lone surrogate escapes in dictionary banks are stored as invalid UTF-8
+
+**Since:** the SQL dictionary import.
+
+`importYomichanBanks` hands each bank's bytes to SQLite's JSON functions. The
+bytes are validated as UTF-8 in Dart first, but a JSON escape for a lone
+surrogate (`"\ud800"`) is valid UTF-8 source that SQLite decodes to the bytes
+`ED A0 80`, which are not valid UTF-8. The old Dart import stored U+FFFD
+there. `sqlite3` decodes text strictly, so such a row would import and then
+throw a `FormatException` when it is looked up.
+
+This relies on no real dictionary containing a lone surrogate escape, which
+JMdict and the other dictionaries tried do not.
+
+**To pay it off**, reject (or replace) such text after staging, for example with
+a check on the staged text columns for the bytes `ED A0`..`ED BF`, or scan the
+bank for `\ud[89a-f]` escapes that are not part of a surrogate pair.

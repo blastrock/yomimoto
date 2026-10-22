@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -63,6 +64,21 @@ void importYomichanBanks({
   }
 }
 
+/// The size of the slices in which a bank's bytes are validated.
+const int _validationChunk = 1 << 16;
+
+/// A sink dropping what it is given, to validate UTF-8 without keeping the
+/// decoded text.
+class _DiscardingSink implements Sink<String> {
+  const _DiscardingSink();
+
+  @override
+  void add(String data) {}
+
+  @override
+  void close() {}
+}
+
 /// The state and statements of one [importYomichanBanks] run.
 class _YomichanImport {
   _YomichanImport({
@@ -125,7 +141,7 @@ class _YomichanImport {
   void importTags(Iterable<YomichanBank> banks) {
     for (YomichanBank bank in banks) {
       database.execute('DELETE FROM tag_stage');
-      _stageTags.execute([bank.read()]);
+      _stageTags.execute([_read(bank)]);
       _insertTags.execute([dictionaryId]);
       _finish(bank);
     }
@@ -142,8 +158,8 @@ class _YomichanImport {
   void importMeta(Iterable<YomichanBank> banks) {
     for (YomichanBank bank in banks) {
       database.execute('DELETE FROM meta_stage');
-      _stageMeta.execute([bank.read()]);
-      int rows = _scalar('SELECT COALESCE(MAX(n), 0) FROM meta_stage');
+      _stageMeta.execute([_read(bank)]);
+      int rows = _queryInt('SELECT COALESCE(MAX(n), 0) FROM meta_stage');
       for (int first = 1; first <= rows; first += _chunkSize) {
         int last = min(first + _chunkSize - 1, rows);
         _insertMetaHeadings.execute([first, last]);
@@ -163,9 +179,9 @@ class _YomichanImport {
   void _importTermBank(YomichanBank bank) {
     database.execute('DELETE FROM stage');
     (bank.name.startsWith('kanji_bank') ? _stageKanji : _stageTerms)
-        .execute([bank.read()]);
-    int rows = _scalar('SELECT COALESCE(MAX(n), 0) FROM stage');
-    int offset = _scalar('SELECT COALESCE(MAX(id), 0) FROM entry');
+        .execute([_read(bank)]);
+    int rows = _queryInt('SELECT COALESCE(MAX(n), 0) FROM stage');
+    int offset = _queryInt('SELECT COALESCE(MAX(id), 0) FROM entry');
     for (int first = 1; first <= rows; first += _chunkSize) {
       int last = min(first + _chunkSize - 1, rows);
       _insertHeadings.execute([first, last]);
@@ -177,7 +193,26 @@ class _YomichanImport {
     }
   }
 
-  int _scalar(String sql) => database.select(sql).first.values.first as int;
+  /// The bytes of [bank], checked to be UTF-8. SQLite takes the bytes as they
+  /// are and `sqlite3` decodes text strictly when reading it back, so invalid
+  /// bytes would import and only fail at lookup.
+  Uint8List _read(YomichanBank bank) {
+    Uint8List bytes = bank.read();
+    try {
+      ByteConversionSink sink =
+          utf8.decoder.startChunkedConversion(const _DiscardingSink());
+      for (int start = 0; start < bytes.length; start += _validationChunk) {
+        sink.addSlice(bytes, start,
+            min(start + _validationChunk, bytes.length), false);
+      }
+      sink.close();
+    } on FormatException catch (e) {
+      throw FormatException('${bank.name} is not valid UTF-8: ${e.message}');
+    }
+    return bytes;
+  }
+
+  int _queryInt(String sql) => database.select(sql).first.values.first as int;
 
   void _finish(YomichanBank bank) {
     _done += bank.size;
@@ -233,10 +268,14 @@ CREATE TEMP TABLE IF NOT EXISTS stage (
   heading_id INTEGER
 ) STRICT''';
 
-/// Stage a tag bank (`?1`: its bytes).
-const String _stageTagsSql = '''
+/// Stage a tag bank (`?1`: its bytes). Every element must be a string or a
+/// number; a tag with anything else, or with a missing element, fails the
+/// import.
+final String _stageTagsSql = '''
 INSERT INTO tag_stage (name, category, sorting_order, notes, popularity)
-SELECT value->>0, value->>1, value->>2, value->>3, value->>4
+SELECT ${_scalarSql('value', 0, 'value->>0')},
+  ${_scalarSql('value', 1, 'value->>1')}, ${_scalarSql('value', 2, 'value->>2')},
+  ${_scalarSql('value', 3, 'value->>3')}, ${_scalarSql('value', 4, 'value->>4')}
 FROM json_each(CAST(?1 AS TEXT))''';
 
 /// Insert the staged tags of dictionary `?1`; defining a name again
@@ -254,7 +293,7 @@ ON CONFLICT (dictionary_id, name) DO UPDATE SET
 /// element is a string or a number, which SQLite converts to text or real
 /// without loss, and NULL otherwise: a missing element, `null`, a boolean, an
 /// object or an array. The staging columns reject NULL.
-String _scalar(String row, int index, String value) =>
+String _scalarSql(String row, int index, String value) =>
     "CASE WHEN json_type($row, '\$[$index]') IN ('text', 'integer', 'real') "
     'THEN $value END';
 
@@ -264,21 +303,20 @@ String _scalar(String row, int index, String value) =>
 /// element, fails the import (the definitions column is made NULL for a bad
 /// definition tags, which the column rejects). Definitions are converted
 /// as follows: a string as is, a text element's text, the content of
-/// structured content and images as JSON, anything else dropped. The outer row is aliased `r` because inside the subquery a bare
-/// `value` is the inner `json_each`'s. A text element whose text is not a
-/// string, or definitions that are not a list, make the value NULL, which the
-/// column rejects. `|| ''` strips the JSON subtype, so the content is added to
-/// the array as a string.
+/// structured content and images as JSON, anything else dropped. The outer row
+/// is aliased `r` because inside the subquery a bare `value` is the inner
+/// `json_each`'s. A text element whose text is not a string, or definitions
+/// that are not a list, make the value NULL, which X
 final String _stageTermsSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
-SELECT ${_scalar('r.value', 0, 'r.value->>0')},
-  ${_scalar('r.value', 1, 'r.value->>1')}, r.value->>2,
-  ${_scalar('r.value', 4, 'r.value->>4')},
+SELECT ${_scalarSql('r.value', 0, 'r.value->>0')},
+  ${_scalarSql('r.value', 1, 'r.value->>1')}, r.value->>2,
+  ${_scalarSql('r.value', 4, 'r.value->>4')},
   CASE WHEN json_type(r.value->5) = 'array'
       AND json_type(r.value, '\$[2]') IN ('null', 'text', 'integer', 'real')
     THEN (
     SELECT CASE WHEN max(bad) THEN NULL
-      ELSE json_group_array(d) FILTER (WHERE d IS NOT NULL) END
+      ELSE json_group_array(d ORDER BY i) FILTER (WHERE d IS NOT NULL) END
     FROM (
       SELECT CASE
         WHEN e.type = 'text' THEN e.atom
@@ -287,7 +325,7 @@ SELECT ${_scalar('r.value', 0, 'r.value->>0')},
         WHEN e.type = 'object'
             AND e.value->>'type' IN ('structured-content', 'image')
           THEN COALESCE(json(e.value->'content'), 'null') || ''
-      END AS d,
+      END AS d, e.id AS i,
       CASE WHEN e.type = 'object' AND e.value->>'type' = 'text'
         THEN COALESCE(
           json_type(e.value, '\$.text') NOT IN ('text', 'null'), 0)
@@ -295,7 +333,7 @@ SELECT ${_scalar('r.value', 0, 'r.value->>0')},
       FROM json_each(r.value->5) e
       ORDER BY e.id
     )) END,
-  ${_scalar('r.value', 7, 'r.value->>7')}
+  ${_scalarSql('r.value', 7, 'r.value->>7')}
 FROM json_each(CAST(?1 AS TEXT)) r''';
 
 /// The characters trimmed from kanji definitions: the whitespace Dart's `trim`
@@ -324,9 +362,9 @@ String _kanjiHasReading(String text) =>
 
 /// Stage a kanji bank (`?1`: its bytes) like a term bank, with an empty
 /// reading, no definition tags and no popularity. The definition is built as
-/// `prepareEntriesYomichanFormat` builds it: a section for the on'yomi (音読み)
-/// and one for the kun'yomi (訓読み) unless blank, one for the meanings (意味)
-/// unless there are none, and the whole trimmed. A kanji whose definition is
+/// follows: a section for the on'yomi (音読み) and one for the kun'yomi (訓読み)
+/// unless blank, one for the meanings (意味) unless there are none, and the
+/// whole trimmed. A kanji whose definition is
 /// empty is left out. The term, the readings and the tags must be strings or
 /// numbers and the meanings a list of them; a kanji with anything else, or
 /// with a missing element, fails the import (its definition is NULL, which the
@@ -347,10 +385,10 @@ SELECT term, '', NULL, 0, CASE WHEN definition IS NOT NULL
       ${_kanjiSection('意味', 'meanings', 'json_array_length(meanings) > 0')},
       $_kanjiTrimmed) END AS definition
   FROM (
-    SELECT ${_scalar('r.value', 0, 'r.value->>0')} AS term,
-      ${_scalar('r.value', 1, 'r.value->>1')} AS onyomi,
-      ${_scalar('r.value', 2, 'r.value->>2')} AS kunyomi,
-      ${_scalar('r.value', 3, 'r.value->>3')} AS term_tags,
+    SELECT ${_scalarSql('r.value', 0, 'r.value->>0')} AS term,
+      ${_scalarSql('r.value', 1, 'r.value->>1')} AS onyomi,
+      ${_scalarSql('r.value', 2, 'r.value->>2')} AS kunyomi,
+      ${_scalarSql('r.value', 3, 'r.value->>3')} AS term_tags,
       r.value->4 AS meanings
     FROM json_each(CAST(?1 AS TEXT)) r))
 WHERE definition IS NULL OR definition <> ''
@@ -422,7 +460,7 @@ CREATE TEMP TABLE IF NOT EXISTS pitch_stage (
 ) STRICT''';
 
 /// SQL giving the number at the JSON [path] of the JSONB `d`, or 0 when it is
-/// absent or `null` (as `?? 0` does), and NULL when it is anything else than a
+/// absent or `null` (as `?? 0` does), and NULL when it is anything other than a
 /// number: the stage rejects that, as Dart's cast does.
 String _metaNumber(String path) => '''
 CASE WHEN COALESCE(json_type(d, '$path'), 'null')
@@ -447,8 +485,9 @@ final String _metaReading = _metaText('\$.reading');
 /// left out of the import. A pitch takes its `reading` (empty by default) and
 /// keeps its `pitches` in `data`, which the table rejects unless it is an
 /// array. The term must be a string or a number and the type a string; rows of
-/// other types are dropped. The shape is read from a JSONB copy `d` of the
-/// third element, in a `MATERIALIZED` subquery so it is parsed once.
+/// other types are dropped, but rows with a wrongly typed term or type are
+/// kept, so that the stage rejects them. The shape is read from a JSONB copy
+/// `d` of the third element, in a `MATERIALIZED` subquery so it is parsed once.
 final String _stageMetaSql = '''
 INSERT INTO meta_stage (term, type, reading, value, display_value, data)
 SELECT CASE WHEN t IS NULL AND type IN ('freq', 'pitch') THEN NULL
@@ -493,7 +532,7 @@ SELECT CASE WHEN t IS NULL AND type IN ('freq', 'pitch') THEN NULL
     THEN d->'pitches' END
 FROM (
   WITH x AS MATERIALIZED (
-    SELECT ${_scalar('value', 0, 'value->>0')} AS term,
+    SELECT ${_scalarSql('value', 0, 'value->>0')} AS term,
       CASE WHEN json_type(value, '\$[1]') = 'text' THEN value->>1 END AS type,
       jsonb(value->2) AS d, json_type(value, '\$[2]') AS t
     FROM json_each(CAST(?1 AS TEXT))

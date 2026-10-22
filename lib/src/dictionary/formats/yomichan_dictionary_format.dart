@@ -23,7 +23,7 @@ import 'package:yuuna/utils.dart';
 /// https://github.com/FooSoft/yomichan/blob/master/ext/data/schemas/dictionary-term-bank-v3-schema.json
 class YomichanFormat extends DictionaryFormat {
   /// Define a format with the given metadata that has its behaviour for
-  /// import, search and display defined with af set of top-level helper methods.
+  /// import, search and display defined with a set of top-level helper methods.
   YomichanFormat._privateConstructor()
       : super(
           uniqueKey: 'yomichan',
@@ -151,10 +151,10 @@ bool _isRootBankFile(String entryName) =>
     entryName.endsWith('.json');
 
 /// Where to extract the archive entry [entryName] below [resourceDirectory],
-/// or null if it must not be extracted: the index and the bank files at the root
-/// (read from the archive itself, or not read at all) are not resources,
-/// directories are created as needed, and a name that
-/// is absolute or leads outside [resourceDirectory] is refused.
+/// or null if it must not be extracted: the index and the bank files at the
+/// root (read from the archive itself, or not read at all) are not resources,
+/// directories are created as needed, and a name that is absolute or leads
+/// outside [resourceDirectory] is refused.
 String? yomichanResourcePath(String resourceDirectory, String entryName) {
   if (entryName == 'index.json' ||
       entryName.endsWith('/') ||

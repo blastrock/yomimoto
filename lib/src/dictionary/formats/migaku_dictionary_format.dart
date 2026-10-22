@@ -18,7 +18,7 @@ import 'package:yuuna/i18n/strings.g.dart';
 /// http://lingvo.helpmax.net/en/troubleshooting/dsl-compiler/dsl-dictionary-structure/
 class MigakuFormat extends DictionaryFormat {
   /// Define a format with the given metadata that has its behaviour for
-  /// import, search and display defined with af set of top-level helper methods.
+  /// import, search and display defined with a set of top-level helper methods.
   MigakuFormat._privateConstructor()
       : super(
           uniqueKey: 'migaku',

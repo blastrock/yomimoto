@@ -49,12 +49,10 @@ class PrepareDirectoryParams extends IsolateParams {
   final DictionaryFormat dictionaryFormat;
 }
 
-/// For isolate communication purposes. See a dictionary format's import
-/// method. Some parameters may be null at certain
-/// stages of the import.
+/// For isolate communication purposes. See a dictionary format's
+/// `importData`.
 class PrepareDictionaryParams extends IsolateParams {
-  /// Prepare parameters for a dictionary format's name, entries and metadata
-  /// preparation methods.
+  /// Prepare parameters for a dictionary format's `importData`.
   PrepareDictionaryParams({
     required this.dictionaryName,
     required this.dictionaryFormat,

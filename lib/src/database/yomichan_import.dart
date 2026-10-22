@@ -300,13 +300,14 @@ String _scalarSql(String row, int index, String value) =>
 /// Stage a term bank (`?1`: its bytes). The term, the reading, the popularity
 /// and the term tags must be strings or numbers, and the definition tags a
 /// string, a number or `null`; a row with anything else, or with a missing
-/// element, fails the import (the definitions column is made NULL for a bad
-/// definition tags, which the column rejects). Definitions are converted
-/// as follows: a string as is, a text element's text, the content of
-/// structured content and images as JSON, anything else dropped. The outer row
-/// is aliased `r` because inside the subquery a bare `value` is the inner
-/// `json_each`'s. A text element whose text is not a string, or definitions
-/// that are not a list, make the value NULL, which X
+/// element, fails the import. Definitions are converted as follows: a string
+/// as is, a text element's text, the content of structured content and images
+/// as JSON, anything else dropped. Definitions that are not a list, a text
+/// element whose text is not a string, or bad definition tags make the
+/// definitions NULL, which the column rejects. The outer row is aliased `r`
+/// because inside the subquery a bare `value` is the inner `json_each`'s;
+/// `|| ''` strips the JSON subtype, so content is added to the array as a
+/// string.
 final String _stageTermsSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
 SELECT ${_scalarSql('r.value', 0, 'r.value->>0')},
@@ -336,8 +337,8 @@ SELECT ${_scalarSql('r.value', 0, 'r.value->>0')},
   ${_scalarSql('r.value', 7, 'r.value->>7')}
 FROM json_each(CAST(?1 AS TEXT)) r''';
 
-/// The characters trimmed from kanji definitions: the whitespace Dart's `trim`
-/// removes from them, ASCII and U+3000.
+/// The characters trimmed from kanji definitions: ASCII whitespace and U+3000,
+/// a subset of what Dart's `trim` removes.
 const String _kanjiTrimmed = "' \t\n\r　'";
 
 /// SQL building the section [title] of a kanji definition when the condition
@@ -364,11 +365,10 @@ String _kanjiHasReading(String text) =>
 /// reading, no definition tags and no popularity. The definition is built as
 /// follows: a section for the on'yomi (音読み) and one for the kun'yomi (訓読み)
 /// unless blank, one for the meanings (意味) unless there are none, and the
-/// whole trimmed. A kanji whose definition is
-/// empty is left out. The term, the readings and the tags must be strings or
-/// numbers and the meanings a list of them; a kanji with anything else, or
-/// with a missing element, fails the import (its definition is NULL, which the
-/// column rejects).
+/// whole trimmed. A kanji whose definition is empty is left out. The term, the
+/// readings and the tags must be strings or numbers and the meanings a list of
+/// them; a kanji with anything else, or with a missing element, fails the
+/// import (its definition is NULL, which the column rejects).
 final String _stageKanjiSql = '''
 INSERT INTO stage (term, reading, def_tags, popularity, definitions, term_tags)
 SELECT term, '', NULL, 0, CASE WHEN definition IS NOT NULL

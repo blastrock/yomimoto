@@ -325,4 +325,106 @@ void main() {
         throwsA(isA<SqliteException>()));
     expect(countRows(raw, 'entry'), 0);
   });
+
+  test('imports every frequency shape as today', () {
+    importBanks(raw, 'F', [
+      bank('term_meta_bank_1.json', '['
+          '["a","freq",5],["b","freq",2.5],["c","freq",3.0],'
+          '["d","freq",{"reading":"でぃ","frequency":{"value":7,"displayValue":"7★"}}],'
+          '["e","freq",{"value":8,"displayValue":"8㋕"}],'
+          '["f","freq",{"reading":"えふ","value":9.7}],'
+          '["g","freq",{"frequency":4}],["h","freq",{"frequency":4.5}],'
+          '["i","freq",{"reading":"あい"}],["j","freq","rare"],'
+          '["l","ipa",{}]]'),
+    ]);
+    expect(
+        raw.select('SELECT h.term, h.reading, f.value, f.display_value '
+            'FROM frequency f JOIN heading h ON h.id = f.heading_id '
+            'ORDER BY f.id'),
+        [
+          {'term': 'a', 'reading': '', 'value': 5.0, 'display_value': '5'},
+          {'term': 'b', 'reading': '', 'value': 2.5, 'display_value': '2.5'},
+          {'term': 'c', 'reading': '', 'value': 3.0, 'display_value': '3'},
+          {'term': 'd', 'reading': 'でぃ', 'value': 7.0, 'display_value': '7★'},
+          {'term': 'e', 'reading': '', 'value': 8.0, 'display_value': '8㋕'},
+          {'term': 'f', 'reading': 'えふ', 'value': 9.7, 'display_value': '9'},
+          {'term': 'g', 'reading': '', 'value': 4.0, 'display_value': '4'},
+          {'term': 'h', 'reading': '', 'value': 4.5, 'display_value': '4.5'},
+          {'term': 'j', 'reading': '', 'value': 0.0, 'display_value': 'rare'},
+        ]);
+    expect(countRows(raw, 'heading'), 9); // 'i' and 'l' create none
+  });
+
+  test('imports pitches with their reading', () {
+    importBanks(raw, 'P', [
+      bank('term_meta_bank_1.json', '['
+          '["け","pitch",{"reading":"け","pitches":[{"position":0},{"position":2}]}],'
+          '["く","pitch",{"pitches":[{"position":1}]}]]'),
+    ]);
+    expect(
+        raw.select('SELECT h.term, h.reading, p.downstep '
+            'FROM pitch p JOIN heading h ON h.id = p.heading_id '
+            'ORDER BY p.id'),
+        [
+          {'term': 'け', 'reading': 'け', 'downstep': 0},
+          {'term': 'け', 'reading': 'け', 'downstep': 2},
+          {'term': 'く', 'reading': '', 'downstep': 1},
+        ]);
+    expect(countRows(raw, 'heading'), 2);
+  });
+
+  test('processes term banks before meta banks whatever their order', () {
+    importBanks(raw, 'D', [
+      bank('term_meta_bank_1.json', '[["犬","freq",3]]'),
+      bank('term_bank_1.json', '[["猫","ねこ","","",1,["cat"],1,""]]'),
+    ]);
+    expect(raw.select('SELECT id, term FROM heading ORDER BY id'), [
+      {'id': 1, 'term': '猫'},
+      {'id': 2, 'term': '犬'},
+    ]);
+  });
+
+  test('a pitch row without a pitch list fails the import', () {
+    for (String data in ['{"reading":"け"}', '{"pitches":null}', 'null']) {
+      expect(
+          () => importBanks(raw, 'P', [
+                bank('term_meta_bank_1.json', '[["け","pitch",$data]]'),
+              ]),
+          throwsA(isA<SqliteException>()),
+          reason: data);
+    }
+    expect(countRows(raw, 'pitch'), 0);
+    expect(countRows(raw, 'heading'), 0);
+  });
+
+  test('a pitch position that is not an integer fails the import', () {
+    for (String position in ['1.5', '"x"', 'null']) {
+      expect(
+          () => importBanks(raw, 'P', [
+                bank('term_meta_bank_1.json',
+                    '[["け","pitch",{"pitches":[{"position":$position}]}]]'),
+              ]),
+          throwsA(isA<SqliteException>()),
+          reason: position);
+    }
+    expect(countRows(raw, 'pitch'), 0);
+  });
+
+  test('fails the import on wrongly typed meta rows', () {
+    for (String row in [
+      '[null,"freq",1]',
+      '["a",1,1]',
+      '["a","freq",{"value":"x","displayValue":"y"}]',
+      '["a","freq",{"reading":"r","frequency":{"value":"x"}}]',
+      '["a","freq",{"frequency":4,"value":true}]',
+    ]) {
+      expect(
+          () => importBanks(raw, 'F', [
+                bank('term_meta_bank_1.json', '[$row]'),
+              ]),
+          throwsA(isA<SqliteException>()),
+          reason: row);
+    }
+    expect(countRows(raw, 'frequency'), 0);
+  });
 }

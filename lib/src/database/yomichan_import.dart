@@ -56,7 +56,8 @@ void importYomichanBanks({
       ..importTerms(accepted.where((bank) =>
           bank.name.startsWith('term_bank') ||
           bank.name.startsWith('kanji_bank')))
-      ..skip(accepted.where((bank) => bank.name.startsWith('term_meta_bank')));
+      ..importMeta(
+          accepted.where((bank) => bank.name.startsWith('term_meta_bank')));
   } finally {
     import.close();
   }
@@ -75,7 +76,11 @@ class _YomichanImport {
       ..execute(_createTagStage)
       ..execute('DELETE FROM tag_stage')
       ..execute(_createStage)
-      ..execute('DELETE FROM stage');
+      ..execute('DELETE FROM stage')
+      ..execute(_createMetaStage)
+      ..execute('DELETE FROM meta_stage')
+      ..execute(_createPitchStage)
+      ..execute('DELETE FROM pitch_stage');
     _stageTags = database.prepare(_stageTagsSql);
     _insertTags = database.prepare(_insertTagsSql);
     _stageTerms = database.prepare(_stageTermsSql);
@@ -85,6 +90,12 @@ class _YomichanImport {
     _insertEntries = database.prepare(_insertEntriesSql);
     _insertEntryTags = database.prepare(_insertEntryTagsSql);
     _insertHeadingTags = database.prepare(_insertHeadingTagsSql);
+    _stageMeta = database.prepare(_stageMetaSql);
+    _insertMetaHeadings = database.prepare(_insertMetaHeadingsSql);
+    _resolveMetaHeadings = database.prepare(_resolveMetaHeadingsSql);
+    _insertFrequencies = database.prepare(_insertFrequenciesSql);
+    _stagePitches = database.prepare(_stagePitchesSql);
+    _insertPitches = database.prepare(_insertPitchesSql);
   }
 
   final Database database;
@@ -104,6 +115,12 @@ class _YomichanImport {
   late final PreparedStatement _insertEntries;
   late final PreparedStatement _insertEntryTags;
   late final PreparedStatement _insertHeadingTags;
+  late final PreparedStatement _stageMeta;
+  late final PreparedStatement _insertMetaHeadings;
+  late final PreparedStatement _resolveMetaHeadings;
+  late final PreparedStatement _insertFrequencies;
+  late final PreparedStatement _stagePitches;
+  late final PreparedStatement _insertPitches;
 
   void importTags(Iterable<YomichanBank> banks) {
     for (YomichanBank bank in banks) {
@@ -121,9 +138,24 @@ class _YomichanImport {
     }
   }
 
-  /// Count [banks] as done without reading them.
-  void skip(Iterable<YomichanBank> banks) {
-    banks.forEach(_finish);
+  /// Import the frequencies and pitches of the term meta [banks].
+  void importMeta(Iterable<YomichanBank> banks) {
+    for (YomichanBank bank in banks) {
+      database.execute('DELETE FROM meta_stage');
+      _stageMeta.execute([bank.read()]);
+      int rows = _scalar('SELECT COALESCE(MAX(n), 0) FROM meta_stage');
+      for (int first = 1; first <= rows; first += _chunkSize) {
+        int last = min(first + _chunkSize - 1, rows);
+        _insertMetaHeadings.execute([first, last]);
+        _resolveMetaHeadings.execute([first, last]);
+        _insertFrequencies.execute([first, last, dictionaryId]);
+        database.execute('DELETE FROM pitch_stage');
+        _stagePitches.execute([first, last]);
+        _insertPitches.execute([dictionaryId]);
+        onProgress((_done + bank.size * last / rows) / total);
+      }
+      _finish(bank);
+    }
   }
 
   /// Import a term bank or a kanji bank: both are staged, and the same
@@ -163,12 +195,20 @@ class _YomichanImport {
       _insertEntries,
       _insertEntryTags,
       _insertHeadingTags,
+      _stageMeta,
+      _insertMetaHeadings,
+      _resolveMetaHeadings,
+      _insertFrequencies,
+      _stagePitches,
+      _insertPitches,
     ]) {
       statement.close();
     }
     database
       ..execute('DROP TABLE IF EXISTS tag_stage')
-      ..execute('DROP TABLE IF EXISTS stage');
+      ..execute('DROP TABLE IF EXISTS stage')
+      ..execute('DROP TABLE IF EXISTS meta_stage')
+      ..execute('DROP TABLE IF EXISTS pitch_stage');
   }
 }
 
@@ -361,3 +401,126 @@ CROSS JOIN json_each('["' || replace(replace(replace(s.term_tags,
 CROSS JOIN tag t ON t.dictionary_id = ?4 AND t.name = j.value
 WHERE s.n BETWEEN ?1 AND ?2 AND s.term_tags <> ''
 ''';
+
+const String _createMetaStage = '''
+CREATE TEMP TABLE IF NOT EXISTS meta_stage (
+  n INTEGER PRIMARY KEY,
+  term TEXT NOT NULL,
+  type TEXT NOT NULL,
+  reading TEXT,
+  value REAL,
+  display_value TEXT,
+  data ANY,
+  heading_id INTEGER,
+  CHECK (type <> 'pitch' OR data IS NOT NULL),
+  CHECK (type <> 'freq' OR reading IS NULL OR value IS NOT NULL)
+) STRICT''';
+
+const String _createPitchStage = '''
+CREATE TEMP TABLE IF NOT EXISTS pitch_stage (
+  heading_id INTEGER NOT NULL,
+  downstep INTEGER NOT NULL
+) STRICT''';
+
+/// SQL giving the number at the JSON [path] of the JSONB `d`, or 0 when it is
+/// absent or `null` (as `?? 0` does), and NULL when it is anything else than a
+/// number: the stage rejects that, as Dart's cast does.
+String _metaNumber(String path) => '''
+CASE WHEN COALESCE(json_type(d, '$path'), 'null')
+    IN ('null', 'integer', 'real')
+  THEN COALESCE(d->>'$path', 0) END''';
+
+/// Stage a term meta bank (`?1`: its bytes), keeping its frequency and pitch
+/// rows. For a frequency the heading reading, the value and the display value
+/// are computed as `prepareFrequenciesYomichanFormat` does, its cases in its
+/// order; a row for which no case sets the reading has a NULL reading and is
+/// left out of the import. A pitch takes its `reading` (empty by default) and
+/// keeps its `pitches` in `data`, which the table rejects unless it is an
+/// array. The term must be a string or a number and the type a string; rows of
+/// other types are dropped. The shape is read from a JSONB copy `d` of the
+/// third element, in a `MATERIALIZED` subquery so it is parsed once.
+final String _stageMetaSql = '''
+INSERT INTO meta_stage (term, type, reading, value, display_value, data)
+SELECT CASE WHEN t IS NULL AND type IN ('freq', 'pitch') THEN NULL
+    ELSE term END, type,
+  CASE
+    WHEN type <> 'freq' THEN COALESCE(d->>'reading', '')
+    WHEN t <> 'object' THEN ''
+    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+      THEN d->>'reading'
+    WHEN d->>'displayValue' IS NOT NULL OR d->>'value' IS NOT NULL
+        OR json_type(d, '\$.frequency') IN ('integer', 'real')
+      THEN COALESCE(d->>'reading', '')
+  END,
+  CASE
+    WHEN type <> 'freq' THEN NULL
+    WHEN t IN ('integer', 'real') THEN d->>'\$'
+    WHEN t <> 'object' THEN 0
+    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+      THEN ${_metaNumber('\$.frequency.value')}
+    WHEN d->>'displayValue' IS NOT NULL OR d->>'value' IS NOT NULL
+      THEN ${_metaNumber('\$.value')}
+    ELSE d->>'frequency'
+  END,
+  CASE
+    WHEN type <> 'freq' THEN NULL
+    WHEN t = 'integer' THEN d->>'\$'
+    WHEN t = 'real' THEN iif(d->>'\$' = floor(d->>'\$'),
+      CAST(CAST(d->>'\$' AS INTEGER) AS TEXT), d->>'\$')
+    WHEN t IN ('true', 'false', 'null') THEN t
+    WHEN t <> 'object' THEN d->>'\$'
+    WHEN d->>'reading' IS NOT NULL AND json_type(d, '\$.frequency') = 'object'
+      THEN COALESCE(d->'frequency'->>'displayValue', '')
+    WHEN d->>'displayValue' IS NOT NULL THEN d->>'displayValue'
+    WHEN d->>'value' IS NOT NULL THEN CAST(CAST(d->>'value' AS INTEGER) AS TEXT)
+    WHEN json_type(d, '\$.frequency') = 'integer' THEN d->>'frequency'
+    ELSE iif(d->>'frequency' = floor(d->>'frequency'),
+      CAST(CAST(d->>'frequency' AS INTEGER) AS TEXT), d->>'frequency')
+  END,
+  CASE WHEN type = 'pitch' AND json_type(d, '\$.pitches') = 'array'
+    THEN d->'pitches' END
+FROM (
+  WITH x AS MATERIALIZED (
+    SELECT ${_scalar('value', 0, 'value->>0')} AS term,
+      CASE WHEN json_type(value, '\$[1]') = 'text' THEN value->>1 END AS type,
+      jsonb(value->2) AS d, json_type(value, '\$[2]') AS t
+    FROM json_each(CAST(?1 AS TEXT))
+  ) SELECT * FROM x
+)
+WHERE type IS NULL OR term IS NULL OR type IN ('freq', 'pitch')''';
+
+/// Insert the headings of the chunk `?1` to `?2` of the meta stage.
+const String _insertMetaHeadingsSql = '''
+INSERT INTO heading (term, reading)
+SELECT term, reading FROM meta_stage
+WHERE n BETWEEN ?1 AND ?2 AND reading IS NOT NULL
+ON CONFLICT DO NOTHING''';
+
+/// Find the heading of each staged meta row of the chunk `?1` to `?2`.
+const String _resolveMetaHeadingsSql = '''
+UPDATE meta_stage SET heading_id = (
+  SELECT h.id FROM heading h
+  WHERE h.term = meta_stage.term AND h.reading = meta_stage.reading)
+WHERE n BETWEEN ?1 AND ?2 AND reading IS NOT NULL''';
+
+/// Insert the frequencies of the chunk `?1` to `?2`; `?3`: the dictionary id.
+const String _insertFrequenciesSql = '''
+INSERT INTO frequency (heading_id, dictionary_id, value, display_value)
+SELECT heading_id, ?3, value, COALESCE(display_value, '')
+FROM meta_stage
+WHERE n BETWEEN ?1 AND ?2 AND type = 'freq' AND reading IS NOT NULL
+ORDER BY n''';
+
+/// Stage the pitch positions of the chunk `?1` to `?2` in the STRICT pitch
+/// stage, which rejects a position that is not an integer.
+const String _stagePitchesSql = '''
+INSERT INTO pitch_stage (heading_id, downstep)
+SELECT m.heading_id, p.value->>'position'
+FROM meta_stage m CROSS JOIN json_each(m.data) p
+WHERE m.n BETWEEN ?1 AND ?2 AND m.type = 'pitch'
+ORDER BY m.n, p.id''';
+
+/// Insert the staged pitches; `?1`: the dictionary id.
+const String _insertPitchesSql = '''
+INSERT INTO pitch (heading_id, dictionary_id, downstep)
+SELECT heading_id, ?1, downstep FROM pitch_stage ORDER BY rowid''';

@@ -38,6 +38,7 @@ void main() {
   PrepareDictionaryParams params(String name) => PrepareDictionaryParams(
         dictionaryName: name,
         dictionaryFormat: MigakuFormat.instance,
+        file: File(path.join(directory.path, 'unused.zip')),
         resourceDirectory: resources,
         alertSendPort: alerts.sendPort,
         sendPort: progress.sendPort,

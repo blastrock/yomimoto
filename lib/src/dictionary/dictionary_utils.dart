@@ -18,19 +18,11 @@ Future<int> depositDictionaryDataHelper(PrepareDictionaryParams params) async {
       );
       int dictionaryId = database.lastInsertRowId;
 
-      DictionaryImportWriter writer = DictionaryImportWriter(
+      params.dictionaryFormat.importData(
+        params: params,
         database: database,
         dictionaryId: dictionaryId,
       );
-      try {
-        params.dictionaryFormat.prepareTags(params: params, writer: writer);
-        params.dictionaryFormat.prepareEntries(params: params, writer: writer);
-        params.dictionaryFormat.preparePitches(params: params, writer: writer);
-        params.dictionaryFormat
-            .prepareFrequencies(params: params, writer: writer);
-      } finally {
-        writer.close();
-      }
 
       database.execute('COMMIT');
       // The import is one transaction, so the WAL file has grown to the

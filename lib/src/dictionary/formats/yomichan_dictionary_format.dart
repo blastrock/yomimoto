@@ -9,6 +9,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:list_counter/list_counter.dart';
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
+import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/utils.dart';
@@ -31,10 +32,7 @@ class YomichanFormat extends DictionaryFormat {
           fileType: FileType.custom,
           prepareDirectory: prepareDirectoryYomichanFormat,
           prepareName: prepareNameYomichanFormat,
-          prepareEntries: prepareEntriesYomichanFormat,
-          prepareTags: prepareTagsYomichanFormat,
-          preparePitches: preparePitchesYomichanFormat,
-          prepareFrequencies: prepareFrequenciesYomichanFormat,
+          importData: importDataYomichanFormat,
         );
 
   /// Get the singleton instance of this dictionary format.
@@ -177,6 +175,26 @@ Future<String> prepareNameYomichanFormat(PrepareDirectoryParams params) async {
 }
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
+void importDataYomichanFormat({
+  required PrepareDictionaryParams params,
+  required Database database,
+  required int dictionaryId,
+}) {
+  DictionaryImportWriter writer = DictionaryImportWriter(
+    database: database,
+    dictionaryId: dictionaryId,
+  );
+  try {
+    prepareTagsYomichanFormat(params: params, writer: writer);
+    prepareEntriesYomichanFormat(params: params, writer: writer);
+    preparePitchesYomichanFormat(params: params, writer: writer);
+    prepareFrequenciesYomichanFormat(params: params, writer: writer);
+  } finally {
+    writer.close();
+  }
+}
+
+/// Writes the entries of the dictionary through [writer].
 void prepareEntriesYomichanFormat({
   required PrepareDictionaryParams params,
   required DictionaryImportWriter writer,

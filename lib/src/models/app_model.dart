@@ -1015,6 +1015,7 @@ class AppModel with ChangeNotifier {
       PrepareDictionaryParams prepareDictionaryParams = PrepareDictionaryParams(
         dictionaryName: name,
         dictionaryFormat: dictionaryFormat,
+        file: file,
         resourceDirectory: stagingDirectory,
         databasePath: databasePath,
         sendPort: receivePort.sendPort,

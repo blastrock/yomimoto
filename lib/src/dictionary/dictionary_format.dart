@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yuuna/database.dart';
+import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:yuuna/dictionary.dart';
 import 'package:flutter/widgets.dart';
 
@@ -22,10 +22,7 @@ abstract class DictionaryFormat {
     required this.fileType,
     required this.prepareDirectory,
     required this.prepareName,
-    required this.prepareEntries,
-    required this.prepareTags,
-    required this.preparePitches,
-    required this.prepareFrequencies,
+    required this.importData,
   });
 
   /// This is used to distinguish dictionary formats from one another, and to
@@ -80,37 +77,16 @@ abstract class DictionaryFormat {
   /// parameters.
   Future<String> Function(PrepareDirectoryParams params) prepareName;
 
-  /// Prepares a list of tags that will be written to the database, synchronously, through `writer`.
+  /// Writes this dictionary's tags, entries, pitches and frequencies to
+  /// `database`, synchronously, as dictionary `dictionaryId`. It runs inside
+  /// the caller's transaction, which it must neither commit nor roll back.
   /// See [PrepareDictionaryParams] for how to work with the individual input
   /// parameters.
   void Function({
     required PrepareDictionaryParams params,
-    required DictionaryImportWriter writer,
-  }) prepareTags;
-
-  /// Prepares entries that will be written to the database, synchronously, through `writer`.
-  /// See [PrepareDictionaryParams] for how to work with the individual input
-  /// parameters.
-  void Function({
-    required PrepareDictionaryParams params,
-    required DictionaryImportWriter writer,
-  }) prepareEntries;
-
-  /// Prepares pitch entries that will be written to the database, synchronously, through `writer`.
-  /// See [PrepareDictionaryParams] for how to work with the individual input
-  /// parameters.
-  void Function({
-    required PrepareDictionaryParams params,
-    required DictionaryImportWriter writer,
-  }) preparePitches;
-
-  /// Prepares frequency entries that will be written to the database, synchronously, through `writer`.
-  /// See [PrepareDictionaryParams] for how to work with the individual input
-  /// parameters.
-  void Function({
-    required PrepareDictionaryParams params,
-    required DictionaryImportWriter writer,
-  }) prepareFrequencies;
+    required Database database,
+    required int dictionaryId,
+  }) importData;
 
   /// Used to allow a format to render its dictionary entries with a custom
   /// widget.

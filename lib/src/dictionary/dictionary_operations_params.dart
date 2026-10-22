@@ -58,6 +58,7 @@ class PrepareDictionaryParams extends IsolateParams {
   PrepareDictionaryParams({
     required this.dictionaryName,
     required this.dictionaryFormat,
+    required this.file,
     required this.resourceDirectory,
     required this.alertSendPort,
     required super.sendPort,
@@ -69,6 +70,9 @@ class PrepareDictionaryParams extends IsolateParams {
 
   /// The dictionary format to be used for entry processing.
   final DictionaryFormat dictionaryFormat;
+
+  /// The archive picked by the user.
+  final File file;
 
   /// A working directory to extract dictionary data to.
   final Directory resourceDirectory;

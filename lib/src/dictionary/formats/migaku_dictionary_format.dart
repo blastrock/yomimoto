@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:path/path.dart' as path;
+import 'package:sqlite3/sqlite3.dart' show Database;
 
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
@@ -27,10 +28,7 @@ class MigakuFormat extends DictionaryFormat {
           fileType: FileType.any,
           prepareDirectory: prepareDirectoryMigakuFormat,
           prepareName: prepareNameMigakuFormat,
-          prepareEntries: prepareEntriesMigakuFormat,
-          prepareTags: prepareTagsMigakuFormat,
-          preparePitches: preparePitchesMigakuFormat,
-          prepareFrequencies: prepareFrequenciesMigakuFormat,
+          importData: importDataMigakuFormat,
         );
 
   /// Get the singleton instance of this dictionary format.
@@ -54,6 +52,23 @@ Future<String> prepareNameMigakuFormat(PrepareDirectoryParams params) async {
 }
 
 /// Top-level function for use in compute. See [DictionaryFormat] for details.
+void importDataMigakuFormat({
+  required PrepareDictionaryParams params,
+  required Database database,
+  required int dictionaryId,
+}) {
+  DictionaryImportWriter writer = DictionaryImportWriter(
+    database: database,
+    dictionaryId: dictionaryId,
+  );
+  try {
+    prepareEntriesMigakuFormat(params: params, writer: writer);
+  } finally {
+    writer.close();
+  }
+}
+
+/// Writes the entries of the dictionary through [writer].
 void prepareEntriesMigakuFormat({
   required PrepareDictionaryParams params,
   required DictionaryImportWriter writer,
@@ -92,21 +107,3 @@ void prepareEntriesMigakuFormat({
 
   params.send(t.import_found_entry(count: count));
 }
-
-/// Top-level function for use in compute. See [DictionaryFormat] for details.
-void prepareTagsMigakuFormat({
-  required PrepareDictionaryParams params,
-  required DictionaryImportWriter writer,
-}) {}
-
-/// Top-level function for use in compute. See [DictionaryFormat] for details.
-void preparePitchesMigakuFormat({
-  required PrepareDictionaryParams params,
-  required DictionaryImportWriter writer,
-}) {}
-
-/// Top-level function for use in compute. See [DictionaryFormat] for details.
-void prepareFrequenciesMigakuFormat({
-  required PrepareDictionaryParams params,
-  required DictionaryImportWriter writer,
-}) {}

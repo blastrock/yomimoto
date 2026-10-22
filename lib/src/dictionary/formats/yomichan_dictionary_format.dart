@@ -130,23 +130,36 @@ class YomichanFormat extends DictionaryFormat {
   }
 }
 
-/// Top-level function for use in compute. See [DictionaryFormat] for details.
+/// Extracts the archive's resources in an isolate of its own, through
+/// `compute`: call it from the main isolate, not from inside `compute`. See
+/// [DictionaryFormat] for details.
 Future<void> prepareDirectoryYomichanFormat(
         PrepareDirectoryParams params) =>
     compute(extractYomichanResources, params);
 
-/// Top-level function for use in compute. See [DictionaryFormat] for details.
+/// Reads the dictionary's name in an isolate of its own, through `compute`:
+/// call it from the main isolate, not from inside `compute`. See
+/// [DictionaryFormat] for details.
 Future<String> prepareNameYomichanFormat(PrepareDirectoryParams params) =>
     compute(readYomichanTitle, params.file.path);
 
+/// Whether [entryName] is a JSON bank file at the root of the archive that the
+/// import does not read, such as `kanji_meta_bank_1.json`.
+bool _isRootBankFile(String entryName) =>
+    !entryName.contains('/') &&
+    entryName.contains('_bank_') &&
+    entryName.endsWith('.json');
+
 /// Where to extract the archive entry [entryName] below [resourceDirectory],
-/// or null if it must not be extracted: the index and the bank files are read
-/// from the archive itself, directories are created as needed, and a name that
+/// or null if it must not be extracted: the index and the bank files at the root
+/// (read from the archive itself, or not read at all) are not resources,
+/// directories are created as needed, and a name that
 /// is absolute or leads outside [resourceDirectory] is refused.
 String? yomichanResourcePath(String resourceDirectory, String entryName) {
   if (entryName == 'index.json' ||
       entryName.endsWith('/') ||
-      isYomichanBank(entryName)) {
+      isYomichanBank(entryName) ||
+      _isRootBankFile(entryName)) {
     return null;
   }
   String target = path.join(resourceDirectory, entryName);

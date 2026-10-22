@@ -53,27 +53,28 @@ abstract class DictionaryFormat {
   /// format class. This is because these functions should not block the UI
   /// isolate and must be top-level in order to do so.
 
-  /// Given a [File], prepare files to be accessible in a working [Directory]
-  /// such that it will be possible to make relative commands (in the
-  /// directory) to be able to get a dictionary's name, its entries and
-  /// other related metadata that will be useful for preservation.
+  /// Given a [File], prepare the resources the dictionary's definitions refer
+  /// to (images, stylesheets, ...) in a working [Directory], such that it will
+  /// be possible to make relative commands (in the directory) to get at them.
+  /// It runs after [prepareName], so the dictionary is known to be new.
   ///
   /// For many formats, this will likely be a ZIP extraction operation. A
   /// given parameter is where the final working directory should be, and where
-  /// zthe rest of the operations will be performed.
+  /// the rest of the operations will be performed.
   ///
   /// See [PrepareDirectoryParams] for how to work with the individual input
   /// parameters.
   Future<void> Function(PrepareDirectoryParams params) prepareDirectory;
 
-  /// Given a [Directory] of files pertaining to this dictionary format,
-  /// return a [String] that will refer to a dictionary's name in this format.
+  /// Given a [File], return a [String] that will refer to a dictionary's name
+  /// in this format. It runs first, before anything is extracted, so it must
+  /// work from `params.file` alone.
   ///
   /// If this format does not offer a way for a dictionary's name to be
   /// represented in its schema, return a unique [String] instead such that
   /// collisions with other dictionaries will not be likely.
   ///
-  /// See [PrepareDictionaryParams] for how to work with the individual input
+  /// See [PrepareDirectoryParams] for how to work with the individual input
   /// parameters.
   Future<String> Function(PrepareDirectoryParams params) prepareName;
 

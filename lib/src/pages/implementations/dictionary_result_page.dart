@@ -99,39 +99,31 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
         removeLeft: true,
         removeRight: true,
       ),
-      child: RawScrollbar(
-        thumbVisibility: true,
-        thickness: 3,
+      child: CustomScrollView(
+        scrollCacheExtent: const ScrollCacheExtent.pixels(999999999999999),
         controller: _scrollController,
-        child: Padding(
-          padding: Spacing.of(context).insets.onlyRight.extraSmall,
-          child: CustomScrollView(
-            scrollCacheExtent: const ScrollCacheExtent.pixels(999999999999999),
-            controller: _scrollController,
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            slivers: [
-              SliverPadding(
-                  padding: widget.spaceBeforeFirstResult
-                      ? Spacing.of(context).insets.onlyTop.normal
-                      : EdgeInsets.zero),
-              ...headings
-                  .map((heading) => DictionaryTermPage(
-                        lastSelectedMapping: lastSelectedMapping,
-                        opacity: widget.opacity,
-                        heading: heading,
-                        onSearch: widget.onSearch,
-                        onShare: widget.onShare,
-                        expandableControllers:
-                            expandableControllersByHeading[heading]!,
-                        dictionaryNamesByHidden: dictionaryNamesByHidden,
-                        dictionaryNamesByOrder: dictionaryNamesByOrder,
-                      )),
-              if (widget.footerWidget != null) widget.footerWidget!,
-            ],
-          ),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
         ),
+        slivers: [
+          SliverPadding(
+              padding: widget.spaceBeforeFirstResult
+                  ? Spacing.of(context).insets.onlyTop.normal
+                  : EdgeInsets.zero),
+          ...headings
+              .map((heading) => DictionaryTermPage(
+                    lastSelectedMapping: lastSelectedMapping,
+                    opacity: widget.opacity,
+                    heading: heading,
+                    onSearch: widget.onSearch,
+                    onShare: widget.onShare,
+                    expandableControllers:
+                        expandableControllersByHeading[heading]!,
+                    dictionaryNamesByHidden: dictionaryNamesByHidden,
+                    dictionaryNamesByOrder: dictionaryNamesByOrder,
+                  )),
+          if (widget.footerWidget != null) widget.footerWidget!,
+        ],
       ),
     );
   }

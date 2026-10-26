@@ -16,6 +16,7 @@ class DictionaryEntryPage extends ConsumerStatefulWidget {
     required this.onSearch,
     required this.onShare,
     required this.expandableController,
+    this.onClosePopup,
     super.key,
   });
 
@@ -30,6 +31,9 @@ class DictionaryEntryPage extends ConsumerStatefulWidget {
 
   /// Controller specific to a dictionary name.
   final ExpandableController expandableController;
+
+  /// See [DictionaryQuickActionsRow.onClosePopup].
+  final VoidCallback? onClosePopup;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -51,7 +55,10 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
           hasIcon: false,
         ),
         controller: widget.expandableController,
-        header: _DictionaryEntryHeader(entry: widget.entry),
+        header: _DictionaryEntryHeader(
+          entry: widget.entry,
+          onClosePopup: widget.onClosePopup,
+        ),
         collapsed: const SizedBox.shrink(),
         expanded: Padding(
           padding: EdgeInsets.only(
@@ -113,9 +120,12 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
 class _DictionaryEntryHeader extends ConsumerWidget {
   const _DictionaryEntryHeader({
     required this.entry,
+    required this.onClosePopup,
   });
 
   final DictionaryEntry entry;
+
+  final VoidCallback? onClosePopup;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -164,6 +174,7 @@ class _DictionaryEntryHeader extends ConsumerWidget {
           heading: entry.heading,
           actions: appModel.entryQuickActions,
           selectedEntry: entry,
+          onClosePopup: onClosePopup,
         ),
       ],
     );

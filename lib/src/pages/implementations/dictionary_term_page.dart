@@ -27,6 +27,7 @@ class DictionaryTermPage extends ConsumerWidget {
     required this.lastSelectedMapping,
     this.opacity = 1,
     this.footerWidget,
+    this.onClosePopup,
     super.key,
   });
 
@@ -50,6 +51,10 @@ class DictionaryTermPage extends ConsumerWidget {
 
   /// Optional footer foor use in [DictionaryHistoryPage].
   final Widget? footerWidget;
+
+  /// Closes the dictionary popup the result is shown in, after an action that
+  /// [QuickAction.closesPopup]. Null when the result is not in a popup.
+  final VoidCallback? onClosePopup;
 
   /// Opacity for entries.
   final double opacity;
@@ -100,6 +105,7 @@ class DictionaryTermPage extends ConsumerWidget {
                     _DictionaryTermTopRow(
                       heading: heading,
                       onSearch: onSearch,
+                      onClosePopup: onClosePopup,
                     ),
                     if (heading.tags.isNotEmpty) const Space.normal(),
                     if (heading.tags.isNotEmpty)
@@ -134,6 +140,7 @@ class DictionaryTermPage extends ConsumerWidget {
                       onShare: onShare,
                       expandableController:
                           expandableControllers[entry.dictionary]!,
+                      onClosePopup: onClosePopup,
                     );
                   },
                 ),
@@ -155,6 +162,7 @@ class DictionaryQuickActionsRow extends ConsumerStatefulWidget {
     required this.heading,
     required this.actions,
     this.selectedEntry,
+    this.onClosePopup,
     super.key,
   });
 
@@ -166,6 +174,10 @@ class DictionaryQuickActionsRow extends ConsumerStatefulWidget {
 
   /// The definition the actions act on, or null for the whole [heading].
   final DictionaryEntry? selectedEntry;
+
+  /// Closes the dictionary popup the result is shown in, after an action that
+  /// [QuickAction.closesPopup]. Null when the result is not in a popup.
+  final VoidCallback? onClosePopup;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -272,6 +284,9 @@ class _DictionaryQuickActionsRowState
               );
 
               ref.invalidate(quickActionColorProvider(widget.heading));
+              if (quickAction.closesPopup && mounted) {
+                widget.onClosePopup?.call();
+              }
             },
           ),
         ),
@@ -464,6 +479,7 @@ class _DictionaryTermTopRow extends ConsumerWidget {
   const _DictionaryTermTopRow({
     required this.heading,
     required this.onSearch,
+    required this.onClosePopup,
   });
 
   /// The result made from a dictionary database search.
@@ -471,6 +487,9 @@ class _DictionaryTermTopRow extends ConsumerWidget {
 
   /// Action to be done upon selecting the search option.
   final Function(String) onSearch;
+
+  /// See [DictionaryQuickActionsRow.onClosePopup].
+  final VoidCallback? onClosePopup;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -487,6 +506,7 @@ class _DictionaryTermTopRow extends ConsumerWidget {
           child: DictionaryQuickActionsRow(
             heading: heading,
             actions: appModel.headingQuickActions,
+            onClosePopup: onClosePopup,
           ),
         ),
         Floatable(

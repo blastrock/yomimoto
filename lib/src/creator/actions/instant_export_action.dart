@@ -16,6 +16,7 @@ class InstantExportAction extends QuickAction {
           description:
               'Export a card with the selected dictionary entry parameters.',
           icon: Icons.send,
+          closesPopup: true,
         );
 
   /// Used to identify this enhancement and to allow a constant value for the

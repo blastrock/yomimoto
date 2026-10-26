@@ -14,6 +14,7 @@ abstract class QuickAction {
     required this.label,
     required this.description,
     required this.icon,
+    this.closesPopup = false,
   });
 
   /// A unique name that allows distinguishing this type from others,
@@ -31,6 +32,9 @@ abstract class QuickAction {
   /// An icon that will show the action if activated by the user in the
   /// quick menu.
   final IconData icon;
+
+  /// Whether the reader's dictionary popup closes once this action is done.
+  final bool closesPopup;
 
   /// Whether or not [initialise] has been called for this action.
   bool _initialised = false;

@@ -19,6 +19,7 @@ class DictionaryResultPage extends BasePage {
     this.updateHistory = true,
     this.spaceBeforeFirstResult = true,
     this.footerWidget,
+    this.onClosePopup,
     super.key,
   });
 
@@ -45,6 +46,10 @@ class DictionaryResultPage extends BasePage {
 
   /// Optional footer for use for showing more.
   final Widget? footerWidget;
+
+  /// Closes the dictionary popup the result is shown in, after an action that
+  /// [QuickAction.closesPopup]. Null when the result is not in a popup.
+  final VoidCallback? onClosePopup;
 
   @override
   BasePageState<DictionaryResultPage> createState() =>
@@ -121,6 +126,7 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
                         expandableControllersByHeading[heading]!,
                     dictionaryNamesByHidden: dictionaryNamesByHidden,
                     dictionaryNamesByOrder: dictionaryNamesByOrder,
+                    onClosePopup: widget.onClosePopup,
                   )),
           if (widget.footerWidget != null) widget.footerWidget!,
         ],

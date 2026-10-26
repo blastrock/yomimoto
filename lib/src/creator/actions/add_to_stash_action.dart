@@ -18,6 +18,7 @@ class AddToStashAction extends QuickAction {
           description: 'Save the word, its sentence and its place in the book'
               ' to make a card later.',
           icon: Icons.bookmark_add_outlined,
+          closesPopup: true,
         );
 
   /// Used to identify this action and to allow a constant value for the

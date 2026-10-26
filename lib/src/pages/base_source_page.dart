@@ -407,6 +407,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
           result: _dictionaryResultNotifier.value!,
           spaceBeforeFirstResult: false,
           footerWidget: footerWidget,
+          onClosePopup: clearDictionaryResult,
         );
       },
     );

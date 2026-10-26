@@ -19,6 +19,7 @@ class CardCreatorAction extends QuickAction {
               'Create a card with the selected dictionary entry parameters and'
               ' edit before export.',
           icon: Icons.note_add,
+          closesPopup: true,
         );
 
   /// Used to identify this enhancement and to allow a constant value for the

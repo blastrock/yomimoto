@@ -270,7 +270,7 @@ class _DictionaryQuickActionsRowState
                 .colorScheme
                 .onSurface
                 .withValues(alpha: 0.05),
-            size: Spacing.of(context).spaces.semiBig,
+            size: Spacing.of(context).spaces.big,
             tooltip: quickAction.label,
             icon: quickAction.icon,
             onTap: () async {

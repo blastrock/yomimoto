@@ -17,6 +17,9 @@ export 'src/utils/components/jidoujisho_list_tile.dart';
 
 export 'src/utils/converters/enhancements_converter.dart';
 
+export 'src/utils/explanation/explanation_prompts.dart';
+export 'src/utils/explanation/sentence_explanation.dart';
+
 
 export 'src/utils/misc/app_colors.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';

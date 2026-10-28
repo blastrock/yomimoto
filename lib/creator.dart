@@ -16,6 +16,7 @@ export 'src/creator/actions/share_action.dart';
 export 'src/creator/actions/play_audio_action.dart';
 export 'src/creator/actions/copy_to_clipboard_action.dart';
 export 'src/creator/actions/add_to_stash_action.dart';
+export 'src/creator/actions/explain_sentence_action.dart';
 
 export 'src/creator/enhancements/clear_field_enhancement.dart';
 export 'src/creator/enhancements/massif_example_sentences_enhancement.dart';

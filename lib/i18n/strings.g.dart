@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 219
+/// Strings: 220
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -295,6 +295,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get stash_added => 'Added to stash';
 	String get stash_already => 'Already stashed';
 	String get stash_unavailable => 'Open a book to stash words';
+	String get explain_unavailable => 'Open a book to explain its sentences';
 	String get stash_jump => 'Jump to word';
 	String get stash_all_dictionaries => 'All dictionaries';
 	String get stash_entry_missing => 'This dictionary entry is no longer installed';
@@ -522,6 +523,7 @@ extension on Translations {
 			case 'stash_added': return 'Added to stash';
 			case 'stash_already': return 'Already stashed';
 			case 'stash_unavailable': return 'Open a book to stash words';
+			case 'explain_unavailable': return 'Open a book to explain its sentences';
 			case 'stash_jump': return 'Jump to word';
 			case 'stash_all_dictionaries': return 'All dictionaries';
 			case 'stash_entry_missing': return 'This dictionary entry is no longer installed';

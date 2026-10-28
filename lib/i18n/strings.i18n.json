@@ -161,6 +161,7 @@
     "stash_added": "Added to stash",
     "stash_already": "Already stashed",
     "stash_unavailable": "Open a book to stash words",
+    "explain_unavailable": "Open a book to explain its sentences",
     "stash_jump": "Jump to word",
     "stash_all_dictionaries": "All dictionaries",
     "stash_entry_missing": "This dictionary entry is no longer installed",

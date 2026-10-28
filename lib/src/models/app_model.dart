@@ -696,6 +696,7 @@ class AppModel with ChangeNotifier {
     headingQuickActions = List<QuickAction>.unmodifiable([
       CopyToClipboardAction(),
       PlayAudioAction(),
+      ExplainSentenceAction(),
     ]);
     entryQuickActions = List<QuickAction>.unmodifiable([
       ShareAction(),

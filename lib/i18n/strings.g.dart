@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 208
+/// Strings: 219
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -168,6 +168,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_edit => 'EDIT';
 	String get dialog_import => 'IMPORT';
 	String get dialog_close => 'CLOSE';
+	String get dialog_retry => 'RETRY';
 	String get dialog_clear => 'CLEAR';
 	String get dialog_create => 'CREATE';
 	String get dialog_delete => 'DELETE';
@@ -318,6 +319,16 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get explanation_model => 'Model';
 	String get explanation_preset_sonnet => 'Sonnet 5.5 (better)';
 	String get explanation_preset_haiku => 'Haiku 5.5 (cheaper)';
+	String get explanation_no_api_key => 'Set an Anthropic API key in Settings';
+	String get explanation_network => 'Could not reach the API';
+	String get explanation_timeout => 'The API took too long to answer';
+	String get explanation_rate_limited => 'Too many requests, try again shortly';
+	String get explanation_server => 'The API had a problem';
+	String get explanation_bad_key => 'The API key was rejected';
+	String get explanation_request => 'The API rejected the request';
+	String get explanation_refusal => 'The model declined to explain this sentence';
+	String get explanation_truncated => 'The answer was cut off';
+	String get explanation_unparseable => 'The answer could not be read';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
@@ -384,6 +395,7 @@ extension on Translations {
 			case 'dialog_edit': return 'EDIT';
 			case 'dialog_import': return 'IMPORT';
 			case 'dialog_close': return 'CLOSE';
+			case 'dialog_retry': return 'RETRY';
 			case 'dialog_clear': return 'CLEAR';
 			case 'dialog_create': return 'CREATE';
 			case 'dialog_delete': return 'DELETE';
@@ -534,6 +546,16 @@ extension on Translations {
 			case 'explanation_model': return 'Model';
 			case 'explanation_preset_sonnet': return 'Sonnet 5.5 (better)';
 			case 'explanation_preset_haiku': return 'Haiku 5.5 (cheaper)';
+			case 'explanation_no_api_key': return 'Set an Anthropic API key in Settings';
+			case 'explanation_network': return 'Could not reach the API';
+			case 'explanation_timeout': return 'The API took too long to answer';
+			case 'explanation_rate_limited': return 'Too many requests, try again shortly';
+			case 'explanation_server': return 'The API had a problem';
+			case 'explanation_bad_key': return 'The API key was rejected';
+			case 'explanation_request': return 'The API rejected the request';
+			case 'explanation_refusal': return 'The model declined to explain this sentence';
+			case 'explanation_truncated': return 'The answer was cut off';
+			case 'explanation_unparseable': return 'The answer could not be read';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';

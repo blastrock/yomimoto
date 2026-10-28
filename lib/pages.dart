@@ -19,6 +19,7 @@ export 'src/pages/implementations/home_manga_page.dart';
 export 'src/pages/implementations/home_novel_page.dart';
 export 'src/pages/implementations/home_page.dart';
 export 'src/pages/implementations/settings_page.dart';
+export 'src/pages/implementations/sentence_explanation_dialog_page.dart';
 export 'src/pages/implementations/stash_item_page.dart';
 export 'src/pages/implementations/stash_page.dart';
 export 'src/pages/implementations/recursive_dictionary_page.dart';

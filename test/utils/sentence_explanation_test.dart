@@ -95,6 +95,26 @@ void main() {
     });
   });
 
+  group('limitContext', () {
+    test('keeps context that fits', () {
+      expect(limitContext(['ab', 'cd'], maxLength: 4), ['ab', 'cd']);
+    });
+
+    test('drops the oldest paragraphs first', () {
+      expect(limitContext(['ab', 'cd', 'ef'], maxLength: 4), ['cd', 'ef']);
+    });
+
+    test('sends no context when the tapped paragraph alone is too long', () {
+      expect(limitContext(['ab', 'cdefg'], maxLength: 4), isEmpty);
+    });
+
+    test('defaults to 2000 characters', () {
+      String long = 'あ' * 1500;
+
+      expect(limitContext([long, long]), [long]);
+    });
+  });
+
   group('ExplanationPreset', () {
     test('preset from key', () {
       expect(ExplanationPreset.fromKey('haiku'), ExplanationPreset.haiku);

@@ -73,7 +73,7 @@ class ExplainSentenceAction extends QuickAction {
       title: mediaItem.overrideTitle ?? mediaItem.title,
       sentence: sentence.trim(),
       kind: kind,
-      context: paragraphs,
+      context: limitContext(paragraphs),
     );
 
     if (!context.mounted) {

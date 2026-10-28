@@ -107,6 +107,25 @@ class ExplanationException implements Exception {
   String toString() => 'ExplanationException(${failure.name}): $message';
 }
 
+/// Bound the context sent with a sentence to [maxLength] characters, so that
+/// a book whose paragraphs are not marked up (a whole section in one block)
+/// does not send its whole chapter. Drops the oldest paragraphs first; when
+/// the last one, the paragraph of the sentence, is too long on its own, sends
+/// no context at all.
+List<String> limitContext(List<String> paragraphs, {int maxLength = 2000}) {
+  List<String> kept = [];
+  int length = 0;
+  for (String paragraph in paragraphs.reversed) {
+    length += paragraph.length;
+    if (length > maxLength) {
+      break;
+    }
+    kept.insert(0, paragraph);
+  }
+
+  return kept;
+}
+
 /// A sentence to explain, with what the model needs to know around it.
 class ExplanationRequest {
   /// Create a request. [context] holds paragraphs with furigana written

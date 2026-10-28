@@ -317,6 +317,20 @@ Both hand selected text to `AppModel.openRecursiveDictionarySearch` — that pat
 selection → lookup → card creation, is the app's core interaction. Treat it as
 load-bearing.
 
+**Sentence explanation** (design in
+`docs/superpowers/specs/2026-10-28-sentence-explanation-design.md`): the
+`ExplainSentenceAction` heading quick action sends the reader's current
+sentence to the Anthropic Messages API with the user's key and shows the
+translation and the sentence's parts (reading, meaning) in
+`SentenceExplanationDialogPage`. The prompts, schema, request and parsing are
+pure code in `lib/src/utils/explanation/`; the novel prompt comes out of a
+measured comparison, so change it only with a new one. Each reader's source
+gives its `MediaSource.explanationKind` (novel or manga); the ttu page sets
+`explanationContext` to the `getContext` bridge command (preceding paragraphs
+with furigana as `kanji(reading)`), and manga sends the bubble alone. Settings:
+`Preferences.explanationApiKey` and `explanationPreset` (Sonnet 5.5 or
+Haiku 5.5, each with its own thinking settings).
+
 ## Conventions
 
 - The code predates the current `dart format` style: running it on an

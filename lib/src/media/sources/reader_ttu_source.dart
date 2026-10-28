@@ -35,6 +35,9 @@ class ReaderTtuSource extends ReaderMediaSource {
   static final ReaderTtuSource _instance =
       ReaderTtuSource._privateConstructor();
 
+  @override
+  ExplanationKind get explanationKind => ExplanationKind.novel;
+
   // This source's preferences, prefixed with its uniqueKey.
   static const Preference<bool> _volumePageTurningEnabled =
       Preference('reader_ttu/volume_page_turning_enabled', defaultValue: true);

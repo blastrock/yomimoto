@@ -669,45 +669,45 @@ document.getElementById('pageIdxDisplay').style.color = 'white';
                 length: length,
                 whitespaceOffset: whitespaceOffset,
               );
-
-              final range = TextRange(start: rawIndex, end: rawIndex + length);
-
-              final rawSelection = JidoujishoTextSelection(
-                text: rawText,
-                range: range,
-              );
-
-              final sb = StringBuffer();
-              sb.write(rawSelection.textBefore
-                  .split('\n')
-                  .map((e) => e.trim())
-                  .join());
-
-              int finalStart = sb.length;
-
-              sb.write(rawSelection.textInside
-                  .split('\n')
-                  .map((e) => e.trim())
-                  .join());
-
-              int finalEnd = sb.length;
-              sb.write(rawSelection.textAfter
-                  .split('\n')
-                  .map((e) => e.trim())
-                  .join());
-
-              String finalText = sb.toString();
-
-              TextRange finalRange =
-                  TextRange(start: finalStart, end: finalEnd);
-
-              mediaSource.setCurrentSentence(
-                selection: JidoujishoTextSelection(
-                  text: finalText,
-                  range: finalRange,
-                ),
-              );
             }
+
+            final range = TextRange(start: rawIndex, end: rawIndex + length);
+
+            final rawSelection = JidoujishoTextSelection(
+              text: rawText,
+              range: range,
+            );
+
+            final sb = StringBuffer();
+            sb.write(rawSelection.textBefore
+                .split('\n')
+                .map((e) => e.trim())
+                .join());
+
+            int finalStart = sb.length;
+
+            sb.write(rawSelection.textInside
+                .split('\n')
+                .map((e) => e.trim())
+                .join());
+
+            int finalEnd = sb.length;
+            sb.write(rawSelection.textAfter
+                .split('\n')
+                .map((e) => e.trim())
+                .join());
+
+            String finalText = sb.toString();
+
+            TextRange finalRange =
+                TextRange(start: finalStart, end: finalEnd);
+
+            mediaSource.setCurrentSentence(
+              selection: JidoujishoTextSelection(
+                text: finalText,
+                range: finalRange,
+              ),
+            );
           }));
 
           mediaSource.setExtraData(imageUrl);

@@ -125,7 +125,7 @@ class TtuBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in ebook-reader-lite's `host-bridge.ts`.
-  static const int protocolVersion = 3;
+  static const int protocolVersion = 4;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);
@@ -212,6 +212,20 @@ class TtuBridge {
   /// The current selection with furigana removed, trimmed.
   Future<String> getSelectedText() async =>
       (await _call('getSelectedText') as String?) ?? '';
+
+  /// The last tapped paragraph and up to [paragraphs] paragraphs before it,
+  /// oldest first, within its book section, with furigana written
+  /// `kanji(reading)`. Empty when nothing has been tapped.
+  Future<List<String>> getContext({int paragraphs = 3}) async =>
+      parseContext(await _call('getContext', args: {'paragraphs': paragraphs}));
+
+  /// Read a `getContext` result, dropping anything that is not a string.
+  static List<String> parseContext(dynamic raw) {
+    if (raw is! List) {
+      return [];
+    }
+    return raw.whereType<String>().toList();
+  }
 
   /// Every book in ttu's library.
   Future<List<TtuBook>> listBooks() async {

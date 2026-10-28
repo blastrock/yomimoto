@@ -53,8 +53,15 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    if (mediaSource.explanationContext == _explanationContext) {
+      mediaSource.explanationContext = null;
+    }
     super.dispose();
   }
+
+  /// Supplies the sentence explanation context while this page is open.
+  Future<List<String>> _explanationContext() async =>
+      await _bridge?.getContext() ?? [];
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -230,6 +237,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           onTap: _onTap,
           onExit: _onBridgeExit,
         );
+        mediaSource.explanationContext = _explanationContext;
       },
       onLoadStop: (controller, uri) {
         Future.delayed(const Duration(seconds: 1), _focusNode.requestFocus);

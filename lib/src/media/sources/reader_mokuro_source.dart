@@ -40,6 +40,9 @@ class ReaderMokuroSource extends ReaderMediaSource {
   static final ReaderMokuroSource _instance =
       ReaderMokuroSource._privateConstructor();
 
+  @override
+  ExplanationKind get explanationKind => ExplanationKind.manga;
+
   // This source's preferences, prefixed with its uniqueKey.
   static const Preference<bool> _volumePageTurningEnabled =
       Preference('reader_mokuro/volume_page_turning_enabled',

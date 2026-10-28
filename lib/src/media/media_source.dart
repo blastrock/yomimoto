@@ -141,6 +141,15 @@ abstract class MediaSource extends HomeTab {
     _currentPosition = -1;
   }
 
+  /// What kind of text this source shows, for sentence explanations, or null
+  /// when it cannot explain sentences.
+  ExplanationKind? get explanationKind => null;
+
+  /// Supplies the context of [currentSentence] for a sentence explanation:
+  /// paragraphs with furigana written `kanji(reading)`. Set by the source page
+  /// while it is open; null when the source sends no context.
+  Future<List<String>> Function()? explanationContext;
+
   /// This is used to hold data for generating images and audio.
   String? get currentExtraData => _currentExtraData;
   String? _currentExtraData;

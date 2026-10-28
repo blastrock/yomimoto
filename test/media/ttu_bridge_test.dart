@@ -9,7 +9,7 @@ void main() {
         'route': '/b.html',
       });
 
-      expect(TtuBridge.protocolVersion, 3);
+      expect(TtuBridge.protocolVersion, 4);
       expect(event.isCompatible, isTrue);
       expect(event.route, '/b.html');
     });
@@ -32,6 +32,14 @@ void main() {
       TtuReadyEvent event = TtuReadyEvent.fromJson({'protocolVersion': 3});
 
       expect(event.route, '');
+    });
+  });
+
+  group('TtuBridge.parseContext', () {
+    test('parses a context result', () {
+      expect(TtuBridge.parseContext(['a', 'b']), ['a', 'b']);
+      expect(TtuBridge.parseContext(null), isEmpty);
+      expect(TtuBridge.parseContext(['a', 1]), ['a']);
     });
   });
 

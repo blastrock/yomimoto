@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 203
+/// Strings: 208
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -313,6 +313,11 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get theme_light => 'Light';
 	String get theme_dark => 'Dark';
 	String get settings_about => 'About';
+	String get sentence_explanation => 'Sentence explanation';
+	String get explanation_api_key => 'Anthropic API key';
+	String get explanation_model => 'Model';
+	String get explanation_preset_sonnet => 'Sonnet 5.5 (better)';
+	String get explanation_preset_haiku => 'Haiku 5.5 (cheaper)';
 	String get volume_button_page_turning => 'Volume button page turning';
 	String get invert_volume_buttons => 'Invert volume buttons';
 	String get extend_page_beyond_navbar => 'Extend page beyond navigation bar';
@@ -524,6 +529,11 @@ extension on Translations {
 			case 'theme_light': return 'Light';
 			case 'theme_dark': return 'Dark';
 			case 'settings_about': return 'About';
+			case 'sentence_explanation': return 'Sentence explanation';
+			case 'explanation_api_key': return 'Anthropic API key';
+			case 'explanation_model': return 'Model';
+			case 'explanation_preset_sonnet': return 'Sonnet 5.5 (better)';
+			case 'explanation_preset_haiku': return 'Haiku 5.5 (cheaper)';
 			case 'volume_button_page_turning': return 'Volume button page turning';
 			case 'invert_volume_buttons': return 'Invert volume buttons';
 			case 'extend_page_beyond_navbar': return 'Extend page beyond navigation bar';

@@ -30,6 +30,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
 
   late final TextEditingController _fontSizeController;
   late final TextEditingController _maximumTermsController;
+  late final TextEditingController _apiKeyController;
 
   /// Captured in [initState] so [dispose] does not have to reach for a
   /// provider, which is no longer legal at that point.
@@ -54,6 +55,9 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _maximumTermsController = TextEditingController(
       text: _appModel.preferences.get(Preferences.maximumTerms).toString(),
     );
+    _apiKeyController = TextEditingController(
+      text: _appModel.preferences.get(Preferences.explanationApiKey),
+    );
   }
 
   @override
@@ -61,6 +65,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     _scrollController.dispose();
     _fontSizeController.dispose();
     _maximumTermsController.dispose();
+    _apiKeyController.dispose();
 
     if (_appModel.preferences.get(Preferences.dictionaryFontSize) !=
         _initialFontSize) {
@@ -208,6 +213,26 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 value: mokuroSource.extendPageBeyondNavigationBar,
                 toggle: mokuroSource.toggleExtendPageBeyondNavigationBar,
               ),
+              buildHeader(t.sentence_explanation),
+              buildTextField(
+                controller: _apiKeyController,
+                label: t.explanation_api_key,
+                obscureText: true,
+                onChanged: (value) => appModel.preferences
+                    .set(Preferences.explanationApiKey, value.trim()),
+              ),
+              buildChoice<ExplanationPreset>(
+                label: t.explanation_model,
+                options: ExplanationPreset.values,
+                value: ExplanationPreset.fromKey(
+                    appModel.preferences.get(Preferences.explanationPreset)),
+                generateLabel: (preset) => switch (preset) {
+                  ExplanationPreset.sonnet => t.explanation_preset_sonnet,
+                  ExplanationPreset.haiku => t.explanation_preset_haiku,
+                },
+                onChanged: (preset) => appModel.preferences
+                    .set(Preferences.explanationPreset, preset.name),
+              ),
               buildHeader(t.settings_about),
               buildAction(
                 icon: Icons.code,
@@ -333,6 +358,30 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
               FocusScope.of(context).unfocus();
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required Function(String) onChanged,
+    bool obscureText = false,
+  }) {
+    return Padding(
+      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
+            top: Spacing.of(context).spaces.small,
+          ),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        autocorrect: false,
+        enableSuggestions: false,
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          labelText: label,
         ),
       ),
     );

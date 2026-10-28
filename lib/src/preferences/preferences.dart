@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/preferences.dart';
+import 'package:yuuna/utils.dart';
 
 /// The app-wide settings. Each reader source declares its own next to the
 /// getters that use them.
@@ -66,6 +67,17 @@ abstract final class Preferences {
   static const StringListPreference duplicateCheckModels =
       StringListPreference('duplicate_check_models',
           defaultValue: [AnkiMapping.standardModelName]);
+
+  // Sentence explanation.
+
+  /// The Anthropic API key sentence explanations are requested with; empty
+  /// while unset.
+  static const Preference<String> explanationApiKey =
+      Preference('explanation_api_key', defaultValue: '');
+
+  /// The `name` of the [ExplanationPreset] explanations use.
+  static const Preference<String> explanationPreset =
+      Preference('explanation_preset', defaultValue: 'sonnet');
 
   // Files.
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -73,7 +75,11 @@ class _MangaAddVolumeDialogPageState
   }
 
   void _openCatalog(String url) {
-    Navigator.of(context).pop();
+    NavigatorState navigator = Navigator.of(context);
+    navigator.pop();
+    unawaited(navigator.push(MaterialPageRoute<void>(
+      builder: (_) => MangaCatalogPage(catalogUrl: url),
+    )));
   }
 
   Future<void> _removeCatalog(String url) async {

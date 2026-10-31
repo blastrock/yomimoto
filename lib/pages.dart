@@ -37,6 +37,8 @@ export 'src/pages/implementations/reader_mokuro_source_page.dart';
 export 'src/pages/implementations/mokuro_reader_bar.dart';
 export 'src/pages/implementations/manga_add_catalog_dialog_page.dart';
 export 'src/pages/implementations/manga_add_volume_dialog_page.dart';
+export 'src/pages/implementations/manga_catalog_page.dart';
+export 'src/pages/implementations/manga_catalog_tile.dart';
 export 'src/pages/implementations/loading_page.dart';
 export 'src/pages/implementations/switch_settings_page.dart';
 

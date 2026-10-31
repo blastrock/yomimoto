@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 232
+/// Strings: 238
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -300,6 +300,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get manga_catalog_invalid_url => 'This is not a web address';
 	String get manga_catalog_not_found => 'No mokuro catalog answers at this address';
 	String get manga_catalog_checking => 'Checking the catalog…';
+	String get manga_catalog_search_hint => 'Search titles';
+	String get manga_catalog_unreachable => 'Could not reach the catalog';
+	String get manga_catalog_http_error => 'The catalog answered with an error';
+	String get manga_catalog_unexpected => 'The catalog sent something unexpected';
+	String get manga_catalog_unsupported => 'This catalog is too new for this version of the app';
+	String get manga_catalog_no_ocr => 'This volume has no OCR yet';
 	String get manga_importing => 'Importing volume…';
 	String get manga_no_volumes_added => 'No volumes yet: tap + to download one from a catalog or import a file';
 	String get manga_import_no_ocr => 'No .mokuro file next to or inside this archive';
@@ -540,6 +546,12 @@ extension on Translations {
 			case 'manga_catalog_invalid_url': return 'This is not a web address';
 			case 'manga_catalog_not_found': return 'No mokuro catalog answers at this address';
 			case 'manga_catalog_checking': return 'Checking the catalog…';
+			case 'manga_catalog_search_hint': return 'Search titles';
+			case 'manga_catalog_unreachable': return 'Could not reach the catalog';
+			case 'manga_catalog_http_error': return 'The catalog answered with an error';
+			case 'manga_catalog_unexpected': return 'The catalog sent something unexpected';
+			case 'manga_catalog_unsupported': return 'This catalog is too new for this version of the app';
+			case 'manga_catalog_no_ocr': return 'This volume has no OCR yet';
 			case 'manga_importing': return 'Importing volume…';
 			case 'manga_no_volumes_added': return 'No volumes yet: tap + to download one from a catalog or import a file';
 			case 'manga_import_no_ocr': return 'No .mokuro file next to or inside this archive';

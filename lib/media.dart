@@ -15,6 +15,7 @@ export 'src/media/sources/ttu_import_path_handler.dart';
 export 'src/media/sources/mokuro_asset_path_handler.dart';
 export 'src/media/sources/mokuro_bridge.dart';
 export 'src/media/sources/mokuro_catalog.dart';
+export 'src/media/sources/mokuro_catalog_download.dart';
 export 'src/media/sources/mokuro_import.dart';
 export 'src/media/sources/mokuro_volume.dart';
 export 'src/media/sources/mokuro_volume_path_handler.dart';

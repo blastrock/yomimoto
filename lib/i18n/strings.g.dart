@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 221
+/// Strings: 232
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -173,6 +173,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_create => 'CREATE';
 	String get dialog_delete => 'DELETE';
 	String get dialog_cancel => 'CANCEL';
+	String get dialog_add => 'ADD';
+	String get dialog_remove => 'REMOVE';
 	String get dialog_select => 'SELECT';
 	String get dialog_search => 'SEARCH';
 	String get dialog_exit => 'EXIT';
@@ -288,9 +290,18 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get ttu_delete_book_confirm => 'Delete this book and its reading position?';
 	String get ttu_deleting => 'Deleting book…';
 	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
-	String get manga_import_volume => 'Import volume';
+	String get manga_add_volume => 'Add volume';
+	String get manga_add_catalog => 'Add catalog';
+	String get manga_import_file => 'Import file';
+	String get manga_catalogs_empty => 'No catalogs yet';
+	String get manga_catalog_remove => 'Remove catalog';
+	String manga_catalog_remove_confirm({required Object host}) => 'Remove the catalog ${host}? Downloaded volumes stay in the library.';
+	String get manga_catalog_url_hint => 'https://mokuro.moe';
+	String get manga_catalog_invalid_url => 'This is not a web address';
+	String get manga_catalog_not_found => 'No mokuro catalog answers at this address';
+	String get manga_catalog_checking => 'Checking the catalog…';
 	String get manga_importing => 'Importing volume…';
-	String get manga_no_volumes_added => 'No volumes yet: import a CBZ or ZIP processed by mokuro';
+	String get manga_no_volumes_added => 'No volumes yet: tap + to download one from a catalog or import a file';
 	String get manga_import_no_ocr => 'No .mokuro file next to or inside this archive';
 	String get manga_import_several_ocr => 'This archive holds several .mokuro files';
 	String get manga_import_invalid_ocr => 'The .mokuro file could not be read';
@@ -402,6 +413,8 @@ extension on Translations {
 			case 'dialog_create': return 'CREATE';
 			case 'dialog_delete': return 'DELETE';
 			case 'dialog_cancel': return 'CANCEL';
+			case 'dialog_add': return 'ADD';
+			case 'dialog_remove': return 'REMOVE';
 			case 'dialog_select': return 'SELECT';
 			case 'dialog_search': return 'SEARCH';
 			case 'dialog_exit': return 'EXIT';
@@ -517,9 +530,18 @@ extension on Translations {
 			case 'ttu_delete_book_confirm': return 'Delete this book and its reading position?';
 			case 'ttu_deleting': return 'Deleting book…';
 			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
-			case 'manga_import_volume': return 'Import volume';
+			case 'manga_add_volume': return 'Add volume';
+			case 'manga_add_catalog': return 'Add catalog';
+			case 'manga_import_file': return 'Import file';
+			case 'manga_catalogs_empty': return 'No catalogs yet';
+			case 'manga_catalog_remove': return 'Remove catalog';
+			case 'manga_catalog_remove_confirm': return ({required Object host}) => 'Remove the catalog ${host}? Downloaded volumes stay in the library.';
+			case 'manga_catalog_url_hint': return 'https://mokuro.moe';
+			case 'manga_catalog_invalid_url': return 'This is not a web address';
+			case 'manga_catalog_not_found': return 'No mokuro catalog answers at this address';
+			case 'manga_catalog_checking': return 'Checking the catalog…';
 			case 'manga_importing': return 'Importing volume…';
-			case 'manga_no_volumes_added': return 'No volumes yet: import a CBZ or ZIP processed by mokuro';
+			case 'manga_no_volumes_added': return 'No volumes yet: tap + to download one from a catalog or import a file';
 			case 'manga_import_no_ocr': return 'No .mokuro file next to or inside this archive';
 			case 'manga_import_several_ocr': return 'This archive holds several .mokuro files';
 			case 'manga_import_invalid_ocr': return 'The .mokuro file could not be read';

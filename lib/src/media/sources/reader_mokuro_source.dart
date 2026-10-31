@@ -56,6 +56,26 @@ class ReaderMokuroSource extends ReaderMediaSource {
   static const Preference<bool> _highlightOnTap =
       Preference('reader_mokuro/highlight_on_tap', defaultValue: true);
 
+  static const StringListPreference _catalogs =
+      StringListPreference('reader_mokuro/catalogs', defaultValue: []);
+
+  /// The base URLs of the mokuro-bunko catalogs the user added, in the order
+  /// they were added.
+  List<String> get catalogs => List.of(preferences.get(_catalogs));
+
+  /// Add the catalog at [url], a normalised base URL; nothing happens when
+  /// it is already there.
+  Future<void> addCatalog(String url) async {
+    List<String> urls = catalogs;
+    if (!urls.contains(url)) {
+      await preferences.set(_catalogs, [...urls, url]);
+    }
+  }
+
+  /// Remove the catalog at [url]. The volumes downloaded from it stay.
+  Future<void> removeCatalog(String url) =>
+      preferences.set(_catalogs, catalogs..remove(url));
+
   @override
   Widget get home => const HomeMangaPage();
 
@@ -191,28 +211,35 @@ class ReaderMokuroSource extends ReaderMediaSource {
       directory: Directory(path.dirname(archivePath)),
     );
 
-    MokuroImportResult? result = await runWithProgress<MokuroImportResult?>(
+    await runWithProgress<void>(
       context: context,
       message: t.manga_importing,
       task: () async {
         try {
-          return await compute(
-            importMokuroVolume,
-            MokuroImportParams(
-              archivePath: archivePath,
-              volumesDirectory: volumesDirectory(appModel).path,
-            ),
-          );
+          await importArchive(appModel: appModel, archivePath: archivePath);
         } on MokuroImportException catch (error) {
           debugPrint('manga import: $error');
-          showToast(msg: _importErrorMessage(error.error));
-          return null;
+          showToast(msg: importErrorMessage(error.error));
         }
       },
     );
-    if (result == null) {
-      return;
-    }
+  }
+
+  /// Import the volume in the archive at [archivePath] (with its OCR beside
+  /// it or inside it) and add it to the library, keeping the entry of a
+  /// volume imported before. Throws a [MokuroImportException] when the
+  /// volume cannot be imported.
+  Future<MokuroImportResult> importArchive({
+    required AppModel appModel,
+    required String archivePath,
+  }) async {
+    MokuroImportResult result = await compute(
+      importMokuroVolume,
+      MokuroImportParams(
+        archivePath: archivePath,
+        volumesDirectory: volumesDirectory(appModel).path,
+      ),
+    );
 
     MediaItem? existing = appModel
         .getMediaSourceHistory(mediaSource: this)
@@ -222,9 +249,11 @@ class ReaderMokuroSource extends ReaderMediaSource {
       showToast(msg: t.manga_import_missing_pages(n: result.missingPages));
     }
     refreshTab();
+    return result;
   }
 
-  String _importErrorMessage(MokuroImportError error) {
+  /// The message telling the user why an import failed with [error].
+  String importErrorMessage(MokuroImportError error) {
     switch (error) {
       case MokuroImportError.notAnArchive:
         return t.manga_import_not_archive;
@@ -342,9 +371,12 @@ class ReaderMokuroSource extends ReaderMediaSource {
         showIfOpened: true,
         child: JidoujishoIconButton(
           size: Theme.of(context).textTheme.titleLarge?.fontSize,
-          tooltip: t.manga_import_volume,
+          tooltip: t.manga_add_volume,
           icon: Icons.add,
-          onTap: () => importVolume(context: context, appModel: appModel),
+          onTap: () => showDialog<void>(
+            context: context,
+            builder: (_) => const MangaAddVolumeDialogPage(),
+          ),
         ),
       ),
     ];

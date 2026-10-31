@@ -129,6 +129,7 @@ void main() {
     expect(formatCatalogSize(98000000), '98 MB');
     expect(formatCatalogSize(55846180 + 398114), '56 MB');
     expect(formatCatalogSize(1000), '1 MB');
+    expect(formatCatalogSize(0), '0 MB');
   });
 
   group('MokuroCatalogClient', () {

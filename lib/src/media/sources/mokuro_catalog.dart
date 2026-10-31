@@ -39,10 +39,11 @@ String? normaliseCatalogUrl(String input) {
 /// The name a catalog is shown by: its address's host.
 String catalogHost(String url) => Uri.parse(url).host;
 
-/// A download size for the user, in megabytes (10⁶ bytes), never below 1.
+/// A download size for the user, in megabytes (10⁶ bytes), never below 1
+/// unless nothing at all.
 String formatCatalogSize(int bytes) {
   int megabytes = (bytes / 1000000).round();
-  return '${megabytes < 1 ? 1 : megabytes} MB';
+  return '${megabytes < 1 && bytes > 0 ? 1 : megabytes} MB';
 }
 
 /// Why a catalog request failed.

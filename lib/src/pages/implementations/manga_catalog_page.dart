@@ -184,7 +184,15 @@ class _MangaCatalogPageState extends BasePageState<MangaCatalogPage> {
       coverUrl: _client.coverUri(series.cover).toString(),
       title: series.displayTitle,
       badge: series.tag,
-      onTap: () {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (_) => MangaSeriesPage(
+            catalogUrl: widget.catalogUrl,
+            series: series,
+          ),
+        ),
+      ),
     );
   }
 }

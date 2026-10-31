@@ -39,6 +39,8 @@ export 'src/pages/implementations/manga_add_catalog_dialog_page.dart';
 export 'src/pages/implementations/manga_add_volume_dialog_page.dart';
 export 'src/pages/implementations/manga_catalog_page.dart';
 export 'src/pages/implementations/manga_catalog_tile.dart';
+export 'src/pages/implementations/manga_download_dialog.dart';
+export 'src/pages/implementations/manga_series_page.dart';
 export 'src/pages/implementations/loading_page.dart';
 export 'src/pages/implementations/switch_settings_page.dart';
 

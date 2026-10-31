@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 238
+/// Strings: 252
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -175,6 +175,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_cancel => 'CANCEL';
 	String get dialog_add => 'ADD';
 	String get dialog_remove => 'REMOVE';
+	String get dialog_download => 'DOWNLOAD';
 	String get dialog_select => 'SELECT';
 	String get dialog_search => 'SEARCH';
 	String get dialog_exit => 'EXIT';
@@ -306,6 +307,19 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get manga_catalog_unexpected => 'The catalog sent something unexpected';
 	String get manga_catalog_unsupported => 'This catalog is too new for this version of the app';
 	String get manga_catalog_no_ocr => 'This volume has no OCR yet';
+	String manga_selected({required Object n}) => '${n} selected';
+	String get manga_download_preparing => 'Getting the volumes\' sizes…';
+	String manga_download_one({required Object name}) => 'Download ${name}?';
+	String manga_download_again({required Object name}) => '${name} is already in your library. Download it again? Its reading position and stash are kept.';
+	String manga_download_size({required Object size}) => '${size}.';
+	String manga_download_many({required Object n}) => 'Download ${n} volumes?';
+	String manga_download_total({required Object size}) => '${size} in total.';
+	String get manga_download_title => 'Downloading';
+	String manga_download_volume({required Object i, required Object n}) => 'Volume ${i} of ${n}';
+	String get manga_download_importing => 'Importing…';
+	String manga_download_bytes({required Object received, required Object total}) => '${received} / ${total}';
+	String get manga_download_cancelling => 'CANCELLING…';
+	String manga_download_failed({required Object name, required Object reason}) => '${name}: ${reason}';
 	String get manga_importing => 'Importing volume…';
 	String get manga_no_volumes_added => 'No volumes yet: tap + to download one from a catalog or import a file';
 	String get manga_import_no_ocr => 'No .mokuro file next to or inside this archive';
@@ -421,6 +435,7 @@ extension on Translations {
 			case 'dialog_cancel': return 'CANCEL';
 			case 'dialog_add': return 'ADD';
 			case 'dialog_remove': return 'REMOVE';
+			case 'dialog_download': return 'DOWNLOAD';
 			case 'dialog_select': return 'SELECT';
 			case 'dialog_search': return 'SEARCH';
 			case 'dialog_exit': return 'EXIT';
@@ -552,6 +567,19 @@ extension on Translations {
 			case 'manga_catalog_unexpected': return 'The catalog sent something unexpected';
 			case 'manga_catalog_unsupported': return 'This catalog is too new for this version of the app';
 			case 'manga_catalog_no_ocr': return 'This volume has no OCR yet';
+			case 'manga_selected': return ({required Object n}) => '${n} selected';
+			case 'manga_download_preparing': return 'Getting the volumes\' sizes…';
+			case 'manga_download_one': return ({required Object name}) => 'Download ${name}?';
+			case 'manga_download_again': return ({required Object name}) => '${name} is already in your library. Download it again? Its reading position and stash are kept.';
+			case 'manga_download_size': return ({required Object size}) => '${size}.';
+			case 'manga_download_many': return ({required Object n}) => 'Download ${n} volumes?';
+			case 'manga_download_total': return ({required Object size}) => '${size} in total.';
+			case 'manga_download_title': return 'Downloading';
+			case 'manga_download_volume': return ({required Object i, required Object n}) => 'Volume ${i} of ${n}';
+			case 'manga_download_importing': return 'Importing…';
+			case 'manga_download_bytes': return ({required Object received, required Object total}) => '${received} / ${total}';
+			case 'manga_download_cancelling': return 'CANCELLING…';
+			case 'manga_download_failed': return ({required Object name, required Object reason}) => '${name}: ${reason}';
 			case 'manga_importing': return 'Importing volume…';
 			case 'manga_no_volumes_added': return 'No volumes yet: tap + to download one from a catalog or import a file';
 			case 'manga_import_no_ocr': return 'No .mokuro file next to or inside this archive';

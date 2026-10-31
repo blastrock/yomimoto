@@ -283,6 +283,9 @@ class _ReaderMokuroSourcePageState
       clearDictionaryResult();
       mediaSource.clearCurrentSentence();
     }
+    // The card image is the page of the last lookup: not one turned away
+    // from.
+    mediaSource.clearExtraData();
     setState(() => _shown = event);
 
     if (_zoomScale > 1.01) {
@@ -295,7 +298,7 @@ class _ReaderMokuroSourcePageState
     }
     MediaItem item = widget.item!;
     item.position = event.last;
-    item.duration = event.count;
+    item.duration = ReaderMokuroSource.progressLength(event.count);
     unawaited(appModel.updateMediaItem(item));
   }
 
@@ -312,6 +315,7 @@ class _ReaderMokuroSourcePageState
     if (event.isDismiss) {
       clearDictionaryResult();
       mediaSource.clearCurrentSentence();
+      mediaSource.clearExtraData();
       return;
     }
 

@@ -106,7 +106,7 @@ MokuroImportResult importMokuroVolume(MokuroImportParams params) {
 
     Map<String, ArchiveFile> files = {
       for (ArchiveFile file in archive.files)
-        if (file.isFile) file.name: file,
+        if (file.isFile && !_isMacMetadata(file.name)) file.name: file,
     };
 
     String source = _readOcr(params.archivePath, files);
@@ -178,6 +178,12 @@ MokuroImportResult importMokuroVolume(MokuroImportParams params) {
   }
 }
 
+/// Whether [entry] is metadata macOS adds to the archives it makes: a
+/// `__MACOSX/` folder of `._` files, which would otherwise count as a second
+/// OCR file and a second top-level folder.
+bool _isMacMetadata(String entry) =>
+    entry.startsWith('__MACOSX/') || p.posix.basename(entry).startsWith('._');
+
 /// Whether the file at [path] starts like a zip archive: the decoder reads
 /// anything else as an empty archive instead of failing.
 bool _isZip(String path) {
@@ -223,8 +229,9 @@ String _readOcr(String archivePath, Map<String, ArchiveFile> files) {
 /// the archive's [fileEntries], or null. Producers do not agree on what
 /// `img_path` is relative to: mokuro-bunko names the archive's folder in it,
 /// the mokuro tool does not. So [imgPath] is looked up at the archive's root,
-/// then in its single top-level folder when every entry is in one. A path
-/// that is absolute or leaves the image root names nothing.
+/// then in its top-level folder when it has a single one (files beside it,
+/// such as the OCR, do not count). A path that is absolute or leaves the
+/// image root names nothing.
 String? resolveImageEntry(String imgPath, Set<String> fileEntries) {
   String normalised = p.posix.normalize(imgPath);
   if (p.posix.isAbsolute(normalised) ||
@@ -238,9 +245,9 @@ String? resolveImageEntry(String imgPath, Set<String> fileEntries) {
 
   Set<String> topFolders = {
     for (String entry in fileEntries)
-      if (entry.contains('/')) entry.split('/').first else '',
+      if (entry.contains('/')) entry.split('/').first,
   };
-  if (topFolders.length != 1 || topFolders.single.isEmpty) {
+  if (topFolders.length != 1) {
     return null;
   }
 

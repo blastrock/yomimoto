@@ -203,6 +203,35 @@ void main() {
     });
   });
 
+  group('importMokuroVolume, archives as people zip them', () {
+    test('imports OCR at the root beside the image folder', () {
+      String path = archive('vol1.zip', {
+        'vol1.mokuro': ocr(['000a.jpg']),
+        'vol1/000a.jpg': 'a',
+      });
+
+      MokuroImportResult result = import(path);
+
+      expect(result.missingPages, 0);
+      expect(File(p.join(result.directory, 'images', '000a.jpg'))
+          .readAsStringSync(), 'a');
+    });
+
+    test('ignores the metadata macOS adds to archives', () {
+      String path = archive('vol1.zip', {
+        'vol1.mokuro': ocr(['000a.jpg']),
+        'vol1/000a.jpg': 'a',
+        '__MACOSX/._vol1.mokuro': 'resource fork',
+        '__MACOSX/vol1/._000a.jpg': 'resource fork',
+      });
+
+      MokuroImportResult result = import(path);
+
+      expect(result.missingPages, 0);
+      expect(result.title, 'series vol1');
+    });
+  });
+
   group('resolveImageEntry', () {
     test('finds the image at the root of the archive', () {
       expect(resolveImageEntry('a.jpg', {'a.jpg'}), 'a.jpg');
@@ -210,6 +239,11 @@ void main() {
 
     test('finds the image in the single top-level folder', () {
       expect(resolveImageEntry('a.jpg', {'vol/a.jpg', 'vol/b.jpg'}),
+          'vol/a.jpg');
+    });
+
+    test('looks in the only folder when files sit beside it', () {
+      expect(resolveImageEntry('a.jpg', {'v.mokuro', 'vol/a.jpg'}),
           'vol/a.jpg');
     });
 

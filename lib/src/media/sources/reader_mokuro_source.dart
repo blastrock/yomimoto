@@ -130,6 +130,12 @@ class ReaderMokuroSource extends ReaderMediaSource {
     return [NetworkToFileImage(file: file)];
   }
 
+  /// A volume's `duration` for [pageCount] pages: the last page's index,
+  /// since its `position` is the index of the highest page shown, so that
+  /// reaching the last page reads as finished in the library.
+  static int progressLength(int pageCount) =>
+      pageCount > 1 ? pageCount - 1 : 1;
+
   /// The library entry for an imported volume. A volume imported again
   /// keeps the [existing] entry's row, so its stash, its reading position
   /// and the title the user gave it.
@@ -145,7 +151,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
       mediaSourceIdentifier: instance.uniqueKey,
       imageUrl: coverPath == null ? null : 'file://$coverPath',
       position: existing?.position ?? 0,
-      duration: result.pageCount,
+      duration: progressLength(result.pageCount),
       canDelete: false,
       canEdit: true,
       overrideTitle: existing?.overrideTitle,

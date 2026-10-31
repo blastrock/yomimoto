@@ -26,7 +26,8 @@ void main() {
       expect(item.title, '【推しの子】 01');
       expect(item.imageUrl, 'file:///v/uuid-1/images/a.jpg');
       expect(item.position, 0);
-      expect(item.duration, 224);
+      // The last page's index: reaching it reads as finished.
+      expect(item.duration, 223);
       expect(item.canDelete, isFalse);
       expect(item.canEdit, isTrue);
     });
@@ -51,7 +52,7 @@ void main() {
       expect(item.position, 42);
       expect(item.overrideTitle, 'Mine');
       expect(item.title, '【推しの子】 01');
-      expect(item.duration, 224);
+      expect(item.duration, 223);
     });
 
     test('has no cover when the first page is missing', () {
@@ -59,6 +60,17 @@ void main() {
           ReaderMokuroSource.volumeItem(result: result(coverPath: null))
               .imageUrl,
           isNull);
+    });
+  });
+
+  group('ReaderMokuroSource.progressLength', () {
+    test('is the last page index, so the last page reads as finished', () {
+      expect(ReaderMokuroSource.progressLength(6), 5);
+      expect(ReaderMokuroSource.progressLength(224), 223);
+    });
+
+    test('is never zero', () {
+      expect(ReaderMokuroSource.progressLength(1), 1);
     });
   });
 

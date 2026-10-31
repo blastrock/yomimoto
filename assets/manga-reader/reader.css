@@ -81,6 +81,24 @@ body {
   display: block;
 }
 
+/* Lines placed on their quads (mokuro-reader's perLine mode): inline-block in
+ * normal flow, so the block stays one text run, then translated onto the
+ * quad by positionLines. Letter-spacing set inline puts the glyphs on the
+ * print's pitch; kerning off because print is fixed-pitch and the measurer
+ * measures it that way. */
+.block.perLine .line.positionedLine {
+  display: inline-block;
+  line-height: 1;
+  letter-spacing: 0;
+  font-kerning: none;
+  white-space: nowrap;
+}
+
+.block.perLine .line.positionedLine.wrappedLine {
+  white-space: normal;
+  line-break: anywhere;
+}
+
 .block.shown {
   z-index: 10;
   color: var(--overlay-text);

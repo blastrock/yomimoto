@@ -7,6 +7,13 @@
 // Outside the app, `?debug=1` logs events to the console instead; commands
 // can be called as `await mokuroHost.<command>({...})`.
 
+import {
+  createCanvasMeasurer,
+  layoutLines,
+  lineTransform,
+  processLine,
+} from './mokuro-layout.js';
+
 /** Must equal MokuroBridge.protocolVersion in the app. */
 export const PROTOCOL_VERSION = 1;
 
@@ -52,10 +59,15 @@ async function send(message) {
 // ---------------------------------------------------------------------------
 // Text
 
-/** mokuro-reader's ellipsis substitution: the text as it is rendered. */
-function processLine(raw) {
-  if (typeof raw !== 'string') return '';
-  return raw.replace(/\.\.\./g, '…').replace(/．．．/g, '…');
+/** The overlay's font, as reader.css sets it. */
+const FONT = "'Noto Sans JP', 'Noto Sans CJK JP', sans-serif";
+
+let measurer;
+
+/** Text advance in em, for mokuro-reader's line layout. */
+function measure(text) {
+  measurer ??= createCanvasMeasurer(FONT);
+  return measurer(text);
 }
 
 /** The rendered lines of a block and where each starts in their join. */
@@ -136,18 +148,87 @@ function buildBlock(block, pageIndex) {
   element.style.writingMode = block.vertical ? 'vertical-rl' : 'horizontal-tb';
 
   const { lines, starts, text } = blockText(block);
+  // Each line on its printed line, as mokuro-reader lays it out; null when
+  // the block has no usable line quads, which keeps the block-level layout.
+  const layouts = block.lines_coords ? layoutLines(block, lines, measure) : null;
+  if (layouts) {
+    element.classList.add('perLine');
+  }
+
   const paragraph = document.createElement('p');
   lines.forEach((line, i) => {
     const span = document.createElement('span');
     span.className = 'line';
     span.dataset.start = String(starts[i]);
     span.textContent = line;
+    if (layouts) {
+      placeLine(span, layouts[i]);
+    }
     paragraph.append(span);
   });
   element.append(paragraph);
 
   element.mokuro = { page: pageIndex, text };
   return element;
+}
+
+/** Give [span] its size and spacing from [layout]; where it goes is set by
+ * positionLines once it is laid out. A hidden line (a duplicate the OCR
+ * captured twice) keeps its text, so that offsets in the block's text do not
+ * shift, but takes no room. */
+function placeLine(span, layout) {
+  span.classList.add('positionedLine');
+  if (layout.hidden) {
+    span.style.display = 'none';
+    return;
+  }
+  span.style.fontSize = `${layout.fontSize}px`;
+  if (layout.letterSpacing) {
+    span.style.letterSpacing = `${layout.letterSpacing}px`;
+  }
+  if (layout.wrap) {
+    span.classList.add('wrappedLine');
+    span.style.width = `${layout.width}px`;
+    span.style.height = `${layout.height}px`;
+  }
+  span.dataset.targetLeft = String(layout.left);
+  span.dataset.targetTop = String(layout.top);
+  span.dataset.inset = String(layout.inset || 0);
+  span.dataset.rotation = String(layout.rotation || 0);
+  span.dataset.boxWidth = String(layout.width);
+  span.dataset.boxHeight = String(layout.height);
+}
+
+/** Move every positioned line of [container] onto its quad: mokuro-reader's
+ * positionPerLine. Offsets are layout values in image px, untouched by the
+ * page's scale and by a transform already set, so this can run again. All
+ * lines are measured before any is moved. */
+function positionLines(container) {
+  const spans = [...container.querySelectorAll('.positionedLine')].filter(
+    (span) => span.style.display !== 'none'
+  );
+  const naturals = spans.map((span) => ({
+    left: span.offsetLeft,
+    top: span.offsetTop,
+    width: span.offsetWidth,
+    height: span.offsetHeight,
+  }));
+  spans.forEach((span, i) => {
+    const data = span.dataset;
+    const rotation = Number(data.rotation) || 0;
+    const { transform, origin } = lineTransform({
+      natural: naturals[i],
+      target: { left: Number(data.targetLeft), top: Number(data.targetTop) },
+      box: rotation
+        ? { width: Number(data.boxWidth), height: Number(data.boxHeight) }
+        : undefined,
+      inset: Number(data.inset) || 0,
+      rotation,
+      vertical: span.closest('.block').style.writingMode === 'vertical-rl',
+    });
+    span.style.transform = transform;
+    span.style.transformOrigin = origin;
+  });
 }
 
 /** Lay the current spread out, fitted to the viewport. */
@@ -178,6 +259,9 @@ function render() {
     slot.append(page);
     container.append(slot);
   });
+
+  requestAnimationFrame(() => positionLines(container));
+  document.fonts.ready.then(() => positionLines(container));
 
   preload(current + 1);
   preload(current - 1);

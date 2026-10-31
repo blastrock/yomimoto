@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:path/path.dart' as path;
@@ -220,11 +221,42 @@ class ReaderMokuroSource extends ReaderMediaSource {
     return deleted;
   }
 
+  /// Settings for the WebView showing the volume in [volume]: the reader
+  /// page and the volume's files are served on the asset loader's origin.
+  /// Zoom is the WebView's own pinch-zoom, which the defaults enable.
+  InAppWebViewSettings webViewSettings(Directory volume) =>
+      InAppWebViewSettings(
+        webViewAssetLoader: WebViewAssetLoader(
+          pathHandlers: [
+            MokuroAssetPathHandler(),
+            MokuroVolumePathHandler(volume),
+          ],
+        ),
+      );
+
+  int? _peekPage;
+
+  /// Open [item] at page [position] to see a word in context. The volume's
+  /// reading position is left untouched for the whole session.
+  Future<void> peek({
+    required WidgetRef ref,
+    required AppModel appModel,
+    required MediaItem item,
+    required int position,
+  }) async {
+    _peekPage = position;
+    try {
+      await appModel.openMedia(ref: ref, mediaSource: this, item: item);
+    } finally {
+      _peekPage = null;
+    }
+  }
+
   @override
   BaseSourcePage buildLaunchPage({
     MediaItem? item,
   }) {
-    throw UnimplementedError('The manga reader is not built yet');
+    return ReaderMokuroSourcePage(item: item!, peekPage: _peekPage);
   }
 
   @override

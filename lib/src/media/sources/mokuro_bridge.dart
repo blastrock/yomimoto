@@ -186,6 +186,9 @@ class MokuroBridge {
   Future<void> highlight({required int start, required int length}) =>
       _call('highlight', args: {'start': start, 'length': length});
 
+  /// Remove any selection, leaving the shown block shown.
+  Future<void> clearSelection() => _call('clearSelection');
+
   /// Hide the shown block and remove any selection.
   Future<void> clearOverlay() => _call('clearOverlay');
 

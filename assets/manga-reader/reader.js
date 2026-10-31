@@ -88,6 +88,10 @@ function blockText(block) {
 let volume;
 let spreads = [];
 let current = 0;
+// The page the reader is on, which a spread does not tell: the page opened
+// or gone to, or the first page of the spread turned to. Rotating the
+// device re-pairs the pages around it.
+let anchor = 0;
 let shownPages = [];
 let shownBlock;
 
@@ -278,8 +282,9 @@ function preload(spreadIndex) {
   }
 }
 
-function showSpread(index) {
+function showSpread(index, page) {
   const clamped = Math.max(0, Math.min(spreads.length - 1, index));
+  anchor = page ?? spreads[clamped][0];
   if (clamped === current && shownPages.length > 0) {
     return;
   }
@@ -288,9 +293,8 @@ function showSpread(index) {
 }
 
 function relayout() {
-  const firstShown = shownPages[0] ?? 0;
   spreads = pairPages(volume.pages.length, isLandscape());
-  current = spreadOf(firstShown);
+  current = spreadOf(anchor);
   render();
 }
 
@@ -458,7 +462,7 @@ async function prevPage() {
 }
 
 async function goToPage({ page }) {
-  showSpread(spreadOf(Number(page)));
+  showSpread(spreadOf(Number(page)), Number(page));
 }
 
 async function highlight({ start, length }) {
@@ -478,6 +482,10 @@ async function highlight({ start, length }) {
   selection?.addRange(range);
 }
 
+async function clearSelection() {
+  window.getSelection()?.removeAllRanges();
+}
+
 async function clearOverlay() {
   window.getSelection()?.removeAllRanges();
   hideBlock();
@@ -492,6 +500,7 @@ window.mokuroHost = {
   prevPage,
   goToPage,
   highlight,
+  clearSelection,
   clearOverlay,
   getSelectedText,
 };
@@ -507,6 +516,7 @@ async function start() {
   spreads = pairPages(volume.pages.length, isLandscape());
   const page = Math.max(0, Math.min(volume.pages.length - 1, Number(params.get('page')) || 0));
   current = spreadOf(page);
+  anchor = page;
   render();
 
   document.addEventListener('click', onClick);

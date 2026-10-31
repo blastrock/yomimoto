@@ -126,6 +126,7 @@ class CardCreatorAction extends QuickAction {
         ref: ref,
         killOnPop: false,
         creatorFieldValues: CreatorFieldValues(textValues: newTextFields),
+        creatorContext: creatorContext,
       );
 
       if (appModel.isMediaOpen) {

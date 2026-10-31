@@ -1757,6 +1757,7 @@ class AppModel with ChangeNotifier {
     required WidgetRef ref,
     required bool killOnPop,
     CreatorFieldValues? creatorFieldValues,
+    CreatorContext? creatorContext,
   }) async {
 
     List<String> decks = await getDecks();
@@ -1782,6 +1783,7 @@ class AppModel with ChangeNotifier {
           editEnhancements: false,
           editFields: false,
           killOnPop: killOnPop,
+          creatorContext: creatorContext,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,

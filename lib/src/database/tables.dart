@@ -296,7 +296,8 @@ class StashItems extends Table {
   /// How long the word is in [sentence].
   IntColumn get wordLength => integer()();
 
-  /// Where the word is in the book, in ttu bookmark units.
+  /// Where the word is in the book, in the source's own units: ttu bookmark
+  /// units for books, the page index for manga.
   IntColumn get position => integer()();
 
   /// When the word was saved.

@@ -50,7 +50,8 @@ class StashItem {
   /// How long the word is in [sentence], in UTF-16 code units.
   int wordLength;
 
-  /// Where the word is in the book, in ttu bookmark units.
+  /// Where the word is in the book, in the source's own units: ttu bookmark
+  /// units for books, the page index for manga.
   int position;
 
   /// When the word was saved.

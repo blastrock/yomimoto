@@ -10,6 +10,7 @@ class CreatorContext {
   CreatorContext({
     required this.sentence,
     this.mediaItem,
+    this.imageData,
   });
 
   /// The context of whatever is open in the app right now.
@@ -17,6 +18,7 @@ class CreatorContext {
     return CreatorContext(
       sentence: appModel.getCurrentSentence(),
       mediaItem: appModel.currentMediaItem,
+      imageData: appModel.currentMediaSource?.currentExtraData,
     );
   }
 
@@ -25,4 +27,8 @@ class CreatorContext {
 
   /// The media the sentence was read in, if any.
   final MediaItem? mediaItem;
+
+  /// What [mediaItem]'s source needs to generate the card's image, for a
+  /// source that `overridesAutoImage`: see `MediaSource.generateImages`.
+  final String? imageData;
 }

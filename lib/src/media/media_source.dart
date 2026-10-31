@@ -309,6 +309,16 @@ abstract class MediaSource extends HomeTab {
     );
   }
 
+  /// The data [generateImages] needs for the word stashed at [position] in
+  /// [item], so that a card made later from the stash gets the image a card
+  /// made while reading would. Null by default: no image.
+  String? imageDataFor({
+    required AppModel appModel,
+    required MediaItem item,
+    required int position,
+  }) =>
+      null;
+
   /// If this source is non-null, this will be used as the initial function
   /// for the image field over the auto enhancement. Extra durations can be
   /// invoked and defined when initially opening the creator, to call attention

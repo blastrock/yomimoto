@@ -20,6 +20,7 @@ class CreatorPage extends BasePage {
     required this.editEnhancements,
     required this.editFields,
     required this.killOnPop,
+    this.creatorContext,
     super.key,
   });
 
@@ -34,6 +35,10 @@ class CreatorPage extends BasePage {
 
   /// If true, popping will exit the application.
   final bool killOnPop;
+
+  /// Where the card's word was met, for the media's own image. Null takes
+  /// the context of whatever is open.
+  final CreatorContext? creatorContext;
 
   @override
   BasePageState<CreatorPage> createState() => _CreatorPageState();
@@ -101,9 +106,11 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     for (Field field in appModel.activeFields) {
       /// If a media source has a generate images function, then use that over
       /// any set auto enhancement.
-      if (appModel.isMediaOpen && appModel.getCurrentMediaItem() != null) {
-        MediaSource mediaSource =
-            appModel.getCurrentMediaItem()!.getMediaSource(appModel: appModel);
+      CreatorContext creatorContext =
+          widget.creatorContext ?? CreatorContext.current(appModel);
+      MediaItem? mediaItem = creatorContext.mediaItem;
+      if (mediaItem != null) {
+        MediaSource mediaSource = mediaItem.getMediaSource(appModel: appModel);
         if (field is ImageField && mediaSource.overridesAutoImage) {
           await field.setImages(
             appModel: appModel,
@@ -114,8 +121,8 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             generateImages: () {
               return mediaSource.generateImages(
                 appModel: appModel,
-                item: appModel.getCurrentMediaItem()!,
-                data: mediaSource.currentExtraData,
+                item: mediaItem,
+                data: creatorContext.imageData,
               );
             },
           );

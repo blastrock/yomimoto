@@ -327,7 +327,8 @@ class ReaderTtuSource extends ReaderMediaSource {
 
   /// Open [item] at [position] to see the word in context. The book's
   /// bookmark is left untouched for the whole session.
-  Future<void> peekBook({
+  @override
+  Future<void> peek({
     required WidgetRef ref,
     required AppModel appModel,
     required MediaItem item,

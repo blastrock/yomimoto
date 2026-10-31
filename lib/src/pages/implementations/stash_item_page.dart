@@ -47,6 +47,13 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
   CreatorContext get _creatorContext => CreatorContext(
         sentence: item.getSelection(),
         mediaItem: widget.mediaItem,
+        imageData: widget.mediaItem
+            .getMediaSource(appModel: appModelNoUpdate)
+            .imageDataFor(
+              appModel: appModelNoUpdate,
+              item: widget.mediaItem,
+              position: item.position,
+            ),
       );
 
   @override
@@ -59,7 +66,9 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
   }
 
   Future<void> _jump() async {
-    await ReaderTtuSource.instance.peekBook(
+    MediaSource source =
+        widget.mediaItem.getMediaSource(appModel: appModelNoUpdate);
+    await (source as ReaderMediaSource).peek(
       ref: ref,
       appModel: appModelNoUpdate,
       item: widget.mediaItem,

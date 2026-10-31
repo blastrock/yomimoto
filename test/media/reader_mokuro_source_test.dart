@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:yuuna/media.dart';
 
 void main() {
@@ -56,6 +59,27 @@ void main() {
           ReaderMokuroSource.volumeItem(result: result(coverPath: null))
               .imageUrl,
           isNull);
+    });
+  });
+
+  group('ReaderMokuroSource.imagePathOfPage', () {
+    test("gives a page's image, as the OCR names it", () {
+      Directory volume = Directory.systemTemp.createTempSync('volume');
+      addTearDown(() => volume.deleteSync(recursive: true));
+      File('test/media/fixtures/vol1.mokuro')
+          .copySync(p.join(volume.path, 'volume.mokuro'));
+
+      expect(ReaderMokuroSource.imagePathOfPage(volume, 0), '000a.jpg');
+      expect(ReaderMokuroSource.imagePathOfPage(volume, 1), '000b.jpg');
+      expect(ReaderMokuroSource.imagePathOfPage(volume, 99), isNull);
+      expect(ReaderMokuroSource.imagePathOfPage(volume, -1), isNull);
+    });
+
+    test('gives nothing for a volume whose OCR is gone', () {
+      Directory volume = Directory.systemTemp.createTempSync('volume');
+      addTearDown(() => volume.deleteSync(recursive: true));
+
+      expect(ReaderMokuroSource.imagePathOfPage(volume, 0), isNull);
     });
   });
 }

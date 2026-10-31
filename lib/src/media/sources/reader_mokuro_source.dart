@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path/path.dart' as path;
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -69,6 +70,65 @@ class ReaderMokuroSource extends ReaderMediaSource {
   /// `images/<img_path>`.
   Directory volumeDirectory(AppModel appModel, MediaItem item) => Directory(
       path.join(volumesDirectory(appModel).path, item.mediaIdentifier));
+
+  /// The image of page [page] of the volume in [volume], as its OCR names it
+  /// (relative to the volume's `images/`), or null when there is no such
+  /// page or the OCR cannot be read.
+  static String? imagePathOfPage(Directory volume, int page) {
+    try {
+      List<MokuroPage> pages = MokuroVolume.parse(
+              File(path.join(volume.path, 'volume.mokuro'))
+                  .readAsStringSync())
+          .pages;
+      return page >= 0 && page < pages.length ? pages[page].imgPath : null;
+    } on FileSystemException {
+      return null;
+    } on FormatException {
+      return null;
+    }
+  }
+
+  /// A word stashed from a volume gets the image of its page.
+  @override
+  String? imageDataFor({
+    required AppModel appModel,
+    required MediaItem item,
+    required int position,
+  }) =>
+      imagePathOfPage(volumeDirectory(appModel, item), position);
+
+  /// The page whose image path [data] is, from the volume's files: the
+  /// reader sets it for the page of the word looked up, and [imageDataFor]
+  /// for a stashed word.
+  @override
+  Future<List<NetworkToFileImage>> generateImages({
+    required AppModel appModel,
+    required MediaItem item,
+    String? data,
+  }) async {
+    if (data == null) {
+      return [];
+    }
+    File page = File(
+        path.join(volumeDirectory(appModel, item).path, 'images', data));
+    if (!page.existsSync()) {
+      return [];
+    }
+
+    Directory previews = Directory(
+        path.join(appModel.temporaryDirectory.path, 'mokuroImagePreview'));
+    if (previews.existsSync()) {
+      previews.deleteSync(recursive: true);
+    }
+    // A new directory each time, so that no cached image is shown instead.
+    Directory directory = Directory(path.join(
+        previews.path, '${DateTime.now().millisecondsSinceEpoch}'))
+      ..createSync(recursive: true);
+    File file = appModel.getPreviewImageFile(directory, 0);
+    page.copySync(file.path);
+
+    return [NetworkToFileImage(file: file)];
+  }
 
   /// The library entry for an imported volume. A volume imported again
   /// keeps the [existing] entry's row, so its stash, its reading position
@@ -238,6 +298,7 @@ class ReaderMokuroSource extends ReaderMediaSource {
 
   /// Open [item] at page [position] to see a word in context. The volume's
   /// reading position is left untouched for the whole session.
+  @override
   Future<void> peek({
     required WidgetRef ref,
     required AppModel appModel,

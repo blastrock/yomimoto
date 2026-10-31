@@ -79,9 +79,9 @@ class InstantExportAction extends QuickAction {
     for (Field field in appModel.activeFields) {
       /// If a media source has a generate images function, then use that over
       /// any set auto enhancement.
-      if (appModel.isMediaOpen && appModel.getCurrentMediaItem() != null) {
-        MediaSource mediaSource =
-            appModel.getCurrentMediaItem()!.getMediaSource(appModel: appModel);
+      MediaItem? mediaItem = creatorContext.mediaItem;
+      if (mediaItem != null) {
+        MediaSource mediaSource = mediaItem.getMediaSource(appModel: appModel);
         if (field is ImageField && mediaSource.overridesAutoImage) {
           await field.setImages(
             appModel: appModel,
@@ -92,8 +92,8 @@ class InstantExportAction extends QuickAction {
             generateImages: () {
               return mediaSource.generateImages(
                 appModel: appModel,
-                item: appModel.getCurrentMediaItem()!,
-                data: mediaSource.currentExtraData,
+                item: mediaItem,
+                data: creatorContext.imageData,
               );
             },
           );

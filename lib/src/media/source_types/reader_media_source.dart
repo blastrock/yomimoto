@@ -1,4 +1,6 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/models.dart';
 
 /// A media source that handles primarily text-based media, read rather than
 /// watched or listened to. Being one is what makes a media item's launch
@@ -18,4 +20,13 @@ abstract class ReaderMediaSource extends MediaSource {
 
   @override
   double get aspectRatio => 176 / 250;
+
+  /// Open [item] at [position], in the source's own units, to see a stashed
+  /// word in context, leaving the item's reading position untouched.
+  Future<void> peek({
+    required WidgetRef ref,
+    required AppModel appModel,
+    required MediaItem item,
+    required int position,
+  });
 }

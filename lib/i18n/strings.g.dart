@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 218
+/// Strings: 221
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -298,6 +298,9 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String manga_import_missing_pages({required Object n}) => 'Imported, but ${n} pages are missing';
 	String get manga_delete_volume_confirm => 'Delete this volume, its reading position and its stash?';
 	String get manga_deleting => 'Deleting volume…';
+	String get manga_hide_bar => 'Hide';
+	String get manga_next_page => 'Next page';
+	String get manga_previous_page => 'Previous page';
 	String get stash => 'Stash';
 	String get stash_added => 'Added to stash';
 	String get stash_already => 'Already stashed';
@@ -524,6 +527,9 @@ extension on Translations {
 			case 'manga_import_missing_pages': return ({required Object n}) => 'Imported, but ${n} pages are missing';
 			case 'manga_delete_volume_confirm': return 'Delete this volume, its reading position and its stash?';
 			case 'manga_deleting': return 'Deleting volume…';
+			case 'manga_hide_bar': return 'Hide';
+			case 'manga_next_page': return 'Next page';
+			case 'manga_previous_page': return 'Previous page';
 			case 'stash': return 'Stash';
 			case 'stash_added': return 'Added to stash';
 			case 'stash_already': return 'Already stashed';

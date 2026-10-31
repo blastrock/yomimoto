@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yuuna/utils.dart';
 
 /// The manga reader's bar: page turning buttons, a slider over the whole
 /// volume and the page number. Everything runs right to left like the
@@ -73,10 +74,12 @@ class _MokuroReaderBarState extends State<MokuroReaderBar> {
           children: [
             IconButton(
               icon: const Icon(Icons.close),
+              tooltip: t.manga_hide_bar,
               onPressed: widget.onHide,
             ),
             IconButton(
               icon: const Icon(Icons.chevron_left),
+              tooltip: t.manga_next_page,
               onPressed: widget.onNext,
             ),
             Expanded(
@@ -99,6 +102,7 @@ class _MokuroReaderBarState extends State<MokuroReaderBar> {
             ),
             IconButton(
               icon: const Icon(Icons.chevron_right),
+              tooltip: t.manga_previous_page,
               onPressed: widget.onPrevious,
             ),
             Padding(

@@ -330,8 +330,11 @@ translations are gone.
   `MokuroBridge.protocolVersion`: bump both when a message changes shape.
   The page stores nothing.
 
-  Import takes a `.cbz` or `.zip` only, with its `.mokuro` beside it (how
-  mokuro-bunko serves volumes) or inside it, and copies the volume into
+  Volumes come in two ways, both from the tab's `+` popup: a file, or a
+  catalog download. Import takes a `.cbz` or `.zip` only, with its
+  `.mokuro` beside it (how mokuro-bunko serves volumes) or inside it
+  (`ReaderMokuroSource.importArchive`, shared by both ways), and copies the
+  volume into
   `mangaVolumes/<volume_uuid>/` (`volume.mokuro`, `images/<img_path>`) in an
   isolate (`importMokuroVolume`). `img_path` is resolved at the archive root,
   then in its single top-level folder, since producers disagree. Each volume
@@ -340,6 +343,18 @@ translations are gone.
   index; `ReaderMokuroSource.peek` opens a page without saving. A bubble is
   a card's sentence, its page the image (also for cards from the stash,
   through `CreatorContext.imageData`).
+
+  Catalogs are mokuro-bunko servers (mokuro.moe), stored as base URLs in
+  the `reader_mokuro/catalogs` preference. `MokuroCatalogClient`
+  (`mokuro_catalog.dart`) reads their public API: the library, a series'
+  volumes, its `series.json` (volume ids, for the library check) and a
+  volume's manifest; only the manifest is versioned, and a version other
+  than 1 is refused. `downloadCatalogVolumes` (`mokuro_catalog_download.dart`)
+  downloads `volume.cbz` and `volume.mokuro` into
+  `<temporary>/catalogDownloads/` one volume at a time and hands them to the
+  import; Cancel stops a download at once but lets an import finish. Native
+  titles are shown, romaji only searched. Design:
+  `docs/superpowers/specs/2026-10-31-manga-catalogs-design.md`.
 
   The page works in a desktop browser with `?debug=1` (events logged to the
   console, commands callable as `await mokuroHost.<command>({...})`): serve

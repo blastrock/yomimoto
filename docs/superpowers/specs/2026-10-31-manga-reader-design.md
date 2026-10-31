@@ -364,6 +364,8 @@ then keep its words is that project's question.
 
 ## Next project: catalogs (findings)
 
+Built: see `2026-10-31-manga-catalogs-design.md`.
+
 mokuro.moe runs **mokuro-bunko**, whose catalog page is drawn from a public
 JSON API (no login needed for browsing):
 

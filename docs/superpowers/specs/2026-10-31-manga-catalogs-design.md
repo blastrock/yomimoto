@@ -38,7 +38,8 @@ about reading changes.
   volume ids.
 - Series grouping in the library (still "Later: series" in the reader
   design).
-- E-ink tuning, apart from adding no animations.
+- E-ink tuning. Animations stay (they suit phones); an e-ink option comes
+  with the later e-ink pass (the user's decision).
 
 ## Anti-goals
 

@@ -74,7 +74,8 @@ class CatalogDownloadException implements Exception {
   /// The server's name for the volume that failed.
   final String volumeName;
 
-  /// What failed: a [CatalogException] or a [MokuroImportException].
+  /// What failed: a [CatalogException], a [MokuroImportException], or any
+  /// other error, such as a [FileSystemException] when the disk is full.
   final Object error;
 
   @override
@@ -151,9 +152,9 @@ Future<int> downloadCatalogVolumes({
       report(importing: true);
       await importArchive(archivePath);
       imported++;
-    } on CatalogException catch (error) {
-      throw CatalogDownloadException(download.volumeName, error);
-    } on MokuroImportException catch (error) {
+    } catch (error) {
+      // Catalog and import errors, but also a full disk or a database
+      // error: all are this volume's failure.
       throw CatalogDownloadException(download.volumeName, error);
     } finally {
       if (directory.existsSync()) {
@@ -198,6 +199,10 @@ Future<bool> _downloadFile({
         return false;
       }
     }
+    // Closed here, so that a write error is reported as one.
+    IOSink written = sink;
+    sink = null;
+    await written.close();
     return !cancel.isCancelled;
   } on TimeoutException {
     if (cancel.isCancelled) {

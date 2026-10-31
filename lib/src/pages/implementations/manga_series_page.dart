@@ -217,13 +217,12 @@ class _MangaSeriesPageState extends BasePageState<MangaSeriesPage> {
     } finally {
       navigator.pop();
       progress.dispose();
-    }
-
-    if (mounted) {
-      setState(() {
-        _selected.clear();
-        _readLibrary();
-      });
+      if (mounted) {
+        setState(() {
+          _selected.clear();
+          _readLibrary();
+        });
+      }
     }
   }
 

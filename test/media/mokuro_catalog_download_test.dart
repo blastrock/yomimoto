@@ -213,6 +213,18 @@ void main() {
     expect(temporary.listSync(), isEmpty);
   });
 
+  test('any other error, such as a full disk, is a failure of that volume',
+      () async {
+    await expectLater(
+        run(
+          serve(volume('vol 01', bytes(10, 1), bytes(3, 2))),
+          [download('vol 01', 10, 3)],
+          (_) async => throw const FileSystemException('No space left'),
+        ),
+        failsFor('vol 01', isA<FileSystemException>()));
+    expect(temporary.listSync(), isEmpty);
+  });
+
   test('cancel during a download keeps earlier volumes and deletes the '
       'partial one', () async {
     int imports = 0;

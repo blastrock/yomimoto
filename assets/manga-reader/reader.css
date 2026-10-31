@@ -1,0 +1,93 @@
+/* The manga reader page: one spread fitted to the viewport, the OCR text of
+ * every block laid out over its bubble but invisible until shown. */
+
+:root {
+  --background: #ffffff;
+  --overlay-background: #ffffff;
+  --overlay-text: #000000;
+}
+
+:root[data-theme='dark'] {
+  --background: #000000;
+  --overlay-background: #000000;
+  --overlay-text: #ffffff;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+  /* Pinch-zoom and panning stay; double-tap zoom goes, so taps are not
+   * delayed while the browser waits for a second one. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#spread {
+  display: flex;
+  /* Right to left: the lower page index is on the right. */
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.slot {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.page > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.block {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 0;
+  line-height: 1.1em;
+  white-space: nowrap;
+  font-family: 'Noto Sans JP', 'Noto Sans CJK JP', sans-serif;
+  color: transparent;
+  background: transparent;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.block > p {
+  margin: 0;
+}
+
+.block .line {
+  display: block;
+}
+
+.block.shown {
+  z-index: 10;
+  color: var(--overlay-text);
+  background: var(--overlay-background);
+}
+
+.block ::selection {
+  color: var(--overlay-text);
+  background: rgba(128, 128, 255, 0.45);
+}

@@ -159,6 +159,8 @@ flutter:
     - assets/ttu-ebook-reader/_app/immutable/entry/
     - assets/ttu-ebook-reader/_app/immutable/nodes/
     - assets/ttu-ebook-reader/icons/
+    # The manga reader page: hand-written, no build step.
+    - assets/manga-reader/
 
   fonts:
     - family: NotoSansJP

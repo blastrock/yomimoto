@@ -21,8 +21,9 @@ remains is deliberately three things:
 - **No backward compatibility is owed.** The fork ships under its own
   Android `applicationId`, so every install is fresh: the database starts
   empty. Do not write migration code, orphan cleanup, index clamping,
-  or defensive nullable-ing for things that were removed. Changing schema
-  version 1 is free until 1.0.
+  or defensive nullable-ing for things that were removed. Until 1.0 the
+  latest schema version may be changed in place, unless installed data must
+  be kept: then it takes a migration, as version 2 did (see Persistence).
 - **The rename is external only.** The `applicationId` is
   `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
   DCIM folder and exported file names say Yomimoto too. Internal identifiers
@@ -41,6 +42,7 @@ remains is deliberately three things:
 
 ```sh
 tool/fetch_ttu.sh                                          # ebook-reader-lite build → assets/ttu-ebook-reader/ (--local <path> to build a checkout)
+tool/port_mokuro_layout.sh ../mokuro-reader                # mokuro-reader's line layout → assets/manga-reader/mokuro-layout.js
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs   # json, dart_mappable, Drift
 dart run drift_dev schema dump lib/src/database/app_database.dart drift_schemas/
@@ -164,7 +166,7 @@ Everything persisted lives in SQLite; there is no other store.
 
 - **SQLite** — the database, through Drift over `sqlite3` (FFI; the
   package's build hook bundles SQLite): dictionary entries, headings,
-  pitches, frequencies, tags, media items, Anki mappings, mokuro catalogs,
+  pitches, frequencies, tags, media items, Anki mappings,
   stash items, the search history, and the dictionary history
   (`dictionary_history`, which stores each looked-up term with the wildcard
   flag it was searched with; the Dictionary tab searches them again to show
@@ -201,10 +203,14 @@ Everything persisted lives in SQLite; there is no other store.
   setting needs no schema change; after 1.0, renaming a key or changing a
   value's type or meaning is a data migration in a `schemaVersion` bump.
 
-  Schema version 1 is the 1.0 baseline. Until 1.0 ships, schema edits change
-  version 1 and re-dump it (`drift_schemas/`). After 1.0, every change bumps
-  `schemaVersion`, adds a migration, dumps a new snapshot and adds a migration
-  test (`drift_dev make-migrations`).
+  The schema is at version 2. Version 2 is a pre-1.0 bump made because
+  installs already held data: its migration drops the legacy mokuro reader's
+  catalogs, volumes (with their stashes) and two settings, and
+  `test/database/schema_test.dart` tests it from the version 1 snapshot. Until
+  1.0 ships, a schema edit changes the latest version in place and re-dumps
+  it (`drift_schemas/`), unless installed data must be kept; after 1.0, every
+  change bumps `schemaVersion`, adds a migration, dumps a new snapshot and
+  adds a migration test (`drift_dev make-migrations`).
 
 Dictionary import, deletion and search run in **isolates** via `compute` /
 `cancelable_compute`. Isolate entry points must therefore be **top-level
@@ -310,8 +316,35 @@ translations are gone.
     Tap the page first when testing on an emulator.
   - Tapping another word while one is highlighted starts a new lookup: the
     tap's mousedown clears the selection before `click` fires.
-- **mokuro** — reads mokuro-processed manga (HTML + OCR text overlay), with a
-  catalog of remote/local sources persisted in the database (`MokuroCatalog`).
+- **manga** — reads volumes processed by mokuro: page images and a `.mokuro`
+  file (per-page OCR text blocks with their boxes and line quads). Nothing of
+  mokuro or mokuro-reader runs in the app. `assets/manga-reader/` is our own
+  page (hand-written HTML/CSS/JS, no build step) showing one volume in a
+  WebView; `mokuro-layout.js` beside it is mokuro-reader's line layout
+  (`line-coords-layout`, `line-grid`, `glyph-insets` at `bfaeb482`), generated
+  by `tool/port_mokuro_layout.sh`: do not edit it. The page is served on the
+  asset loader's origin at `/manga/` (`MokuroAssetPathHandler`), the open
+  volume's files at `/volume/` (`MokuroVolumePathHandler`), and the app talks
+  to it only through `MokuroBridge` (`mokuroHost` handler, `window.mokuroHost`
+  commands); its protocol version is `PROTOCOL_VERSION` in `reader.js` and
+  `MokuroBridge.protocolVersion`: bump both when a message changes shape.
+  The page stores nothing.
+
+  Import takes a `.cbz` or `.zip` only, with its `.mokuro` beside it (how
+  mokuro-bunko serves volumes) or inside it, and copies the volume into
+  `mangaVolumes/<volume_uuid>/` (`volume.mokuro`, `images/<img_path>`) in an
+  isolate (`importMokuroVolume`). `img_path` is resolved at the archive root,
+  then in its single top-level folder, since producers disagree. Each volume
+  is a `media_item` keyed by its `volume_uuid`; re-importing keeps the row.
+  The position is the highest page shown, and the stash position is the page
+  index; `ReaderMokuroSource.peek` opens a page without saving. A bubble is
+  a card's sentence, its page the image (also for cards from the stash,
+  through `CreatorContext.imageData`).
+
+  The page works in a desktop browser with `?debug=1` (events logged to the
+  console, commands callable as `await mokuroHost.<command>({...})`): serve
+  a directory holding `manga/` (the assets) and `volume/` (a `volume.mokuro`
+  and its `images/`) with `python3 -m http.server`.
 
 Both hand selected text to `AppModel.openRecursiveDictionarySearch` — that path,
 selection → lookup → card creation, is the app's core interaction. Treat it as

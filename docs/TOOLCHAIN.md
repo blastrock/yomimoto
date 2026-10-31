@@ -114,8 +114,8 @@ is a fresh one — there is no existing database to preserve. Check at minimum:
 - cold launch: first-time setup runs and the bottom bar shows exactly two tabs,
   Reader and Dictionary
 - dictionary import and lookup (confirms the SQLite database and its build hook work on the device)
-- text selection -> dictionary lookup in the TTU reader and in mokuro
-- volume-key page turning in the TTU reader and mokuro browse (the
+- text selection -> dictionary lookup in the TTU reader and in the manga reader
+- volume-key page turning in the TTU reader and the manga reader (the
   `onKey` -> `onKeyEvent` change)
 - back-button behaviour on reader and creator pages (`WillPopScope` ->
   `PopScope` inverts the control flow)

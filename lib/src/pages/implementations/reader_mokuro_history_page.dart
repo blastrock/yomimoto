@@ -4,7 +4,7 @@ import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
 /// A page for [ReaderMokuroSource]'s tab body content when selected as a source
-/// in the main menu.
+/// in the main menu: the library of imported volumes.
 class ReaderMokuroHistoryPage extends HistoryReaderPage {
   /// Create an instance of this tab page.
   const ReaderMokuroHistoryPage({
@@ -16,9 +16,6 @@ class ReaderMokuroHistoryPage extends HistoryReaderPage {
       _ReaderMokuroHistoryPageState();
 }
 
-/// A base class for providing all tabs in the main menu. In large part, this
-/// was implemented to define shortcuts for common lengthy methods across UI
-/// code.
 class _ReaderMokuroHistoryPageState<T extends HistoryReaderPage>
     extends HistoryReaderPageState {
   @override
@@ -36,9 +33,44 @@ class _ReaderMokuroHistoryPageState<T extends HistoryReaderPage>
     super.dispose();
   }
 
-  /// Refresh the page and respond to history changes.
+  /// Refresh the page and respond to library changes.
   void refresh() {
     setState(() {});
+  }
+
+  @override
+  List<Widget> extraActions(MediaItem item) {
+    return [
+      TextButton(
+        onPressed: () async {
+          NavigatorState navigator = Navigator.of(context);
+          navigator.pop();
+          await navigator.push(
+            MaterialPageRoute(
+              builder: (context) => StashPage(item: item),
+            ),
+          );
+        },
+        child: Text(t.stash.toUpperCase()),
+      ),
+      TextButton(
+        onPressed: () async {
+          NavigatorState navigator = Navigator.of(context);
+          bool deleted = await mediaSource.deleteVolume(
+            context: context,
+            appModel: appModel,
+            item: item,
+          );
+          if (deleted) {
+            navigator.pop();
+          }
+        },
+        child: Text(
+          t.dialog_delete,
+          style: TextStyle(color: theme.colorScheme.primary),
+        ),
+      ),
+    ];
   }
 
   @override
@@ -48,11 +80,7 @@ class _ReaderMokuroHistoryPageState<T extends HistoryReaderPage>
         .reversed
         .toList();
 
-    if (items.isEmpty) {
-      return buildPlaceholder();
-    } else {
-      return buildHistory(items);
-    }
+    return items.isEmpty ? buildPlaceholder() : buildHistory(items);
   }
 
   /// This is shown as the body when [shouldPlaceholderBeShown] is true.
@@ -61,7 +89,7 @@ class _ReaderMokuroHistoryPageState<T extends HistoryReaderPage>
     return Center(
       child: JidoujishoPlaceholderMessage(
         icon: mediaSource.icon,
-        message: t.info_empty_home_tab,
+        message: t.manga_no_volumes_added,
       ),
     );
   }

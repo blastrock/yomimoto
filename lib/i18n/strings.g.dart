@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 208
+/// Strings: 218
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -288,6 +288,16 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get ttu_delete_book_confirm => 'Delete this book and its reading position?';
 	String get ttu_deleting => 'Deleting book…';
 	String get ttu_bridge_mismatch => 'The reader build does not match this app version';
+	String get manga_import_volume => 'Import volume';
+	String get manga_importing => 'Importing volume…';
+	String get manga_no_volumes_added => 'No volumes yet: import a CBZ or ZIP processed by mokuro';
+	String get manga_import_no_ocr => 'No .mokuro file next to or inside this archive';
+	String get manga_import_several_ocr => 'This archive holds several .mokuro files';
+	String get manga_import_invalid_ocr => 'The .mokuro file could not be read';
+	String get manga_import_not_archive => 'This file is not a CBZ or ZIP archive';
+	String manga_import_missing_pages({required Object n}) => 'Imported, but ${n} pages are missing';
+	String get manga_delete_volume_confirm => 'Delete this volume, its reading position and its stash?';
+	String get manga_deleting => 'Deleting volume…';
 	String get stash => 'Stash';
 	String get stash_added => 'Added to stash';
 	String get stash_already => 'Already stashed';
@@ -504,6 +514,16 @@ extension on Translations {
 			case 'ttu_delete_book_confirm': return 'Delete this book and its reading position?';
 			case 'ttu_deleting': return 'Deleting book…';
 			case 'ttu_bridge_mismatch': return 'The reader build does not match this app version';
+			case 'manga_import_volume': return 'Import volume';
+			case 'manga_importing': return 'Importing volume…';
+			case 'manga_no_volumes_added': return 'No volumes yet: import a CBZ or ZIP processed by mokuro';
+			case 'manga_import_no_ocr': return 'No .mokuro file next to or inside this archive';
+			case 'manga_import_several_ocr': return 'This archive holds several .mokuro files';
+			case 'manga_import_invalid_ocr': return 'The .mokuro file could not be read';
+			case 'manga_import_not_archive': return 'This file is not a CBZ or ZIP archive';
+			case 'manga_import_missing_pages': return ({required Object n}) => 'Imported, but ${n} pages are missing';
+			case 'manga_delete_volume_confirm': return 'Delete this volume, its reading position and its stash?';
+			case 'manga_deleting': return 'Deleting volume…';
 			case 'stash': return 'Stash';
 			case 'stash_added': return 'Added to stash';
 			case 'stash_already': return 'Already stashed';

@@ -21,9 +21,9 @@ export 'src/utils/explanation/explanation_client.dart';
 export 'src/utils/explanation/explanation_prompts.dart';
 export 'src/utils/explanation/sentence_explanation.dart';
 
-
 export 'src/utils/misc/app_colors.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';
 export 'src/utils/misc/jidoujisho_text_selection.dart';
 export 'src/utils/misc/dialog_content.dart';
+export 'src/utils/misc/run_with_progress.dart';
 export 'src/utils/misc/toast.dart';

@@ -3,7 +3,6 @@ import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
-import 'package:yuuna/utils.dart';
 
 /// Imported dictionaries.
 @UseRowClass(Dictionary)
@@ -213,7 +212,7 @@ class EntryTags extends Table {
   Set<Column<Object>> get primaryKey => {entryId, tagId};
 }
 
-/// Books in the Novels library and volumes in the mokuro history.
+/// Books in the Novels library and volumes in the Manga library.
 @UseRowClass(MediaItem)
 class MediaItems extends Table {
   @override
@@ -354,25 +353,6 @@ class AnkiMappings extends Table {
 
   /// Whether meanings are prefixed with their dictionary's name.
   BoolColumn get prependDictionaryNames => boolean().nullable()();
-}
-
-/// Saved mokuro catalogs.
-@UseRowClass(MokuroCatalog)
-class MokuroCatalogs extends Table {
-  @override
-  String get tableName => 'mokuro_catalog';
-
-  /// Assigned on insert.
-  IntColumn get id => integer().autoIncrement()();
-
-  /// Display name.
-  TextColumn get name => text()();
-
-  /// Where the catalog is.
-  TextColumn get url => text().unique()();
-
-  /// Position in the catalog list.
-  IntColumn get order => integer().unique()();
 }
 
 /// Search terms typed in the dictionary search bar. Ids give recency.

@@ -3,7 +3,6 @@ import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
-import 'package:yuuna/utils.dart';
 
 import 'test_database.dart';
 
@@ -262,26 +261,6 @@ void main() {
       expect(store.nextMappingOrder(), 2);
       expect(store.mappingLabelTaken(profile('A', 5)), isTrue);
       expect(store.mappingLabelTaken(profile('A', 1)), isFalse);
-    });
-  });
-
-  group('catalogs', () {
-    test('put, reorder and delete', () async {
-      MokuroCatalog a = MokuroCatalog(name: 'A', url: 'https://a', order: 0);
-      MokuroCatalog b = MokuroCatalog(name: 'B', url: 'https://b', order: 1);
-      await store.putCatalog(a);
-      await store.putCatalog(b);
-      expect(store.catalogUrlTaken(
-          MokuroCatalog(name: 'C', url: 'https://a', order: 7)), isTrue);
-      expect(store.nextCatalogOrder(), 2);
-
-      a.order = 1;
-      b.order = 0;
-      await store.replaceCatalogs([b, a]);
-      expect(store.catalogs().map((catalog) => catalog.name), ['B', 'A']);
-
-      await store.deleteCatalog(b.id!);
-      expect(store.catalogs().map((catalog) => catalog.name), ['A']);
     });
   });
 

@@ -5,16 +5,16 @@ import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
-import 'package:yuuna/utils.dart';
 
 part 'app_database.g.dart';
 
 /// Name of the database file, in the app support directory.
 const String databaseFileName = 'yomimoto.sqlite';
 
-/// The app's SQLite database: dictionaries, libraries, stashes, profiles,
-/// catalogs and histories. Schema version 1 is the 1.0 baseline; every later
-/// version comes with a migration and a schema snapshot.
+/// The app's SQLite database: dictionaries, libraries, stashes, profiles and
+/// histories. Every version comes with a migration and a schema snapshot.
+/// Version 2 dropped the mokuro catalogs and the volumes of the legacy mokuro
+/// reader.
 @DriftDatabase(
   tables: [
     Dictionaries,
@@ -28,7 +28,6 @@ const String databaseFileName = 'yomimoto.sqlite';
     MediaItems,
     StashItems,
     AnkiMappings,
-    MokuroCatalogs,
     SearchHistoryItems,
     DictionaryHistoryItems,
     PreferenceEntries,
@@ -50,11 +49,15 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase.fromRaw(openRawDatabase(path));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// Creates the schema, then the standard profile with id
   /// [AnkiMapping.standardProfileId]. That profile cannot be deleted, so the
   /// id is never handed out again.
+  ///
+  /// Version 2 removes what the legacy mokuro reader left: its catalogs,
+  /// its volumes (legacy HTML URLs the new reader cannot open) with their
+  /// stashes, and two dropped settings.
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
@@ -62,6 +65,21 @@ class AppDatabase extends _$AppDatabase {
           await into(ankiMappings).insert(ankiMappingCompanion(
               AnkiMapping.defaultMapping(order: 0)
                 ..id = AnkiMapping.standardProfileId));
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await customStatement('DROP TABLE IF EXISTS mokuro_catalog');
+            // Not left to the cascade: foreign keys may be off while a
+            // migration runs.
+            await customStatement('DELETE FROM stash_item '
+                'WHERE media_item_id IN (SELECT id FROM media_item '
+                "WHERE media_source_identifier = 'reader_mokuro')");
+            await customStatement('DELETE FROM media_item '
+                "WHERE media_source_identifier = 'reader_mokuro'");
+            await customStatement('DELETE FROM preference WHERE key IN '
+                "('reader_mokuro/use_dark_theme', "
+                "'reader_mokuro/extend_page_beyond_navbar')");
+          }
         },
       );
 }

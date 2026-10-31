@@ -203,16 +203,6 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 value: mokuroSource.volumePageTurningInverted,
                 toggle: mokuroSource.toggleVolumePageTurningInverted,
               ),
-              buildSwitch(
-                label: t.use_dark_theme,
-                value: mokuroSource.useDarkTheme,
-                toggle: mokuroSource.toggleUseDarkTheme,
-              ),
-              buildSwitch(
-                label: t.extend_page_beyond_navbar,
-                value: mokuroSource.extendPageBeyondNavigationBar,
-                toggle: mokuroSource.toggleExtendPageBeyondNavigationBar,
-              ),
               buildHeader(t.sentence_explanation),
               buildTextField(
                 controller: _apiKeyController,

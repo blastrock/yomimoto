@@ -243,9 +243,6 @@ class AppModel with ChangeNotifier {
   /// Returns all export profiles.
   List<AnkiMapping> get mappings => _store.mappings();
 
-  /// Returns all Mokuro catalogs.
-  List<MokuroCatalog> get mokuroCatalogs => _store.catalogs();
-
   /// The searches whose results the Dictionary tab shows. Oldest is first.
   List<DictionaryHistoryItem> get dictionaryHistory =>
       _store.dictionaryHistory();
@@ -537,11 +534,6 @@ class AppModel with ChangeNotifier {
   /// See the dictionary dialog's [ReorderableListView] for usage.
   Future<void> updateMappingsOrder(List<AnkiMapping> newMappings) =>
       _store.replaceMappings(newMappings);
-
-  /// Update the user-defined order of given catalogs in the database.
-  /// See the catalog dialog's [ReorderableListView] for usage.
-  Future<void> updateCatalogsOrder(List<MokuroCatalog> newCatalogs) =>
-      _store.replaceCatalogs(newCatalogs);
 
   /// Populate maps for home tabs at startup to optimise performance.
   void populateTabs() {
@@ -1144,13 +1136,6 @@ class AppModel with ChangeNotifier {
   /// Add a selected mapping to the database.
   Future<void> addMapping(AnkiMapping mapping) => _store.putMapping(mapping);
 
-  /// Delete a selected catalog from the database.
-  Future<void> deleteCatalog(MokuroCatalog catalog) =>
-      _store.deleteCatalog(catalog.id!);
-
-  /// Add a selected catalog to the database.
-  Future<void> addCatalog(MokuroCatalog catalog) => _store.putCatalog(catalog);
-
   /// Used for caching search results. Cleared when a dictionary is added or
   /// deleted.
   final Map<String, DictionarySearchResult> _dictionarySearchCache = {};
@@ -1224,16 +1209,8 @@ class AppModel with ChangeNotifier {
   bool mappingNameHasDuplicate(AnkiMapping mapping) =>
       _store.mappingLabelTaken(mapping);
 
-  /// Check if a catalog with a certain URL with a different order already
-  /// exists.
-  bool catalogUrlHasDuplicate(MokuroCatalog catalog) =>
-      _store.catalogUrlTaken(catalog);
-
   /// Get the newest available order for a new mapping.
   int get nextMappingOrder => _store.nextMappingOrder();
-
-  /// Get the newest available order for a new catalog.
-  int get nextCatalogOrder => _store.nextCatalogOrder();
 
   /// Requests for full external storage permissions. Required to browse for
   /// media anywhere on the device.

@@ -25,7 +25,5 @@ export 'src/utils/explanation/sentence_explanation.dart';
 export 'src/utils/misc/app_colors.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';
 export 'src/utils/misc/jidoujisho_text_selection.dart';
-export 'src/utils/misc/mokuro_catalog.dart';
-export 'src/utils/misc/mokuro_payload.dart';
 export 'src/utils/misc/dialog_content.dart';
 export 'src/utils/misc/toast.dart';

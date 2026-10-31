@@ -4,13 +4,12 @@ import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/media.dart';
-import 'package:yuuna/utils.dart';
 
 /// The app's own data over one connection: the libraries and their stashes,
-/// the Anki mappings, the mokuro catalogs, the search and dictionary
-/// histories, and the dictionary list. Reads are synchronous, through [raw],
-/// so widgets can call them while building; writes go through [db], which
-/// runs on that same connection.
+/// the Anki mappings, the search and dictionary histories, and the
+/// dictionary list. Reads are synchronous, through [raw], so widgets can call
+/// them while building; writes go through [db], which runs on that same
+/// connection.
 class AppStore {
   /// Wrap [db] and [raw], the connection it runs on.
   AppStore({required this.db, required this.raw});
@@ -232,64 +231,6 @@ class AppStore {
   Future<void> deleteMapping(int id) async {
     await (db.delete(db.ankiMappings)..where((table) => table.id.equals(id)))
         .go();
-  }
-
-  /// The mokuro catalogs, in the user's order.
-  List<MokuroCatalog> catalogs() {
-    return _select(db.mokuroCatalogs.map,
-        'SELECT * FROM mokuro_catalog ORDER BY "order"');
-  }
-
-  /// Whether another catalog, at another position, has [catalog]'s URL.
-  bool catalogUrlTaken(MokuroCatalog catalog) {
-    return raw.select(
-      'SELECT 1 FROM mokuro_catalog WHERE url = ? AND "order" != ? LIMIT 1',
-      [catalog.url, catalog.order],
-    ).isNotEmpty;
-  }
-
-  /// The position after the last catalog.
-  int nextCatalogOrder() {
-    return raw
-        .select('SELECT COALESCE(MAX("order") + 1, 0) AS next '
-            'FROM mokuro_catalog')
-        .first['next'] as int;
-  }
-
-  /// Save [catalog], replacing the catalog with its id, URL or position, and
-  /// set its id.
-  Future<void> putCatalog(MokuroCatalog catalog) async {
-    MokuroCatalog row = await db.into(db.mokuroCatalogs).insertReturning(
-          _catalogCompanion(catalog),
-          mode: InsertMode.insertOrReplace,
-        );
-    catalog.id = row.id;
-  }
-
-  /// Replace every catalog with [catalogs], keeping their ids. Used to save a
-  /// new order.
-  Future<void> replaceCatalogs(List<MokuroCatalog> catalogs) async {
-    await db.transaction(() async {
-      await db.delete(db.mokuroCatalogs).go();
-      for (MokuroCatalog catalog in catalogs) {
-        await db.into(db.mokuroCatalogs).insert(_catalogCompanion(catalog));
-      }
-    });
-  }
-
-  /// Delete the catalog [id].
-  Future<void> deleteCatalog(int id) async {
-    await (db.delete(db.mokuroCatalogs)..where((table) => table.id.equals(id)))
-        .go();
-  }
-
-  MokuroCatalogsCompanion _catalogCompanion(MokuroCatalog catalog) {
-    return MokuroCatalogsCompanion.insert(
-      id: Value.absentIfNull(catalog.id),
-      name: catalog.name,
-      url: catalog.url,
-      order: catalog.order,
-    );
   }
 
   /// The search bar's history, oldest first.

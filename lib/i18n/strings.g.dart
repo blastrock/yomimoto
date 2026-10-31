@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 220
+/// Strings: 208
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -180,13 +180,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_crop => 'CROP';
 	String get dialog_append => 'APPEND';
 	String get dialog_record => 'RECORD';
-	String get dialog_manage => 'MANAGE';
 	String get dialog_stop => 'STOP';
-	String get dialog_done => 'DONE';
 	String get reset => 'Reset';
 	String get dialog_launch_ankidroid => 'LAUNCH ANKIDROID';
 	String get mappings_delete_confirmation => 'This profile will be deleted. Are you sure you want to do this?';
-	String get catalog_delete_confirmation => 'This catalog will be deleted. Are you sure you want to do this?';
 	String get dictionaries_deleting_data => 'Deleting dictionary data...';
 	String get dictionaries_menu_empty => 'Import a dictionary for use';
 	String get options_dictionaries => 'Manage dictionaries';
@@ -304,7 +301,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String stash_selected({required Object n}) => '${n} selected';
 	String get stash_select_all => 'Select all';
 	String stash_delete_confirm({required Object n}) => 'Delete ${n} stashed word(s)?';
-	String get paste => 'Paste';
 	String get no_recordings_found => 'No recordings found';
 	String get wrap_image_audio => 'Include image/audio HTML tags on export';
 	String get text_segmentation => 'Text Segmentation';
@@ -348,20 +344,12 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get highlight_on_tap => 'Highlight text on tap';
 	String get no_audio_file => 'No audio file to save.';
 	String get storage_permissions => 'Please grant the following permissions for exporting to AnkiDroid.';
-	String get pick_file => 'Pick File';
-	String get open_url => 'Open URL';
-	String get catalogs => 'Catalogs';
 	String get name => 'Name';
 	String get url => 'URL';
-	String get duplicate_catalog => 'A catalog with this URL already exists.';
-	String get no_catalogs_listed => 'No catalogs listed';
-	String get invalid_mokuro_file => 'File is not a Mokuro generated HTML file.';
-	String get create_catalog => 'Create Catalog';
 	String field_locked({required Object field}) => '${field} locked and will not clear on export while Creator is active.';
 	String field_unlocked({required Object field}) => '${field} unlocked and will clear on export.';
 	String get field_lock => 'Lock Field';
 	String get field_unlock => 'Unlock Field';
-	String get use_dark_theme => 'Use dark theme';
 	String get saved_tags => 'Tags saved.';
 	String get cloze => 'Cloze';
 	String get manage_duplicate_checks => 'Manage Duplicate Checks';
@@ -408,13 +396,10 @@ extension on Translations {
 			case 'dialog_crop': return 'CROP';
 			case 'dialog_append': return 'APPEND';
 			case 'dialog_record': return 'RECORD';
-			case 'dialog_manage': return 'MANAGE';
 			case 'dialog_stop': return 'STOP';
-			case 'dialog_done': return 'DONE';
 			case 'reset': return 'Reset';
 			case 'dialog_launch_ankidroid': return 'LAUNCH ANKIDROID';
 			case 'mappings_delete_confirmation': return 'This profile will be deleted. Are you sure you want to do this?';
-			case 'catalog_delete_confirmation': return 'This catalog will be deleted. Are you sure you want to do this?';
 			case 'dictionaries_deleting_data': return 'Deleting dictionary data...';
 			case 'dictionaries_menu_empty': return 'Import a dictionary for use';
 			case 'options_dictionaries': return 'Manage dictionaries';
@@ -532,7 +517,6 @@ extension on Translations {
 			case 'stash_selected': return ({required Object n}) => '${n} selected';
 			case 'stash_select_all': return 'Select all';
 			case 'stash_delete_confirm': return ({required Object n}) => 'Delete ${n} stashed word(s)?';
-			case 'paste': return 'Paste';
 			case 'no_recordings_found': return 'No recordings found';
 			case 'wrap_image_audio': return 'Include image/audio HTML tags on export';
 			case 'text_segmentation': return 'Text Segmentation';
@@ -576,20 +560,12 @@ extension on Translations {
 			case 'highlight_on_tap': return 'Highlight text on tap';
 			case 'no_audio_file': return 'No audio file to save.';
 			case 'storage_permissions': return 'Please grant the following permissions for exporting to AnkiDroid.';
-			case 'pick_file': return 'Pick File';
-			case 'open_url': return 'Open URL';
-			case 'catalogs': return 'Catalogs';
 			case 'name': return 'Name';
 			case 'url': return 'URL';
-			case 'duplicate_catalog': return 'A catalog with this URL already exists.';
-			case 'no_catalogs_listed': return 'No catalogs listed';
-			case 'invalid_mokuro_file': return 'File is not a Mokuro generated HTML file.';
-			case 'create_catalog': return 'Create Catalog';
 			case 'field_locked': return ({required Object field}) => '${field} locked and will not clear on export while Creator is active.';
 			case 'field_unlocked': return ({required Object field}) => '${field} unlocked and will clear on export.';
 			case 'field_lock': return 'Lock Field';
 			case 'field_unlock': return 'Unlock Field';
-			case 'use_dark_theme': return 'Use dark theme';
 			case 'saved_tags': return 'Tags saved.';
 			case 'cloze': return 'Cloze';
 			case 'manage_duplicate_checks': return 'Manage Duplicate Checks';

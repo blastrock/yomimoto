@@ -29,9 +29,6 @@ class JapaneseLanguage {
   /// Testing text for basic use. This is useful for pre-loading the database.
   static const String helloWorld = 'こんにちは世界';
 
-  /// Default font for Japanese text.
-  static const String fontFamily = 'NotoSansJP';
-
   /// Locale used to render Japanese text, so that Han characters get
   /// Japanese glyphs.
   static const Locale locale = Locale('ja', 'JP');

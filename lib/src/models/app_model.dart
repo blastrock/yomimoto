@@ -285,7 +285,6 @@ class AppModel with ChangeNotifier {
 
   /// Get the app-wide text style.
   TextStyle get textStyle => TextStyle(
-        fontFamily: JapaneseLanguage.fontFamily,
         fontFeatures: const [FontFeature('liga', 0)],
         locale: JapaneseLanguage.locale,
         textBaseline: JapaneseLanguage.textBaseline,

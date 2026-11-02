@@ -292,7 +292,9 @@ class _ReaderMokuroSourcePageState
 
     if (_zoomScale > 1.01) {
       // Android clamps the factor to the page's minimum scale: back to fit.
-      unawaited(_controller.zoomBy(zoomFactor: 0.01));
+      // The plugin asserts a factor above 0.01, and 0.02 undoes even the
+      // page's maximum scale of 5.
+      unawaited(_controller.zoomBy(zoomFactor: 0.02));
     }
 
     if (_isPeeking) {

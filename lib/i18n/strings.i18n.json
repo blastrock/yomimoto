@@ -195,6 +195,7 @@
     "manga_import_missing_pages": "Imported, but $n pages are missing",
     "manga_delete_volume_confirm": "Delete this volume, its reading position and its stash?",
     "manga_deleting": "Deleting volume…",
+    "manga_exit": "Exit",
     "manga_hide_bar": "Hide",
     "manga_next_page": "Next page",
     "manga_previous_page": "Previous page",

@@ -210,6 +210,8 @@ class _ReaderMokuroSourcePageState
         firstShown: shown?.first ?? 0,
         lastShown: shown?.last ?? 0,
         count: shown?.count ?? _volume.pages.length,
+        // Through the pop, so leaving asks the same confirmation as Back.
+        onExit: () => unawaited(Navigator.maybePop(context)),
         onHide: () => setState(() => _barShown = false),
         onNext: () => _turnPage(forward: true),
         onPrevious: () => _turnPage(forward: false),

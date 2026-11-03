@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
@@ -8,10 +7,10 @@ import 'package:yuuna/utils.dart';
 abstract final class Preferences {
   // App.
 
-  /// Whether the app is light, dark or follows the system.
-  static const EnumPreference<ThemeMode> themeMode = EnumPreference(
-      'theme_mode', ThemeMode.values,
-      defaultValue: ThemeMode.system);
+  /// Whether the app is light, dark, e-ink or follows the system.
+  static const EnumPreference<AppThemeMode> themeMode = EnumPreference(
+      'theme_mode', AppThemeMode.values,
+      defaultValue: AppThemeMode.system);
 
   /// The index of the home tab shown, in the order of `AppModel.tabs`.
   static const Preference<int> currentHomeTabIndex =

@@ -212,9 +212,9 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
       localizationsDelegates: const [
         JidoujishoLocalizationsDelegate(),
       ],
-      themeMode: themeMode,
-      theme: appModel.theme,
-      darkTheme: appModel.darkTheme,
+      themeMode: themeMode.materialMode,
+      theme: AppThemes.lightFor(themeMode),
+      darkTheme: AppThemes.dark(),
       // This is responsible for the initialising the global spacing across
       // the entire project, making use of the [spaces] package.
       builder: (context, child) => Spacing(
@@ -235,8 +235,8 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
   /// The application will open to this page upon startup.
   Widget get home => _isMainIntent ? const HomePage() : const Scaffold();
 
-  /// The current theme mode: light, dark or following the system.
-  ThemeMode get themeMode => appModel.themeMode;
+  /// The current theme mode: light, dark, e-ink or following the system.
+  AppThemeMode get themeMode => appModel.themeMode;
 }
 
 /// Used to override certain strings.

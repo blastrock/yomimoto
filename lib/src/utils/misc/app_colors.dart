@@ -31,6 +31,15 @@ class AppColors extends ThemeExtension<AppColors> {
     imagePlaceholder: Colors.white10,
   );
 
+  /// Colours for the e-ink theme.
+  static const AppColors eink = AppColors(
+    searchBarBackground: Color.fromARGB(255, 229, 229, 229),
+    searchBarBackdrop: Colors.white,
+    dictionaryCard: Colors.white,
+    dictionaryPopup: Colors.white,
+    imagePlaceholder: Colors.black12,
+  );
+
   /// Background of the floating search bars.
   final Color searchBarBackground;
 

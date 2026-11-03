@@ -96,14 +96,15 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
             padding: Spacing.of(context).insets.onlyBottom.big,
             children: [
               buildHeader(t.settings_appearance),
-              buildChoice<ThemeMode>(
+              buildChoice<AppThemeMode>(
                 label: t.settings_theme,
-                options: ThemeMode.values,
+                options: AppThemeMode.values,
                 value: appModel.themeMode,
                 generateLabel: (mode) => switch (mode) {
-                  ThemeMode.system => t.theme_system,
-                  ThemeMode.light => t.theme_light,
-                  ThemeMode.dark => t.theme_dark,
+                  AppThemeMode.system => t.theme_system,
+                  AppThemeMode.light => t.theme_light,
+                  AppThemeMode.dark => t.theme_dark,
+                  AppThemeMode.eink => t.theme_eink,
                 },
                 onChanged: appModel.setThemeMode,
               ),

@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 255
+/// Strings: 256
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -355,6 +355,7 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get theme_system => 'System';
 	String get theme_light => 'Light';
 	String get theme_dark => 'Dark';
+	String get theme_eink => 'E-ink';
 	String get settings_about => 'About';
 	String get sentence_explanation => 'Sentence explanation';
 	String get explanation_api_key => 'Anthropic API key';
@@ -618,6 +619,7 @@ extension on Translations {
 			case 'theme_system': return 'System';
 			case 'theme_light': return 'Light';
 			case 'theme_dark': return 'Dark';
+			case 'theme_eink': return 'E-ink';
 			case 'settings_about': return 'About';
 			case 'sentence_explanation': return 'Sentence explanation';
 			case 'explanation_api_key': return 'Anthropic API key';

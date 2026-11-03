@@ -221,6 +221,7 @@
     "theme_system": "System",
     "theme_light": "Light",
     "theme_dark": "Dark",
+    "theme_eink": "E-ink",
     "settings_about": "About",
     "sentence_explanation": "Sentence explanation",
     "explanation_api_key": "Anthropic API key",

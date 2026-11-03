@@ -57,9 +57,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   /// Used for listening to when the Card Creator is opened and closed.
   StreamSubscription<bool>? _creatorActiveStreamSubscription;
 
-  /// Allows customisation of dictionary background.
-  double get dictionaryBackgroundOpacity => 0.95;
-
   /// Allows customisation of opacity of dictionary entries.
   double get dictionaryEntryOpacity => 1;
 
@@ -321,8 +318,11 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       child: Container(
         padding: Spacing.of(context).insets.all.semiSmall,
         margin: Spacing.of(context).insets.all.normal,
-        color: theme.appColors.dictionaryPopup
-            .withValues(alpha: dictionaryBackgroundOpacity),
+        decoration: BoxDecoration(
+          color: theme.appColors.dictionaryPopup
+              .withValues(alpha: theme.appStyle.dictionaryPopupOpacity),
+          border: Border.fromBorderSide(theme.appStyle.border),
+        ),
         child: Stack(
           children: [
             buildSearchResult(),

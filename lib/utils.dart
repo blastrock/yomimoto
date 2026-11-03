@@ -22,6 +22,7 @@ export 'src/utils/explanation/explanation_prompts.dart';
 export 'src/utils/explanation/sentence_explanation.dart';
 
 export 'src/utils/misc/app_colors.dart';
+export 'src/utils/misc/app_style.dart';
 export 'src/utils/misc/app_theme_mode.dart';
 export 'src/utils/misc/app_themes.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';

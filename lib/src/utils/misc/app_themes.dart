@@ -113,7 +113,7 @@ abstract final class AppThemes {
               brightness: Brightness.light,
             )
             .copyWith(surface: Colors.white),
-        extensions: const [AppColors.light],
+        extensions: const [AppColors.light, AppStyle.standard],
       );
 
   /// The dark theme.
@@ -197,13 +197,17 @@ abstract final class AppThemes {
               onError: Colors.white,
             )
             .copyWith(surface: Colors.black),
-        extensions: const [AppColors.dark],
+        extensions: const [AppColors.dark, AppStyle.standard],
       );
 
   /// The e-ink theme: [light] with pure black text and icons, for the highest
-  /// contrast on the text being read.
+  /// contrast on the text being read, and borders around windows and text
+  /// buttons, which would otherwise be white on white.
   static ThemeData eink() {
     ThemeData theme = light();
+    BorderSide border = AppStyle.eink.border;
+    RoundedRectangleBorder windowShape = RoundedRectangleBorder(side: border);
+
     return theme.copyWith(
       textTheme: theme.textTheme.apply(
         bodyColor: Colors.black,
@@ -211,7 +215,20 @@ abstract final class AppThemes {
       ),
       iconTheme: const IconThemeData(color: Colors.black),
       colorScheme: theme.colorScheme.copyWith(onSurface: Colors.black),
-      extensions: const [AppColors.eink],
+      dialogTheme: theme.dialogTheme.copyWith(shape: windowShape),
+      popupMenuTheme: theme.popupMenuTheme.copyWith(shape: windowShape),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: Colors.white,
+        shape: windowShape,
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.black,
+          side: border,
+          shape: const RoundedRectangleBorder(),
+        ),
+      ),
+      extensions: const [AppColors.eink, AppStyle.eink],
     );
   }
 

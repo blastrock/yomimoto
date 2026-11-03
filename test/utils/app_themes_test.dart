@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yuuna/media.dart';
 import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
@@ -66,6 +67,12 @@ void main() {
     expect(AppColors.eink.dictionaryLink, Colors.black);
     expect(AppColors.light.dictionaryLink, isNull);
     expect(AppColors.dark.dictionaryLink, isNull);
+  });
+
+  test('each theme carries its book colours', () {
+    expect(AppThemes.light().appColors.ttu, TtuColours.light);
+    expect(AppThemes.dark().appColors.ttu, TtuColours.black);
+    expect(AppThemes.eink().appColors.ttu, TtuColours.eink);
   });
 
   test('e-ink windows stay white', () {

@@ -34,21 +34,6 @@ reads), either queue main-isolate writes until the import ends, or commit
 the import in batches and mark the dictionary incomplete until its last
 batch, deleting incomplete dictionaries on failure and at startup.
 
-## The ttu `theme` event has no listener
-
-**Since:** the dictionary popup stopped adapting to the reader's theme.
-
-The app now dictates the theme, so the popup no longer follows the book's page
-colours. ttu still sends a `theme` event on load and on every theme change,
-and `TtuBridge` still parses it into a `TtuThemeEvent` (covered by
-`test/media/ttu_bridge_test.dart`), but nothing passes an `onTheme` callback,
-so it is dropped. It was kept to leave the protocol and the pinned ttu build
-untouched.
-
-**When ttu is made to follow the app's theme** (a host command pushing the
-app's colours), rework the event or remove it from both sides of the bridge
-and bump the protocol version.
-
 ## Lone surrogate escapes in dictionary banks are stored as invalid UTF-8
 
 **Since:** the SQL dictionary import.

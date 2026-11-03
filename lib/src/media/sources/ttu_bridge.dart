@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:yuuna/media.dart';
 
 /// Sent once per page load when the ebook-reader-lite host bridge is up.
 class TtuReadyEvent {
@@ -50,30 +51,6 @@ class TtuTapEvent {
   bool get isDismiss => offset < 0 || text.isEmpty;
 }
 
-/// The reader's current theme colours.
-class TtuThemeEvent {
-  /// Create the event from its wire form.
-  TtuThemeEvent.fromJson(Map<String, dynamic> json)
-      : backgroundColor = _colour(json['backgroundColor']),
-        fontColor = _colour(json['fontColor']);
-
-  /// Page background colour.
-  final Color backgroundColor;
-
-  /// Text colour.
-  final Color fontColor;
-
-  static Color _colour(dynamic json) {
-    Map<String, dynamic> rgba = Map<String, dynamic>.from(json as Map);
-    return Color.fromRGBO(
-      (rgba['r'] as num).round(),
-      (rgba['g'] as num).round(),
-      (rgba['b'] as num).round(),
-      (rgba['a'] as num? ?? 1).toDouble(),
-    );
-  }
-}
-
 /// A book in ttu's IndexedDB.
 class TtuBook {
   /// Create the book from its wire form.
@@ -115,7 +92,6 @@ class TtuBridge {
     required this.controller,
     this.onReady,
     this.onTap,
-    this.onTheme,
     this.onExit,
   }) {
     controller.addJavaScriptHandler(
@@ -125,7 +101,7 @@ class TtuBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in ebook-reader-lite's `host-bridge.ts`.
-  static const int protocolVersion = 4;
+  static const int protocolVersion = 5;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);
@@ -138,9 +114,6 @@ class TtuBridge {
 
   /// Called when book content is tapped.
   final void Function(TtuTapEvent)? onTap;
-
-  /// Called with the current theme on load and on every theme change.
-  final void Function(TtuThemeEvent)? onTheme;
 
   /// Called when the reader's Exit entry is chosen.
   final void Function()? onExit;
@@ -158,8 +131,6 @@ class TtuBridge {
         onReady?.call(TtuReadyEvent.fromJson(message));
       case 'tap':
         onTap?.call(TtuTapEvent.fromJson(message));
-      case 'theme':
-        onTheme?.call(TtuThemeEvent.fromJson(message));
       case 'exit':
         onExit?.call();
       default:
@@ -205,6 +176,10 @@ class TtuBridge {
   /// Select [length] characters from [start] in the last tapped paragraph.
   Future<void> highlight({required int start, required int length}) =>
       _call('highlight', args: {'start': start, 'length': length});
+
+  /// Show the book in [colours], whatever theme is chosen in ttu's settings.
+  Future<void> setTheme(TtuColours colours) =>
+      _call('setTheme', args: colours.toJson());
 
   /// Remove any selection in the reader.
   Future<void> clearSelection() => _call('clearSelection');

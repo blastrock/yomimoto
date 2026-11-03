@@ -9,7 +9,7 @@ void main() {
         'route': '/b.html',
       });
 
-      expect(TtuBridge.protocolVersion, 4);
+      expect(TtuBridge.protocolVersion, 5);
       expect(event.isCompatible, isTrue);
       expect(event.route, '/b.html');
     });
@@ -98,37 +98,6 @@ void main() {
 
       expect(noOffset.isDismiss, isTrue);
       expect(noText.isDismiss, isTrue);
-    });
-  });
-
-  group('TtuThemeEvent', () {
-    test('reads colours', () {
-      TtuThemeEvent event = TtuThemeEvent.fromJson({
-        'backgroundColor': {'r': 255, 'g': 250, 'b': 240, 'a': 1},
-        'fontColor': {'r': 0, 'g': 0, 'b': 0, 'a': 0.5},
-      });
-
-      expect(event.backgroundColor.toARGB32(), 0xFFFFFAF0);
-      expect(event.fontColor.toARGB32(), 0x80000000);
-    });
-
-    test('defaults a missing alpha to opaque', () {
-      TtuThemeEvent event = TtuThemeEvent.fromJson({
-        'backgroundColor': {'r': 1, 'g': 2, 'b': 3},
-        'fontColor': {'r': 4, 'g': 5, 'b': 6},
-      });
-
-      expect(event.backgroundColor.toARGB32(), 0xFF010203);
-      expect(event.fontColor.toARGB32(), 0xFF040506);
-    });
-
-    test('rounds fractional components', () {
-      TtuThemeEvent event = TtuThemeEvent.fromJson({
-        'backgroundColor': {'r': 254.6, 'g': 0.4, 'b': 127.5},
-        'fontColor': {'r': 0, 'g': 0, 'b': 0},
-      });
-
-      expect(event.backgroundColor.toARGB32(), 0xFFFF0080);
     });
   });
 

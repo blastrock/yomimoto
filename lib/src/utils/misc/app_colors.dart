@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yuuna/media.dart';
 
 /// Colours the app needs that have no slot in [ColorScheme]. Each theme sets
 /// its own values; read them with [AppColorsTheme.appColors].
@@ -13,6 +14,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.imagePlaceholder,
     required this.quickActionBackground,
     required this.nestedChipBackground,
+    required this.ttu,
     this.chipBackground,
     this.chipForeground,
     this.nestedChipForeground,
@@ -28,6 +30,7 @@ class AppColors extends ThemeExtension<AppColors> {
     imagePlaceholder: Colors.black12,
     quickActionBackground: Color(0x0D000000),
     nestedChipBackground: Color(0xFFEF5350),
+    ttu: TtuColours.light,
   );
 
   /// Colours for the dark theme.
@@ -39,6 +42,7 @@ class AppColors extends ThemeExtension<AppColors> {
     imagePlaceholder: Colors.white10,
     quickActionBackground: Color(0x0DFFFFFF),
     nestedChipBackground: Color(0xFFEF5350),
+    ttu: TtuColours.black,
   );
 
   /// Colours for the e-ink theme.
@@ -50,6 +54,7 @@ class AppColors extends ThemeExtension<AppColors> {
     imagePlaceholder: Colors.black12,
     quickActionBackground: Colors.transparent,
     nestedChipBackground: Colors.white,
+    ttu: TtuColours.eink,
     chipBackground: Colors.black,
     chipForeground: Colors.white,
     nestedChipForeground: Colors.black,
@@ -79,6 +84,9 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Background of a chip nested in a chip, like a dictionary's frequencies.
   final Color nestedChipBackground;
 
+  /// The colours of the book in the ttu reader.
+  final TtuColours ttu;
+
   /// Background of every chip. If null, each chip keeps its own colour.
   final Color? chipBackground;
 
@@ -101,6 +109,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? imagePlaceholder,
     Color? quickActionBackground,
     Color? nestedChipBackground,
+    TtuColours? ttu,
     Color? chipBackground,
     Color? chipForeground,
     Color? nestedChipForeground,
@@ -115,6 +124,7 @@ class AppColors extends ThemeExtension<AppColors> {
       quickActionBackground:
           quickActionBackground ?? this.quickActionBackground,
       nestedChipBackground: nestedChipBackground ?? this.nestedChipBackground,
+      ttu: ttu ?? this.ttu,
       chipBackground: chipBackground ?? this.chipBackground,
       chipForeground: chipForeground ?? this.chipForeground,
       nestedChipForeground: nestedChipForeground ?? this.nestedChipForeground,
@@ -141,6 +151,7 @@ class AppColors extends ThemeExtension<AppColors> {
           Color.lerp(quickActionBackground, other.quickActionBackground, t)!,
       nestedChipBackground:
           Color.lerp(nestedChipBackground, other.nestedChipBackground, t)!,
+      ttu: t < 0.5 ? ttu : other.ttu,
       chipBackground: t < 0.5 ? chipBackground : other.chipBackground,
       chipForeground: t < 0.5 ? chipForeground : other.chipForeground,
       nestedChipForeground:

@@ -35,8 +35,8 @@ remains is deliberately three things:
 - **An older fork lineage exists in this repo's history** (`cc7e4925..8189e2fa`,
   "白い熊 辞書"). It did similar removals against the pre-migration tree. It is
   considered diverged — ignore it, do not cherry-pick from it.
-- E-ink UI tuning (refresh behaviour, contrast, animation suppression) is a
-  **later pass** that has not started.
+- The E-ink theme exists (see Pages); the rest of e-ink tuning (refresh
+  behaviour, animation suppression) is a **later pass** that has not started.
 
 ## Commands
 
@@ -235,8 +235,14 @@ Reusable widgets are `lib/src/utils/components/jidoujisho_*.dart`.
 Colours that differ between themes come from the theme, never from a
 brightness check: a `ColorScheme` role when one fits (`colorScheme.onSurface`
 for text and icons, at 5% opacity for a tint), else a field of the `AppColors`
-theme extension (`theme.appColors`), which `AppModel.theme` and `darkTheme`
-each set.
+theme extension (`theme.appColors`). What differs between themes other than
+colours (the border, sizes, the popup's opacity) is in the `AppStyle` theme
+extension (`theme.appStyle`). `AppThemes` (`lib/src/utils/misc/`) builds the
+three themes, Light, Dark and E-ink; `AppThemeMode` is the setting, `system`
+through `eink`, and E-ink is a light theme to `MaterialApp`. E-ink is built
+for high contrast on what is read: book and dictionary text are pure black on
+white. It borders windows, text buttons and the dictionary's quick actions;
+other buttons have no border in it, deliberately.
 
 ### i18n
 
@@ -258,6 +264,12 @@ translations are gone.
   the source of truth. The origin (`ReaderTtuSource.origin`) must stay fixed:
   IndexedDB is tied to it. The app talks to ttu only through `TtuBridge` (the
   fork's `apps/web/src/lib/host/`), never by injecting JS.
+
+  The app sets the book's colours: `AppColors.ttu` is a `TtuColours` per
+  theme, sent with `setTheme` when the bridge is ready and when the theme
+  changes. The theme chosen in ttu's own settings has no effect in the app.
+  The fork keeps the last colours in `localStorage.ttuHostTheme`, so a book
+  opens in them before the command arrives.
 
   The Novels tab is a database mirror of that library: `MediaItem` rows whose
   `mediaIdentifier` is the relative reader path `b.html?id=<ttu id>`, with

@@ -34,6 +34,12 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
   late InAppWebViewController _controller;
   TtuBridge? _bridge;
 
+  /// Whether the page in the WebView can take commands.
+  bool _bridgeReady = false;
+
+  /// The colours last sent to the page.
+  TtuColours? _pushedColours;
+
   Orientation? lastOrientation;
 
   final FocusNode _focusNode = FocusNode();
@@ -57,6 +63,31 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
       mediaSource.explanationContext = null;
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Reading the theme here is what brings this back when it changes.
+    TtuColours colours = theme.appColors.ttu;
+    if (_bridgeReady) {
+      unawaited(_pushColours(colours));
+    }
+  }
+
+  /// Show the book in [colours], unless the page already does.
+  Future<void> _pushColours(TtuColours colours) async {
+    if (colours == _pushedColours) {
+      return;
+    }
+    _pushedColours = colours;
+
+    try {
+      await _bridge?.setTheme(colours);
+    } on TtuBridgeException catch (e) {
+      debugPrint('ttuHost: $e');
+    }
   }
 
   /// Supplies the sentence explanation context while this page is open.
@@ -175,7 +206,7 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
           }
         },
         child: Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: theme.appColors.ttu.background,
           resizeToAvoidBottomInset: false,
           body: SafeArea(
             top: !mediaSource.extendPageBeyondNavigationBar,
@@ -348,6 +379,9 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
   void _onBridgeReady(TtuReadyEvent event) {
     if (event.isCompatible) {
+      _bridgeReady = true;
+      _pushedColours = null;
+      unawaited(_pushColours(theme.appColors.ttu));
       return;
     }
 

@@ -81,7 +81,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
   /// use this and wrap their [build] function with a [PopScope].
   Future<bool> onWillPop() async {
     Widget alertDialog = AlertDialog(
-      shape: const RoundedRectangleBorder(),
       title: Text(t.exit_media_title),
       content: Text(t.exit_media_description),
       actions: <Widget>[

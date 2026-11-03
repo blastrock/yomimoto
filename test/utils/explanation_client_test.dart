@@ -170,4 +170,100 @@ void main() {
 
     expect(explanation.parts.single.reading, 'ほんを');
   });
+
+  group('testApiKey', () {
+    test('sends a one-token request to the preset model', () async {
+      late http.Request sent;
+
+      await testApiKey(
+        apiKey: ' k ',
+        preset: ExplanationPreset.haiku,
+        client: MockClient((request) async {
+          sent = request;
+          return http.Response(
+            jsonEncode({
+              'stop_reason': 'max_tokens',
+              'content': [
+                {'type': 'text', 'text': 'Hello'},
+              ],
+            }),
+            200,
+          );
+        }),
+      );
+
+      expect(sent.method, 'POST');
+      expect(sent.url.toString(), 'https://api.anthropic.com/v1/messages');
+      expect(sent.headers['x-api-key'], 'k');
+      expect(sent.headers['anthropic-version'], '2026-10-21');
+      expect(jsonDecode(sent.body), {
+        'model': 'claude-haiku-5-5',
+        'max_tokens': 1,
+        'messages': [
+          {'role': 'user', 'content': 'Hi'},
+        ],
+      });
+    });
+
+    test('empty key', () async {
+      bool called = false;
+
+      ExplanationFailure failure = await failureOf(() => testApiKey(
+            apiKey: '  ',
+            preset: ExplanationPreset.sonnet,
+            client: MockClient((_) async {
+              called = true;
+              return http.Response('{}', 200);
+            }),
+          ));
+
+      expect(failure, ExplanationFailure.noApiKey);
+      expect(called, isFalse);
+    });
+
+    test('maps HTTP errors with the API message', () async {
+      Future<ExplanationException> exceptionFor(int status) async {
+        try {
+          await testApiKey(
+            apiKey: 'k',
+            preset: ExplanationPreset.sonnet,
+            client: MockClient((_) async => http.Response(
+                  jsonEncode({
+                    'type': 'error',
+                    'error': {'type': 'x', 'message': 'no credit'},
+                  }),
+                  status,
+                )),
+          );
+        } on ExplanationException catch (e) {
+          return e;
+        }
+        throw StateError('no ExplanationException');
+      }
+
+      Map<int, ExplanationFailure> expected = {
+        401: ExplanationFailure.badKey,
+        400: ExplanationFailure.request,
+        402: ExplanationFailure.request,
+        404: ExplanationFailure.request,
+      };
+
+      for (MapEntry<int, ExplanationFailure> entry in expected.entries) {
+        ExplanationException exception = await exceptionFor(entry.key);
+
+        expect(exception.failure, entry.value, reason: '${entry.key}');
+        expect(exception.message, 'no credit', reason: '${entry.key}');
+      }
+    });
+
+    test('network error', () async {
+      ExplanationFailure failure = await failureOf(() => testApiKey(
+            apiKey: 'k',
+            preset: ExplanationPreset.sonnet,
+            client: MockClient((_) async => throw http.ClientException('down')),
+          ));
+
+      expect(failure, ExplanationFailure.network);
+    });
+  });
 }

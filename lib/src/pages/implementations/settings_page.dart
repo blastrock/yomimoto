@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:spaces/spaces.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yuuna/media.dart';
@@ -31,6 +32,9 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
   late final TextEditingController _fontSizeController;
   late final TextEditingController _maximumTermsController;
   late final TextEditingController _apiKeyController;
+
+  /// Whether the API key is being tested, which disables the test row.
+  bool _testingApiKey = false;
 
   /// Captured in [initState] so [dispose] does not have to reach for a
   /// provider, which is no longer legal at that point.
@@ -211,6 +215,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
                 onChanged: (value) => appModel.preferences
                     .set(Preferences.explanationApiKey, value.trim()),
               ),
+              buildTestApiKey(),
               buildChoice<ExplanationPreset>(
                 label: t.explanation_model,
                 options: ExplanationPreset.values,
@@ -351,6 +356,50 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
         ),
       ),
     );
+  }
+
+  /// A row sending a one-token request with the key in the field and the
+  /// chosen model, then saying in a toast whether it worked.
+  Widget buildTestApiKey() {
+    return ListTile(
+      leading: _testingApiKey
+          ? SizedBox.square(
+              dimension: textTheme.bodyLarge?.fontSize,
+              child: const CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(Icons.network_check, size: textTheme.bodyLarge?.fontSize),
+      title: Text(t.explanation_test_key, style: textTheme.bodyMedium),
+      enabled: !_testingApiKey,
+      onTap: testApiKeyInField,
+      contentPadding: Spacing.of(context).insets.horizontal.normal,
+    );
+  }
+
+  /// Test the key in the field with the chosen model.
+  Future<void> testApiKeyInField() async {
+    setState(() {
+      _testingApiKey = true;
+    });
+
+    String message;
+    try {
+      await testApiKey(
+        apiKey: _apiKeyController.text,
+        preset: ExplanationPreset.fromKey(
+            _appModel.preferences.get(Preferences.explanationPreset)),
+      );
+      message = t.explanation_key_works;
+    } on ExplanationException catch (e) {
+      message = e.displayMessage;
+    }
+
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _testingApiKey = false;
+    });
+    showToast(msg: message, toastLength: Toast.LENGTH_LONG);
   }
 
   Widget buildTextField({

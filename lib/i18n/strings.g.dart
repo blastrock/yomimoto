@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 253
+/// Strings: 255
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -358,6 +358,8 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get settings_about => 'About';
 	String get sentence_explanation => 'Sentence explanation';
 	String get explanation_api_key => 'Anthropic API key';
+	String get explanation_test_key => 'Test API key';
+	String get explanation_key_works => 'The API key works';
 	String get explanation_model => 'Model';
 	String get explanation_preset_sonnet => 'Sonnet 5.5 (better)';
 	String get explanation_preset_haiku => 'Haiku 5.5 (cheaper)';
@@ -619,6 +621,8 @@ extension on Translations {
 			case 'settings_about': return 'About';
 			case 'sentence_explanation': return 'Sentence explanation';
 			case 'explanation_api_key': return 'Anthropic API key';
+			case 'explanation_test_key': return 'Test API key';
+			case 'explanation_key_works': return 'The API key works';
 			case 'explanation_model': return 'Model';
 			case 'explanation_preset_sonnet': return 'Sonnet 5.5 (better)';
 			case 'explanation_preset_haiku': return 'Haiku 5.5 (cheaper)';

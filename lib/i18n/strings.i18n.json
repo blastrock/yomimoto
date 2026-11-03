@@ -224,6 +224,8 @@
     "settings_about": "About",
     "sentence_explanation": "Sentence explanation",
     "explanation_api_key": "Anthropic API key",
+    "explanation_test_key": "Test API key",
+    "explanation_key_works": "The API key works",
     "explanation_model": "Model",
     "explanation_preset_sonnet": "Sonnet 5.5 (better)",
     "explanation_preset_haiku": "Haiku 5.5 (cheaper)",

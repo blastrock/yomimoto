@@ -23,6 +23,56 @@ Future<SentenceExplanation> explainSentence({
   http.Client? client,
   Duration timeout = const Duration(seconds: 20),
 }) async {
+  String body = await _post(
+    apiKey: apiKey,
+    body: request.bodyFor(preset),
+    client: client,
+    timeout: timeout,
+  );
+
+  Map<String, dynamic> json;
+  try {
+    json = jsonDecode(body) as Map<String, dynamic>;
+  } on FormatException {
+    throw ExplanationException(ExplanationFailure.unparseable);
+  } on TypeError {
+    throw ExplanationException(ExplanationFailure.unparseable);
+  }
+
+  return SentenceExplanation.fromResponse(json);
+}
+
+/// Check that [apiKey] can use [preset]'s model, with a one-token request:
+/// unlike listing models, it also fails when the account cannot pay. Throws
+/// only [ExplanationException]. [client] is for tests.
+Future<void> testApiKey({
+  required String apiKey,
+  required ExplanationPreset preset,
+  http.Client? client,
+  Duration timeout = const Duration(seconds: 20),
+}) async {
+  await _post(
+    apiKey: apiKey,
+    body: {
+      'model': preset.model,
+      'max_tokens': 1,
+      'messages': [
+        {'role': 'user', 'content': 'Hi'},
+      ],
+    },
+    client: client,
+    timeout: timeout,
+  );
+}
+
+/// Send [body] to the Messages API with [apiKey] and return the body of a
+/// 200 answer. Throws only [ExplanationException].
+Future<String> _post({
+  required String apiKey,
+  required Map<String, dynamic> body,
+  required http.Client? client,
+  required Duration timeout,
+}) async {
   String key = apiKey.trim();
   if (key.isEmpty) {
     throw ExplanationException(ExplanationFailure.noApiKey);
@@ -39,7 +89,7 @@ Future<SentenceExplanation> explainSentence({
             'x-api-key': key,
             'anthropic-version': explanationApiVersion,
           },
-          body: jsonEncode(request.bodyFor(preset)),
+          body: jsonEncode(body),
         )
         .timeout(timeout);
   } on TimeoutException {
@@ -54,22 +104,13 @@ Future<SentenceExplanation> explainSentence({
     }
   }
 
-  String body = utf8.decode(response.bodyBytes, allowMalformed: true);
+  String text = utf8.decode(response.bodyBytes, allowMalformed: true);
   int status = response.statusCode;
   if (status != 200) {
-    throw ExplanationException(_failureFor(status), _errorMessage(body));
+    throw ExplanationException(_failureFor(status), _errorMessage(text));
   }
 
-  Map<String, dynamic> json;
-  try {
-    json = jsonDecode(body) as Map<String, dynamic>;
-  } on FormatException {
-    throw ExplanationException(ExplanationFailure.unparseable);
-  } on TypeError {
-    throw ExplanationException(ExplanationFailure.unparseable);
-  }
-
-  return SentenceExplanation.fromResponse(json);
+  return text;
 }
 
 ExplanationFailure _failureFor(int status) {

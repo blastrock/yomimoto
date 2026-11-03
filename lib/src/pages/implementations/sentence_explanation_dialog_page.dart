@@ -136,29 +136,9 @@ class _SentenceExplanationDialogPageState
 
   /// What went wrong, with the API's own message when it explains more.
   Widget buildFailure(ExplanationException exception) {
-    String message = switch (exception.failure) {
-      ExplanationFailure.noApiKey => t.explanation_no_api_key,
-      ExplanationFailure.network => t.explanation_network,
-      ExplanationFailure.timeout => t.explanation_timeout,
-      ExplanationFailure.rateLimited => t.explanation_rate_limited,
-      ExplanationFailure.server => t.explanation_server,
-      ExplanationFailure.badKey => t.explanation_bad_key,
-      ExplanationFailure.request => t.explanation_request,
-      ExplanationFailure.refusal => t.explanation_refusal,
-      ExplanationFailure.truncated => t.explanation_truncated,
-      ExplanationFailure.unparseable => t.explanation_unparseable,
-    };
-    String? detail = switch (exception.failure) {
-      ExplanationFailure.badKey ||
-      ExplanationFailure.request ||
-      ExplanationFailure.server =>
-        exception.message,
-      _ => null,
-    };
-
     return JidoujishoPlaceholderMessage(
       icon: Icons.error_outline,
-      message: detail == null ? message : '$message\n\n$detail',
+      message: exception.displayMessage,
     );
   }
 }

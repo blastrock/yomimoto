@@ -103,6 +103,32 @@ class ExplanationException implements Exception {
   /// The API's error message, if any.
   final String? message;
 
+  /// What went wrong, for the user, with the API's own message when it
+  /// explains more.
+  String get displayMessage {
+    String text = switch (failure) {
+      ExplanationFailure.noApiKey => t.explanation_no_api_key,
+      ExplanationFailure.network => t.explanation_network,
+      ExplanationFailure.timeout => t.explanation_timeout,
+      ExplanationFailure.rateLimited => t.explanation_rate_limited,
+      ExplanationFailure.server => t.explanation_server,
+      ExplanationFailure.badKey => t.explanation_bad_key,
+      ExplanationFailure.request => t.explanation_request,
+      ExplanationFailure.refusal => t.explanation_refusal,
+      ExplanationFailure.truncated => t.explanation_truncated,
+      ExplanationFailure.unparseable => t.explanation_unparseable,
+    };
+    String? detail = switch (failure) {
+      ExplanationFailure.badKey ||
+      ExplanationFailure.request ||
+      ExplanationFailure.server =>
+        message,
+      _ => null,
+    };
+
+    return detail == null ? text : '$text\n\n$detail';
+  }
+
   @override
   String toString() => 'ExplanationException(${failure.name}): $message';
 }

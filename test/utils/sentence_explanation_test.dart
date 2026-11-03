@@ -221,4 +221,26 @@ void main() {
       );
     });
   });
+
+  group('ExplanationException.displayMessage', () {
+    test('adds the API message when it explains more', () {
+      expect(
+        ExplanationException(ExplanationFailure.badKey, 'invalid x-api-key')
+            .displayMessage,
+        'The API key was rejected\n\ninvalid x-api-key',
+      );
+      expect(
+        ExplanationException(ExplanationFailure.request).displayMessage,
+        'The API rejected the request',
+      );
+    });
+
+    test('leaves out a network error detail', () {
+      expect(
+        ExplanationException(ExplanationFailure.network, 'down')
+            .displayMessage,
+        'Could not reach the API',
+      );
+    });
+  });
 }

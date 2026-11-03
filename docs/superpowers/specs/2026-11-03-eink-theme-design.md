@@ -33,16 +33,12 @@ ttu's own settings: the app now chooses the book's colours.
 3. **Thin black borders in E-ink** (1dp, black) around
    - **text buttons** (`TextButton`, about 83 uses: dialog and page actions),
      through the theme's `textButtonTheme`;
-   - **the app's icon button, `JidoujishoIconButton`** (about 37 uses,
-     including every quick action), in the component itself, reading the
-     border from the theme. Both of its paths get it: its own `InkWell`
-     rendering and the `IconButton` it builds when `isWideTapArea` is set.
+   - **the dictionary's quick actions**, with a square border.
 
-   Deliberately left without a border, because they are rarely used: plain
-   `IconButton`s (Material 2 ignores `IconButtonThemeData`, so each would
-   need its own edit), `PopupMenuButton`s, the floating search bar's
-   actions (`FloatingSearchBarAction`), and `InkWell`/`GestureDetector` tap
-   areas;
+   Deliberately left without a border: every other `JidoujishoIconButton`
+   (the user tried circular borders on them and did not like them), plain
+   `IconButton`s, `PopupMenuButton`s, the floating search bar's actions
+   (`FloatingSearchBarAction`), and `InkWell`/`GestureDetector` tap areas;
    - **windows**: the reader's dictionary popup, dialogs, popup menus and
      bottom sheets.
 4. **Opaque white dictionary popup in E-ink**: today it is `#F2F2F2` at 95%
@@ -143,8 +139,8 @@ ttu's own settings: the app now chooses the book's colours.
 - High contrast is required only for reading text (book, dictionary); other
   greys are unimportant.
 - The red accent stays.
-- Borders: thin, black, on text buttons, `JidoujishoIconButton` and
-  windows; E-ink only. Other buttons are skipped.
+- Borders: thin, black, on text buttons, quick actions and windows; E-ink
+  only. Other buttons, the other icon buttons included, are skipped.
 - Quick-action buttons: large in E-ink, smaller in Light and Dark.
 - Chips: black with white text; the nested chip inverted to black on white.
 - The app pushes the book's colours to ttu for every theme; the `theme`

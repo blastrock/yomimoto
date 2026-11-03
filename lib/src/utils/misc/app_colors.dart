@@ -11,6 +11,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.dictionaryCard,
     required this.dictionaryPopup,
     required this.imagePlaceholder,
+    required this.quickActionBackground,
   });
 
   /// Colours for the light theme.
@@ -20,6 +21,7 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryCard: Color.fromARGB(255, 249, 249, 249),
     dictionaryPopup: Color.fromARGB(255, 242, 242, 242),
     imagePlaceholder: Colors.black12,
+    quickActionBackground: Color(0x0D000000),
   );
 
   /// Colours for the dark theme.
@@ -29,6 +31,7 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryCard: Color.fromARGB(255, 16, 16, 16),
     dictionaryPopup: Color.fromARGB(255, 43, 43, 43),
     imagePlaceholder: Colors.white10,
+    quickActionBackground: Color(0x0DFFFFFF),
   );
 
   /// Colours for the e-ink theme.
@@ -38,6 +41,7 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryCard: Colors.white,
     dictionaryPopup: Colors.white,
     imagePlaceholder: Colors.black12,
+    quickActionBackground: Colors.transparent,
   );
 
   /// Background of the floating search bars.
@@ -57,6 +61,9 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Filler for an empty slot in the creator's image carousel.
   final Color imagePlaceholder;
 
+  /// Tint behind the icon of a dictionary quick action.
+  final Color quickActionBackground;
+
   @override
   AppColors copyWith({
     Color? searchBarBackground,
@@ -64,6 +71,7 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? dictionaryCard,
     Color? dictionaryPopup,
     Color? imagePlaceholder,
+    Color? quickActionBackground,
   }) {
     return AppColors(
       searchBarBackground: searchBarBackground ?? this.searchBarBackground,
@@ -71,6 +79,8 @@ class AppColors extends ThemeExtension<AppColors> {
       dictionaryCard: dictionaryCard ?? this.dictionaryCard,
       dictionaryPopup: dictionaryPopup ?? this.dictionaryPopup,
       imagePlaceholder: imagePlaceholder ?? this.imagePlaceholder,
+      quickActionBackground:
+          quickActionBackground ?? this.quickActionBackground,
     );
   }
 
@@ -89,6 +99,8 @@ class AppColors extends ThemeExtension<AppColors> {
       dictionaryPopup: Color.lerp(dictionaryPopup, other.dictionaryPopup, t)!,
       imagePlaceholder:
           Color.lerp(imagePlaceholder, other.imagePlaceholder, t)!,
+      quickActionBackground:
+          Color.lerp(quickActionBackground, other.quickActionBackground, t)!,
     );
   }
 }

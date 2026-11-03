@@ -261,33 +261,34 @@ class _DictionaryQuickActionsRowState
       buttons.add(
         Padding(
           padding: Spacing.of(context).insets.onlyLeft.semiSmall,
-          child: JidoujishoIconButton(
-            busy: true,
-            enabledColor: enabledColor,
-            disabledColor: enabledColor.withValues(alpha: 0.5),
-            shapeBorder: const RoundedRectangleBorder(),
-            backgroundColor: Theme.of(context)
-                .colorScheme
-                .onSurface
-                .withValues(alpha: 0.05),
-            size: Spacing.of(context).spaces.big,
-            tooltip: quickAction.label,
-            icon: quickAction.icon,
-            onTap: () async {
-              await quickAction.executeAction(
-                context: context,
-                ref: ref,
-                appModel: appModel,
-                creatorModel: creatorModel,
-                heading: widget.heading,
-                selectedEntry: widget.selectedEntry,
-              );
+          child: QuickActionBorder(
+            child: JidoujishoIconButton(
+              busy: true,
+              enabledColor: enabledColor,
+              disabledColor: enabledColor.withValues(alpha: 0.5),
+              shapeBorder: const RoundedRectangleBorder(),
+              backgroundColor: Theme.of(context).appColors.quickActionBackground,
+              size: Theme.of(context).appStyle.quickActionIconSize,
+              padding:
+                  EdgeInsets.all(Theme.of(context).appStyle.quickActionPadding),
+              tooltip: quickAction.label,
+              icon: quickAction.icon,
+              onTap: () async {
+                await quickAction.executeAction(
+                  context: context,
+                  ref: ref,
+                  appModel: appModel,
+                  creatorModel: creatorModel,
+                  heading: widget.heading,
+                  selectedEntry: widget.selectedEntry,
+                );
 
-              ref.invalidate(quickActionColorProvider(widget.heading));
-              if (quickAction.closesPopup && mounted) {
-                widget.onClosePopup?.call();
-              }
-            },
+                ref.invalidate(quickActionColorProvider(widget.heading));
+                if (quickAction.closesPopup && mounted) {
+                  widget.onClosePopup?.call();
+                }
+              },
+            ),
           ),
         ),
       );
@@ -298,6 +299,26 @@ class _DictionaryQuickActionsRowState
       mainAxisAlignment: MainAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: buttons,
+    );
+  }
+}
+
+/// The edge of a quick action: the theme's [AppStyle.border] around [child].
+class QuickActionBorder extends StatelessWidget {
+  /// Create the edge of a quick action.
+  const QuickActionBorder({required this.child, super.key});
+
+  /// The button.
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        border: Border.fromBorderSide(Theme.of(context).appStyle.border),
+      ),
+      child: child,
     );
   }
 }

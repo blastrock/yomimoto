@@ -56,6 +56,12 @@ void main() {
         Colors.black);
   });
 
+  test('quick actions lose their tint in e-ink only', () {
+    expect(AppColors.eink.quickActionBackground, Colors.transparent);
+    expect(AppColors.light.quickActionBackground, const Color(0x0D000000));
+    expect(AppColors.dark.quickActionBackground, const Color(0x0DFFFFFF));
+  });
+
   test('e-ink windows stay white', () {
     ThemeData theme = AppThemes.eink();
     expect(theme.dialogTheme.backgroundColor, Colors.white);

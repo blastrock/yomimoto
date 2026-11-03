@@ -62,6 +62,12 @@ void main() {
     expect(AppColors.dark.quickActionBackground, const Color(0x0DFFFFFF));
   });
 
+  test('dictionary links are black in e-ink only', () {
+    expect(AppColors.eink.dictionaryLink, Colors.black);
+    expect(AppColors.light.dictionaryLink, isNull);
+    expect(AppColors.dark.dictionaryLink, isNull);
+  });
+
   test('e-ink windows stay white', () {
     ThemeData theme = AppThemes.eink();
     expect(theme.dialogTheme.backgroundColor, Colors.white);

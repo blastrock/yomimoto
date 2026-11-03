@@ -66,7 +66,8 @@ class DictionaryHtmlWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textColor = Theme.of(context).colorScheme.onSurface;
-    final linkColor = Theme.of(context).colorScheme.error;
+    final linkColor = Theme.of(context).appColors.dictionaryLink ??
+        Theme.of(context).colorScheme.error;
     final dictionaryFontSize =
         ref.read(appProvider).preferences.get(Preferences.dictionaryFontSize);
     final fontSize = FontSize(dictionaryFontSize);
@@ -82,21 +83,12 @@ class DictionaryHtmlWidget extends ConsumerWidget {
       onAnchorTap: (url, attributes, element) {
         onSearch.call(attributes['query'] ?? element?.text ?? 'f');
       },
-      style: {
-        '*': Style(
-          fontSize: fontSize,
-          color: textColor,
-        ),
-        'td': tableStyle,
-        'th': tableStyle,
-        'ul': Style(
-          padding: HtmlPaddings.zero,
-        ),
-        'li': Style(
-          padding: HtmlPaddings.zero,
-        ),
-        'a': Style(color: linkColor),
-      },
+      style: dictionaryHtmlStyle(
+        textColor: textColor,
+        linkColor: linkColor,
+        fontSize: fontSize,
+        tableStyle: tableStyle,
+      ),
       extensions: [
         const TableHtmlExtension(),
         ImageExtension.inline(
@@ -111,6 +103,35 @@ class DictionaryHtmlWidget extends ConsumerWidget {
       ],
     );
   }
+}
+
+/// The style of a definition's HTML. Links are underlined here because in the
+/// e-ink theme nothing else tells them from the text, and `flutter_html` only
+/// underlines a link that has an `href`.
+Map<String, Style> dictionaryHtmlStyle({
+  required Color textColor,
+  required Color linkColor,
+  required FontSize fontSize,
+  required Style tableStyle,
+}) {
+  return {
+    '*': Style(
+      fontSize: fontSize,
+      color: textColor,
+    ),
+    'td': tableStyle,
+    'th': tableStyle,
+    'ul': Style(
+      padding: HtmlPaddings.zero,
+    ),
+    'li': Style(
+      padding: HtmlPaddings.zero,
+    ),
+    'a': Style(
+      color: linkColor,
+      textDecoration: TextDecoration.underline,
+    ),
+  };
 }
 
 /// Handles image rendering of images in a dictionary definition.

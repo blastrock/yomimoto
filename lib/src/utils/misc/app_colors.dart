@@ -12,6 +12,11 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.dictionaryPopup,
     required this.imagePlaceholder,
     required this.quickActionBackground,
+    required this.nestedChipBackground,
+    this.chipBackground,
+    this.chipForeground,
+    this.nestedChipForeground,
+    this.dictionaryLink,
   });
 
   /// Colours for the light theme.
@@ -22,6 +27,7 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryPopup: Color.fromARGB(255, 242, 242, 242),
     imagePlaceholder: Colors.black12,
     quickActionBackground: Color(0x0D000000),
+    nestedChipBackground: Color(0xFFEF5350),
   );
 
   /// Colours for the dark theme.
@@ -32,6 +38,7 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryPopup: Color.fromARGB(255, 43, 43, 43),
     imagePlaceholder: Colors.white10,
     quickActionBackground: Color(0x0DFFFFFF),
+    nestedChipBackground: Color(0xFFEF5350),
   );
 
   /// Colours for the e-ink theme.
@@ -42,6 +49,11 @@ class AppColors extends ThemeExtension<AppColors> {
     dictionaryPopup: Colors.white,
     imagePlaceholder: Colors.black12,
     quickActionBackground: Colors.transparent,
+    nestedChipBackground: Colors.white,
+    chipBackground: Colors.black,
+    chipForeground: Colors.white,
+    nestedChipForeground: Colors.black,
+    dictionaryLink: Colors.black,
   );
 
   /// Background of the floating search bars.
@@ -64,6 +76,22 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Tint behind the icon of a dictionary quick action.
   final Color quickActionBackground;
 
+  /// Background of a chip nested in a chip, like a dictionary's frequencies.
+  final Color nestedChipBackground;
+
+  /// Background of every chip. If null, each chip keeps its own colour.
+  final Color? chipBackground;
+
+  /// Text colour of every chip. If null, each chip keeps its own colour.
+  final Color? chipForeground;
+
+  /// Text colour of a nested chip. If null, it is that of its chip.
+  final Color? nestedChipForeground;
+
+  /// Colour of the links in a definition. If null, it is the colour scheme's
+  /// error colour.
+  final Color? dictionaryLink;
+
   @override
   AppColors copyWith({
     Color? searchBarBackground,
@@ -72,6 +100,11 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? dictionaryPopup,
     Color? imagePlaceholder,
     Color? quickActionBackground,
+    Color? nestedChipBackground,
+    Color? chipBackground,
+    Color? chipForeground,
+    Color? nestedChipForeground,
+    Color? dictionaryLink,
   }) {
     return AppColors(
       searchBarBackground: searchBarBackground ?? this.searchBarBackground,
@@ -81,6 +114,11 @@ class AppColors extends ThemeExtension<AppColors> {
       imagePlaceholder: imagePlaceholder ?? this.imagePlaceholder,
       quickActionBackground:
           quickActionBackground ?? this.quickActionBackground,
+      nestedChipBackground: nestedChipBackground ?? this.nestedChipBackground,
+      chipBackground: chipBackground ?? this.chipBackground,
+      chipForeground: chipForeground ?? this.chipForeground,
+      nestedChipForeground: nestedChipForeground ?? this.nestedChipForeground,
+      dictionaryLink: dictionaryLink ?? this.dictionaryLink,
     );
   }
 
@@ -101,6 +139,13 @@ class AppColors extends ThemeExtension<AppColors> {
           Color.lerp(imagePlaceholder, other.imagePlaceholder, t)!,
       quickActionBackground:
           Color.lerp(quickActionBackground, other.quickActionBackground, t)!,
+      nestedChipBackground:
+          Color.lerp(nestedChipBackground, other.nestedChipBackground, t)!,
+      chipBackground: t < 0.5 ? chipBackground : other.chipBackground,
+      chipForeground: t < 0.5 ? chipForeground : other.chipForeground,
+      nestedChipForeground:
+          t < 0.5 ? nestedChipForeground : other.nestedChipForeground,
+      dictionaryLink: t < 0.5 ? dictionaryLink : other.dictionaryLink,
     );
   }
 }

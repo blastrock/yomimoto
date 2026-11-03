@@ -45,14 +45,18 @@ class JidoujishoTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = Theme.of(context).appColors;
+    Color background = appColors.chipBackground ?? backgroundColor;
+    Color foreground = appColors.chipForeground ?? foregroundColor;
+
     return Padding(
       padding: Spacing.of(context).insets.onlyRight.small,
       child: InkWell(
         onTap: message != null
             ? () {
                 showToast(
-                  backgroundColor: backgroundColor,
-                  textColor: foregroundColor,
+                  backgroundColor: background,
+                  textColor: foreground,
                   msg: message!,
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
@@ -60,7 +64,7 @@ class JidoujishoTag extends StatelessWidget {
               }
             : null,
         child: Container(
-          color: backgroundColor,
+          color: background,
           padding: Spacing.of(context).insets.all.small,
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -68,7 +72,7 @@ class JidoujishoTag extends StatelessWidget {
               if (icon != null)
                 Icon(
                   icon,
-                  color: foregroundColor,
+                  color: foreground,
                   size: Theme.of(context).textTheme.labelSmall?.fontSize,
                 ),
               if (icon != null) const Space.small(),
@@ -78,7 +82,7 @@ class JidoujishoTag extends StatelessWidget {
                   style: Theme.of(context)
                       .textTheme
                       .labelSmall
-                      ?.copyWith(color: foregroundColor),
+                      ?.copyWith(color: foreground),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -88,13 +92,11 @@ class JidoujishoTag extends StatelessWidget {
                 Flexible(
                   child: Container(
                     padding: Spacing.of(context).insets.all.extraSmall,
-                    color: Colors.red.shade400,
+                    color: appColors.nestedChipBackground,
                     child: Text(
                       trailingText!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall
-                          ?.copyWith(color: foregroundColor),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: appColors.nestedChipForeground ?? foreground),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

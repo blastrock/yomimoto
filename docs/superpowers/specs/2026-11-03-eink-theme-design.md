@@ -162,6 +162,9 @@ ttu's own settings: the app now chooses the book's colours.
 - E-ink selection, furigana hint and tooltip colours in ttu: the builder
   picks black/white values in the spirit of goal 2 (for example the hint
   furigana in black rather than 38% black, if it reads well).
+- Links inside dictionary definitions count as reading text: black in
+  E-ink (they use the red `error` role today). The underline is then the
+  only thing marking them, so it is set explicitly and pinned by a test.
 - When a book opens in E-ink, it should not visibly paint in other colours
   first: on e-ink, a flash costs a full refresh. How the colours get in
   before the first paint is the builder's call within the bridge rules

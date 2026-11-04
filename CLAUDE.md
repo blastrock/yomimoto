@@ -21,9 +21,8 @@ remains is deliberately three things:
 - **No backward compatibility is owed.** The fork ships under its own
   Android `applicationId`, so every install is fresh: the database starts
   empty. Do not write migration code, orphan cleanup, index clamping,
-  or defensive nullable-ing for things that were removed. Until 1.0 the
-  latest schema version may be changed in place, unless installed data must
-  be kept: then it takes a migration, as version 2 did (see Persistence).
+  or defensive nullable-ing for things that were removed. Schema changes
+  have their own rule: see Persistence.
 - **The rename is external only.** The `applicationId` is
   `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
   DCIM folder and exported file names say Yomimoto too. Internal identifiers
@@ -32,9 +31,6 @@ remains is deliberately three things:
   `app.arianneorpilla.yuuna/anki` method channel), `Jidoujisho*` classes and
   `jidoujisho_*.dart` files, and internal protocol strings (`jidoujisho://`,
   `jidoujisho-message-type`). Do not rename these as a side effect.
-- **An older fork lineage exists in this repo's history** (`cc7e4925..8189e2fa`,
-  "白い熊 辞書"). It did similar removals against the pre-migration tree. It is
-  considered diverged — ignore it, do not cherry-pick from it.
 - The E-ink theme exists (see Pages); the rest of e-ink tuning (refresh
   behaviour, animation suppression) is a **later pass** that has not started.
 
@@ -54,68 +50,48 @@ flutter build apk --release --split-per-abi
 tool/build_release.sh                                      # the same, signed: prompts for the keystore password
 ```
 
-`flutter analyze` is clean and must stay clean: it exits non-zero on any
-issue, infos included, and CI runs it as is. Fix new infos rather than
-suppressing them; `dart fix --apply` handles most of the mechanical ones.
+`flutter analyze` must stay clean: CI fails on any issue, infos included. Fix
+new infos rather than suppressing them; `dart fix --apply` handles most of the
+mechanical ones.
 
-`flutter test` runs the unit tests in `test/`, which mirrors `lib/src/`. They
-cover pure code (text selection, stash item, sentence splitting, the ttu
-bridge's event parsing, the import handler's path resolution) and the database layer (schema, queries, `AppStore`,
-dictionary import and deletion), which runs against in-memory or temp-file
-SQLite: no device, no mocks. They characterise current behaviour, oddities
-included, rather than prescribe it. The strict lint set applies to them too.
-Anything touching `AppModel`, MeCab or the WebView is still verified by manual
-device testing.
+`test/` mirrors `lib/src/`. The tests cover pure code and the database layer,
+which runs against in-memory or temp-file SQLite: no device, no mocks. They
+characterise current behaviour, oddities included, rather than prescribe it.
+Anything touching `AppModel`, MeCab or the WebView is verified by manual device
+testing.
 
-CI (`.github/workflows/main.yml`, every push and pull request) fetches the
-pinned ttu build, checks that generated files are fresh (regenerates them and
-fails on `git diff`; the Drift schema dump and its test helpers are
-regenerated and diffed too), runs `flutter analyze`, then `flutter test`. It
-builds no APK. `slang.yaml` turns off slang's build timestamp so the
-freshness check is deterministic.
+CI (`.github/workflows/main.yml`) fetches the pinned ttu build, fails if
+regenerating the generated files changes anything (the Drift schema dump and
+its test helpers included), then runs `flutter analyze` and `flutter test`. It
+builds no APK.
 
 ## Toolchain
 
 Read **`docs/TOOLCHAIN.md`** before touching `pubspec.yaml` or anything under
-`android/`. It records the versions (Flutter 3.47.7 / JDK 21 / AGP 8.11.1,
-compileSdk 36 / targetSdk 32 / minSdk 24), and — more importantly — *what is
-pinned below latest and why*: AGP stays on 8 because `app/build.gradle` uses the
-legacy variant API and plugins still call `jcenter()`; `targetSdk` stays at 32;
-Material 3 stays off; `permission_handler` and `sqlite3` (3.5) are held.
-Each pin also carries its reason in a comment at the constraint itself. **Do not
+`android/`. It records the versions and *what is pinned below latest and why*;
+each pin also carries its reason in a comment at the constraint itself. **Do not
 bump a pinned thing without reading the reason first.**
 
 Two mechanisms keep old packages alive, and they are not interchangeable:
 
 - **`android/settings.gradle`'s `gradle.beforeProject` shim** handles anything
-  that is purely a *Gradle configuration* problem — a missing `namespace`, a
+  that is purely a *Gradle configuration* problem: a missing `namespace`, a
   compileSdk pinned too low, a buildscript that only lists dead `jcenter()`.
   Packages stay hosted and keep updating. This is the default fix.
-- **`vendor/`** is for packages needing actual *source* changes. Each carries an
-  `UPSTREAM.md` (source, ref, why, exit condition) and a `local-changes.patch`
-  (`diff -ruN` against pristine upstream) so it can be refreshed rather than
-  reconstructed. See `vendor/README.md`. Reach for this only when the shim
-  cannot help.
+- **`vendor/`** is for packages needing actual *source* changes, when the shim
+  cannot help. See `vendor/README.md`.
 
-Known debt worth knowing about: `spaces` is a dead git-pinned package imported
-in 46 files and is the only reason for two `dependency_overrides`; `ve_dart` is
-also a third-party git ref. Both are liabilities of the same kind that already
-bit this project once.
-
-Deliberate shortcuts that will need revisiting are recorded in **`DEBT.md`**.
-Add an entry when you take one.
+Deliberate shortcuts and known debt are recorded in **`DEBT.md`**. Add an entry
+when you take one.
 
 ## Architecture
 
 ### Barrel imports
 
-`lib/` has nine barrel files — `creator.dart`, `database.dart`,
-`dictionary.dart`, `language.dart`, `media.dart`, `models.dart`, `pages.dart`,
-`preferences.dart`, `utils.dart` — re-exporting everything under
-`lib/src/<name>/`. **Always import the barrel** (`package:yuuna/media.dart`),
-never a file under `lib/src/` directly, and always `package:` imports
-(`always_use_package_imports` is enforced). Adding a file means adding an
-`export` line to its barrel.
+Each directory under `lib/src/` has a barrel file in `lib/` re-exporting
+everything in it. **Always import the barrel** (`package:yuuna/media.dart`),
+never a file under `lib/src/` directly. Adding a file means adding an `export`
+line to its barrel.
 
 ### Everything is a registered singleton
 
@@ -138,16 +114,14 @@ To add or remove any of these, edit the corresponding `populate*` list in
 `lib/src/models/app_model.dart` — that is the single registry. Registration
 order is meaningful for home tabs (tab order) and for defaults elsewhere.
 
-Language is **not** an extension point. The app reads Japanese only, and the UI
-is English only (via slang, see below). `JapaneseLanguage`
-(`lib/src/language/`) is a plain singleton for segmentation (MeCab), sentence
-splitting, highlight lengths, furigana and pitch display. The dictionary search
-isolate entry point `prepareSearchResultsJapaneseLanguage` lives in the same
-file.
+Language is **not** an extension point: the app reads Japanese only, and the UI
+is English only. `JapaneseLanguage` (`lib/src/language/`) is a plain singleton;
+the dictionary search isolate entry point
+`prepareSearchResultsJapaneseLanguage` lives in the same file.
 
 ### `AppModel`
 
-`lib/src/models/app_model.dart` (~3200 lines) is the god object: a
+`lib/src/models/app_model.dart` is the god object: a
 `ChangeNotifier` behind a Riverpod `appProvider`, holding every registry, every
 directory path, the database handles and the preference store, dictionary
 search, Anki export, and a navigator key so dialogs can be opened without a
@@ -232,26 +206,16 @@ Concrete pages live in `lib/src/pages/implementations/`. Dialogs are pages too.
 
 Reusable widgets are `lib/src/utils/components/jidoujisho_*.dart`.
 
-Colours that differ between themes come from the theme, never from a
-brightness check: a `ColorScheme` role when one fits (`colorScheme.onSurface`
-for text and icons, at 5% opacity for a tint), else a field of the `AppColors`
-theme extension (`theme.appColors`). What differs between themes other than
-colours (the border, sizes, the popup's opacity) is in the `AppStyle` theme
-extension (`theme.appStyle`). `AppThemes` (`lib/src/utils/misc/`) builds the
-three themes, Light, Dark and E-ink; `AppThemeMode` is the setting, `system`
-through `eink`, and E-ink is a light theme to `MaterialApp`. E-ink is built
-for high contrast on what is read: book and dictionary text are pure black on
-white. It borders windows, text buttons and the dictionary's quick actions;
-other buttons have no border in it, deliberately.
+The E-ink theme borders windows, text buttons and the dictionary's quick
+actions; other buttons have no border in it, deliberately.
 
 ### i18n
 
 `slang`, not `flutter_localizations` codegen. Strings live in
-`lib/i18n/strings.i18n.json`; `lib/i18n/strings.g.dart` is **generated — never
-edit it**. Regenerate with `dart run slang`. Access is the global `t` (exported
-via `utils.dart`), e.g. `t.options_attribution`, and `t[key]` for dynamic keys
-like a home tab's `uniqueKey`. Only `en-US` exists; upstream's Crowdin
-translations are gone.
+`lib/i18n/strings.i18n.json`; `lib/i18n/strings.g.dart` is **generated, never
+edit it**. Access is the global `t` (exported via `utils.dart`), e.g.
+`t.options_attribution`, and `t[key]` for dynamic keys like a home tab's
+`uniqueKey`. Only `en-US` exists.
 
 ### Reader internals
 
@@ -365,8 +329,7 @@ translations are gone.
   downloads `volume.cbz` and `volume.mokuro` into
   `<temporary>/catalogDownloads/` one volume at a time and hands them to the
   import; Cancel stops a download at once but lets an import finish. Native
-  titles are shown, romaji only searched. Design:
-  `docs/superpowers/specs/2026-10-31-manga-catalogs-design.md`.
+  titles are shown, romaji only searched.
 
   The page works in a desktop browser with `?debug=1` (events logged to the
   console, commands callable as `await mokuroHost.<command>({...})`): serve
@@ -377,9 +340,7 @@ Both hand selected text to `AppModel.openRecursiveDictionarySearch` — that pat
 selection → lookup → card creation, is the app's core interaction. Treat it as
 load-bearing.
 
-**Sentence explanation** (design in
-`docs/superpowers/specs/2026-10-28-sentence-explanation-design.md`): the
-`ExplainSentenceAction` heading quick action sends the reader's current
+**Sentence explanation**: the `ExplainSentenceAction` heading quick action sends the reader's current
 sentence to the Anthropic Messages API with the user's key and shows the
 translation and the sentence's parts (reading, meaning) in
 `SentenceExplanationDialogPage`. The prompts, schema, request and parsing are
@@ -396,15 +357,10 @@ Haiku 5.5, each with its own thinking settings).
 - The code predates the current `dart format` style: running it on an
   existing file rewrites unrelated lines. Format new code by hand to match the
   surrounding file instead.
-- `analysis_options.yaml` enables a large strict rule set on top of
-  `flutter_lints` 6. Notably **`public_member_api_docs`**: every public class,
-  member and getter needs a `///` doc comment. Also `prefer_single_quotes`,
-  `sort_constructors_first`, `sort_pub_dependencies`,
-  `always_put_control_body_on_new_line`, `prefer_asserts_with_message`.
-  Generated files and `vendor/` are excluded.
-- `unawaited_futures` is on: a Future in an `async` body is either awaited
-  or wrapped in `unawaited(...)` to say the fire-and-forget is deliberate.
-  Toasts go through `showToast` (`lib/src/utils/misc/toast.dart`), never
+- `analysis_options.yaml` enables a strict rule set, notably
+  **`public_member_api_docs`**: every public class, member and getter needs a
+  `///` doc comment.
+- Toasts go through `showToast` (`lib/src/utils/misc/toast.dart`), never
   `Fluttertoast.showToast` directly.
 - Spelling in identifiers, comments and strings is **British/upstream style**
   (`initialise`, `localisation`, `customisation`). Match it.

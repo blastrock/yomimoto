@@ -86,24 +86,6 @@ at the constraint itself:
 package, and `freezed_annotation`/`gap` exist only to satisfy the `spaces`
 fork.
 
-## Known debt
-
-- **`spaces`** is imported in 46 files and is a dead package pinned to a
-  third-party git ref, declaring `flutter: ">=2.0.0 <3.0.0"`. It is the sole
-  reason for the `freezed_annotation` and `gap` overrides. Its API is thin
-  (`SpacedColumn`, `Space.*`) and maps onto `Gap`/`SizedBox`. Biggest single
-  cleanup available.
-- **Remaining third-party git refs**: `ve_dart` and `spaces`. Each is a build
-  dependency on someone else's account staying alive —
-  which is how `material_floating_search_bar` became a problem when its upstream
-  was deleted. Mirror or vendor them.
-- **`change_notifier_builder`** is discontinued (-> `multi_listenable_builder`).
-- 82 style infos on pre-existing code, from `flutter_lints` 6 and the analyzer's
-  own set: `unnecessary_underscores` (25), `avoid_redundant_argument_values`
-  (17), `strict_top_level_inference` (12), `avoid_types_on_closure_parameters`
-  (12), `use_null_aware_elements` (10), `use_build_context_synchronously` (3),
-  `unnecessary_to_list_in_spreads` (3). No errors, no warnings, no deprecations.
-
 ## Not verified on device
 
 The migration is verified only as far as *it builds*: `flutter analyze` is clean

@@ -39,16 +39,23 @@ below AGP 8.11.1 / Gradle 8.14 / KGP 2.2.20 / Java 17. **We are exactly on that
 error floor**: the next Flutter release that raises it breaks the build, short
 of `--android-skip-build-dependency-validation`. Check its thresholds
 (`packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt`)
-before upgrading Flutter. Two things in this project depend on staying below 9:
+before upgrading Flutter.
 
-- `android/app/build.gradle` renames APK outputs and offsets per-ABI version
-  codes through the **legacy variant API** (`applicationVariants.all`), which
-  AGP 9 removed.
-- Several plugins still call **`jcenter()`** in their own buildscript blocks.
-  Gradle 9 removed the method, so those projects fail to configure at all.
+Moving to 9 has not been tried, so what follows is from reading the code, not
+from a build:
 
-Moving to 9 is a real project: it needs a replacement version-code scheme and
-those plugins vendored or dropped.
+- **`jcenter()`** is no longer a blocker: no plugin's `android/build.gradle`
+  calls it now that the vendored `mecab_dart` lists `mavenCentral()`. Gradle 9
+  removed the method.
+- **The legacy variant API** is probably not one either.
+  `android/app/build.gradle` renames APK outputs and offsets per-ABI version
+  codes through `applicationVariants.all`. Flutter's own Gradle plugin still
+  calls `applicationVariants`, and its template pairs AGP 9.1.0 with
+  `android.newDsl=false`, which `gradle.properties` also sets.
+- **Unknown until a trial build:** whether `kotlinOptions` (in the app, the
+  shim and several plugins) survives the newer Kotlin Gradle Plugin, whether
+  `com.android.build.OutputFile` still exists, and how the older plugins
+  behave.
 
 ## Legacy-plugin shim
 

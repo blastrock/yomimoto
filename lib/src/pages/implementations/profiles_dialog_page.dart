@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:spaces/spaces.dart';
@@ -403,9 +402,9 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             ),
           ),
         ),
-        ChangeNotifierBuilder(
-          notifier: _modelNotifier,
-          builder: (_, _, _) => JidoujishoDropdown<String>(
+        ListenableBuilder(
+          listenable: _modelNotifier,
+          builder: (_, _) => JidoujishoDropdown<String>(
             options: widget.models,
             initialOption: widget.initialModel,
             generateLabel: (modelName) => modelName,

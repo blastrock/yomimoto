@@ -69,9 +69,3 @@ that account staying alive. That is how `material_floating_search_bar` became a
 problem when its upstream was deleted.
 
 **To pay it off**, replace `spaces`, as in the entry above.
-
-## `change_notifier_builder` is discontinued
-
-It still works, but gets no updates.
-
-**To pay it off**, move to its replacement, `multi_listenable_builder`.

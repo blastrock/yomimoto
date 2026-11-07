@@ -16,7 +16,6 @@ dependencies:
   cached_network_image: ^3.2.3
   cancelable_compute: ^2.1.1
   carousel_slider: ^5.1.2
-  change_notifier_builder: ^1.1.2
   collection:
   crop_image: ^1.0.4
   dart_mappable: ^4.7.0

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:spaces/spaces.dart';
 import 'package:yuuna/language.dart';
@@ -161,9 +160,9 @@ class _HomePageState extends BasePageState<HomePage>
   }
 
   Widget? buildLeading() {
-    return ChangeNotifierBuilder(
-      notifier: appModel.incognitoNotifier,
-      builder: (context, notifier, _) {
+    return ListenableBuilder(
+      listenable: appModel.incognitoNotifier,
+      builder: (context, _) {
         return Padding(
           padding: Spacing.of(context).insets.onlyLeft.normal,
           child: Image.asset('assets/meta/icon.png'),

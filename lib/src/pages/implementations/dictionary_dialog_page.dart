@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:change_notifier_builder/change_notifier_builder.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
@@ -544,9 +543,9 @@ class _DictionaryDialogPageState extends BasePageState {
         Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            ChangeNotifierBuilder(
-              notifier: _formatNotifier,
-              builder: (_, _, _) => JidoujishoDropdown<DictionaryFormat>(
+            ListenableBuilder(
+              listenable: _formatNotifier,
+              builder: (_, _) => JidoujishoDropdown<DictionaryFormat>(
                 options: appModel.dictionaryFormats.values.toList(),
                 initialOption: appModel.lastSelectedDictionaryFormat,
                 generateLabel: (format) => format.name,

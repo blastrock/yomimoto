@@ -2,7 +2,6 @@ import 'package:audio_session/audio_session.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -88,8 +87,8 @@ class _ForvoAudioDialogPageState extends BasePageState<ForvoAudioDialogPage> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
       actions: widget.results.isEmpty ? null : actions,
     );
@@ -115,7 +114,7 @@ class _ForvoAudioDialogPageState extends BasePageState<ForvoAudioDialogPage> {
   Widget buildEmptyMessage() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: Spacing.of(context).spaces.normal,
+        bottom: Spacing.normal,
       ),
       child: JidoujishoPlaceholderMessage(
         icon: Icons.search_off,
@@ -138,12 +137,12 @@ class _ForvoAudioDialogPageState extends BasePageState<ForvoAudioDialogPage> {
           builder: (context, value, child) {
             return Container(
               padding: EdgeInsets.symmetric(
-                vertical: Spacing.of(context).spaces.small,
-                horizontal: Spacing.of(context).spaces.semiSmall,
+                vertical: Spacing.small,
+                horizontal: Spacing.semiSmall,
               ),
               margin: EdgeInsets.only(
-                top: Spacing.of(context).spaces.normal,
-                right: Spacing.of(context).spaces.normal,
+                top: Spacing.normal,
+                right: Spacing.normal,
               ),
               color: _notifier.value == index
                   ? theme.colorScheme.primary.withValues(alpha: 0.3)

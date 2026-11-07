@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -225,7 +224,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
         Flexible(
           child: buildDictionaryResult(),
         ),
-        const Space.semiBig(),
+        const SizedBox(height: Spacing.semiBig),
         const Flexible(
           child: SizedBox.shrink(),
         ),
@@ -241,7 +240,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
         const Flexible(
           child: SizedBox.shrink(),
         ),
-        const Space.semiBig(),
+        const SizedBox(height: Spacing.semiBig),
         Flexible(
           child: buildDictionaryResult(),
         ),
@@ -257,7 +256,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
         Flexible(
           child: buildDictionaryResult(),
         ),
-        const Space.semiBig(),
+        const SizedBox(width: Spacing.semiBig),
         const Flexible(
           child: SizedBox.shrink(),
         ),
@@ -273,7 +272,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
         const Flexible(
           child: SizedBox.shrink(),
         ),
-        const Space.semiBig(),
+        const SizedBox(width: Spacing.semiBig),
         Flexible(
           child: buildDictionaryResult(),
         ),
@@ -290,7 +289,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
           flex: 3,
           child: buildDictionaryResult(),
         ),
-        const Space.semiBig(),
+        const SizedBox(height: Spacing.semiBig),
         const Flexible(
           child: SizedBox.shrink(),
         ),
@@ -315,8 +314,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
       dismissThresholds: const {DismissDirection.horizontal: 0.05},
       movementDuration: const Duration(milliseconds: 20),
       child: Container(
-        padding: Spacing.of(context).insets.all.semiSmall,
-        margin: Spacing.of(context).insets.all.normal,
+        padding: const EdgeInsets.all(Spacing.semiSmall),
+        margin: const EdgeInsets.all(Spacing.normal),
         decoration: BoxDecoration(
           color: theme.appColors.dictionaryPopup
               .withValues(alpha: theme.appStyle.dictionaryPopupOpacity),
@@ -420,7 +419,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: Spacing.of(context).insets.all.small,
+        padding: const EdgeInsets.all(Spacing.small),
         child: Tooltip(
           message: t.show_more,
           child: InkWell(
@@ -443,7 +442,7 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
                   .withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
-                padding: Spacing.of(context).insets.all.normal,
+                padding: const EdgeInsets.all(Spacing.normal),
                 child: Text(
                   t.show_more,
                   textAlign: TextAlign.center,

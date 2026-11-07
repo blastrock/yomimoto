@@ -1,7 +1,6 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
@@ -47,8 +46,8 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        top: Spacing.of(context).spaces.extraSmall,
-        bottom: Spacing.of(context).spaces.normal,
+        top: Spacing.extraSmall,
+        bottom: Spacing.normal,
       ),
       child: ExpandablePanel(
         theme: ExpandableThemeData(
@@ -62,8 +61,8 @@ class _DictionaryEntryPageState extends ConsumerState<DictionaryEntryPage> {
         collapsed: const SizedBox.shrink(),
         expanded: Padding(
           padding: EdgeInsets.only(
-            top: Spacing.of(context).spaces.small,
-            left: Spacing.of(context).spaces.normal,
+            top: Spacing.small,
+            left: Spacing.normal,
           ),
           child: SelectionArea(
             onSelectionChanged: (selection) {

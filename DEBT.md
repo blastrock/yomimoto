@@ -51,21 +51,3 @@ JMdict and the other dictionaries tried do not.
 **To pay it off**, reject (or replace) such text after staging, for example with
 a check on the staged text columns for the bytes `ED A0`..`ED BF`, or scan the
 bank for `\ud[89a-f]` escapes that are not part of a surrogate pair.
-
-## `spaces` is a dead package
-
-`spaces` is imported in 37 files, pinned to a third-party git ref, and declares
-`flutter: ">=2.0.0 <3.0.0"`. It is the sole reason for the `freezed_annotation`
-and `gap` entries in `dependency_overrides`.
-
-**To pay it off**, replace it and drop both overrides. Its API is thin
-(`Spacing.of`, `Space.*`) and maps onto `Gap`/`SizedBox`. This is the biggest
-single cleanup available.
-
-## Third-party git refs
-
-`spaces` is a git dependency on someone else's account, so the build relies on
-that account staying alive. That is how `material_floating_search_bar` became a
-problem when its upstream was deleted.
-
-**To pay it off**, replace `spaces`, as in the entry above.

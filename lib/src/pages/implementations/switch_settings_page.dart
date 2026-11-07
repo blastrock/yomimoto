@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
@@ -50,8 +49,8 @@ class _SwitchSettingsPageState<T> extends BasePageState<SwitchSettingsPage<T>> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
       actions: actions,
     );

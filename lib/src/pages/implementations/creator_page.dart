@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -234,15 +233,15 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   Widget buildCollapsableHeader() {
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: Spacing.of(context).spaces.normal,
-        horizontal: Spacing.of(context).spaces.small,
+        vertical: Spacing.normal,
+        horizontal: Spacing.small,
       ),
       child: Row(
         children: [
           Icon(Icons.edit_note,
               color: Theme.of(context).unselectedWidgetColor,
               size: textTheme.labelLarge?.fontSize),
-          const Space.semiSmall(),
+          const SizedBox(width: Spacing.semiSmall),
           Text(
             t.hidden_fields,
             style: TextStyle(
@@ -263,7 +262,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
 
     return ExpandablePanel(
       theme: ExpandableThemeData(
-        iconPadding: Spacing.of(context).insets.onlyRight.small,
+        iconPadding: const EdgeInsets.only(right: Spacing.small),
         iconSize: Theme.of(context).textTheme.titleLarge?.fontSize,
         expandIcon: Icons.arrow_drop_down,
         collapseIcon: Icons.arrow_drop_down,
@@ -310,11 +309,11 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     }
 
     return Padding(
-      padding: Spacing.of(context).insets.all.normal,
+      padding: const EdgeInsets.all(Spacing.normal),
       child: InkWell(
         onTap: isExportable ? exportCard : null,
         child: Container(
-          padding: Spacing.of(context).insets.vertical.normal,
+          padding: const EdgeInsets.symmetric(vertical: Spacing.normal),
           alignment: Alignment.center,
           width: double.infinity,
           color: isExportable ? activeButtonColor : inactiveButtonColor,
@@ -326,7 +325,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                 size: textTheme.titleSmall?.fontSize,
                 color: isExportable ? activeTextColor : inactiveTextColor,
               ),
-              const Space.small(),
+              const SizedBox(width: Spacing.small),
               Text(
                 t.creator_export_card,
                 style: textTheme.titleSmall?.copyWith(
@@ -343,14 +342,14 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
 
   Widget buildEditFieldsButton() {
     return Padding(
-      padding: Spacing.of(context).insets.all.normal,
+      padding: const EdgeInsets.all(Spacing.normal),
       child: InkWell(
         onTap: () async {
           await appModel.openCreatorFieldsEditor();
           setState(() {});
         },
         child: Container(
-          padding: Spacing.of(context).insets.vertical.normal,
+          padding: const EdgeInsets.symmetric(vertical: Spacing.normal),
           alignment: Alignment.center,
           width: double.infinity,
           color: activeButtonColor,
@@ -362,7 +361,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                 size: textTheme.titleSmall?.fontSize,
                 color: activeTextColor,
               ),
-              const Space.small(),
+              const SizedBox(width: Spacing.small),
               Text(
                 t.edit_fields,
                 style: textTheme.titleSmall?.copyWith(
@@ -406,7 +405,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             child: Column(
               children: [
                 buildAppBar(),
-                const Space.semiBig(),
+                const SizedBox(height: Spacing.semiBig),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -442,7 +441,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                   ),
                 ),
                 buildDeckDropdown(),
-                const Space.small(),
+                const SizedBox(height: Spacing.small),
               ],
             ),
           ),
@@ -480,7 +479,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       thumbVisibility: true,
       controller: creatorModel.scrollController,
       child: Padding(
-        padding: Spacing.of(context).insets.horizontal.small,
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.small),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics()),
@@ -957,7 +956,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
                 ),
           suffixIcon: widget.editEnhancements
               ? Padding(
-                  padding: Spacing.of(context).insets.onlyRight.small,
+                  padding: const EdgeInsets.only(right: Spacing.small),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.min,
@@ -983,7 +982,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
           prefixIcon: buildPrefixIcon(field),
           suffixIcon: (mapping.enhancements![field.uniqueKey] ?? {}).isNotEmpty
               ? Padding(
-                  padding: Spacing.of(context).insets.onlyRight.small,
+                  padding: const EdgeInsets.only(right: Spacing.small),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.min,
@@ -1052,12 +1051,12 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
     } else {
       return [
         buildCloseOnExportButton(),
-        const Space.small(),
+        const SizedBox(width: Spacing.small),
         buildSearchClearButton(),
-        const Space.small(),
+        const SizedBox(width: Spacing.small),
         buildManageEnhancementsButton(),
         buildSwitchProfilesButton(),
-        const Space.extraSmall(),
+        const SizedBox(width: Spacing.extraSmall),
       ];
     }
   }
@@ -1138,7 +1137,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               size: textTheme.bodyMedium?.fontSize,
               color: color,
             ),
-          if (icon != null) const Space.normal(),
+          if (icon != null) const SizedBox(width: Spacing.normal),
           Text(
             label,
             style: TextStyle(color: color),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -65,7 +64,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
                 mediaSource.icon,
                 color: Theme.of(context).unselectedWidgetColor,
               ),
-              const Space.small(),
+              const SizedBox(width: Spacing.small),
               Text(
                 mediaSource.sourceName,
                 style: TextStyle(
@@ -78,7 +77,7 @@ class _MediaItemDialogPageState extends BasePageState<MediaItemDialogPage> {
               ),
             ],
           ),
-          const Space.normal(),
+          const SizedBox(height: Spacing.normal),
           AspectRatio(
             aspectRatio: mediaSource.aspectRatio,
             child: FadeInImage(

@@ -2,7 +2,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:progress_indicators/progress_indicators.dart';
-import 'package:spaces/spaces.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
@@ -71,7 +70,7 @@ class ImageField extends ImageExportField {
                 width: double.infinity,
               ),
             ),
-          const Space.normal(),
+          const SizedBox(height: Spacing.normal),
           buildFooterLoading(
             appModel: appModel,
             context: context,
@@ -105,7 +104,7 @@ class ImageField extends ImageExportField {
             appModel: appModel,
             creatorModel: creatorModel,
           ),
-        const Space.normal(),
+        const SizedBox(height: Spacing.normal),
         ValueListenableBuilder<int?>(
           valueListenable: indexNotifier,
           builder: (context, index, _) => buildFooterTextSpans(
@@ -188,7 +187,7 @@ class ImageField extends ImageExportField {
                 popup?.remove();
               },
               child: Padding(
-                padding: Spacing.of(context).insets.horizontal.small,
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.small),
                 child: buildImage(
                   image: currentImageSuggestions![index],
                   fit: BoxFit.fitHeight,
@@ -233,7 +232,7 @@ class ImageField extends ImageExportField {
             child: Padding(
               padding: EdgeInsets.only(
                 top: 1.25,
-                right: Spacing.of(context).spaces.small,
+                right: Spacing.small,
               ),
               child: Icon(
                 icon,
@@ -338,7 +337,7 @@ class ImageField extends ImageExportField {
             child: Padding(
               padding: EdgeInsets.only(
                 top: 1.25,
-                right: Spacing.of(context).spaces.small,
+                right: Spacing.small,
               ),
               child: Icon(
                 icon,

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
 import 'package:record_mp3_plus/record_mp3_plus.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/utils.dart';
 import 'package:yuuna/pages.dart';
 
@@ -46,7 +45,7 @@ class _AudioRecorderDialogPageState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      contentPadding: Spacing.of(context).insets.all.small,
+      contentPadding: const EdgeInsets.all(Spacing.small),
       content: buildContent(),
       actions: [
         if (_isRecording) buildStopButton() else buildRecordButton(),

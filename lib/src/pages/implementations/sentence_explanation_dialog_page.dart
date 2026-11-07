@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ruby_text/ruby_text.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
@@ -62,12 +61,12 @@ class _SentenceExplanationDialogPageState
         bool waiting = snapshot.connectionState != ConnectionState.done;
 
         return AlertDialog(
-          contentPadding: Spacing.of(context).insets.all.big,
+          contentPadding: const EdgeInsets.all(Spacing.big),
           content: SizedBox(
             width: double.maxFinite,
             child: waiting
                 ? Padding(
-                    padding: Spacing.of(context).insets.vertical.big,
+                    padding: const EdgeInsets.symmetric(vertical: Spacing.big),
                     child: buildLoading(),
                   )
                 : failure != null
@@ -110,7 +109,7 @@ class _SentenceExplanationDialogPageState
     TextStyle? style = textTheme.titleMedium;
 
     return Padding(
-      padding: Spacing.of(context).insets.vertical.extraSmall,
+      padding: const EdgeInsets.symmetric(vertical: Spacing.extraSmall),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -124,7 +123,7 @@ class _SentenceExplanationDialogPageState
                   )
                 : Text(part.text, style: style),
           ),
-          const Space.normal(),
+          const SizedBox(width: Spacing.normal),
           Expanded(
             flex: 3,
             child: Text(part.meaning, style: textTheme.bodyMedium),

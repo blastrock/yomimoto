@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/utils.dart';
 
 Future<void> pumpTag(WidgetTester tester, ThemeData theme) async {
   await tester.pumpWidget(
     MaterialApp(
       theme: theme,
-      home: Material(
-        child: Spacing(
-          dataBuilder: (_) => SpacingData.generate(10),
-          child: const Center(
-            child: JidoujishoTag(
-              text: 'JPDB',
-              trailingText: '123, 888ka',
-              backgroundColor: Colors.blue,
-            ),
+      home: const Material(
+        child: Center(
+          child: JidoujishoTag(
+            text: 'JPDB',
+            trailingText: '123, 888ka',
+            backgroundColor: Colors.blue,
           ),
         ),
       ),

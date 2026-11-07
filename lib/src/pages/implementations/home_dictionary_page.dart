@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -80,7 +79,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
       controller: DictionaryTab.instance.scrollController,
       child: Padding(
         padding: EdgeInsets.symmetric(
-          horizontal: Spacing.of(context).spaces.normal,
+          horizontal: Spacing.normal,
         ),
         child: DictionaryHistoryPage(
           onSearch: onSearch,
@@ -407,7 +406,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
 
     return SliverToBoxAdapter(
       child: Padding(
-        padding: Spacing.of(context).insets.all.small,
+        padding: const EdgeInsets.all(Spacing.small),
         child: Tooltip(
           message: t.show_more,
           child: InkWell(
@@ -429,7 +428,7 @@ class _HomeDictionaryPageState<T extends BaseTabPage> extends BaseTabPageState {
                   .withValues(alpha: 0.05),
               width: double.maxFinite,
               child: Padding(
-                padding: Spacing.of(context).insets.all.normal,
+                padding: const EdgeInsets.all(Spacing.normal),
                 child: Text(
                   t.show_more,
                   textAlign: TextAlign.center,

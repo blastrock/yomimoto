@@ -90,10 +90,6 @@ dependencies:
   slang: ^3.13.0
   slang_flutter: ^3.13.0
   sliver_tools: ^0.2.12
-  spaces:
-    git:
-      url: https://github.com/arianneorpilla/spaces
-      ref: master
   # Bundles SQLite through its build hook; sqlite3_flutter_libs is end-of-life
   # and not needed.
   sqlite3: ^3.7.1
@@ -105,8 +101,6 @@ dependencies:
   wakelock_plus: ^1.7.0
 
 dependency_overrides:
-  freezed_annotation: ^2.2.0 # Caused by spaces
-  gap: ^3.0.1 # Caused by spaces
   # ve_dart asks for the hosted mecab_dart, which does not compile, and pub
   # refuses one package from two sources. Override it with the vendored copy.
   # See vendor/mecab_dart/UPSTREAM.md.

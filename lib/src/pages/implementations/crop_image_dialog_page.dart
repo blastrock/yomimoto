@@ -6,7 +6,6 @@ import 'package:crop_image/crop_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
@@ -35,8 +34,8 @@ class _CropImageDialogPageState extends BasePageState<CropImageDialogPage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      contentPadding: Spacing.of(context).insets.all.normal,
-      actionsPadding: Spacing.of(context).insets.horizontal.normal,
+      contentPadding: const EdgeInsets.all(Spacing.normal),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
       content: SizedBox(
         width: double.maxFinite,
         child: buildContent(),

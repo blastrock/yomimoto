@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/utils.dart';
 
@@ -78,8 +77,8 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   Widget buildLoading() {
     return Center(
       child: SizedBox(
-        height: Spacing.of(context).spaces.big,
-        width: Spacing.of(context).spaces.big,
+        height: Spacing.big,
+        width: Spacing.big,
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
         ),

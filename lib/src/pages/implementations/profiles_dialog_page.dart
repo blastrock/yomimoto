@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
@@ -50,17 +49,19 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.exceptBottom.big
-          : Spacing.of(context).insets.exceptBottom.normal.copyWith(
-                left: Spacing.of(context).spaces.semiBig,
-                right: Spacing.of(context).spaces.semiBig,
-              ),
-      actionsPadding: Spacing.of(context).insets.exceptBottom.normal.copyWith(
-            left: Spacing.of(context).spaces.normal,
-            right: Spacing.of(context).spaces.normal,
-            bottom: Spacing.of(context).spaces.normal,
-            top: Spacing.of(context).spaces.extraSmall,
-          ),
+          ? const EdgeInsets.fromLTRB(Spacing.big, Spacing.big, Spacing.big, 0)
+          : const EdgeInsets.fromLTRB(
+              Spacing.semiBig,
+              Spacing.normal,
+              Spacing.semiBig,
+              0,
+            ),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.extraSmall,
+        Spacing.normal,
+        Spacing.normal,
+      ),
       content: buildContent(),
       actions: actions,
     );
@@ -124,7 +125,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
         controller: contentController,
         child: Padding(
           padding: contentController.hasClients
-              ? Spacing.of(context).insets.onlyRight.normal
+              ? const EdgeInsets.only(right: Spacing.normal)
               : EdgeInsets.zero,
           child: SingleChildScrollView(
             controller: contentController,
@@ -234,7 +235,8 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
                     ],
                   ),
                 ),
-                if (_selectedOrder == mapping.order) const Space.normal(),
+                if (_selectedOrder == mapping.order)
+                  const SizedBox(width: Spacing.normal),
                 if (_selectedOrder == mapping.order)
                   buildMappingTileTrailing(mapping.label)
               ],
@@ -305,7 +307,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
               size: textTheme.bodyMedium?.fontSize,
               color: color,
             ),
-          if (icon != null) const Space.normal(),
+          if (icon != null) const SizedBox(width: Spacing.normal),
           Text(
             label,
             style: TextStyle(color: color),
@@ -393,7 +395,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: Spacing.of(context).insets.onlyLeft.small,
+          padding: const EdgeInsets.only(left: Spacing.small),
           child: Text(
             t.model_to_map,
             style: TextStyle(
@@ -432,7 +434,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
         thumbVisibility: true,
         controller: contentController,
         child: Padding(
-          padding: Spacing.of(context).insets.onlyRight.normal,
+          padding: const EdgeInsets.only(right: Spacing.normal),
           child: SingleChildScrollView(
             controller: contentController,
             child: Column(
@@ -440,18 +442,18 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildMappingNameFormField(controller: controller),
-                const Space.normal(),
+                const SizedBox(height: Spacing.normal),
                 Flexible(
                   child: buildMappingFieldDropdowns(
                     modelFields: modelFields,
                     mappingClone: mappingClone,
                   ),
                 ),
-                const Space.normal(),
+                const SizedBox(height: Spacing.normal),
                 buildWrapImageAudio(mappingClone: mappingClone),
-                const Space.small(),
+                const SizedBox(height: Spacing.small),
                 buildUseBrTags(mappingClone: mappingClone),
-                const Space.small(),
+                const SizedBox(height: Spacing.small),
                 buildPrependDictionaryNames(mappingClone: mappingClone),
               ],
             ),
@@ -548,7 +550,7 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: Spacing.of(context).insets.onlyLeft.small,
+                padding: const EdgeInsets.only(left: Spacing.small),
                 child: Text(
                   modelFields.elementAt(index),
                   style: TextStyle(
@@ -592,7 +594,8 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
                   ),
                 ],
               ),
-              if (index != modelFields.length - 1) const Space.normal(),
+              if (index != modelFields.length - 1)
+                const SizedBox(height: Spacing.normal),
             ],
           );
         },
@@ -620,21 +623,22 @@ class _ProfilesDialogPageState extends BasePageState<ProfilesDialogPage>
     TextEditingController controller =
         TextEditingController(text: mapping.label);
     final mediaQuery = MediaQuery.of(context);
-    final spacing = Spacing.of(context);
     List<String> modelFields = await appModel.getFieldList(mapping.model);
 
     Widget alertDialog = AlertDialog(
       contentPadding: mediaQuery.orientation == Orientation.portrait
-          ? spacing.insets.exceptBottom.big
-          : spacing.insets.exceptBottom.normal.copyWith(
-              left: spacing.spaces.semiBig,
-              right: spacing.spaces.semiBig,
+          ? const EdgeInsets.fromLTRB(Spacing.big, Spacing.big, Spacing.big, 0)
+          : const EdgeInsets.fromLTRB(
+              Spacing.semiBig,
+              Spacing.normal,
+              Spacing.semiBig,
+              0,
             ),
-      actionsPadding: spacing.insets.exceptBottom.normal.copyWith(
-        left: spacing.spaces.normal,
-        right: spacing.spaces.normal,
-        bottom: spacing.spaces.normal,
-        top: spacing.spaces.extraSmall,
+      actionsPadding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.extraSmall,
+        Spacing.normal,
+        Spacing.normal,
       ),
       content: buildEditContent(
         modelFields: modelFields,

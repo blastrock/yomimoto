@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -177,27 +176,27 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
         SelectableText(item.term, style: textTheme.headlineMedium),
         if (item.reading.isNotEmpty && item.reading != item.term)
           SelectableText(item.reading, style: textTheme.titleMedium),
-        const Space.normal(),
+        const SizedBox(height: Spacing.normal),
         buildSentence(),
-        const Space.semiBig(),
+        const SizedBox(height: Spacing.semiBig),
         Text(
           item.dictionaryName ?? t.stash_all_dictionaries,
           style: textTheme.labelLarge?.copyWith(
             color: theme.unselectedWidgetColor,
           ),
         ),
-        const Space.small(),
+        const SizedBox(height: Spacing.small),
         for (String definition in item.definitions)
           Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: SelectableText('• $definition'),
           ),
         if (!_resolved.found) ...[
-          const Space.normal(),
+          const SizedBox(height: Spacing.normal),
           Row(
             children: [
               Icon(Icons.info_outline, color: theme.unselectedWidgetColor),
-              const Space.small(),
+              const SizedBox(width: Spacing.small),
               Expanded(
                 child: Text(
                   t.stash_entry_missing,
@@ -207,7 +206,7 @@ class _StashItemPageState extends BasePageState<StashItemPage> {
             ],
           ),
         ],
-        const Space.normal(),
+        const SizedBox(height: Spacing.normal),
         Text(
           intl.DateFormat.yMMMd().add_Hm().format(item.dateAdded),
           style: textTheme.bodySmall?.copyWith(

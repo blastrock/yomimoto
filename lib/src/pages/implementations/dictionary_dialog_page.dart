@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -35,17 +34,19 @@ class _DictionaryDialogPageState extends BasePageState {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.exceptBottom.big
-          : Spacing.of(context).insets.exceptBottom.normal.copyWith(
-                left: Spacing.of(context).spaces.semiBig,
-                right: Spacing.of(context).spaces.semiBig,
-              ),
-      actionsPadding: Spacing.of(context).insets.exceptBottom.normal.copyWith(
-            left: Spacing.of(context).spaces.normal,
-            right: Spacing.of(context).spaces.normal,
-            bottom: Spacing.of(context).spaces.normal,
-            top: Spacing.of(context).spaces.extraSmall,
-          ),
+          ? const EdgeInsets.fromLTRB(Spacing.big, Spacing.big, Spacing.big, 0)
+          : const EdgeInsets.fromLTRB(
+              Spacing.semiBig,
+              Spacing.normal,
+              Spacing.semiBig,
+              0,
+            ),
+      actionsPadding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.extraSmall,
+        Spacing.normal,
+        Spacing.normal,
+      ),
       content: buildContent(),
       actions: actions,
     );
@@ -257,7 +258,7 @@ class _DictionaryDialogPageState extends BasePageState {
         controller: contentController,
         child: Padding(
           padding: contentController.hasClients
-              ? Spacing.of(context).insets.onlyRight.normal
+              ? const EdgeInsets.only(right: Spacing.normal)
               : EdgeInsets.zero,
           child: SingleChildScrollView(
             controller: contentController,
@@ -283,7 +284,7 @@ class _DictionaryDialogPageState extends BasePageState {
   Widget buildEmptyMessage() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: Spacing.of(context).spaces.normal,
+        bottom: Spacing.normal,
       ),
       child: JidoujishoPlaceholderMessage(
         icon: DictionaryTab.instance.outlinedIcon,
@@ -409,7 +410,7 @@ class _DictionaryDialogPageState extends BasePageState {
                     ],
                   ),
                 ),
-                const Space.normal(),
+                const SizedBox(width: Spacing.normal),
                 if (_selectedOrder == dictionary.order)
                   buildDictionaryTileTrailing(dictionary)
               ],
@@ -471,7 +472,7 @@ class _DictionaryDialogPageState extends BasePageState {
               size: textTheme.bodyMedium?.fontSize,
               color: color,
             ),
-          if (icon != null) const Space.normal(),
+          if (icon != null) const SizedBox(width: Spacing.normal),
           Text(
             label,
             style: TextStyle(color: color),
@@ -531,7 +532,7 @@ class _DictionaryDialogPageState extends BasePageState {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: Spacing.of(context).insets.onlyLeft.small,
+          padding: const EdgeInsets.only(left: Spacing.small),
           child: Text(
             t.import_format,
             style: TextStyle(

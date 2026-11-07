@@ -3,7 +3,6 @@ import 'package:float_column/float_column.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:spaces/spaces.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
@@ -92,10 +91,10 @@ class DictionaryTermPage extends ConsumerWidget {
         ),
         SliverPadding(
           padding: EdgeInsets.only(
-            left: Spacing.of(context).spaces.semiBig,
-            top: Spacing.of(context).spaces.normal,
-            right: Spacing.of(context).spaces.normal,
-            bottom: Spacing.of(context).spaces.normal,
+            left: Spacing.semiBig,
+            top: Spacing.normal,
+            right: Spacing.normal,
+            bottom: Spacing.normal,
           ),
           sliver: MultiSliver(
             children: [
@@ -107,10 +106,11 @@ class DictionaryTermPage extends ConsumerWidget {
                       onSearch: onSearch,
                       onClosePopup: onClosePopup,
                     ),
-                    if (heading.tags.isNotEmpty) const Space.normal(),
+                    if (heading.tags.isNotEmpty)
+                      const SizedBox(height: Spacing.normal),
                     if (heading.tags.isNotEmpty)
                       _DictionaryTermTagsWrap(heading: heading),
-                    const Space.normal(),
+                    const SizedBox(height: Spacing.normal),
                     _DictionaryTermFreqList(
                       heading: heading,
                       dictionaryNamesByHidden: dictionaryNamesByHidden,
@@ -119,7 +119,7 @@ class DictionaryTermPage extends ConsumerWidget {
                 ),
               ),
               SliverPadding(
-                padding: Spacing.of(context).insets.onlyBottom.normal,
+                padding: const EdgeInsets.only(bottom: Spacing.normal),
                 sliver: _DictionaryTermPitchList(heading: heading),
               ),
               SliverList(
@@ -260,7 +260,7 @@ class _DictionaryQuickActionsRowState
       Color enabledColor = colors[quickAction.uniqueKey] ?? defaultColor;
       buttons.add(
         Padding(
-          padding: Spacing.of(context).insets.onlyLeft.semiSmall,
+          padding: const EdgeInsets.only(left: Spacing.semiSmall),
           child: QuickActionBorder(
             child: JidoujishoIconButton(
               busy: true,
@@ -362,7 +362,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
           List<Widget> pitchWidgets = pitches
               .map(
                 (pitch) => Padding(
-                  padding: Spacing.of(context).insets.onlyLeft.normal,
+                  padding: const EdgeInsets.only(left: Spacing.normal),
                   child: JapaneseLanguage.instance.getPitchWidget(
                     appModel: appModel,
                     context: context,
@@ -377,7 +377,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: Spacing.of(context).insets.onlyBottom.semiSmall,
+                padding: const EdgeInsets.only(bottom: Spacing.semiSmall),
                 child: JidoujishoTag(
                   text: dictionary.name,
                   backgroundColor: Colors.red.shade900,
@@ -390,7 +390,7 @@ class _DictionaryTermPitchList extends ConsumerWidget {
           List<Widget> pitchWidgets = pitches
               .map(
                 (pitch) => Padding(
-                  padding: Spacing.of(context).insets.onlyLeft.small,
+                  padding: const EdgeInsets.only(left: Spacing.small),
                   child: JapaneseLanguage.instance.getPitchWidget(
                     appModel: appModel,
                     context: context,
@@ -459,7 +459,7 @@ class _DictionaryTermFreqList extends ConsumerWidget {
     List<Widget> children =
         frequenciesByDictionary.map((frequenciesForDictionary) {
       return Padding(
-        padding: Spacing.of(context).insets.onlyBottom.normal,
+        padding: const EdgeInsets.only(bottom: Spacing.normal),
         child: JidoujishoTag(
           text: frequenciesForDictionary.key.name,
           trailingText: frequenciesForDictionary.value
@@ -520,9 +520,9 @@ class _DictionaryTermTopRow extends ConsumerWidget {
         Floatable(
           float: FCFloat.end,
           padding: EdgeInsets.only(
-            top: Spacing.of(context).spaces.small,
-            right: Spacing.of(context).spaces.small,
-            bottom: Spacing.of(context).spaces.small,
+            top: Spacing.small,
+            right: Spacing.small,
+            bottom: Spacing.small,
           ),
           child: DictionaryQuickActionsRow(
             heading: heading,

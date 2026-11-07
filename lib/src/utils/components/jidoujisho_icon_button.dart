@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
+import 'package:yuuna/utils.dart';
 
 /// A button that can be set as busy. When busy, the icon is faded out when its
 /// [onTap] action is on-going and processing, which can be used to
@@ -103,8 +103,8 @@ class _JidoujishoIconButtonState extends State<JidoujishoIconButton> {
     if (widget.isWideTapArea) {
       return IconButton(
         constraints: BoxConstraints(
-          maxWidth: Spacing.of(context).spaces.extraBig,
-          maxHeight: Spacing.of(context).spaces.extraBig,
+          maxWidth: Spacing.extraBig,
+          maxHeight: Spacing.extraBig,
         ),
         tooltip: widget.tooltip,
         icon: Icon(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/utils.dart';
 
 /// A tag that can be clicked on for more information. Used in dictionary
@@ -50,7 +49,7 @@ class JidoujishoTag extends StatelessWidget {
     Color foreground = appColors.chipForeground ?? foregroundColor;
 
     return Padding(
-      padding: Spacing.of(context).insets.onlyRight.small,
+      padding: const EdgeInsets.only(right: Spacing.small),
       child: InkWell(
         onTap: message != null
             ? () {
@@ -65,7 +64,7 @@ class JidoujishoTag extends StatelessWidget {
             : null,
         child: Container(
           color: background,
-          padding: Spacing.of(context).insets.all.small,
+          padding: const EdgeInsets.all(Spacing.small),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -75,7 +74,7 @@ class JidoujishoTag extends StatelessWidget {
                   color: foreground,
                   size: Theme.of(context).textTheme.labelSmall?.fontSize,
                 ),
-              if (icon != null) const Space.small(),
+              if (icon != null) const SizedBox(width: Spacing.small),
               Flexible(
                 child: Text(
                   text,
@@ -87,11 +86,11 @@ class JidoujishoTag extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (trailingText != null) const Space.small(),
+              if (trailingText != null) const SizedBox(width: Spacing.small),
               if (trailingText != null)
                 Flexible(
                   child: Container(
-                    padding: Spacing.of(context).insets.all.extraSmall,
+                    padding: const EdgeInsets.all(Spacing.extraSmall),
                     color: appColors.nestedChipBackground,
                     child: Text(
                       trailingText!,

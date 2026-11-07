@@ -8,7 +8,6 @@ import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_intent/receive_intent.dart' as intents;
 import 'package:stack_trace/stack_trace.dart';
-import 'package:spaces/spaces.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
@@ -215,14 +214,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
       themeMode: themeMode.materialMode,
       theme: AppThemes.lightFor(themeMode),
       darkTheme: AppThemes.dark(),
-      // This is responsible for the initialising the global spacing across
-      // the entire project, making use of the [spaces] package.
-      builder: (context, child) => Spacing(
-        dataBuilder: (context) {
-          return SpacingData.generate(10);
-        },
-        child: child!,
-      ),
     );
   }
 

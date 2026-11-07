@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_value_listenable_builder/multi_value_listenable_builder.dart';
-import 'package:spaces/spaces.dart';
-import 'package:yuuna/i18n/strings.g.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/utils.dart';
 
 /// The content of the dialog used for showing dictionary import progress when
 /// importing a dictionary from the dictionary menu. See the
@@ -43,7 +42,7 @@ class _DictionaryDialogImportPageState
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        contentPadding: Spacing.of(context).insets.all.big,
+        contentPadding: const EdgeInsets.all(Spacing.big),
         content: buildProgressMessage(),
       ),
     );
@@ -54,7 +53,7 @@ class _DictionaryDialogImportPageState
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Space.extraSmall(),
+        const SizedBox(height: Spacing.extraSmall),
         Padding(
           padding: const EdgeInsets.only(left: 0.5),
           child: MultiValueListenableBuilder(
@@ -76,7 +75,7 @@ class _DictionaryDialogImportPageState
                 );
               }),
         ),
-        const Space.small(),
+        const SizedBox(height: Spacing.small),
         ValueListenableBuilder<String>(
           valueListenable: widget.progressNotifier,
           builder: (context, progressNotification, _) {
@@ -87,7 +86,7 @@ class _DictionaryDialogImportPageState
             );
           },
         ),
-        const Space.small(),
+        const SizedBox(height: Spacing.small),
         buildProgressBar(),
       ],
     );
@@ -108,7 +107,7 @@ class _DictionaryDialogImportPageState
               ),
             ),
             if (fraction != null) ...[
-              const Space.small(),
+              const SizedBox(width: Spacing.small),
               Text(t.import_percent(percent: (fraction * 100).floor())),
             ],
           ],

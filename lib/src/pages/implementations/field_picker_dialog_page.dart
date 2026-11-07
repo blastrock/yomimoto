@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/src/models/app_model.dart';
@@ -31,8 +30,8 @@ class _FieldPickerDialogPageState extends BasePageState<FieldPickerDialogPage> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
     );
   }
@@ -75,7 +74,7 @@ class _FieldPickerDialogPageState extends BasePageState<FieldPickerDialogPage> {
   Widget buildEmptyMessage() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: Spacing.of(context).spaces.normal,
+        bottom: Spacing.normal,
       ),
       child: JidoujishoPlaceholderMessage(
         icon: Icons.edit,

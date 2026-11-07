@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -38,8 +37,8 @@ class _EnhancementsPickerDialogPage
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
     );
   }
@@ -83,7 +82,7 @@ class _EnhancementsPickerDialogPage
   Widget buildEmptyMessage() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: Spacing.of(context).spaces.normal,
+        bottom: Spacing.normal,
       ),
       child: JidoujishoPlaceholderMessage(
         icon: Icons.auto_fix_high,

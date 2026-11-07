@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/utils.dart';
 
 /// Used for various dialogs, such as the dictionary, profiles and enhancements
@@ -43,7 +42,7 @@ class JidoujishoListTile extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: ListTile(
-        contentPadding: Spacing.of(context).insets.onlyLeft.semiBig,
+        contentPadding: const EdgeInsets.only(left: Spacing.semiBig),
         dense: true,
         selected: selected,
         leading: Icon(
@@ -75,7 +74,7 @@ class JidoujishoListTile extends StatelessWidget {
               ),
             ),
             if (trailing != null && selected) trailing!,
-            const Space.semiSmall(),
+            const SizedBox(width: Spacing.semiSmall),
           ],
         ),
         onTap: onTap,

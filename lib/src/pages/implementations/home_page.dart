@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -164,7 +163,7 @@ class _HomePageState extends BasePageState<HomePage>
       listenable: appModel.incognitoNotifier,
       builder: (context, _) {
         return Padding(
-          padding: Spacing.of(context).insets.onlyLeft.normal,
+          padding: const EdgeInsets.only(left: Spacing.normal),
           child: Image.asset('assets/meta/icon.png'),
         );
       },
@@ -179,7 +178,7 @@ class _HomePageState extends BasePageState<HomePage>
           appName,
           style: textTheme.titleLarge,
         ),
-        const Space.extraSmall(),
+        const SizedBox(width: Spacing.extraSmall),
         Text(
           appVersion,
           style: textTheme.labelSmall!.copyWith(

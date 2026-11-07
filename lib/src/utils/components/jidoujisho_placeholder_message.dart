@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
+import 'package:yuuna/utils.dart';
 
 /// Used to show information or error messages across the application.
 /// For example, this is used for the empty placeholder messages on the home
@@ -43,7 +43,7 @@ class JidoujishoPlaceholderMessage extends StatelessWidget {
           size: Theme.of(context).textTheme.headlineMedium?.fontSize,
           color: color ?? Theme.of(context).unselectedWidgetColor,
         ),
-        const Space.small(),
+        const SizedBox(height: Spacing.small),
         Text(
           message,
           textAlign: TextAlign.center,

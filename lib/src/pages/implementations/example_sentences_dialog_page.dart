@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
@@ -47,8 +46,8 @@ class _ExampleSentencesDialogPageState
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
       actions: widget.exampleSentences.isEmpty ? null : actions,
     );
@@ -57,7 +56,7 @@ class _ExampleSentencesDialogPageState
   Widget buildEmptyMessage() {
     return Padding(
       padding: EdgeInsets.only(
-        bottom: Spacing.of(context).spaces.normal,
+        bottom: Spacing.normal,
       ),
       child: JidoujishoPlaceholderMessage(
         icon: Icons.search_off,
@@ -102,12 +101,12 @@ class _ExampleSentencesDialogPageState
             builder: (context, value, child) {
               return Container(
                 padding: EdgeInsets.symmetric(
-                  vertical: Spacing.of(context).spaces.small,
-                  horizontal: Spacing.of(context).spaces.semiSmall,
+                  vertical: Spacing.small,
+                  horizontal: Spacing.semiSmall,
                 ),
                 margin: EdgeInsets.only(
-                  top: Spacing.of(context).spaces.normal,
-                  right: Spacing.of(context).spaces.normal,
+                  top: Spacing.normal,
+                  right: Spacing.normal,
                 ),
                 color: _valuesSelected[index]!.value
                     ? theme.colorScheme.primary.withValues(alpha: 0.3)

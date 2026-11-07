@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
 
@@ -52,8 +51,8 @@ class _TextSegmentationDialogPage
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
       actions: actions,
     );
@@ -120,12 +119,12 @@ class _TextSegmentationDialogPage
           builder: (context, value, child) {
             return Container(
               padding: EdgeInsets.symmetric(
-                vertical: Spacing.of(context).spaces.small,
-                horizontal: Spacing.of(context).spaces.semiSmall,
+                vertical: Spacing.small,
+                horizontal: Spacing.semiSmall,
               ),
               margin: EdgeInsets.only(
-                top: Spacing.of(context).spaces.normal,
-                right: Spacing.of(context).spaces.normal,
+                top: Spacing.normal,
+                right: Spacing.normal,
               ),
               color: _valuesSelected[index]!.value
                   ? theme.colorScheme.primary.withValues(alpha: 0.3)

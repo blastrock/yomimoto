@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/utils.dart';
 
 /// The shared body content for a [ReaderMediaSource]'s tab in the main menu.
 /// Each reader source subclasses this to supply its own history.
@@ -48,7 +48,7 @@ abstract class HistoryReaderPageState<T extends HistoryReaderPage>
   @override
   Widget buildMediaItemContent(MediaItem item) {
     return Container(
-      padding: Spacing.of(context).insets.all.normal,
+      padding: const EdgeInsets.all(Spacing.normal),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [

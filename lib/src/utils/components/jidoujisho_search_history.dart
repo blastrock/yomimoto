@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/models.dart';
+import 'package:yuuna/utils.dart';
 
 /// Used in a floating search bar body for showing search history items.
 class JidoujishoSearchHistory extends ConsumerStatefulWidget {
@@ -51,7 +51,7 @@ class _JidoujishoSearchHistoryState
           itemCount: searchHistory.length + 1,
           itemBuilder: (context, index) {
             if (index == 0) {
-              return const Space.normal();
+              return const SizedBox(height: Spacing.normal);
             }
 
             return buildSearchHistoryItem(
@@ -84,16 +84,16 @@ class _JidoujishoSearchHistoryState
       },
       child: Padding(
         padding: EdgeInsets.only(
-          top: Spacing.of(context).spaces.normal,
-          bottom: Spacing.of(context).spaces.semiBig,
-          left: Spacing.of(context).spaces.big,
-          right: Spacing.of(context).spaces.big,
+          top: Spacing.normal,
+          bottom: Spacing.semiBig,
+          left: Spacing.big,
+          right: Spacing.big,
         ),
         child: Row(
           children: [
             Padding(
               padding: EdgeInsets.only(
-                top: Spacing.of(context).spaces.small,
+                top: Spacing.small,
               ),
               child: Icon(
                 widget.searchSuggestions.isNotEmpty

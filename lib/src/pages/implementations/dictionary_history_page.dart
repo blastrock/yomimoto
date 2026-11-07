@@ -1,13 +1,12 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
-import 'package:yuuna/i18n/strings.g.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/utils.dart';
 
 /// Returns the main body of the [HomeDictionaryPage] before the search bar
 /// is opened.
@@ -179,7 +178,7 @@ class _DictionaryHistoryScrollableItemState
     required int length,
   }) {
     return Padding(
-      padding: Spacing.of(context).insets.onlyBottom.small,
+      padding: const EdgeInsets.only(bottom: Spacing.small),
       child: Tooltip(
         message: t.show_more,
         child: InkWell(
@@ -194,7 +193,7 @@ class _DictionaryHistoryScrollableItemState
                 .withValues(alpha: 0.05),
             width: double.maxFinite,
             child: Padding(
-              padding: Spacing.of(context).insets.all.small,
+              padding: const EdgeInsets.all(Spacing.small),
               child: buildFooterTextSpans(
                 result: result,
                 length: length,
@@ -221,7 +220,7 @@ class _DictionaryHistoryScrollableItemState
             child: Padding(
               padding: EdgeInsets.only(
                 top: 1.25,
-                right: Spacing.of(context).spaces.small,
+                right: Spacing.small,
               ),
               child: Icon(
                 DictionaryTab.instance.icon,

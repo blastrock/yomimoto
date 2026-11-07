@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -62,8 +61,8 @@ class _MediaItemEditDialogPageState
 
     return AlertDialog(
       contentPadding: MediaQuery.of(context).orientation == Orientation.portrait
-          ? Spacing.of(context).insets.all.big
-          : Spacing.of(context).insets.all.normal,
+          ? const EdgeInsets.all(Spacing.big)
+          : const EdgeInsets.all(Spacing.normal),
       content: buildContent(),
       actions: actions,
     );
@@ -106,7 +105,7 @@ class _MediaItemEditDialogPageState
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: Spacing.of(context).insets.all.small,
+                      padding: const EdgeInsets.all(Spacing.small),
                       child: Image(
                           image: _coverImageProvider ?? _defaultImageProvider!,
                           fit: BoxFit.fitHeight),

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:spaces/spaces.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -93,7 +92,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
           controller: _scrollController,
           child: ListView(
             controller: _scrollController,
-            padding: Spacing.of(context).insets.onlyBottom.big,
+            padding: const EdgeInsets.only(bottom: Spacing.big),
             children: [
               buildHeader(t.settings_appearance),
               buildChoice<AppThemeMode>(
@@ -249,10 +248,12 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
 
   Widget buildHeader(String label) {
     return Padding(
-      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
-            top: Spacing.of(context).spaces.big,
-            bottom: Spacing.of(context).spaces.small,
-          ),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.big,
+        Spacing.normal,
+        Spacing.small,
+      ),
       child: Text(
         label,
         style: textTheme.labelLarge?.copyWith(
@@ -278,7 +279,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
         toggle();
         setState(() {});
       },
-      contentPadding: Spacing.of(context).insets.horizontal.normal,
+      contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
     );
   }
 
@@ -291,9 +292,12 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     required Future<void> Function(T) onChanged,
   }) {
     return Padding(
-      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
-            top: Spacing.of(context).spaces.small,
-          ),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.small,
+        Spacing.normal,
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -318,7 +322,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
       leading: Icon(icon, size: textTheme.bodyLarge?.fontSize),
       title: Text(label, style: textTheme.bodyMedium),
       onTap: onTap,
-      contentPadding: Spacing.of(context).insets.horizontal.normal,
+      contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
     );
   }
 
@@ -333,9 +337,12 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     String? suffixText,
   }) {
     return Padding(
-      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
-            top: Spacing.of(context).spaces.small,
-          ),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.small,
+        Spacing.normal,
+        0,
+      ),
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.number,
@@ -372,7 +379,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
       title: Text(t.explanation_test_key, style: textTheme.bodyMedium),
       enabled: !_testingApiKey,
       onTap: testApiKeyInField,
-      contentPadding: Spacing.of(context).insets.horizontal.normal,
+      contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.normal),
     );
   }
 
@@ -410,9 +417,12 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     bool obscureText = false,
   }) {
     return Padding(
-      padding: Spacing.of(context).insets.horizontal.normal.copyWith(
-            top: Spacing.of(context).spaces.small,
-          ),
+      padding: const EdgeInsets.fromLTRB(
+        Spacing.normal,
+        Spacing.small,
+        Spacing.normal,
+        0,
+      ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
@@ -478,7 +488,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
             applicationVersion: appModel.packageInfo.version,
             applicationLegalese: t.legalese,
             applicationIcon: Padding(
-              padding: Spacing.of(context).insets.all.normal,
+              padding: const EdgeInsets.all(Spacing.normal),
               child: Image.asset(
                 'assets/meta/icon.png',
                 height: 128,

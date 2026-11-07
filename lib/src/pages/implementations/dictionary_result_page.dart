@@ -1,10 +1,10 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:spaces/spaces.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/utils.dart';
 
 /// Returns the widget for a [DictionarySearchResult] which returns a
 /// scrollable list of each [DictionaryEntry] in its mappings.
@@ -113,7 +113,7 @@ class _DictionaryResultPageState extends BasePageState<DictionaryResultPage> {
         slivers: [
           SliverPadding(
               padding: widget.spaceBeforeFirstResult
-                  ? Spacing.of(context).insets.onlyTop.normal
+                  ? const EdgeInsets.only(top: Spacing.normal)
                   : EdgeInsets.zero),
           ...headings
               .map((heading) => DictionaryTermPage(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:spaces/spaces.dart';
-import 'package:yuuna/i18n/strings.g.dart';
 import 'package:yuuna/pages.dart';
+import 'package:yuuna/utils.dart';
 
 /// The content of the dialog used for showing dictionary import progress when
 /// deleting a dictionary from the dictionary menu. See the
@@ -27,12 +26,12 @@ class _DictionaryDialogDeletePageState
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        contentPadding: Spacing.of(context).insets.all.big,
+        contentPadding: const EdgeInsets.all(Spacing.big),
         content: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             buildProgressSpinner(),
-            const Space.semiBig(),
+            const SizedBox(width: Spacing.semiBig),
             buildProgressMessage(),
           ],
         ),
@@ -54,7 +53,7 @@ class _DictionaryDialogDeletePageState
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Space.extraSmall(),
+          const SizedBox(height: Spacing.extraSmall),
           Padding(
             padding: const EdgeInsets.only(left: 0.5),
             child: Text(
@@ -67,7 +66,7 @@ class _DictionaryDialogDeletePageState
               ),
             ),
           ),
-          const Space.small(),
+          const SizedBox(height: Spacing.small),
           Text(
             t.dictionaries_deleting_data,
             maxLines: 10,

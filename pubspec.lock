@@ -1376,10 +1376,11 @@ packages:
   receive_intent:
     dependency: "direct main"
     description:
-      path: "vendor/receive_intent"
-      relative: true
-    source: path
-    version: "0.2.7"
+      name: receive_intent
+      sha256: "0fdb0bf57e6759f586803c4a42e35fbe9e49ee948298c6d2ae75bf99c06be005"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.8"
   record_mp3_plus:
     dependency: "direct main"
     description:
@@ -1764,12 +1765,11 @@ packages:
   ve_dart:
     dependency: "direct main"
     description:
-      path: "."
-      ref: c366bb1ae24f6fad4f5c7e3a1efad5f2b8122e58
-      resolved-ref: c366bb1ae24f6fad4f5c7e3a1efad5f2b8122e58
-      url: "https://github.com/arianneorpilla/ve_dart"
-    source: git
-    version: "0.2.1"
+      name: ve_dart
+      sha256: "8b02ef9248959b30c4b751639507f0776384d8a8cae71416b3a64bb3583298ff"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   vector_math:
     dependency: transitive
     description:

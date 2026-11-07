@@ -78,10 +78,7 @@ dependencies:
   permission_handler: ^12.0.3
   progress_indicators: ^1.0.0
   recase: ^4.1.0
-  receive_intent:
-    # Vendored upstream 0.2.7 with the fork's `setResult(action:)` patch
-    # rebased on top. See vendor/receive_intent/UPSTREAM.md.
-    path: vendor/receive_intent
+  receive_intent: ^0.2.8
   record_mp3_plus: ^1.5.0
   remove_emoji: ^0.0.7
   reorderables: ^0.6.0
@@ -104,20 +101,16 @@ dependencies:
   stack_trace: ^1.11.1
   transparent_image: ^2.0.1
   url_launcher: ^6.0.20
-  ve_dart:
-    git:
-      url: https://github.com/arianneorpilla/ve_dart
-      ref: c366bb1ae24f6fad4f5c7e3a1efad5f2b8122e58
+  ve_dart: ^0.3.1
   visibility_detector: ^0.4.0+2
   wakelock_plus: ^1.7.0
 
 dependency_overrides:
   freezed_annotation: ^2.2.0 # Caused by spaces
   gap: ^3.0.1 # Caused by spaces
-  # ve_dart's fork pins `mecab_dart: 0.1.3` exactly, which still wants ffi ^1
-  # and declares an sdk upper bound of <3.0.0. Override to the vendored 0.1.6,
-  # which is on ffi ^2 and has the removed v1-embedding code stripped out. See
-  # vendor/mecab_dart/UPSTREAM.md.
+  # ve_dart asks for the hosted mecab_dart, which does not compile, and pub
+  # refuses one package from two sources. Override it with the vendored copy.
+  # See vendor/mecab_dart/UPSTREAM.md.
   mecab_dart:
     path: vendor/mecab_dart
 

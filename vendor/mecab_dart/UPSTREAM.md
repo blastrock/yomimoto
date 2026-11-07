@@ -19,8 +19,7 @@ e: MecabDartPlugin.kt:9:48 Unresolved reference 'Registrar'.
 
 This is a source problem, so the Gradle shim in `android/settings.gradle` cannot
 reach it — hence the vendoring. The shim does still handle this package's
-missing `namespace`, its `compileSdkVersion 33`, its `minSdkVersion 16` and the
-`jcenter()` in its buildscript.
+missing `namespace`, its `compileSdkVersion 33` and its `minSdkVersion 16`.
 
 ## Local changes
 
@@ -29,8 +28,12 @@ See `local-changes.patch`.
 1. Deleted the `companion object { registerWith(Registrar) }` block and its
    import. Dead code under the v2 embedding — the app registers this plugin
    through `GeneratedPluginRegistrant`, which calls `onAttachedToEngine`.
-2. `example/` (54 MB sample app) is not vendored. Nothing in the plugin build
-   references it.
+2. `android/CMakeLists.txt` compiles MeCab as C++14: its sources use the
+   `register` storage class, which C++17 removed and the current NDK rejects.
+3. `android/build.gradle` lists `mavenCentral()` instead of `jcenter()`, which
+   Gradle 9 removed.
+4. `example/` (54 MB sample app), `analysis_options.yaml` and `mecab_dart.iml`
+   are not vendored. Nothing in the plugin build references them.
 
 ## How to stop vendoring this
 
@@ -40,8 +43,7 @@ binding to MeCab plus a trivial method channel that only implements
 `getPlatformVersion`, and the app calls MeCab through the FFI side, not the
 channel.
 
-## Note on the version
+## Note on the override
 
-`ve_dart` pins `mecab_dart: 0.1.3` exactly, which wants `ffi ^1` and declares an
-sdk upper bound of `<3.0.0`. This vendored copy is forced in through
-`dependency_overrides` for that reason as well as the compile fix.
+`ve_dart` asks for the hosted `mecab_dart`, and pub refuses one package from two
+sources, so this copy is also forced in through `dependency_overrides`.

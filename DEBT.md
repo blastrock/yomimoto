@@ -64,12 +64,11 @@ single cleanup available.
 
 ## Third-party git refs
 
-`ve_dart` and `spaces` are git dependencies on someone else's account, so the
-build relies on that account staying alive. That is how
-`material_floating_search_bar` became a problem when its upstream was deleted.
+`spaces` is a git dependency on someone else's account, so the build relies on
+that account staying alive. That is how `material_floating_search_bar` became a
+problem when its upstream was deleted.
 
-**To pay it off**, mirror or vendor `ve_dart`; `spaces` goes with the entry
-above.
+**To pay it off**, replace `spaces`, as in the entry above.
 
 ## `change_notifier_builder` is discontinued
 

@@ -30,7 +30,6 @@ export 'src/creator/enhancements/forvo_audio_enhancement.dart';
 export 'src/creator/enhancements/immersion_kit_enhancement.dart';
 export 'src/creator/enhancements/pick_audio_enhancement.dart';
 export 'src/creator/enhancements/audio_recorder_enhancement.dart';
-export 'src/creator/enhancements/text_segmentation_enhancement.dart';
 export 'src/creator/enhancements/save_tags_enhancement.dart';
 
 export 'src/creator/fields/sentence_field.dart';

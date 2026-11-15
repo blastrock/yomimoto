@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 256
+/// Strings: 254
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -177,7 +177,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_remove => 'REMOVE';
 	String get dialog_download => 'DOWNLOAD';
 	String get dialog_select => 'SELECT';
-	String get dialog_search => 'SEARCH';
 	String get dialog_exit => 'EXIT';
 	String get dialog_save => 'SAVE';
 	String get dialog_crop => 'CROP';
@@ -348,7 +347,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String stash_delete_confirm({required Object n}) => 'Delete ${n} stashed word(s)?';
 	String get no_recordings_found => 'No recordings found';
 	String get wrap_image_audio => 'Include image/audio HTML tags on export';
-	String get text_segmentation => 'Text Segmentation';
 	String get settings => 'Settings';
 	String get settings_appearance => 'Appearance';
 	String get settings_theme => 'Theme';
@@ -441,7 +439,6 @@ extension on Translations {
 			case 'dialog_remove': return 'REMOVE';
 			case 'dialog_download': return 'DOWNLOAD';
 			case 'dialog_select': return 'SELECT';
-			case 'dialog_search': return 'SEARCH';
 			case 'dialog_exit': return 'EXIT';
 			case 'dialog_save': return 'SAVE';
 			case 'dialog_crop': return 'CROP';
@@ -612,7 +609,6 @@ extension on Translations {
 			case 'stash_delete_confirm': return ({required Object n}) => 'Delete ${n} stashed word(s)?';
 			case 'no_recordings_found': return 'No recordings found';
 			case 'wrap_image_audio': return 'Include image/audio HTML tags on export';
-			case 'text_segmentation': return 'Text Segmentation';
 			case 'settings': return 'Settings';
 			case 'settings_appearance': return 'Appearance';
 			case 'settings_theme': return 'Theme';

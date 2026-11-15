@@ -24,7 +24,6 @@ export 'src/pages/implementations/stash_item_page.dart';
 export 'src/pages/implementations/stash_page.dart';
 export 'src/pages/implementations/recursive_dictionary_page.dart';
 export 'src/pages/implementations/recursive_dictionary_history_page.dart';
-export 'src/pages/implementations/text_segmentation_dialog_page.dart';
 export 'src/pages/implementations/field_picker_dialog_page.dart';
 export 'src/pages/implementations/reader_ttu_source_page.dart';
 export 'src/pages/implementations/reader_ttu_source_history_page.dart';

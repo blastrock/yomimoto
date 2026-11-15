@@ -121,7 +121,6 @@ class _RecursiveDictionaryPageState
         buildBackButton(),
       ],
       actions: [
-        buildSegmentButton(),
         buildCreatorButton(),
         buildSearchButton(),
       ],
@@ -260,31 +259,6 @@ class _RecursiveDictionaryPageState
       searchTerm: searchTerm,
       killOnPop: false,
       onUpdateQuery: widget.onUpdateQuery,
-    );
-  }
-
-  Widget buildSegmentButton() {
-    return FloatingSearchBarAction(
-      showIfOpened: true,
-      child: JidoujishoIconButton(
-        size: Theme.of(context).textTheme.titleLarge?.fontSize,
-        tooltip: t.text_segmentation,
-        icon: Icons.account_tree,
-        onTap: () async {
-          await appModel.openTextSegmentationDialog(
-            sourceText: _controller.query,
-            onSearch: (selection) async {
-              await appModel.openRecursiveDictionarySearch(
-                searchTerm: selection.textInside,
-                killOnPop: false,
-                onUpdateQuery: widget.onUpdateQuery,
-              );
-            },
-          );
-
-          widget.onUpdateQuery?.call(_controller.query);
-        },
-      ),
     );
   }
 

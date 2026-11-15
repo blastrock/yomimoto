@@ -177,10 +177,12 @@ Everything persisted lives in SQLite; there is no other store.
   setting needs no schema change; after 1.0, renaming a key or changing a
   value's type or meaning is a data migration in a `schemaVersion` bump.
 
-  The schema is at version 2. Version 2 is a pre-1.0 bump made because
-  installs already held data: its migration drops the legacy mokuro reader's
-  catalogs, volumes (with their stashes) and two settings, and
-  `test/database/schema_test.dart` tests it from the version 1 snapshot. Until
+  The schema is at version 3. Versions 2 and 3 are pre-1.0 bumps made because
+  installs already held data: version 2's migration drops the legacy mokuro
+  reader's catalogs, volumes (with their stashes) and two settings, version
+  3's removes the deleted text segmentation enhancement from every profile's
+  slots, and `test/database/schema_test.dart` tests each from the previous
+  snapshot. Until
   1.0 ships, a schema edit changes the latest version in place and re-dumps
   it (`drift_schemas/`), unless installed data must be kept; after 1.0, every
   change bumps `schemaVersion`, adds a migration, dumps a new snapshot and

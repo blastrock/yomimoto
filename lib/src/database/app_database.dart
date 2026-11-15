@@ -14,7 +14,7 @@ const String databaseFileName = 'yomimoto.sqlite';
 /// The app's SQLite database: dictionaries, libraries, stashes, profiles and
 /// histories. Every version comes with a migration and a schema snapshot.
 /// Version 2 dropped the mokuro catalogs and the volumes of the legacy mokuro
-/// reader.
+/// reader; version 3 dropped the text segmentation enhancement.
 @DriftDatabase(
   tables: [
     Dictionaries,
@@ -49,7 +49,7 @@ class AppDatabase extends _$AppDatabase {
       AppDatabase.fromRaw(openRawDatabase(path));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// Creates the schema, then the standard profile with id
   /// [AnkiMapping.standardProfileId]. That profile cannot be deleted, so the
@@ -58,6 +58,10 @@ class AppDatabase extends _$AppDatabase {
   /// Version 2 removes what the legacy mokuro reader left: its catalogs,
   /// its volumes (legacy HTML URLs the new reader cannot open) with their
   /// stashes, and two dropped settings.
+  ///
+  /// Version 3 takes the removed text segmentation enhancement out of every
+  /// profile's slots. The creator expects every assigned enhancement to be
+  /// registered, so a profile still naming it would break the creator.
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async {
@@ -79,6 +83,18 @@ class AppDatabase extends _$AppDatabase {
             await customStatement('DELETE FROM preference WHERE key IN '
                 "('reader_mokuro/use_dark_theme', "
                 "'reader_mokuro/extend_page_beyond_navbar')");
+          }
+          if (from < 3) {
+            // Rebuilds each profile's field-to-slot map without the
+            // enhancement; the other slots keep their numbers.
+            await customStatement('''
+              UPDATE anki_mapping SET enhancements = (
+                SELECT json_group_object(field.key, json((
+                  SELECT json_group_object(slot.key, slot.value)
+                  FROM json_each(field.value) AS slot
+                  WHERE slot.value != 'text_segmentation')))
+                FROM json_each(anki_mapping.enhancements) AS field)
+            ''');
           }
         },
       );

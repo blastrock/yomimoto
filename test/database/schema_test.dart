@@ -5,13 +5,13 @@ import 'package:yuuna/database.dart';
 import 'generated/schema.dart';
 
 void main() {
-  test('the database the app creates matches the version 2 snapshot',
+  test('the database the app creates matches the version 3 snapshot',
       () async {
     SchemaVerifier verifier = SchemaVerifier(GeneratedHelper());
-    AppDatabase db = AppDatabase(await verifier.startAt(2));
+    AppDatabase db = AppDatabase(await verifier.startAt(3));
     addTearDown(db.close);
 
-    await verifier.migrateAndValidate(db, 2);
+    await verifier.migrateAndValidate(db, 3);
   });
 
   test('upgrading from version 1 drops mokuro catalogs and old volumes',
@@ -36,11 +36,39 @@ void main() {
     AppDatabase db = AppDatabase(schema.newConnection());
     addTearDown(db.close);
 
-    await verifier.migrateAndValidate(db, 2);
+    await verifier.migrateAndValidate(db, 3);
 
     expect(await db.select(db.mediaItems).map((r) => r.id).get(), [2]);
     expect(await db.select(db.stashItems).map((r) => r.term).get(), ['犬']);
     expect(await db.select(db.preferenceEntries).map((r) => r.key).get(),
         ['reader_mokuro/highlight_on_tap']);
+  });
+
+  test('upgrading from version 2 removes the text segmentation enhancement',
+      () async {
+    SchemaVerifier verifier = SchemaVerifier(GeneratedHelper());
+    InitializedSchema schema = await verifier.schemaAt(2);
+    schema.rawDatabase.execute('''
+      INSERT INTO anki_mapping (id, label, model, "order", export_field_keys,
+        creator_field_keys, creator_collapsed_field_keys, tags, enhancements)
+      VALUES (1, 'a', 'm', 0, '[]', '[]', '[]', '[]',
+        '{"sentence":{"0":"clear_field","1":"text_segmentation",' ||
+        '"2":"sentence_picker"},"notes":{"-1":"text_segmentation"},' ||
+        '"image":{"-1":"bing_images"}}'),
+        (2, 'b', 'm', 1, '[]', '[]', '[]', '[]', '{}');
+    ''');
+    AppDatabase db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+
+    await verifier.migrateAndValidate(db, 3);
+
+    expect(await db.select(db.ankiMappings).map((r) => r.enhancements).get(), [
+      {
+        'sentence': {0: 'clear_field', 2: 'sentence_picker'},
+        'notes': <int, String>{},
+        'image': {-1: 'bing_images'},
+      },
+      <String, Map<int, String>>{},
+    ]);
   });
 }

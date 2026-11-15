@@ -399,7 +399,6 @@ class AppModel with ChangeNotifier {
       ],
       NotesField.instance: [
         ClearFieldEnhancement(field: NotesField.instance),
-        TextSegmentationEnhancement(field: NotesField.instance),
       ],
       ImageField.instance: [
         ClearFieldEnhancement(field: ImageField.instance),
@@ -411,14 +410,12 @@ class AppModel with ChangeNotifier {
       MeaningField.instance: [
         ClearFieldEnhancement(field: MeaningField.instance),
         SentencePickerEnhancement(field: MeaningField.instance),
-        TextSegmentationEnhancement(field: MeaningField.instance),
       ],
       ReadingField.instance: [
         ClearFieldEnhancement(field: ReadingField.instance),
       ],
       SentenceField.instance: [
         ClearFieldEnhancement(field: SentenceField.instance),
-        TextSegmentationEnhancement(field: SentenceField.instance),
         SentencePickerEnhancement(field: SentenceField.instance),
       ],
       TermField.instance: [
@@ -443,17 +440,14 @@ class AppModel with ChangeNotifier {
       CollapsedMeaningField.instance: [
         ClearFieldEnhancement(field: CollapsedMeaningField.instance),
         SentencePickerEnhancement(field: CollapsedMeaningField.instance),
-        TextSegmentationEnhancement(field: CollapsedMeaningField.instance),
       ],
       ExpandedMeaningField.instance: [
         ClearFieldEnhancement(field: ExpandedMeaningField.instance),
         SentencePickerEnhancement(field: ExpandedMeaningField.instance),
-        TextSegmentationEnhancement(field: ExpandedMeaningField.instance),
       ],
       HiddenMeaningField.instance: [
         ClearFieldEnhancement(field: HiddenMeaningField.instance),
         SentencePickerEnhancement(field: HiddenMeaningField.instance),
-        TextSegmentationEnhancement(field: HiddenMeaningField.instance),
       ],
       TagsField.instance: [
         ClearFieldEnhancement(field: TagsField.instance),
@@ -1748,30 +1742,6 @@ class AppModel with ChangeNotifier {
         builder: (context) => RecursiveDictionaryHistoryPage(
           result: result,
         ),
-      ),
-    );
-  }
-
-  /// A helper function for opening a text segmentation dialog.
-  Future<void> openTextSegmentationDialog({
-    required String sourceText,
-    List<String>? segmentedText,
-    Function(JidoujishoTextSelection)? onSelect,
-    Function(JidoujishoTextSelection)? onSearch,
-  }) async {
-    if (sourceText.trim().isEmpty) {
-      return;
-    }
-
-    segmentedText ??= JapaneseLanguage.instance.textToWords(sourceText);
-
-    await showDialog(
-      context: _navigatorKey.currentContext!,
-      builder: (context) => TextSegmentationDialogPage(
-        sourceText: sourceText,
-        segmentedText: segmentedText!,
-        onSelect: onSelect,
-        onSearch: onSearch,
       ),
     );
   }

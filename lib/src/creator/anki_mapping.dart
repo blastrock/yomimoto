@@ -67,7 +67,6 @@ class AnkiMapping {
   static const Map<String, Map<int, String>> defaultEnhancements = {
     SentenceField.key: {
       0: ClearFieldEnhancement.key,
-      1: TextSegmentationEnhancement.key,
       2: SentencePickerEnhancement.key,
     },
     TermField.key: {
@@ -77,10 +76,7 @@ class AnkiMapping {
       3: ImmersionKitEnhancement.key,
     },
     ReadingField.key: {0: ClearFieldEnhancement.key},
-    MeaningField.key: {
-      0: ClearFieldEnhancement.key,
-      1: TextSegmentationEnhancement.key,
-    },
+    MeaningField.key: {0: ClearFieldEnhancement.key},
     NotesField.key: {0: ClearFieldEnhancement.key},
     ImageField.key: {
       -1: BingImagesSearchEnhancement.key,

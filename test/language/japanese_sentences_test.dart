@@ -110,4 +110,29 @@ void main() {
       expect(selection.range, const TextRange(start: 14, end: 15));
     });
   });
+
+  // The readers start the highlight after the leading whitespace, so the
+  // guess covers the first character past it.
+  group('getGuessHighlightLength', () {
+    Map<String, int> cases = {
+      '猫が鳴いた。': 1,
+      '　 猫': 1,
+      // 𠮟 lies outside the Basic Multilingual Plane: a surrogate pair.
+      '𠮟る': 2,
+    };
+
+    cases.forEach((searchTerm, length) {
+      test(searchTerm, () {
+        expect(language.getGuessHighlightLength(searchTerm: searchTerm),
+            length);
+      });
+    });
+
+    // The reader catches the error and clears the result, as it did when
+    // MeCab found no word.
+    test('throws on whitespace only', () {
+      expect(() => language.getGuessHighlightLength(searchTerm: '　'),
+          throwsStateError);
+    });
+  });
 }

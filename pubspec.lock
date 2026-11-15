@@ -1078,13 +1078,6 @@ packages:
       relative: true
     source: path
     version: "0.5.0"
-  mecab_dart:
-    dependency: "direct main"
-    description:
-      path: "vendor/mecab_dart"
-      relative: true
-    source: path
-    version: "0.1.6"
   meta:
     dependency: transitive
     description:
@@ -1729,14 +1722,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.0"
-  ve_dart:
-    dependency: "direct main"
-    description:
-      name: ve_dart
-      sha256: "8b02ef9248959b30c4b751639507f0776384d8a8cae71416b3a64bb3583298ff"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.1"
   vector_math:
     dependency: transitive
     description:

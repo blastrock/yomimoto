@@ -4,9 +4,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:kana_kit/kana_kit.dart';
-import 'package:mecab_dart/mecab_dart.dart';
 import 'package:ruby_text/ruby_text.dart';
-import 'package:ve_dart/ve_dart.dart';
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/language.dart';
@@ -14,8 +12,8 @@ import 'package:yuuna/models.dart';
 import 'package:yuuna/preferences.dart';
 import 'package:yuuna/utils.dart';
 
-/// Japanese-specific text handling: segmentation, sentence splitting,
-/// highlighting, furigana and pitch accent display. Japanese is the only
+/// Japanese-specific text handling: sentence splitting, highlighting,
+/// furigana and pitch accent display. Japanese is the only
 /// language the app reads.
 class JapaneseLanguage {
   JapaneseLanguage._privateConstructor();
@@ -36,28 +34,12 @@ class JapaneseLanguage {
   /// Text baseline used for Japanese text.
   static const TextBaseline textBaseline = TextBaseline.ideographic;
 
-  /// Used for text segmentation and deinflection.
-  static Mecab mecab = Mecab();
-
   /// Used for processing Japanese characters from Kana to Romaji and so on.
   static KanaKit kanaKit = const KanaKit();
 
   /// Used to cache furigana segments for already generated [DictionaryHeading]
   /// items.
   final Map<DictionaryHeading, List<RubyTextData>?> segmentsCache = {};
-
-  /// Whether or not [initialise] has been called.
-  bool _initialised = false;
-
-  /// Prepare the text segmentation resources. This is run at startup and
-  /// does nothing if already run.
-  Future<void> initialise() async {
-    if (_initialised) {
-      return;
-    }
-    await mecab.init('assets/language/japanese/ipadic', true);
-    _initialised = true;
-  }
 
   /// Given paragraph text and an index, yield the sentence containing that
   /// index.
@@ -108,42 +90,13 @@ class JapaneseLanguage {
     return sentences;
   }
 
-  /// Given unsegmented [text], perform text segmentation and return a list of
-  /// parsed words. For example, '日本語は難しいです。' should ideally return a
-  /// list containing '日本語', 'は', '難しい', 'です', '。'.
-  List<String> textToWords(String text) {
-    String delimiterSanitisedText = text
-        .replaceAll('\uFEFF', '␝')
-        .replaceAll('　', '␝')
-        .replaceAll('\n', '␜')
-        .replaceAll(' ', '␝');
-
-    List<Word> tokens = parseVe(mecab, delimiterSanitisedText);
-
-    List<String> terms = [];
-
-    for (Word token in tokens) {
-      final buffer = StringBuffer();
-      for (TokenNode token in token.tokens) {
-        buffer.write(token.surface);
-      }
-
-      String term = buffer.toString();
-      term = term.replaceAll('␜', '\n').replaceAll('␝', ' ');
-      terms.add(term);
-    }
-
-    return terms;
-  }
-
-  /// Get preliminary highlight length before a dictionary search.
+  /// Get preliminary highlight length before a dictionary search: the tapped
+  /// character, two code units when it is outside the Basic Multilingual
+  /// Plane.
   int getGuessHighlightLength({
     required String searchTerm,
   }) {
-    return textToWords(searchTerm)
-        .firstWhere((e) => e.trim().isNotEmpty)
-        .trim()
-        .length;
+    return searchTerm.trimLeft().runes.first > 0xFFFF ? 2 : 1;
   }
 
   /// Get final highlight length after a dictionary search.

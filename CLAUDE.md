@@ -57,7 +57,7 @@ mechanical ones.
 `test/` mirrors `lib/src/`. The tests cover pure code and the database layer,
 which runs against in-memory or temp-file SQLite: no device, no mocks. They
 characterise current behaviour, oddities included, rather than prescribe it.
-Anything touching `AppModel`, MeCab or the WebView is verified by manual device
+Anything touching `AppModel` or the WebView is verified by manual device
 testing.
 
 CI (`.github/workflows/main.yml`) fetches the pinned ttu build, fails if

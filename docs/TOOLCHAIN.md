@@ -45,8 +45,7 @@ Moving to 9 has not been tried, so what follows is from reading the code, not
 from a build:
 
 - **`jcenter()`** is no longer a blocker: no plugin's `android/build.gradle`
-  calls it now that the vendored `mecab_dart` lists `mavenCentral()`. Gradle 9
-  removed the method.
+  calls it any more. Gradle 9 removed the method.
 - **The legacy variant API** is probably not one either.
   `android/app/build.gradle` renames APK outputs and offsets per-ABI version
   codes through `applicationVariants.all`. Flutter's own Gradle plugin still

@@ -558,8 +558,6 @@ class AppModel with ChangeNotifier {
   Future<void> injectAssetLicenses() async {
     final packageNames = [
       'ebook-reader',
-      'ipadic',
-      've',
     ];
 
     for (String packageName in packageNames) {
@@ -622,9 +620,6 @@ class AppModel with ChangeNotifier {
     populateDictionaryFormats();
     populateEnhancements();
     populateQuickActions();
-
-    /// Prepare the Japanese text segmentation resources for use.
-    await JapaneseLanguage.instance.initialise();
 
     /// Ready all enhancements sources for use.
     for (Field field in globalFields) {

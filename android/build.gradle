@@ -3,7 +3,7 @@ allprojects {
         google()
         mavenCentral()
         // AnkiDroid's API is published on JitPack only.
-        maven { url "https://jitpack.io" }
+        maven { url = "https://jitpack.io" }
     }
 }
 

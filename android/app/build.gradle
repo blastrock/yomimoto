@@ -1,8 +1,7 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin
-    // plugins.
+    // The Flutter Gradle Plugin must be applied after the Android Gradle
+    // Plugin.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -17,24 +16,16 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "app.arianneorpilla.yuuna"
-    compileSdk 36
+    namespace = "app.arianneorpilla.yuuna"
+    compileSdk = 36
     // Higher than flutter.ndkVersion (28.2.x): record_mp3_plus asks for 29.0,
     // and the NDK is backward compatible, so the whole plugin set builds
     // against the highest anyone requests.
-    ndkVersion "29.0.14206865"
+    ndkVersion = "29.0.14206865"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
-    sourceSets {
-        main.java.srcDirs += "src/main/kotlin"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     lint {
@@ -52,33 +43,33 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.kaqui.yomimoto"
-        minSdk 24
+        applicationId = "org.kaqui.yomimoto"
+        minSdk = 24
         // Deliberately left at 32. Raising it pulls in granular media
         // permissions, the audio_service foreground-service manifest work,
         // predictive back, edge-to-edge and the 16 KB page-size audit -- all
         // runtime behaviour changes that do not belong in a toolchain
         // migration.
-        targetSdk 32
-        versionCode flutter.versionCode
-        versionName flutter.versionName
+        targetSdk = 32
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     signingConfigs {
         release {
             // PKCS12 keystores have a single password for the store and its
             // keys.
-            keyAlias keystoreProperties["keyAlias"]
-            keyPassword System.getenv("KEYSTORE_PASSWORD")
-            storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
-            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = keystoreProperties["keyAlias"]
+            keyPassword = System.getenv("KEYSTORE_PASSWORD")
+            storeFile = keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled true
-            signingConfig signingConfigs.release
+            minifyEnabled = true
+            signingConfig = signingConfigs.release
         }
 
         debug {
@@ -138,7 +129,7 @@ android {
 flutter {
     // Relative to this file's directory (android/app), so '../..' is the
     // repository root -- the standard template value.
-    source "../.."
+    source = "../.."
 }
 
 dependencies {

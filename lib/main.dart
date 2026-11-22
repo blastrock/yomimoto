@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_logs/flutter_logs.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:receive_intent/receive_intent.dart' as intents;
 import 'package:stack_trace/stack_trace.dart';
@@ -17,26 +16,11 @@ import 'package:yuuna/utils.dart';
 /// Application execution starts here.
 void main() {
   /// Run and handle an error zone to customise the action performed upon
-  /// an error or exception. This allows for error logging for debug purposes
-  /// as well as communicating errors to Crashlytics if enabled.
+  /// an error or exception. This allows for error logging for debug purposes.
   runZonedGuarded<Future<void>>(() async {
     /// Necessary to initialise Flutter when running native code before
     /// starting the application.
     final binding = WidgetsFlutterBinding.ensureInitialized();
-
-    /// Initialise local file-based logging.
-    await FlutterLogs.initLogs(
-      logLevelsEnabled: [
-        LogLevel.INFO,
-        LogLevel.WARNING,
-        LogLevel.ERROR,
-        LogLevel.SEVERE
-      ],
-      timeStampFormat: TimeStampFormat.DATE_FORMAT_1,
-      directoryStructure: DirectoryStructure.FOR_DATE,
-      logTypesEnabled: ['device', 'network', 'errors'],
-      logFileExtension: LogFileExtension.LOG,
-    );
 
     /// Ensure no pop-in for the app icon.
     binding.addPostFrameCallback((_) {
@@ -86,14 +70,12 @@ void main() {
       ),
     );
   }, (exception, stack) {
-    /// Print error details to the console.
-    final details = FlutterErrorDetails(exception: exception, stack: stack);
-
-    /// Log the error.
-    FlutterLogs.logError(
-      'yomimoto',
-      details.exceptionAsString(),
-      stack.toString(),
+    /// Print error details to the console, where `adb logcat` shows them.
+    /// Forced, so every error keeps its stack trace rather than only the
+    /// first one the process reports.
+    FlutterError.dumpErrorToConsole(
+      FlutterErrorDetails(exception: exception, stack: stack),
+      forceReport: true,
     );
   });
 }

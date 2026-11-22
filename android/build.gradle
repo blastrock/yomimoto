@@ -2,7 +2,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        // AnkiDroid's API and RxLogs are published on JitPack only.
+        // AnkiDroid's API is published on JitPack only.
         maven { url "https://jitpack.io" }
     }
 }

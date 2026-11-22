@@ -709,14 +709,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.0"
-  flutter_logs:
-    dependency: "direct main"
-    description:
-      name: flutter_logs
-      sha256: "3c53e1e6cfc584edbbcea64e299b21ca28b3c195fc6c7f531569caa3d2d6c457"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.7"
   flutter_native_splash:
     dependency: "direct dev"
     description:

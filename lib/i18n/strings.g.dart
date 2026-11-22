@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 254
+/// Strings: 251
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -177,7 +177,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get dialog_remove => 'REMOVE';
 	String get dialog_download => 'DOWNLOAD';
 	String get dialog_select => 'SELECT';
-	String get dialog_exit => 'EXIT';
 	String get dialog_save => 'SAVE';
 	String get dialog_crop => 'CROP';
 	String get dialog_append => 'APPEND';
@@ -277,8 +276,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get audio_unavailable => 'No audio could be found.';
 	String get no_audio_enhancements => 'No audio enhancements are assigned.';
 	String card_exported({required Object deck}) => 'Card exported to 『${deck}』.';
-	String get exit_media_title => 'Exit Media';
-	String get exit_media_description => 'This will return you to the main menu. Are you sure?';
 	String get unimplemented_source => 'Unimplemented source';
 	String get ttu_no_books_added => 'No books yet: import EPUB, HTMLZ or TXT files';
 	String get ttu_refresh_library => 'Refresh library';
@@ -439,7 +436,6 @@ extension on Translations {
 			case 'dialog_remove': return 'REMOVE';
 			case 'dialog_download': return 'DOWNLOAD';
 			case 'dialog_select': return 'SELECT';
-			case 'dialog_exit': return 'EXIT';
 			case 'dialog_save': return 'SAVE';
 			case 'dialog_crop': return 'CROP';
 			case 'dialog_append': return 'APPEND';
@@ -539,8 +535,6 @@ extension on Translations {
 			case 'audio_unavailable': return 'No audio could be found.';
 			case 'no_audio_enhancements': return 'No audio enhancements are assigned.';
 			case 'card_exported': return ({required Object deck}) => 'Card exported to 『${deck}』.';
-			case 'exit_media_title': return 'Exit Media';
-			case 'exit_media_description': return 'This will return you to the main menu. Are you sure?';
 			case 'unimplemented_source': return 'Unimplemented source';
 			case 'ttu_no_books_added': return 'No books yet: import EPUB, HTMLZ or TXT files';
 			case 'ttu_refresh_library': return 'Refresh library';

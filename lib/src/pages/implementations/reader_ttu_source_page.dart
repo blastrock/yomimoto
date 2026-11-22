@@ -194,14 +194,15 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
         }
       },
       child: PopScope(
-        // PopScope inverts WillPopScope: refuse the pop up front, run the
-        // same confirmation, and pop by hand if it is accepted.
+        // PopScope inverts WillPopScope: refuse the pop up front, close the
+        // media, and pop by hand once that is done.
         canPop: false,
         onPopInvokedWithResult: (didPop, result) async {
           if (didPop) {
             return;
           }
-          if (await onWillPop() && context.mounted) {
+          await closeSource();
+          if (context.mounted) {
             Navigator.of(context).pop(result);
           }
         },
@@ -396,8 +397,8 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     }
   }
 
-  /// Exit goes through [PopScope], so the exit confirmation and
-  /// [MediaSource.onSourceExit] run exactly as for the back button.
+  /// Exit goes through [PopScope], so [MediaSource.onSourceExit] runs exactly
+  /// as for the back button.
   void _onBridgeExit() {
     if (mounted) {
       Navigator.maybePop(context);

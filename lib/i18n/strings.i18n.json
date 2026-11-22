@@ -31,7 +31,6 @@
     "dialog_remove": "REMOVE",
     "dialog_download": "DOWNLOAD",
     "dialog_select": "SELECT",
-    "dialog_exit": "EXIT",
     "dialog_save": "SAVE",
     "dialog_crop": "CROP",
     "dialog_append": "APPEND",
@@ -142,9 +141,6 @@
     "audio_unavailable": "No audio could be found.",
     "no_audio_enhancements": "No audio enhancements are assigned.",
     "card_exported": "Card exported to 『$deck』.",
-    "exit_media_title": "Exit Media",
-    "exit_media_description":
-        "This will return you to the main menu. Are you sure?",
     "unimplemented_source": "Unimplemented source",
     "ttu_no_books_added": "No books yet: import EPUB, HTMLZ or TXT files",
     "ttu_refresh_library": "Refresh library",

@@ -18,14 +18,15 @@ class _PlaceholderSourcePage extends BaseSourcePageState {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      // PopScope inverts WillPopScope: refuse the pop up front, run the
-      // same confirmation, and pop by hand if it is accepted.
+      // PopScope inverts WillPopScope: refuse the pop up front, close the
+      // media, and pop by hand once that is done.
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           return;
         }
-        if (await onWillPop() && context.mounted) {
+        await closeSource();
+        if (context.mounted) {
           Navigator.of(context).pop(result);
         }
       },

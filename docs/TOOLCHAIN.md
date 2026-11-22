@@ -4,9 +4,9 @@
 |---|---|
 | Flutter | 3.47.7 (Dart 3.13.5) |
 | JDK | 21 (Flutter's floor for 3.47 is 17) |
-| Gradle | 8.14.3 |
-| AGP | 8.11.1 |
-| Kotlin Gradle Plugin | 2.2.20 |
+| Gradle | 9.3.1 |
+| AGP | 9.1.0 |
+| Kotlin Gradle Plugin | 2.4.0 |
 | compileSdk / targetSdk / minSdk | 36 / 32 / 24 |
 | NDK | 29.0.14206865 |
 
@@ -30,31 +30,47 @@ A relative `storeFile` resolves against `android/app/`. Without the file or
 the password, release builds fail; debug builds are unaffected. Check a
 published APK with `apksigner verify --print-certs`.
 
-## Why AGP 8, not AGP 9
+## AGP 9 and its opt-out flags
 
-`flutter create` on 3.47 emits Gradle 9.3.1 / AGP 9.1.0 / KGP 2.4.0. Flutter's
-own `DependencyVersionChecker` warns below AGP 9.0.1 / Gradle 9.1.0 / KGP
-2.3.20 ("support … will soon be dropped", printed on every build) and errors
-below AGP 8.11.1 / Gradle 8.14 / KGP 2.2.20 / Java 17. **We are exactly on that
-error floor**: the next Flutter release that raises it breaks the build, short
-of `--android-skip-build-dependency-validation`. Check its thresholds
-(`packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt`)
+Gradle, AGP and KGP are the versions `flutter create` emits on Flutter 3.47,
+so its `DependencyVersionChecker` neither errors nor warns. Check its
+thresholds (`packages/flutter_tools/gradle/src/main/kotlin/DependencyVersionChecker.kt`)
 before upgrading Flutter.
 
-Moving to 9 has not been tried, so what follows is from reading the code, not
-from a build:
+`android/gradle.properties` sets three AGP flags back to their AGP 8
+behaviour. AGP 9 prints a deprecation warning for each, and **AGP 10 removes
+all three**:
 
-- **`jcenter()`** is no longer a blocker: no plugin's `android/build.gradle`
-  calls it any more. Gradle 9 removed the method.
-- **The legacy variant API** is probably not one either.
-  `android/app/build.gradle` renames APK outputs and offsets per-ABI version
-  codes through `applicationVariants.all`. Flutter's own Gradle plugin still
-  calls `applicationVariants`, and its template pairs AGP 9.1.0 with
-  `android.newDsl=false`, which `gradle.properties` also sets.
-- **Unknown until a trial build:** whether `kotlinOptions` (in the app, the
-  shim and several plugins) survives the newer Kotlin Gradle Plugin, whether
-  `com.android.build.OutputFile` still exists, and how the older plugins
-  behave.
+- **`android.newDsl=false`**, as in Flutter's template: Flutter's Gradle
+  plugin still uses the legacy variant API, as does
+  `android/app/build.gradle`'s `applicationVariants.all`, which renames the
+  APKs and sets their per-ABI version codes.
+- **`android.builtInKotlin=false`**, as in Flutter's template: four plugins
+  still apply the Kotlin Gradle Plugin themselves (`external_path`,
+  `flutter_archive`, `flutter_exit_app`, `flutter_image_compress_common`),
+  which AGP 9's built-in Kotlin rejects. Flutter prints a warning naming
+  them on every build, and says a future release will refuse them. With
+  the flag off, Flutter applies KGP to the plugins that have moved to
+  built-in Kotlin.
+- **`android.r8.proguardAndroidTxt.disallowed=false`**:
+  `flutter_inappwebview_android` 1.1.3 calls
+  `getDefaultProguardFile('proguard-android.txt')`, which AGP 9 rejects while
+  evaluating the plugin's script, too early for the shim. A library's own
+  `proguardFiles` never reach the app's R8 run, so this changes nothing in the
+  APK.
+
+The app itself is Java only and applies no Kotlin plugin.
+
+**R8's strict keep rules.** AGP 9 turns on
+`android.r8.strictFullModeForKeepRules`: a `-keep class X` rule without
+members no longer keeps `X`'s no-arg constructor. A library whose keep rules
+predate this, and which creates a class by reflection, crashes at runtime in
+release builds only. WorkManager 2.8.1 did (through Room 2.5.0's
+`WorkDatabase_Impl`), which is why `flutter_logs` was removed. When adding or
+updating an Android dependency, compare R8's `seeds.txt`
+(`build/app/outputs/mapping/release/`) between a normal release build and
+one with `-Pandroid.r8.strictFullModeForKeepRules=false`: every no-arg
+constructor only the second keeps must be one the app calls directly.
 
 ## Legacy-plugin shim
 

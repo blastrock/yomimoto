@@ -4,6 +4,24 @@ Shortcuts taken on purpose that will bite back if the assumption behind them
 stops holding. Each entry says what was done, what it relies on, and what has
 to change when that stops being true. Remove an entry once it is paid off.
 
+## AGP 9 runs with three opt-out flags
+
+**Since:** the move to AGP 9.
+
+`android/gradle.properties` sets `android.newDsl`, `android.builtInKotlin`
+and `android.r8.proguardAndroidTxt.disallowed` to `false`, restoring AGP 8
+behaviour (why each is needed is in `docs/TOOLCHAIN.md`). AGP 10 removes all
+three, and a future Flutter release will refuse plugins that apply the Kotlin
+Gradle Plugin.
+
+**To pay it off**, migrate `applicationVariants.all` in
+`android/app/build.gradle` to `androidComponents.onVariants` and wait for
+Flutter's own Gradle plugin to drop the legacy variant API (`newDsl`); get
+`external_path`, `flutter_archive`, `flutter_exit_app` and
+`flutter_image_compress_common` onto built-in Kotlin, or replace them
+(`builtInKotlin`); and get `flutter_inappwebview_android` off
+`proguard-android.txt` (the last flag).
+
 ## The analyzer's strict modes are off
 
 `strict-casts`, `strict-inference` and `strict-raw-types` (under

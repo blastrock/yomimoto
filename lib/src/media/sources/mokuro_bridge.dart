@@ -96,6 +96,7 @@ class MokuroBridge {
     this.onPage,
     this.onMenu,
     this.onTurn,
+    this.onEnd,
   }) {
     controller.addJavaScriptHandler(
       handlerName: 'mokuroHost',
@@ -104,7 +105,7 @@ class MokuroBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in `assets/manga-reader/reader.js`.
-  static const int protocolVersion = 2;
+  static const int protocolVersion = 3;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);
@@ -128,6 +129,9 @@ class MokuroBridge {
   /// the returned future completes.
   final Future<void> Function()? onTurn;
 
+  /// Called when the next page is asked for on the last spread.
+  final void Function()? onEnd;
+
   /// The handler's result goes back to the page: `turn` waits on it.
   Future<void>? _dispatch(List<dynamic> arguments) {
     if (arguments.isEmpty || arguments.first is! Map) {
@@ -148,6 +152,8 @@ class MokuroBridge {
         onMenu?.call();
       case 'turn':
         return onTurn?.call();
+      case 'end':
+        onEnd?.call();
       default:
         debugPrint('mokuroHost: unknown event ${message['type']}');
     }

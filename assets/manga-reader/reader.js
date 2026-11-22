@@ -15,7 +15,7 @@ import {
 } from './mokuro-layout.js';
 
 /** Must equal MokuroBridge.protocolVersion in the app. */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 const params = new URLSearchParams(location.search);
 const debug = params.get('debug') === '1';
@@ -505,6 +505,13 @@ function onSelectionChange() {
 // Commands
 
 async function nextPage() {
+  // Past the last spread, the app closes the volume: the spread shown, not
+  // one a turn is still on its way to.
+  const last = spreads.length - 1;
+  if (current === last && spreadOf(shownPages[0]) === last) {
+    send({ type: 'end' });
+    return;
+  }
   showSpread(current + 1);
 }
 

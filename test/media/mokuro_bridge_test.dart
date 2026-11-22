@@ -4,10 +4,10 @@ import 'package:yuuna/media.dart';
 void main() {
   group('MokuroReadyEvent', () {
     test('is compatible with the same protocol version only', () {
-      expect(MokuroBridge.protocolVersion, 2);
-      expect(MokuroReadyEvent.fromJson({'protocolVersion': 2}).isCompatible,
+      expect(MokuroBridge.protocolVersion, 3);
+      expect(MokuroReadyEvent.fromJson({'protocolVersion': 3}).isCompatible,
           isTrue);
-      expect(MokuroReadyEvent.fromJson({'protocolVersion': 1}).isCompatible,
+      expect(MokuroReadyEvent.fromJson({'protocolVersion': 2}).isCompatible,
           isFalse);
     });
   });

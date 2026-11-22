@@ -273,6 +273,7 @@ class _ReaderMokuroSourcePageState
           onPage: _onPage,
           onTurn: _onTurn,
           onMenu: _onMenu,
+          onEnd: _onEnd,
         );
       },
       onZoomScaleChanged: (controller, oldScale, newScale) {
@@ -372,6 +373,19 @@ class _ReaderMokuroSourcePageState
 
   void _onMenu() {
     setState(() => _barShown = !_barShown);
+  }
+
+  /// Whether turning past the last page has already started closing.
+  bool _isClosingAtEnd = false;
+
+  /// Turning past the last page closes the volume, as Back does. Only once:
+  /// a second turn while closing would pop the library as well.
+  void _onEnd() {
+    if (!mounted || _isClosingAtEnd) {
+      return;
+    }
+    _isClosingAtEnd = true;
+    unawaited(Navigator.maybePop(context));
   }
 
   Future<void> _onTap(MokuroTapEvent event) async {

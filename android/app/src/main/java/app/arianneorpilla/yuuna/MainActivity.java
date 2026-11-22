@@ -27,16 +27,24 @@ import java.util.List;
 import java.util.Set;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import com.ichi2.anki.api.NoteInfo;
 import android.content.res.Configuration;
 
 public class MainActivity extends FlutterActivity {
     private static final String ANKIDROID_CHANNEL = "app.arianneorpilla.yuuna/anki";
+    private static final String EINK_CHANNEL = "app.arianneorpilla.yuuna/eink";
     private static final int AD_PERM_REQUEST = 0;
 
     private Activity context;
     private AnkiDroidHelper mAnkiDroid;
+
+    // The Supernote's android.os.EinkManager and its screenRefresh(boolean,
+    // int), not in the SDK, so found by reflection. Resolved once.
+    private boolean einkResolved;
+    private Object einkManager;
+    private Method einkScreenRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,5 +240,49 @@ public class MainActivity extends FlutterActivity {
                     }
                 }
             );
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EINK_CHANNEL)
+            .setMethodCallHandler(
+                (call, result) -> {
+                    switch (call.method) {
+                        case "isRefreshAvailable":
+                            result.success(resolveEinkRefresh());
+                            break;
+                        case "refreshNextFrame":
+                            if (!resolveEinkRefresh()) {
+                                result.error("eink", "No e-ink refresh on this device", null);
+                                break;
+                            }
+                            try {
+                                // A full refresh of the next frame drawn.
+                                einkScreenRefresh.invoke(einkManager, false, 0);
+                                result.success(null);
+                            } catch (Exception e) {
+                                result.error("eink", e.toString(), null);
+                            }
+                            break;
+                        default:
+                            result.notImplemented();
+                    }
+                }
+            );
+    }
+
+    /** Whether the Supernote's full refresh can be called. */
+    private boolean resolveEinkRefresh() {
+        if (!einkResolved) {
+            einkResolved = true;
+            try {
+                Object manager = getSystemService("eink");
+                if (manager != null) {
+                    einkScreenRefresh = manager.getClass()
+                        .getMethod("screenRefresh", boolean.class, int.class);
+                    einkManager = manager;
+                }
+            } catch (Exception e) {
+                einkScreenRefresh = null;
+            }
+        }
+        return einkManager != null && einkScreenRefresh != null;
     }
 }

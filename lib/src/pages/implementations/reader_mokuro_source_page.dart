@@ -58,6 +58,20 @@ class _ReaderMokuroSourcePageState
   /// The WebView's zoom scale, 1 when the page fits the screen.
   double _zoomScale = 1;
 
+  /// How long the white of the E-ink flash stays up before the page draws
+  /// under it: long enough for the panel to show it.
+  static const Duration _flashDuration = Duration(milliseconds: 300);
+
+  /// How long the flash may wait for the new spread before it goes anyway:
+  /// a turn can end on the pages already shown.
+  static const Duration _flashTimeout = Duration(seconds: 1);
+
+  /// Whether the E-ink flash covers the screen.
+  bool _flashShown = false;
+
+  /// Hides the flash if no new spread is shown in time.
+  Timer? _flashTimer;
+
   bool get _isPeeking => widget.peekPage != null;
 
   @override
@@ -72,6 +86,7 @@ class _ReaderMokuroSourcePageState
 
   @override
   void dispose() {
+    _flashTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -194,6 +209,8 @@ class _ReaderMokuroSourcePageState
               buildReaderArea(),
               if (_barShown) buildBar(),
               buildDictionary(),
+              if (_flashShown)
+                const IgnorePointer(child: ColoredBox(color: Colors.white)),
             ],
           ),
         ),
@@ -248,6 +265,7 @@ class _ReaderMokuroSourcePageState
           onReady: _onBridgeReady,
           onTap: _onTap,
           onPage: _onPage,
+          onTurn: _onTurn,
           onMenu: _onMenu,
         );
       },
@@ -289,6 +307,7 @@ class _ReaderMokuroSourcePageState
     // The card image is the page of the last lookup: not one turned away
     // from.
     mediaSource.clearExtraData();
+    _hideFlash();
     setState(() => _shown = event);
 
     if (_zoomScale > 1.01) {
@@ -305,6 +324,44 @@ class _ReaderMokuroSourcePageState
     item.position = event.last;
     item.duration = ReaderMokuroSource.progressLength(event.count);
     unawaited(appModel.updateMediaItem(item));
+  }
+
+  /// Ready an e-ink panel for the spread the page is about to draw, so that
+  /// it drops the ghost of the previous one: the panel's own full refresh
+  /// where it has one, otherwise a white flash the page then draws under.
+  Future<void> _onTurn() async {
+    if (appModel.themeMode != AppThemeMode.eink) {
+      return;
+    }
+
+    if (await EinkRefresh.instance.isAvailable) {
+      try {
+        await EinkRefresh.instance.refreshNextFrame();
+        return;
+      } on PlatformException catch (e) {
+        debugPrint('E-ink refresh failed, flashing instead: $e');
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+    setState(() => _flashShown = true);
+    await Future.delayed(_flashDuration);
+    if (!mounted) {
+      return;
+    }
+    _flashTimer?.cancel();
+    _flashTimer = Timer(_flashTimeout, _hideFlash);
+  }
+
+  /// Uncover the screen after a flash.
+  void _hideFlash() {
+    _flashTimer?.cancel();
+    _flashTimer = null;
+    if (mounted && _flashShown) {
+      setState(() => _flashShown = false);
+    }
   }
 
   void _onMenu() {

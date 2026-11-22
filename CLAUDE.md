@@ -31,8 +31,10 @@ remains is deliberately three things:
   `app.arianneorpilla.yuuna/anki` method channel), `Jidoujisho*` classes and
   `jidoujisho_*.dart` files, and internal protocol strings (`jidoujisho://`,
   `jidoujisho-message-type`). Do not rename these as a side effect.
-- The E-ink theme exists (see Pages); the rest of e-ink tuning (refresh
-  behaviour, animation suppression) is a **later pass** that has not started.
+- The E-ink theme exists (see Pages), and the manga reader refreshes the
+  panel on page turns in it (see Reader internals); the rest of e-ink tuning
+  (the novel reader's refresh, animation suppression) is a **later pass**
+  that has not started.
 
 ## Commands
 
@@ -307,6 +309,13 @@ edit it**. Access is the global `t` (exported via `utils.dart`), e.g.
   commands); its protocol version is `PROTOCOL_VERSION` in `reader.js` and
   `MokuroBridge.protocolVersion`: bump both when a message changes shape.
   The page stores nothing.
+
+  Before drawing a different spread, the page decodes its images, sends
+  `turn` and waits for the app's reply; it sends `page` once the spread is
+  painted. In the E-ink theme, `onTurn` arms the panel's own full refresh
+  for the next frame (`EinkRefresh`: the Supernote's `EinkManager`, found
+  by reflection in `MainActivity`), or else covers the screen in white for
+  300 ms, which the next `page` removes.
 
   Volumes come in two ways, both from the tab's `+` popup: a file, or a
   catalog download. Import takes a `.cbz` or `.zip` only, with its

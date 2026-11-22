@@ -95,6 +95,7 @@ class MokuroBridge {
     this.onTap,
     this.onPage,
     this.onMenu,
+    this.onTurn,
   }) {
     controller.addJavaScriptHandler(
       handlerName: 'mokuroHost',
@@ -103,7 +104,7 @@ class MokuroBridge {
   }
 
   /// Must equal `PROTOCOL_VERSION` in `assets/manga-reader/reader.js`.
-  static const int protocolVersion = 1;
+  static const int protocolVersion = 2;
 
   /// Timeout applied to every command.
   static const Duration commandTimeout = Duration(seconds: 10);
@@ -123,9 +124,14 @@ class MokuroBridge {
   /// Called when the middle of the screen is tapped away from any text.
   final void Function()? onMenu;
 
-  void _dispatch(List<dynamic> arguments) {
+  /// Called before the page draws a different spread. The page waits until
+  /// the returned future completes.
+  final Future<void> Function()? onTurn;
+
+  /// The handler's result goes back to the page: `turn` waits on it.
+  Future<void>? _dispatch(List<dynamic> arguments) {
     if (arguments.isEmpty || arguments.first is! Map) {
-      return;
+      return null;
     }
 
     Map<String, dynamic> message =
@@ -140,9 +146,12 @@ class MokuroBridge {
         onPage?.call(MokuroPageEvent.fromJson(message));
       case 'menu':
         onMenu?.call();
+      case 'turn':
+        return onTurn?.call();
       default:
         debugPrint('mokuroHost: unknown event ${message['type']}');
     }
+    return null;
   }
 
   Future<dynamic> _call(

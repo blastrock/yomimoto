@@ -15,7 +15,7 @@ import {
 } from './mokuro-layout.js';
 
 /** Must equal MokuroBridge.protocolVersion in the app. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 const params = new URLSearchParams(location.search);
 const debug = params.get('debug') === '1';
@@ -94,6 +94,10 @@ let current = 0;
 let anchor = 0;
 let shownPages = [];
 let shownBlock;
+// Whether a render is under way, and whether another was asked for
+// meanwhile.
+let rendering = false;
+let renderAgain = false;
 
 function isLandscape() {
   return matchMedia('(orientation: landscape)').matches;
@@ -235,12 +239,11 @@ function positionLines(container) {
   });
 }
 
-/** Lay the current spread out, fitted to the viewport. */
-function render() {
-  const container = document.getElementById('spread');
-  hideBlock();
-  container.replaceChildren();
-
+/**
+ * Lay the current spread out, fitted to the viewport, off the page. `decoded`
+ * settles once its images are decoded, or have failed to.
+ */
+function buildSpread() {
   const pages = spreads[current];
   const height = Math.max(...pages.map((i) => volume.pages[i].img_height));
   const widths = pages.map(
@@ -251,7 +254,7 @@ function render() {
   const viewportHeight = document.documentElement.clientHeight;
   const fit = Math.min(viewportWidth / totalWidth, viewportHeight / height);
 
-  pages.forEach((index) => {
+  const slots = pages.map((index) => {
     const data = volume.pages[index];
     const scale = (fit * height) / data.img_height;
     const slot = document.createElement('div');
@@ -261,8 +264,51 @@ function render() {
     const page = buildPage(index);
     page.style.transform = `scale(${scale})`;
     slot.append(page);
-    container.append(slot);
+    return slot;
   });
+  const decoded = Promise.allSettled(
+    slots.map((slot) => slot.querySelector('img').decode())
+  );
+  return { pages, slots, decoded };
+}
+
+/**
+ * Show the current spread. A different spread than the one shown waits for
+ * the app's reply to `turn` first, so that an e-ink panel can be readied
+ * for it: its images are decoded before, so the frame drawn after the reply
+ * is the whole spread. A render asked for meanwhile is folded into this one,
+ * without a second `turn`.
+ */
+async function render() {
+  if (rendering) {
+    renderAgain = true;
+    return;
+  }
+  rendering = true;
+  try {
+    let turned = false;
+    let spread;
+    do {
+      renderAgain = false;
+      spread = buildSpread();
+      await spread.decoded;
+      const isTurn =
+        shownPages.length > 0 && spread.pages.join() !== shownPages.join();
+      if (isTurn && !turned && !renderAgain) {
+        turned = true;
+        await send({ type: 'turn' });
+      }
+    } while (renderAgain);
+    showSlots(spread);
+  } finally {
+    rendering = false;
+  }
+}
+
+function showSlots({ pages, slots }) {
+  const container = document.getElementById('spread');
+  hideBlock();
+  container.replaceChildren(...slots);
 
   requestAnimationFrame(() => positionLines(container));
   document.fonts.ready.then(() => positionLines(container));
@@ -272,7 +318,12 @@ function render() {
 
   if (pages.join() !== shownPages.join()) {
     shownPages = pages;
-    send({ type: 'page', pages, count: volume.pages.length });
+    // Once painted, so that the app can uncover the screen.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        send({ type: 'page', pages, count: volume.pages.length })
+      )
+    );
   }
 }
 

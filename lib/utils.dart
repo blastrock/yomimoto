@@ -28,6 +28,7 @@ export 'src/utils/misc/app_themes.dart';
 export 'src/utils/misc/jidoujisho_time_format.dart';
 export 'src/utils/misc/jidoujisho_text_selection.dart';
 export 'src/utils/misc/dialog_content.dart';
+export 'src/utils/misc/eink_refresh.dart';
 export 'src/utils/misc/run_with_progress.dart';
 export 'src/utils/misc/spacing.dart';
 export 'src/utils/misc/toast.dart';

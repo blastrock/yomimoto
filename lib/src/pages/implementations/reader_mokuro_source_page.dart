@@ -170,21 +170,27 @@ class _ReaderMokuroSourcePageState
           return KeyEventResult.handled;
         }
 
-        // Key-down and repeats turn pages, so holding a key keeps turning;
-        // key-ups pass through.
-        final bool isPress = event is KeyDownEvent || event is KeyRepeatEvent;
-
-        if (isPress && event.logicalKey == LogicalKeyboardKey.audioVolumeUp) {
-          _turnPage(forward: !mediaSource.volumePageTurningInverted);
+        // One press turns one page: only key-down turns, and repeats from
+        // a held key are swallowed so they do not change the volume instead.
+        // Key-ups pass through.
+        final bool isVolumeKey =
+            event.logicalKey == LogicalKeyboardKey.audioVolumeUp ||
+                event.logicalKey == LogicalKeyboardKey.audioVolumeDown;
+        if (!isVolumeKey) {
+          return KeyEventResult.ignored;
+        }
+        if (event is KeyRepeatEvent) {
           return KeyEventResult.handled;
         }
-        if (isPress &&
-            event.logicalKey == LogicalKeyboardKey.audioVolumeDown) {
-          _turnPage(forward: mediaSource.volumePageTurningInverted);
-          return KeyEventResult.handled;
+        if (event is! KeyDownEvent) {
+          return KeyEventResult.ignored;
         }
 
-        return KeyEventResult.ignored;
+        final bool isUp = event.logicalKey == LogicalKeyboardKey.audioVolumeUp;
+        _turnPage(
+          forward: isUp != mediaSource.volumePageTurningInverted,
+        );
+        return KeyEventResult.handled;
       },
       child: PopScope(
         // PopScope inverts WillPopScope: refuse the pop up front, close the

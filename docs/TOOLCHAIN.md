@@ -96,6 +96,7 @@ at the constraint itself:
 |---|---|---|---|
 | `targetSdk` | 32 | Raising it changes runtime behaviour, not just the build | granular media permissions, predictive back, edge-to-edge, 16 KB page-size audit |
 | Material 3 | off (`useMaterial3: false`) | M3 has been the default since 3.16 and restyles AppBar tint, ListTile density, Dialog shape, Switch geometry | A deliberate restyling pass. The flag is itself deprecated, so this is a stay of execution, not a decision |
+| `html` | 0.15.6 | 0.15.7 removed the internal `matches` that flutter_html 3.0.0 imports from `package:html/src/`. `flutter analyze` misses this, since it does not analyze dependencies: only compiling does (`flutter test`, a build) | A flutter_html release that stops importing it, or vendoring flutter_html |
 | `permission_handler` | 12.x | 13 pulls an Android implementation compiling against SDK 37 | compileSdk 37, or waiting for the platform to land |
 | `dependency_validator` | removed | Needs analyzer < 13; drift_dev and dart_mappable_builder need ≥ 13 | A dependency_validator release supporting analyzer ≥ 13 |
 | Text selection | deprecated `TextSelectionControls.buildToolbar` | `contextMenuBuilder` means rewriting the selection -> dictionary-lookup flow, the app's core interaction | Its own change, with device testing |

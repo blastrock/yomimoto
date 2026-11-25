@@ -5073,18 +5073,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
-typedef $$HeadingsTableCreateCompanionBuilder =
-    HeadingsCompanion Function({
-      Value<int> id,
-      required String term,
-      required String reading,
-    });
-typedef $$HeadingsTableUpdateCompanionBuilder =
-    HeadingsCompanion Function({
-      Value<int> id,
-      Value<String> term,
-      Value<String> reading,
-    });
+typedef $$HeadingsTableCreateCompanionBuilder = HeadingsCompanion Function({
+  Value<int> id,
+  required String term,
+  required String reading,
+});
+typedef $$HeadingsTableUpdateCompanionBuilder = HeadingsCompanion Function({
+  Value<int> id,
+  Value<String> term,
+  Value<String> reading,
+});
 
 final class $$HeadingsTableReferences
     extends BaseReferences<_$AppDatabase, $HeadingsTable, HeadingRow> {
@@ -5465,22 +5463,16 @@ class $$HeadingsTableTableManager
               $$HeadingsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$HeadingsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> term = const Value.absent(),
-                Value<String> reading = const Value.absent(),
-              }) => HeadingsCompanion(id: id, term: term, reading: reading),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String term,
-                required String reading,
-              }) => HeadingsCompanion.insert(
-                id: id,
-                term: term,
-                reading: reading,
-              ),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> term = const Value.absent(),
+            Value<String> reading = const Value.absent(),
+          }) => HeadingsCompanion(id: id, term: term, reading: reading),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String term,
+            required String reading,
+          }) => HeadingsCompanion.insert(id: id, term: term, reading: reading),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
@@ -5508,10 +5500,11 @@ class $$HeadingsTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (entriesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           HeadingRow,
                           $HeadingsTable,
-                          EntryRow
+                          EntryRow,
+                          $EntriesTable
                         >(
                           currentTable: table,
                           referencedTable: $$HeadingsTableReferences
@@ -5522,17 +5515,16 @@ class $$HeadingsTableTableManager
                                 table,
                                 p0,
                               ).entriesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'heading_id',
                           typedResults: items,
                         ),
                       if (pitchesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           HeadingRow,
                           $HeadingsTable,
-                          PitchRow
+                          PitchRow,
+                          $PitchesTable
                         >(
                           currentTable: table,
                           referencedTable: $$HeadingsTableReferences
@@ -5543,17 +5535,16 @@ class $$HeadingsTableTableManager
                                 table,
                                 p0,
                               ).pitchesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'heading_id',
                           typedResults: items,
                         ),
                       if (frequenciesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           HeadingRow,
                           $HeadingsTable,
-                          FrequencyRow
+                          FrequencyRow,
+                          $FrequenciesTable
                         >(
                           currentTable: table,
                           referencedTable: $$HeadingsTableReferences
@@ -5564,17 +5555,16 @@ class $$HeadingsTableTableManager
                                 table,
                                 p0,
                               ).frequenciesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'heading_id',
                           typedResults: items,
                         ),
                       if (headingTagsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           HeadingRow,
                           $HeadingsTable,
-                          HeadingTagRow
+                          HeadingTagRow,
+                          $HeadingTagsTable
                         >(
                           currentTable: table,
                           referencedTable: $$HeadingsTableReferences
@@ -5585,10 +5575,8 @@ class $$HeadingsTableTableManager
                                 table,
                                 p0,
                               ).headingTagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.headingId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'heading_id',
                           typedResults: items,
                         ),
                     ];
@@ -6117,10 +6105,11 @@ class $$DictionariesTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (entriesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           Dictionary,
                           $DictionariesTable,
-                          EntryRow
+                          EntryRow,
+                          $EntriesTable
                         >(
                           currentTable: table,
                           referencedTable: $$DictionariesTableReferences
@@ -6131,17 +6120,16 @@ class $$DictionariesTableTableManager
                                 table,
                                 p0,
                               ).entriesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.dictionaryId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'dictionary_id',
                           typedResults: items,
                         ),
                       if (pitchesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           Dictionary,
                           $DictionariesTable,
-                          PitchRow
+                          PitchRow,
+                          $PitchesTable
                         >(
                           currentTable: table,
                           referencedTable: $$DictionariesTableReferences
@@ -6152,17 +6140,16 @@ class $$DictionariesTableTableManager
                                 table,
                                 p0,
                               ).pitchesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.dictionaryId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'dictionary_id',
                           typedResults: items,
                         ),
                       if (frequenciesRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           Dictionary,
                           $DictionariesTable,
-                          FrequencyRow
+                          FrequencyRow,
+                          $FrequenciesTable
                         >(
                           currentTable: table,
                           referencedTable: $$DictionariesTableReferences
@@ -6173,17 +6160,16 @@ class $$DictionariesTableTableManager
                                 table,
                                 p0,
                               ).frequenciesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.dictionaryId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'dictionary_id',
                           typedResults: items,
                         ),
                       if (tagsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           Dictionary,
                           $DictionariesTable,
-                          TagRow
+                          TagRow,
+                          $TagsTable
                         >(
                           currentTable: table,
                           referencedTable: $$DictionariesTableReferences
@@ -6194,10 +6180,8 @@ class $$DictionariesTableTableManager
                                 table,
                                 p0,
                               ).tagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.dictionaryId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'dictionary_id',
                           typedResults: items,
                         ),
                     ];
@@ -6227,22 +6211,20 @@ typedef $$DictionariesTableProcessedTableManager =
         bool tagsRefs,
       })
     >;
-typedef $$EntriesTableCreateCompanionBuilder =
-    EntriesCompanion Function({
-      Value<int> id,
-      required int headingId,
-      required int dictionaryId,
-      required List<String> definitions,
-      required double popularity,
-    });
-typedef $$EntriesTableUpdateCompanionBuilder =
-    EntriesCompanion Function({
-      Value<int> id,
-      Value<int> headingId,
-      Value<int> dictionaryId,
-      Value<List<String>> definitions,
-      Value<double> popularity,
-    });
+typedef $$EntriesTableCreateCompanionBuilder = EntriesCompanion Function({
+  Value<int> id,
+  required int headingId,
+  required int dictionaryId,
+  required List<String> definitions,
+  required double popularity,
+});
+typedef $$EntriesTableUpdateCompanionBuilder = EntriesCompanion Function({
+  Value<int> id,
+  Value<int> headingId,
+  Value<int> dictionaryId,
+  Value<List<String>> definitions,
+  Value<double> popularity,
+});
 
 final class $$EntriesTableReferences
     extends BaseReferences<_$AppDatabase, $EntriesTable, EntryRow> {
@@ -6656,30 +6638,26 @@ class $$EntriesTableTableManager
                         >
                       >(state) {
                         if (headingId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.headingId,
-                                    referencedTable: $$EntriesTableReferences
-                                        ._headingIdTable(db),
-                                    referencedColumn: $$EntriesTableReferences
-                                        ._headingIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.headingId,
+                            referencedTable: $$EntriesTableReferences
+                                ._headingIdTable(db),
+                            referencedColumn: $$EntriesTableReferences
+                                ._headingIdTable(db)
+                                .id,
+                          ) as T;
                         }
                         if (dictionaryId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.dictionaryId,
-                                    referencedTable: $$EntriesTableReferences
-                                        ._dictionaryIdTable(db),
-                                    referencedColumn: $$EntriesTableReferences
-                                        ._dictionaryIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.dictionaryId,
+                            referencedTable: $$EntriesTableReferences
+                                ._dictionaryIdTable(db),
+                            referencedColumn: $$EntriesTableReferences
+                                ._dictionaryIdTable(db)
+                                .id,
+                          ) as T;
                         }
 
                         return state;
@@ -6687,10 +6665,11 @@ class $$EntriesTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (entryTagsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           EntryRow,
                           $EntriesTable,
-                          EntryTagRow
+                          EntryTagRow,
+                          $EntryTagsTable
                         >(
                           currentTable: table,
                           referencedTable: $$EntriesTableReferences
@@ -6701,10 +6680,8 @@ class $$EntriesTableTableManager
                                 table,
                                 p0,
                               ).entryTagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.entryId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'entry_id',
                           typedResults: items,
                         ),
                     ];
@@ -6733,20 +6710,18 @@ typedef $$EntriesTableProcessedTableManager =
         bool entryTagsRefs,
       })
     >;
-typedef $$PitchesTableCreateCompanionBuilder =
-    PitchesCompanion Function({
-      Value<int> id,
-      required int headingId,
-      required int dictionaryId,
-      required int downstep,
-    });
-typedef $$PitchesTableUpdateCompanionBuilder =
-    PitchesCompanion Function({
-      Value<int> id,
-      Value<int> headingId,
-      Value<int> dictionaryId,
-      Value<int> downstep,
-    });
+typedef $$PitchesTableCreateCompanionBuilder = PitchesCompanion Function({
+  Value<int> id,
+  required int headingId,
+  required int dictionaryId,
+  required int downstep,
+});
+typedef $$PitchesTableUpdateCompanionBuilder = PitchesCompanion Function({
+  Value<int> id,
+  Value<int> headingId,
+  Value<int> dictionaryId,
+  Value<int> downstep,
+});
 
 final class $$PitchesTableReferences
     extends BaseReferences<_$AppDatabase, $PitchesTable, PitchRow> {
@@ -7060,30 +7035,26 @@ class $$PitchesTableTableManager
                     >
                   >(state) {
                     if (headingId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.headingId,
-                                referencedTable: $$PitchesTableReferences
-                                    ._headingIdTable(db),
-                                referencedColumn: $$PitchesTableReferences
-                                    ._headingIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.headingId,
+                        referencedTable: $$PitchesTableReferences
+                            ._headingIdTable(db),
+                        referencedColumn: $$PitchesTableReferences
+                            ._headingIdTable(db)
+                            .id,
+                      ) as T;
                     }
                     if (dictionaryId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.dictionaryId,
-                                referencedTable: $$PitchesTableReferences
-                                    ._dictionaryIdTable(db),
-                                referencedColumn: $$PitchesTableReferences
-                                    ._dictionaryIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.dictionaryId,
+                        referencedTable: $$PitchesTableReferences
+                            ._dictionaryIdTable(db),
+                        referencedColumn: $$PitchesTableReferences
+                            ._dictionaryIdTable(db)
+                            .id,
+                      ) as T;
                     }
 
                     return state;
@@ -7459,30 +7430,26 @@ class $$FrequenciesTableTableManager
                     >
                   >(state) {
                     if (headingId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.headingId,
-                                referencedTable: $$FrequenciesTableReferences
-                                    ._headingIdTable(db),
-                                referencedColumn: $$FrequenciesTableReferences
-                                    ._headingIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.headingId,
+                        referencedTable: $$FrequenciesTableReferences
+                            ._headingIdTable(db),
+                        referencedColumn: $$FrequenciesTableReferences
+                            ._headingIdTable(db)
+                            .id,
+                      ) as T;
                     }
                     if (dictionaryId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.dictionaryId,
-                                referencedTable: $$FrequenciesTableReferences
-                                    ._dictionaryIdTable(db),
-                                referencedColumn: $$FrequenciesTableReferences
-                                    ._dictionaryIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.dictionaryId,
+                        referencedTable: $$FrequenciesTableReferences
+                            ._dictionaryIdTable(db),
+                        referencedColumn: $$FrequenciesTableReferences
+                            ._dictionaryIdTable(db)
+                            .id,
+                      ) as T;
                     }
 
                     return state;
@@ -7510,26 +7477,24 @@ typedef $$FrequenciesTableProcessedTableManager =
       FrequencyRow,
       PrefetchHooks Function({bool headingId, bool dictionaryId})
     >;
-typedef $$TagsTableCreateCompanionBuilder =
-    TagsCompanion Function({
-      Value<int> id,
-      required int dictionaryId,
-      required String name,
-      required String category,
-      required int sortingOrder,
-      required String notes,
-      required double popularity,
-    });
-typedef $$TagsTableUpdateCompanionBuilder =
-    TagsCompanion Function({
-      Value<int> id,
-      Value<int> dictionaryId,
-      Value<String> name,
-      Value<String> category,
-      Value<int> sortingOrder,
-      Value<String> notes,
-      Value<double> popularity,
-    });
+typedef $$TagsTableCreateCompanionBuilder = TagsCompanion Function({
+  Value<int> id,
+  required int dictionaryId,
+  required String name,
+  required String category,
+  required int sortingOrder,
+  required String notes,
+  required double popularity,
+});
+typedef $$TagsTableUpdateCompanionBuilder = TagsCompanion Function({
+  Value<int> id,
+  Value<int> dictionaryId,
+  Value<String> name,
+  Value<String> category,
+  Value<int> sortingOrder,
+  Value<String> notes,
+  Value<double> popularity,
+});
 
 final class $$TagsTableReferences
     extends BaseReferences<_$AppDatabase, $TagsTable, TagRow> {
@@ -7971,17 +7936,15 @@ class $$TagsTableTableManager
                         >
                       >(state) {
                         if (dictionaryId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.dictionaryId,
-                                    referencedTable: $$TagsTableReferences
-                                        ._dictionaryIdTable(db),
-                                    referencedColumn: $$TagsTableReferences
-                                        ._dictionaryIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.dictionaryId,
+                            referencedTable: $$TagsTableReferences
+                                ._dictionaryIdTable(db),
+                            referencedColumn: $$TagsTableReferences
+                                ._dictionaryIdTable(db)
+                                .id,
+                          ) as T;
                         }
 
                         return state;
@@ -7989,10 +7952,11 @@ class $$TagsTableTableManager
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (headingTagsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           TagRow,
                           $TagsTable,
-                          HeadingTagRow
+                          HeadingTagRow,
+                          $HeadingTagsTable
                         >(
                           currentTable: table,
                           referencedTable: $$TagsTableReferences
@@ -8002,17 +7966,16 @@ class $$TagsTableTableManager
                             table,
                             p0,
                           ).headingTagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.tagId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'tag_id',
                           typedResults: items,
                         ),
                       if (entryTagsRefs)
-                        await $_getPrefetchedData<
+                        await $_getPrefetchedDataByColumns<
                           TagRow,
                           $TagsTable,
-                          EntryTagRow
+                          EntryTagRow,
+                          $EntryTagsTable
                         >(
                           currentTable: table,
                           referencedTable: $$TagsTableReferences
@@ -8022,10 +7985,8 @@ class $$TagsTableTableManager
                             table,
                             p0,
                           ).entryTagsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.tagId == item.id,
-                              ),
+                          currentColumn: 'id',
+                          referencedColumn: 'tag_id',
                           typedResults: items,
                         ),
                     ];
@@ -8349,30 +8310,26 @@ class $$HeadingTagsTableTableManager
                     >
                   >(state) {
                     if (headingId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.headingId,
-                                referencedTable: $$HeadingTagsTableReferences
-                                    ._headingIdTable(db),
-                                referencedColumn: $$HeadingTagsTableReferences
-                                    ._headingIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.headingId,
+                        referencedTable: $$HeadingTagsTableReferences
+                            ._headingIdTable(db),
+                        referencedColumn: $$HeadingTagsTableReferences
+                            ._headingIdTable(db)
+                            .id,
+                      ) as T;
                     }
                     if (tagId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.tagId,
-                                referencedTable: $$HeadingTagsTableReferences
-                                    ._tagIdTable(db),
-                                referencedColumn: $$HeadingTagsTableReferences
-                                    ._tagIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.tagId,
+                        referencedTable: $$HeadingTagsTableReferences
+                            ._tagIdTable(db),
+                        referencedColumn: $$HeadingTagsTableReferences
+                            ._tagIdTable(db)
+                            .id,
+                      ) as T;
                     }
 
                     return state;
@@ -8400,18 +8357,16 @@ typedef $$HeadingTagsTableProcessedTableManager =
       HeadingTagRow,
       PrefetchHooks Function({bool headingId, bool tagId})
     >;
-typedef $$EntryTagsTableCreateCompanionBuilder =
-    EntryTagsCompanion Function({
-      required int entryId,
-      required int tagId,
-      Value<int> rowid,
-    });
-typedef $$EntryTagsTableUpdateCompanionBuilder =
-    EntryTagsCompanion Function({
-      Value<int> entryId,
-      Value<int> tagId,
-      Value<int> rowid,
-    });
+typedef $$EntryTagsTableCreateCompanionBuilder = EntryTagsCompanion Function({
+  required int entryId,
+  required int tagId,
+  Value<int> rowid,
+});
+typedef $$EntryTagsTableUpdateCompanionBuilder = EntryTagsCompanion Function({
+  Value<int> entryId,
+  Value<int> tagId,
+  Value<int> rowid,
+});
 
 final class $$EntryTagsTableReferences
     extends BaseReferences<_$AppDatabase, $EntryTagsTable, EntryTagRow> {
@@ -8695,30 +8650,27 @@ class $$EntryTagsTableTableManager
                     >
                   >(state) {
                     if (entryId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.entryId,
-                                referencedTable: $$EntryTagsTableReferences
-                                    ._entryIdTable(db),
-                                referencedColumn: $$EntryTagsTableReferences
-                                    ._entryIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.entryId,
+                        referencedTable: $$EntryTagsTableReferences
+                            ._entryIdTable(db),
+                        referencedColumn: $$EntryTagsTableReferences
+                            ._entryIdTable(db)
+                            .id,
+                      ) as T;
                     }
                     if (tagId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.tagId,
-                                referencedTable: $$EntryTagsTableReferences
-                                    ._tagIdTable(db),
-                                referencedColumn: $$EntryTagsTableReferences
-                                    ._tagIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.tagId,
+                        referencedTable: $$EntryTagsTableReferences._tagIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$EntryTagsTableReferences
+                            ._tagIdTable(db)
+                            .id,
+                      ) as T;
                     }
 
                     return state;
@@ -8746,36 +8698,34 @@ typedef $$EntryTagsTableProcessedTableManager =
       EntryTagRow,
       PrefetchHooks Function({bool entryId, bool tagId})
     >;
-typedef $$MediaItemsTableCreateCompanionBuilder =
-    MediaItemsCompanion Function({
-      Value<int> id,
-      required String mediaSourceIdentifier,
-      required String mediaIdentifier,
-      required String title,
-      Value<String?> imageUrl,
-      Value<String?> sourceMetadata,
-      required int position,
-      required int duration,
-      required bool canDelete,
-      required bool canEdit,
-      Value<String?> overrideTitle,
-      required DateTime lastOpenedAt,
-    });
-typedef $$MediaItemsTableUpdateCompanionBuilder =
-    MediaItemsCompanion Function({
-      Value<int> id,
-      Value<String> mediaSourceIdentifier,
-      Value<String> mediaIdentifier,
-      Value<String> title,
-      Value<String?> imageUrl,
-      Value<String?> sourceMetadata,
-      Value<int> position,
-      Value<int> duration,
-      Value<bool> canDelete,
-      Value<bool> canEdit,
-      Value<String?> overrideTitle,
-      Value<DateTime> lastOpenedAt,
-    });
+typedef $$MediaItemsTableCreateCompanionBuilder = MediaItemsCompanion Function({
+  Value<int> id,
+  required String mediaSourceIdentifier,
+  required String mediaIdentifier,
+  required String title,
+  Value<String?> imageUrl,
+  Value<String?> sourceMetadata,
+  required int position,
+  required int duration,
+  required bool canDelete,
+  required bool canEdit,
+  Value<String?> overrideTitle,
+  required DateTime lastOpenedAt,
+});
+typedef $$MediaItemsTableUpdateCompanionBuilder = MediaItemsCompanion Function({
+  Value<int> id,
+  Value<String> mediaSourceIdentifier,
+  Value<String> mediaIdentifier,
+  Value<String> title,
+  Value<String?> imageUrl,
+  Value<String?> sourceMetadata,
+  Value<int> position,
+  Value<int> duration,
+  Value<bool> canDelete,
+  Value<bool> canEdit,
+  Value<String?> overrideTitle,
+  Value<DateTime> lastOpenedAt,
+});
 
 final class $$MediaItemsTableReferences
     extends BaseReferences<_$AppDatabase, $MediaItemsTable, MediaItem> {
@@ -9146,10 +9096,11 @@ class $$MediaItemsTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (stashItemsRefs)
-                    await $_getPrefetchedData<
+                    await $_getPrefetchedDataByColumns<
                       MediaItem,
                       $MediaItemsTable,
-                      StashItem
+                      StashItem,
+                      $StashItemsTable
                     >(
                       currentTable: table,
                       referencedTable: $$MediaItemsTableReferences
@@ -9160,10 +9111,8 @@ class $$MediaItemsTableTableManager
                             table,
                             p0,
                           ).stashItemsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.mediaItemId == item.id,
-                          ),
+                      currentColumn: 'id',
+                      referencedColumn: 'media_item_id',
                       typedResults: items,
                     ),
                 ];
@@ -9188,34 +9137,32 @@ typedef $$MediaItemsTableProcessedTableManager =
       MediaItem,
       PrefetchHooks Function({bool stashItemsRefs})
     >;
-typedef $$StashItemsTableCreateCompanionBuilder =
-    StashItemsCompanion Function({
-      Value<int> id,
-      required int mediaItemId,
-      required String term,
-      required String reading,
-      Value<String?> dictionaryName,
-      required List<String> definitions,
-      required String sentence,
-      required int wordStart,
-      required int wordLength,
-      required int position,
-      required DateTime dateAdded,
-    });
-typedef $$StashItemsTableUpdateCompanionBuilder =
-    StashItemsCompanion Function({
-      Value<int> id,
-      Value<int> mediaItemId,
-      Value<String> term,
-      Value<String> reading,
-      Value<String?> dictionaryName,
-      Value<List<String>> definitions,
-      Value<String> sentence,
-      Value<int> wordStart,
-      Value<int> wordLength,
-      Value<int> position,
-      Value<DateTime> dateAdded,
-    });
+typedef $$StashItemsTableCreateCompanionBuilder = StashItemsCompanion Function({
+  Value<int> id,
+  required int mediaItemId,
+  required String term,
+  required String reading,
+  Value<String?> dictionaryName,
+  required List<String> definitions,
+  required String sentence,
+  required int wordStart,
+  required int wordLength,
+  required int position,
+  required DateTime dateAdded,
+});
+typedef $$StashItemsTableUpdateCompanionBuilder = StashItemsCompanion Function({
+  Value<int> id,
+  Value<int> mediaItemId,
+  Value<String> term,
+  Value<String> reading,
+  Value<String?> dictionaryName,
+  Value<List<String>> definitions,
+  Value<String> sentence,
+  Value<int> wordStart,
+  Value<int> wordLength,
+  Value<int> position,
+  Value<DateTime> dateAdded,
+});
 
 final class $$StashItemsTableReferences
     extends BaseReferences<_$AppDatabase, $StashItemsTable, StashItem> {
@@ -9583,17 +9530,15 @@ class $$StashItemsTableTableManager
                     >
                   >(state) {
                     if (mediaItemId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.mediaItemId,
-                                referencedTable: $$StashItemsTableReferences
-                                    ._mediaItemIdTable(db),
-                                referencedColumn: $$StashItemsTableReferences
-                                    ._mediaItemIdTable(db)
-                                    .id,
-                              )
-                              as T;
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.mediaItemId,
+                        referencedTable: $$StashItemsTableReferences
+                            ._mediaItemIdTable(db),
+                        referencedColumn: $$StashItemsTableReferences
+                            ._mediaItemIdTable(db)
+                            .id,
+                      ) as T;
                     }
 
                     return state;
@@ -10091,11 +10036,10 @@ class $$SearchHistoryItemsTableTableManager
                 $db: db,
                 $table: table,
               ),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> searchTerm = const Value.absent(),
-              }) => SearchHistoryItemsCompanion(id: id, searchTerm: searchTerm),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> searchTerm = const Value.absent(),
+          }) => SearchHistoryItemsCompanion(id: id, searchTerm: searchTerm),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),

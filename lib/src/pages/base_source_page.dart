@@ -156,6 +156,8 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
     return MultiValueListenableBuilder(
       valueListenables: [
         _popupPositionNotifier,
+        _isSearchingNotifier,
+        _dictionaryResultNotifier,
       ],
       builder: (context, result, _) {
         if (!_isSearchingNotifier.value &&

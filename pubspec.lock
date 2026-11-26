@@ -385,14 +385,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.4"
-  external_path:
-    dependency: "direct main"
-    description:
-      name: external_path
-      sha256: "27395e2729d90fcaa5c693eb4273a54cb13e98943ef44dc628abb1cc59c6fb22"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   fading_edge_scrollview:
     dependency: transitive
     description:
@@ -1857,5 +1849,5 @@ packages:
     source: hosted
     version: "2.2.4"
 sdks:
-  dart: ">=3.13.5 <4.0.0"
-  flutter: ">=3.47.6 <4.0.0"
+  dart: ">=3.13.0 <4.0.0"
+  flutter: ">=3.47.0 <4.0.0"

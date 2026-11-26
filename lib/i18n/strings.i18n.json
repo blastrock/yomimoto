@@ -257,7 +257,6 @@
     "prepend_dictionary_names": "Prepend dictionary name in meaning",
     "highlight_on_tap": "Highlight text on tap",
     "no_audio_file": "No audio file to save.",
-    "storage_permissions": "Please grant the following permissions for exporting to AnkiDroid.",
     "name": "Name",
     "url": "URL",
     "field_locked": "$field locked and will not clear on export while Creator is active.",

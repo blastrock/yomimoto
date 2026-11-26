@@ -24,8 +24,8 @@ remains is deliberately three things:
   or defensive nullable-ing for things that were removed. Schema changes
   have their own rule: see Persistence.
 - **The rename is external only.** The `applicationId` is
-  `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag,
-  DCIM folder and exported file names say Yomimoto too. Internal identifiers
+  `org.kaqui.yomimoto` and the label `Yomimoto`; the AnkiDroid note type, tag
+  and exported file names say Yomimoto too. Internal identifiers
   deliberately keep the upstream names: the Dart package `yuuna`, the Android
   `namespace`/Java package `app.arianneorpilla.yuuna` (and the
   `app.arianneorpilla.yuuna/anki` method channel), `Jidoujisho*` classes and

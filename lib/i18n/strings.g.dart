@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 253
+/// Strings: 252
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -388,7 +388,6 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get prepend_dictionary_names => 'Prepend dictionary name in meaning';
 	String get highlight_on_tap => 'Highlight text on tap';
 	String get no_audio_file => 'No audio file to save.';
-	String get storage_permissions => 'Please grant the following permissions for exporting to AnkiDroid.';
 	String get name => 'Name';
 	String get url => 'URL';
 	String field_locked({required Object field}) => '${field} locked and will not clear on export while Creator is active.';
@@ -649,7 +648,6 @@ extension on Translations {
 			case 'prepend_dictionary_names': return 'Prepend dictionary name in meaning';
 			case 'highlight_on_tap': return 'Highlight text on tap';
 			case 'no_audio_file': return 'No audio file to save.';
-			case 'storage_permissions': return 'Please grant the following permissions for exporting to AnkiDroid.';
 			case 'name': return 'Name';
 			case 'url': return 'URL';
 			case 'field_locked': return ({required Object field}) => '${field} locked and will not clear on export while Creator is active.';

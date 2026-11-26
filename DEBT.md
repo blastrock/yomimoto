@@ -17,8 +17,8 @@ Gradle Plugin.
 **To pay it off**, migrate `applicationVariants.all` in
 `android/app/build.gradle` to `androidComponents.onVariants` and wait for
 Flutter's own Gradle plugin to drop the legacy variant API (`newDsl`); get
-`external_path`, `flutter_archive`, `flutter_exit_app` and
-`flutter_image_compress_common` onto built-in Kotlin, or replace them
+`flutter_archive`, `flutter_exit_app` and `flutter_image_compress_common`
+onto built-in Kotlin, or replace them
 (`builtInKotlin`); and get `flutter_inappwebview_android` off
 `proguard-android.txt` (the last flag).
 

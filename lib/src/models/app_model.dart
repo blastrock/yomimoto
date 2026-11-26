@@ -6,7 +6,6 @@ import 'package:cancelable_compute/cancelable_compute.dart' as cancelable;
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
-import 'package:external_path/external_path.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +17,6 @@ import 'package:intl/intl.dart' as intl;
 import 'package:path/path.dart' as path;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:remove_emoji/remove_emoji.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -178,15 +176,9 @@ class AppModel with ChangeNotifier {
   late final Directory _thumbnailsDirectory;
 
 
-  /// Directory where media for export is stored for communication with
-  /// third-party APIs.
+  /// Directory where media handed to AnkiDroid is staged.
   Directory get exportDirectory => _exportDirectory;
   late final Directory _exportDirectory;
-
-  /// Directory where media for export is stored for communication with
-  /// third-party APIs. Fallback for failure.
-  Directory get alternateExportDirectory => _alternateExportDirectory;
-  late final Directory _alternateExportDirectory;
 
   /// Directory used as a working directory for dictionary imports.
   Directory get dictionaryImportWorkingDirectory =>
@@ -503,39 +495,10 @@ class AppModel with ChangeNotifier {
     );
   }
 
-  /// Return the app external directory found in the public DCIM directory.
-  /// This path also initialises the folder if it does not exist, and includes
-  /// a .nomedia file within the folder.
+  /// Return the directory where media handed to AnkiDroid is staged, in the
+  /// app's own storage. This also creates the folder if it does not exist,
+  /// with a .nomedia file within it.
   Future<Directory> prepareJidoujishoDirectory() async {
-    String publicDirectory =
-        await ExternalPath.getExternalStoragePublicDirectory(
-            ExternalPath.DIRECTORY_DCIM);
-    try {
-      String directoryPath = path.join(publicDirectory, 'yomimoto');
-      String noMediaFilePath =
-          path.join(publicDirectory, 'yomimoto', '.nomedia');
-
-      Directory jidoujishoDirectory = Directory(directoryPath);
-      File noMediaFile = File(noMediaFilePath);
-
-      if (!jidoujishoDirectory.existsSync()) {
-        jidoujishoDirectory.createSync(recursive: true);
-      }
-      if (!noMediaFile.existsSync()) {
-        noMediaFile.createSync();
-      }
-
-      return jidoujishoDirectory;
-    } catch (e) {
-      debugPrint('Failed to create directory in DCIM.');
-      return prepareFallbackJidoujishoDirectory();
-    }
-  }
-
-  /// Return the app external directory found in the internal app directory.
-  /// This path also initialises the folder if it does not exist, and includes
-  /// a .nomedia file within the folder.
-  Future<Directory> prepareFallbackJidoujishoDirectory() async {
     String directoryPath = path.join(appDirectory.path, 'yomimotoExport');
     String noMediaFilePath =
         path.join(appDirectory.path, 'yomimotoExport', '.nomedia');
@@ -589,7 +552,6 @@ class AppModel with ChangeNotifier {
     _preferences = PreferenceStore(db: _db, raw: raw);
 
     /// Perform startup activities unnecessary to further initialisation here.
-    await requestExternalStoragePermissions();
     await requestAnkidroidPermissions();
 
     /// These directories will commonly be accessed.
@@ -604,7 +566,6 @@ class AppModel with ChangeNotifier {
     _dictionaryImportWorkingDirectory = Directory(
         path.join(appDirectory.path, 'dictionaryImportWorkingDirectory'));
     _exportDirectory = await prepareJidoujishoDirectory();
-    _alternateExportDirectory = await prepareFallbackJidoujishoDirectory();
 
     thumbnailsDirectory.createSync();
     dictionaryImportWorkingDirectory.createSync();
@@ -1004,36 +965,6 @@ class AppModel with ChangeNotifier {
   /// Get the newest available order for a new mapping.
   int get nextMappingOrder => _store.nextMappingOrder();
 
-  /// Requests for full external storage permissions. Required to browse for
-  /// media anywhere on the device.
-  Future<void> requestExternalStoragePermissions() async {
-    if (_preferences.get(Preferences.firstTimeSetup)) {
-      showToast(
-        msg: t.storage_permissions,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-    }
-
-    final cameraGranted = await Permission.camera.isGranted;
-    if (!cameraGranted) {
-      await Permission.camera.request();
-    }
-
-    final storageGranted = await Permission.storage.isGranted;
-    if (!storageGranted) {
-      await Permission.storage.request();
-    }
-
-    if (_androidDeviceInfo.version.sdkInt >= 30) {
-      final manageStorageGranted =
-          await Permission.manageExternalStorage.isGranted;
-      if (!manageStorageGranted) {
-        await Permission.manageExternalStorage.request();
-      }
-    }
-  }
-
   /// Used to communicate back and forth with Dart and native code.
   static const MethodChannel methodChannel =
       MethodChannel('app.arianneorpilla.yuuna/anki');
@@ -1102,26 +1033,20 @@ class AppModel with ChangeNotifier {
   }
 
   /// Get the file to be written to for image export.
-  File getImageExportFile({bool fallback = false}) {
-    String imagePath = path.join(
-        (fallback ? alternateExportDirectory : exportDirectory).path,
-        'exportImage.jpg');
+  File getImageExportFile() {
+    String imagePath = path.join(exportDirectory.path, 'exportImage.jpg');
     return File(imagePath);
   }
 
   /// Get the placeholder file to compress for image export.
-  File getImageCompressedFile({bool fallback = false}) {
-    String imagePath = path.join(
-        (fallback ? alternateExportDirectory : exportDirectory).path,
-        'compressedImage.jpg');
+  File getImageCompressedFile() {
+    String imagePath = path.join(exportDirectory.path, 'compressedImage.jpg');
     return File(imagePath);
   }
 
   /// Get the file to be written to for audio export.
-  File getAudioExportFile({bool fallback = false}) {
-    String audioPath = path.join(
-        (fallback ? alternateExportDirectory : exportDirectory).path,
-        'exportAudio.mp3');
+  File getAudioExportFile() {
+    String audioPath = path.join(exportDirectory.path, 'exportAudio.mp3');
     return File(audioPath);
   }
 
@@ -1319,13 +1244,12 @@ class AppModel with ChangeNotifier {
     required File exportFile,
     required String preferredName,
     required String mimeType,
-    bool fallback = false,
   }) async {
     late File destinationFile;
     if (mimeType == 'image') {
-      destinationFile = getImageExportFile(fallback: fallback);
+      destinationFile = getImageExportFile();
     } else if (mimeType == 'audio') {
-      destinationFile = getAudioExportFile(fallback: fallback);
+      destinationFile = getAudioExportFile();
     } else {
       throw Exception('Invalid mime type, must be image or audio');
     }
@@ -1336,7 +1260,7 @@ class AppModel with ChangeNotifier {
 
     String destinationPath = destinationFile.path;
     if (mimeType == 'image') {
-      File compressedFile = getImageCompressedFile(fallback: fallback);
+      File compressedFile = getImageCompressedFile();
       if (compressedFile.existsSync()) {
         compressedFile.deleteSync();
       }
@@ -1371,22 +1295,13 @@ class AppModel with ChangeNotifier {
 
       return response;
     } on PlatformException {
-      if (fallback) {
-        showToast(
-          msg: t.error_export_media_ankidroid,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
+      showToast(
+        msg: t.error_export_media_ankidroid,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
 
-        rethrow;
-      } else {
-        return addFileToMedia(
-          exportFile: exportFile,
-          preferredName: preferredName,
-          mimeType: mimeType,
-          fallback: true,
-        );
-      }
+      rethrow;
     }
   }
 

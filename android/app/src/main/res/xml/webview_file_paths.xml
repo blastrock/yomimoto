@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- flutter_inappwebview's camera captures for a web file input, which it
+     writes to getExternalFilesDir(null). -->
+<paths>
+  <external-files-path name="captures" path="." />
+</paths>

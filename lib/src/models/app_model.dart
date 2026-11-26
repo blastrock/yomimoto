@@ -496,24 +496,14 @@ class AppModel with ChangeNotifier {
   }
 
   /// Return the directory where media handed to AnkiDroid is staged, in the
-  /// app's own storage. This also creates the folder if it does not exist,
-  /// with a .nomedia file within it.
+  /// cache: AnkiDroid copies each file at once, and this is the only
+  /// directory the FileProvider shares (`anki_media_paths.xml`). This also
+  /// creates the folder if it does not exist.
   Future<Directory> prepareJidoujishoDirectory() async {
-    String directoryPath = path.join(appDirectory.path, 'yomimotoExport');
-    String noMediaFilePath =
-        path.join(appDirectory.path, 'yomimotoExport', '.nomedia');
-
-    Directory jidoujishoDirectory = Directory(directoryPath);
-    File noMediaFile = File(noMediaFilePath);
-
-    if (!jidoujishoDirectory.existsSync()) {
-      jidoujishoDirectory.createSync(recursive: true);
-    }
-    if (!noMediaFile.existsSync()) {
-      noMediaFile.createSync();
-    }
-
-    return jidoujishoDirectory;
+    Directory directory =
+        Directory(path.join(temporaryDirectory.path, 'ankiMediaExport'));
+    directory.createSync(recursive: true);
+    return directory;
   }
 
   /// Injects licenses to be displayed in the licenses page that aren't

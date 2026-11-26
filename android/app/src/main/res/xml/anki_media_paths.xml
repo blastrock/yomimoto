@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Media handed to AnkiDroid, staged by AppModel.prepareJidoujishoDirectory. -->
+<paths>
+  <cache-path name="anki_media" path="ankiMediaExport/" />
+</paths>

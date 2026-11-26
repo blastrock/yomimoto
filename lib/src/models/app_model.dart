@@ -1235,6 +1235,9 @@ class AppModel with ChangeNotifier {
     required String preferredName,
     required String mimeType,
   }) async {
+    // The cache can be cleared while the app runs.
+    exportDirectory.createSync(recursive: true);
+
     late File destinationFile;
     if (mimeType == 'image') {
       destinationFile = getImageExportFile();

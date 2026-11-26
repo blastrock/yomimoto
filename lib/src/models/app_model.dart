@@ -2004,57 +2004,6 @@ class AppModel with ChangeNotifier {
     return _store.mediaItems(mediaSource.uniqueKey);
   }
 
-  /// Returns the last navigated directory the user used for picking a file for a
-  /// certain media source.
-  Directory? getLastPickedDirectory(MediaSource mediaSource) {
-    String? path = _preferences
-        .get(Preferences.lastPickedDirectory(mediaSource.uniqueKey));
-    if (path == null) {
-      return null;
-    }
-
-    Directory directory = Directory(path);
-    if (!directory.existsSync()) {
-      return null;
-    }
-    return directory;
-  }
-
-  /// Returns the last navigated directory the user used for picking a file for a
-  /// certain media source.
-  void setLastPickedDirectory({
-    required MediaSource mediaSource,
-    required Directory directory,
-  }) {
-    unawaited(_preferences.set(
-        Preferences.lastPickedDirectory(mediaSource.uniqueKey),
-        directory.path));
-  }
-
-  /// Returns valid file picker directories. If there is a last picked directory for
-  /// a media source, this will be included as first on the list. Otherwise,
-  /// external root directories will be included.
-  Future<List<Directory>> getFilePickerDirectoriesForMediaSource(
-      MediaSource mediaSource) async {
-    List<Directory> directories = [];
-    Directory? lastPickedDirectory = getLastPickedDirectory(mediaSource);
-    if (lastPickedDirectory != null) {
-      directories.add(lastPickedDirectory);
-    }
-
-    // external_path 3 made this nullable.
-    List<String> paths =
-        await ExternalPath.getExternalStorageDirectories() ?? <String>[];
-    for (String path in paths) {
-      Directory directory = Directory(path);
-      if (!directories.contains(directory)) {
-        directories.add(directory);
-      }
-    }
-
-    return directories;
-  }
-
   /// Adds a [DictionarySearchResult] to dictionary history.
   /// [searchWithWildcards] is how [result] was searched, so that the history
   /// searches it again the same way.

@@ -77,11 +77,4 @@ abstract final class Preferences {
   /// The `name` of the [ExplanationPreset] explanations use.
   static const Preference<String> explanationPreset =
       Preference('explanation_preset', defaultValue: 'sonnet');
-
-  // Files.
-
-  /// The directory a file was last picked from for the source [sourceKey], if
-  /// any.
-  static Preference<String?> lastPickedDirectory(String sourceKey) =>
-      Preference('$sourceKey/last_picked_directory', defaultValue: null);
 }

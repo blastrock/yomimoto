@@ -318,10 +318,11 @@ edit it**. Access is the global `t` (exported via `utils.dart`), e.g.
   300 ms, which the next `page` removes.
 
   Volumes come in two ways, both from the tab's `+` popup: a file, or a
-  catalog download. Import takes a `.cbz` or `.zip` only, with its
-  `.mokuro` beside it (how mokuro-bunko serves volumes) or inside it
-  (`ReaderMokuroSource.importArchive`, shared by both ways), and copies the
-  volume into
+  catalog download. A file import picks one volume through the system
+  picker: a `.cbz` or `.zip` with its `.mokuro` picked alongside (how
+  mokuro writes it and mokuro-bunko serves it) or inside it
+  (`mokuroPickOf`). Both ways go through
+  `ReaderMokuroSource.importArchive`, which copies the volume into
   `mangaVolumes/<volume_uuid>/` (`volume.mokuro`, `images/<img_path>`) in an
   isolate (`importMokuroVolume`). `img_path` is resolved at the archive root,
   then in its single top-level folder, since producers disagree. Each volume

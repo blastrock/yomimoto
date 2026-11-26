@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -178,50 +178,74 @@ class ReaderMokuroSource extends ReaderMediaSource {
     );
   }
 
-  /// Let the user pick an archive, import its volume and add it to the
-  /// library.
+  /// Let the user pick a volume's archive, with its `.mokuro` file unless
+  /// the archive holds it, import the volume and add it to the library.
   Future<void> importVolume({
     required BuildContext context,
     required AppModel appModel,
   }) async {
-    List<Directory> rootDirectories =
-        await appModel.getFilePickerDirectoriesForMediaSource(this);
-    if (!context.mounted) {
+    List<PlatformFile> picked = await FilePicker.pickFiles();
+    if (picked.isEmpty) {
       return;
     }
 
-    Iterable<String>? picked = await FilesystemPicker.open(
-      allowedExtensions: ['.cbz', '.zip'],
-      context: context,
-      rootDirectories: rootDirectories,
-      fsType: FilesystemType.file,
-      title: '',
-      pickText: t.dialog_select,
-      cancelText: t.dialog_cancel,
-      themeData: Theme.of(context),
-      folderIconColor: Theme.of(context).colorScheme.primary,
-    );
-    if (picked == null || picked.isEmpty || !context.mounted) {
-      return;
-    }
-
-    String archivePath = picked.first;
-    appModel.setLastPickedDirectory(
-      mediaSource: this,
-      directory: Directory(path.dirname(archivePath)),
-    );
-
-    await runWithProgress<void>(
-      context: context,
-      message: t.manga_importing,
-      task: () async {
-        try {
-          await importArchive(appModel: appModel, archivePath: archivePath);
-        } on MokuroImportException catch (error) {
-          debugPrint('manga import: $error');
-          showToast(msg: importErrorMessage(error.error));
+    try {
+      MokuroPick? pick = mokuroPickOf([
+        for (PlatformFile file in picked) (name: file.name, path: file.path),
+      ]);
+      if (pick == null) {
+        if (context.mounted) {
+          await showImportError(context: context, message: t.manga_import_pick);
         }
-      },
+        return;
+      }
+      if (!context.mounted) {
+        return;
+      }
+
+      MokuroImportError? error = await runWithProgress<MokuroImportError?>(
+        context: context,
+        message: t.manga_importing,
+        task: () async {
+          try {
+            await importArchive(
+              appModel: appModel,
+              archivePath: pick.archivePath,
+              ocrPath: pick.ocrPath,
+            );
+            return null;
+          } on MokuroImportException catch (error) {
+            debugPrint('manga import: $error');
+            return error.error;
+          }
+        },
+      );
+      if (error != null && context.mounted) {
+        await showImportError(
+            context: context, message: importErrorMessage(error));
+      }
+    } finally {
+      await FilePicker.clearTemporaryFiles();
+    }
+  }
+
+  /// Tell the user why a volume could not be imported.
+  Future<void> showImportError({
+    required BuildContext context,
+    required String message,
+  }) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(t.manga_import_failed),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t.dialog_close),
+          ),
+        ],
+      ),
     );
   }
 

@@ -4,7 +4,7 @@
 /// To regenerate, run: `dart run slang`
 ///
 /// Locales: 1
-/// Strings: 251
+/// Strings: 253
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
@@ -317,8 +317,10 @@ class Translations implements BaseTranslations<AppLocale, Translations> {
 	String get manga_download_cancelling => 'CANCELLING…';
 	String manga_download_failed({required Object name, required Object reason}) => '${name}: ${reason}';
 	String get manga_importing => 'Importing volume…';
+	String get manga_import_failed => 'Could not import the volume';
+	String get manga_import_pick => 'Select the volume\'s archive (.cbz or .zip) and its .mokuro file together, or the archive alone if its .mokuro file is inside it.';
 	String get manga_no_volumes_added => 'No volumes yet: tap + to download one from a catalog or import a file';
-	String get manga_import_no_ocr => 'No .mokuro file next to or inside this archive';
+	String get manga_import_no_ocr => 'This archive has no .mokuro file inside. Select the archive and its .mokuro file together.';
 	String get manga_import_several_ocr => 'This archive holds several .mokuro files';
 	String get manga_import_invalid_ocr => 'The .mokuro file could not be read';
 	String get manga_import_not_archive => 'This file is not a CBZ or ZIP archive';
@@ -576,8 +578,10 @@ extension on Translations {
 			case 'manga_download_cancelling': return 'CANCELLING…';
 			case 'manga_download_failed': return ({required Object name, required Object reason}) => '${name}: ${reason}';
 			case 'manga_importing': return 'Importing volume…';
+			case 'manga_import_failed': return 'Could not import the volume';
+			case 'manga_import_pick': return 'Select the volume\'s archive (.cbz or .zip) and its .mokuro file together, or the archive alone if its .mokuro file is inside it.';
 			case 'manga_no_volumes_added': return 'No volumes yet: tap + to download one from a catalog or import a file';
-			case 'manga_import_no_ocr': return 'No .mokuro file next to or inside this archive';
+			case 'manga_import_no_ocr': return 'This archive has no .mokuro file inside. Select the archive and its .mokuro file together.';
 			case 'manga_import_several_ocr': return 'This archive holds several .mokuro files';
 			case 'manga_import_invalid_ocr': return 'The .mokuro file could not be read';
 			case 'manga_import_not_archive': return 'This file is not a CBZ or ZIP archive';

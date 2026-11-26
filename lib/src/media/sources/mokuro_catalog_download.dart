@@ -94,7 +94,8 @@ Future<int> downloadCatalogVolumes({
   required List<CatalogDownload> downloads,
   required Directory temporaryDirectory,
   required CatalogCancelToken cancel,
-  required Future<void> Function(String archivePath) importArchive,
+  required Future<void> Function(String archivePath, String ocrPath)
+      importArchive,
   required void Function(CatalogDownloadProgress) onProgress,
   Duration timeout = const Duration(seconds: 30),
 }) async {
@@ -127,6 +128,7 @@ Future<int> downloadCatalogVolumes({
     CatalogDownload download = downloads[i];
     Directory directory = temporaryDirectory.createTempSync('volume');
     String archivePath = p.join(directory.path, 'volume.cbz');
+    String ocrPath = p.join(directory.path, 'volume.mokuro');
     try {
       report(importing: false);
       bool complete = await _downloadFile(
@@ -140,7 +142,7 @@ Future<int> downloadCatalogVolumes({
           await _downloadFile(
             client: client,
             url: download.manifest.ocrUrl,
-            file: File(p.join(directory.path, 'volume.mokuro')),
+            file: File(ocrPath),
             cancel: cancel,
             timeout: timeout,
             onBytes: received,
@@ -150,7 +152,7 @@ Future<int> downloadCatalogVolumes({
       }
 
       report(importing: true);
-      await importArchive(archivePath);
+      await importArchive(archivePath, ocrPath);
       imported++;
     } catch (error) {
       // Catalog and import errors, but also a full disk or a database

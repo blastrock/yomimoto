@@ -225,18 +225,20 @@ class ReaderMokuroSource extends ReaderMediaSource {
     );
   }
 
-  /// Import the volume in the archive at [archivePath] (with its OCR beside
-  /// it or inside it) and add it to the library, keeping the entry of a
-  /// volume imported before. Throws a [MokuroImportException] when the
-  /// volume cannot be imported.
+  /// Import the volume in the archive at [archivePath], its OCR being the
+  /// file at [ocrPath] or else inside the archive, and add it to the
+  /// library, keeping the entry of a volume imported before. Throws a
+  /// [MokuroImportException] when the volume cannot be imported.
   Future<MokuroImportResult> importArchive({
     required AppModel appModel,
     required String archivePath,
+    String? ocrPath,
   }) async {
     MokuroImportResult result = await compute(
       importMokuroVolume,
       MokuroImportParams(
         archivePath: archivePath,
+        ocrPath: ocrPath,
         volumesDirectory: volumesDirectory(appModel).path,
       ),
     );

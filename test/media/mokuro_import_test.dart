@@ -54,14 +54,18 @@ void main() {
     return path;
   }
 
-  /// Write [contents] beside the archives as [name].
-  void beside(String name, String contents) {
-    File(p.join(sources.path, name)).writeAsStringSync(contents);
+  /// Write [contents] as the `.mokuro` file [name], beside the archives
+  /// unless [directory] is given, and return its path.
+  String ocrFile(String name, String contents, {Directory? directory}) {
+    String path = p.join((directory ?? sources).path, name);
+    File(path).writeAsStringSync(contents);
+    return path;
   }
 
-  MokuroImportResult import(String archivePath) {
+  MokuroImportResult import(String archivePath, {String? ocrPath}) {
     return importMokuroVolume(MokuroImportParams(
       archivePath: archivePath,
+      ocrPath: ocrPath,
       volumesDirectory: volumes.path,
     ));
   }
@@ -70,15 +74,15 @@ void main() {
       isA<MokuroImportException>().having((e) => e.error, 'error', error));
 
   group('importMokuroVolume', () {
-    test('imports the mokuro tool layout, OCR beside the archive', () {
+    test('imports the mokuro tool layout, OCR given', () {
       String path = archive('vol1.cbz', {
         'vol1/000a.jpg': 'a',
         'vol1/000b.jpg': 'b',
       });
       String source = ocr(['000a.jpg', '000b.jpg']);
-      beside('vol1.mokuro', source);
+      String ocrPath = ocrFile('vol1.mokuro', source);
 
-      MokuroImportResult result = import(path);
+      MokuroImportResult result = import(path, ocrPath: ocrPath);
 
       expect(result.volumeUuid, 'uuid-1');
       expect(result.title, 'series vol1');
@@ -99,9 +103,10 @@ void main() {
       String path = archive('【推しの子】 01.cbz', {
         '【推しの子】 01/00001.webp': '1',
       });
-      beside('【推しの子】 01.mokuro', ocr(['【推しの子】 01/00001.webp']));
+      String ocrPath =
+          ocrFile('【推しの子】 01.mokuro', ocr(['【推しの子】 01/00001.webp']));
 
-      MokuroImportResult result = import(path);
+      MokuroImportResult result = import(path, ocrPath: ocrPath);
 
       expect(File(p.join(
               result.directory, 'images', '【推しの子】 01', '00001.webp'))
@@ -122,14 +127,31 @@ void main() {
           .readAsStringSync(), 'x');
     });
 
-    test('prefers the OCR beside the archive to the one inside', () {
+    test('prefers the given OCR to the one inside', () {
       String path = archive('v.cbz', {
         'v.mokuro': ocr(['001.jpg'], title: 'inside'),
         '001.jpg': 'x',
       });
-      beside('v.mokuro', ocr(['001.jpg'], title: 'beside'));
+      String ocrPath = ocrFile('v.mokuro', ocr(['001.jpg'], title: 'given'));
 
-      expect(import(path).title, 'beside vol1');
+      expect(import(path, ocrPath: ocrPath).title, 'given vol1');
+    });
+
+    test('reads the given OCR from another directory', () {
+      String path = archive('vol1.cbz', {'001.jpg': 'x'});
+      Directory elsewhere = Directory(p.join(root.path, 'elsewhere'))
+        ..createSync();
+      String ocrPath =
+          ocrFile('picked.mokuro', ocr(['001.jpg']), directory: elsewhere);
+
+      expect(import(path, ocrPath: ocrPath).missingPages, 0);
+    });
+
+    test('ignores a .mokuro beside the archive when none is given', () {
+      String path = archive('vol1.cbz', {'001.jpg': 'x'});
+      ocrFile('vol1.mokuro', ocr(['001.jpg']));
+
+      expect(() => import(path), failsWith(MokuroImportError.noOcr));
     });
 
     test('refuses an archive with no OCR', () {
@@ -139,7 +161,7 @@ void main() {
       expect(volumes.listSync(), isEmpty);
     });
 
-    test('refuses an archive with several OCR files and none beside', () {
+    test('refuses an archive with several OCR files and none given', () {
       String path = archive('v.cbz', {
         'a.mokuro': ocr(['001.jpg']),
         'b.mokuro': ocr(['001.jpg']),
@@ -160,17 +182,18 @@ void main() {
 
     test('refuses OCR that is not a volume', () {
       String path = archive('v.cbz', {'001.jpg': 'x'});
-      beside('v.mokuro', '{"title": ');
+      String ocrPath = ocrFile('v.mokuro', '{"title": ');
 
-      expect(() => import(path), failsWith(MokuroImportError.invalidOcr));
+      expect(() => import(path, ocrPath: ocrPath),
+          failsWith(MokuroImportError.invalidOcr));
       expect(volumes.listSync(), isEmpty);
     });
 
     test('imports a volume with missing pages and counts them', () {
       String path = archive('v.cbz', {'001.jpg': 'x'});
-      beside('v.mokuro', ocr(['000.jpg', '001.jpg']));
+      String ocrPath = ocrFile('v.mokuro', ocr(['000.jpg', '001.jpg']));
 
-      MokuroImportResult result = import(path);
+      MokuroImportResult result = import(path, ocrPath: ocrPath);
 
       expect(result.pageCount, 2);
       expect(result.missingPages, 1);
@@ -179,11 +202,11 @@ void main() {
 
     test('replaces the files of a volume imported before', () {
       String path = archive('v.cbz', {'001.jpg': 'new'});
-      beside('v.mokuro', ocr(['001.jpg']));
+      String ocrPath = ocrFile('v.mokuro', ocr(['001.jpg']));
       File stray = File(p.join(volumes.path, 'uuid-1', 'images', 'old.jpg'))
         ..createSync(recursive: true);
 
-      MokuroImportResult result = import(path);
+      MokuroImportResult result = import(path, ocrPath: ocrPath);
 
       expect(stray.existsSync(), isFalse);
       expect(File(p.join(result.directory, 'images', '001.jpg'))
@@ -192,9 +215,9 @@ void main() {
 
     test('never writes outside the volume directory', () {
       String path = archive('v.cbz', {'evil.jpg': 'x', '001.jpg': 'y'});
-      beside('v.mokuro', ocr(['../evil.jpg', '001.jpg']));
+      String ocrPath = ocrFile('v.mokuro', ocr(['../evil.jpg', '001.jpg']));
 
-      MokuroImportResult result = import(path);
+      MokuroImportResult result = import(path, ocrPath: ocrPath);
 
       expect(result.missingPages, 1);
       expect(File(p.join(result.directory, 'evil.jpg')).existsSync(),
@@ -262,9 +285,9 @@ void main() {
     Archive zip = Archive()..addFile(ArchiveFile.bytes('001.png', bytes));
     String path = p.join(sources.path, 'v.cbz');
     File(path).writeAsBytesSync(ZipEncoder().encodeBytes(zip));
-    beside('v.mokuro', ocr(['001.png']));
+    String ocrPath = ocrFile('v.mokuro', ocr(['001.png']));
 
-    MokuroImportResult result = import(path);
+    MokuroImportResult result = import(path, ocrPath: ocrPath);
 
     expect(File(p.join(result.directory, 'images', '001.png'))
         .readAsBytesSync(), bytes);

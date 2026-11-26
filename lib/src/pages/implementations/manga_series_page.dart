@@ -207,8 +207,10 @@ class _MangaSeriesPageState extends BasePageState<MangaSeriesPage> {
         temporaryDirectory: Directory(p.join(
             appModelNoUpdate.temporaryDirectory.path, 'catalogDownloads')),
         cancel: cancel,
-        importArchive: (path) => _source.importArchive(
-            appModel: appModelNoUpdate, archivePath: path),
+        importArchive: (archivePath, ocrPath) => _source.importArchive(
+            appModel: appModelNoUpdate,
+            archivePath: archivePath,
+            ocrPath: ocrPath),
         onProgress: (value) => progress.value = value,
       );
     } on CatalogDownloadException catch (error) {

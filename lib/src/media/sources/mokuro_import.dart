@@ -12,10 +12,14 @@ class MokuroImportParams {
   const MokuroImportParams({
     required this.archivePath,
     required this.volumesDirectory,
+    this.ocrPath,
   });
 
   /// The `.cbz` or `.zip` holding the volume's images.
   final String archivePath;
+
+  /// The volume's `.mokuro` file, or null when it is inside the archive.
+  final String? ocrPath;
 
   /// Where volumes are stored, one directory per volume.
   final String volumesDirectory;
@@ -57,10 +61,10 @@ enum MokuroImportError {
   /// The picked file is not a zip archive.
   notAnArchive,
 
-  /// There is no `.mokuro` beside the archive or inside it.
+  /// No `.mokuro` file was given and the archive holds none.
   noOcr,
 
-  /// There is no `.mokuro` beside the archive and several inside it.
+  /// No `.mokuro` file was given and the archive holds several.
   severalOcr,
 
   /// The `.mokuro` file is not a volume.
@@ -85,8 +89,8 @@ class MokuroImportException implements Exception {
 /// Top-level function for use in compute. Copies the volume in
 /// [MokuroImportParams.archivePath] into its own directory under
 /// [MokuroImportParams.volumesDirectory], replacing any earlier import of
-/// the same volume. Its OCR is the `.mokuro` file beside the archive with
-/// the archive's name, else the only `.mokuro` file inside it. Only the
+/// the same volume. Its OCR is [MokuroImportParams.ocrPath], else the only
+/// `.mokuro` file inside the archive. Only the
 /// images the OCR names are copied. Throws a [MokuroImportException] when
 /// the volume cannot be imported, leaving nothing behind.
 MokuroImportResult importMokuroVolume(MokuroImportParams params) {
@@ -109,7 +113,7 @@ MokuroImportResult importMokuroVolume(MokuroImportParams params) {
         if (file.isFile && !_isMacMetadata(file.name)) file.name: file,
     };
 
-    String source = _readOcr(params.archivePath, files);
+    String source = _readOcr(params.ocrPath, files);
     MokuroVolume volume;
     try {
       volume = MokuroVolume.parse(source);
@@ -199,12 +203,11 @@ bool _isZip(String path) {
   }
 }
 
-/// The text of the volume's OCR: the `.mokuro` beside [archivePath] with its
-/// name, else the only `.mokuro` among [files].
-String _readOcr(String archivePath, Map<String, ArchiveFile> files) {
-  File beside = File(p.setExtension(archivePath, '.mokuro'));
-  if (beside.existsSync()) {
-    return beside.readAsStringSync();
+/// The text of the volume's OCR: the file at [ocrPath], else the only
+/// `.mokuro` among [files].
+String _readOcr(String? ocrPath, Map<String, ArchiveFile> files) {
+  if (ocrPath != null) {
+    return File(ocrPath).readAsStringSync();
   }
 
   List<ArchiveFile> inside = files.values

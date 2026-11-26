@@ -64,7 +64,7 @@ void main() {
   Future<int> run(
     http.Client client,
     List<CatalogDownload> downloads,
-    Future<void> Function(String archivePath) importArchive,
+    Future<void> Function(String archivePath, String ocrPath) importArchive,
   ) {
     return downloadCatalogVolumes(
       client: client,
@@ -91,11 +91,13 @@ void main() {
         ...volume('vol 02', bytes(20, 3), bytes(4, 4)),
       }),
       [download('vol 01', 10, 3), download('vol 02', 20, 4)],
-      (path) async {
+      (path, ocrPath) async {
         archives.add(path);
         expect(File(path).readAsBytesSync(),
             archives.length == 1 ? bytes(10, 1) : bytes(20, 3));
-        ocrs.add(File(p.setExtension(path, '.mokuro')).readAsBytesSync());
+        expect(p.basename(ocrPath), 'volume.mokuro');
+        expect(p.dirname(ocrPath), p.dirname(path));
+        ocrs.add(File(ocrPath).readAsBytesSync());
       },
     );
 
@@ -112,7 +114,7 @@ void main() {
         ...volume('vol 02', bytes(20, 3), bytes(4, 4)),
       }),
       [download('vol 01', 10, 3), download('vol 02', 20, 4)],
-      (_) async {},
+      (_, _) async {},
     );
 
     expect(progress.last.receivedBytes, 37);
@@ -147,8 +149,10 @@ void main() {
     int imported = await run(
       serve(volume('vol 01', archive, utf8.encode(ocr))),
       [download('vol 01', archive.length, utf8.encode(ocr).length)],
-      (path) async => importMokuroVolume(MokuroImportParams(
-          archivePath: path, volumesDirectory: volumes.path)),
+      (path, ocrPath) async => importMokuroVolume(MokuroImportParams(
+          archivePath: path,
+          ocrPath: ocrPath,
+          volumesDirectory: volumes.path)),
     );
 
     expect(imported, 1);
@@ -175,7 +179,7 @@ void main() {
         download('vol 02', 20, 4),
         download('vol 03', 1, 1),
       ],
-      (_) async => imports++,
+      (_, _) async => imports++,
     );
 
     await expectLater(
@@ -191,7 +195,7 @@ void main() {
 
   test('an HTTP error is a failure of that volume', () async {
     await expectLater(
-        run(serve({}), [download('vol 01', 10, 3)], (_) async {}),
+        run(serve({}), [download('vol 01', 10, 3)], (_, _) async {}),
         failsFor(
             'vol 01',
             isA<CatalogException>()
@@ -204,7 +208,7 @@ void main() {
         run(
           serve(volume('vol 01', bytes(10, 1), bytes(3, 2))),
           [download('vol 01', 10, 3)],
-          (_) async => throw MokuroImportException(MokuroImportError.noOcr),
+          (_, _) async => throw MokuroImportException(MokuroImportError.noOcr),
         ),
         failsFor(
             'vol 01',
@@ -219,7 +223,7 @@ void main() {
         run(
           serve(volume('vol 01', bytes(10, 1), bytes(3, 2))),
           [download('vol 01', 10, 3)],
-          (_) async => throw const FileSystemException('No space left'),
+          (_, _) async => throw const FileSystemException('No space left'),
         ),
         failsFor('vol 01', isA<FileSystemException>()));
     expect(temporary.listSync(), isEmpty);
@@ -240,7 +244,7 @@ void main() {
         'https://c/vol 02.mokuro': () => Stream.value(bytes(4, 4)),
       }),
       [download('vol 01', 10, 3), download('vol 02', 15, 4)],
-      (_) async => imports++,
+      (_, _) async => imports++,
     );
 
     expect(imported, 1);
@@ -258,7 +262,7 @@ void main() {
         ...volume('vol 02', bytes(20, 3), bytes(4, 4)),
       }),
       [download('vol 01', 10, 3), download('vol 02', 20, 4)],
-      (path) async {
+      (path, ocrPath) async {
         cancel.cancel();
         await Future<void>.delayed(Duration.zero);
         finished.add(path);

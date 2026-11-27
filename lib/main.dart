@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:receive_intent/receive_intent.dart' as intents;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';
@@ -90,106 +87,13 @@ class JidoujishoApp extends ConsumerStatefulWidget {
   ConsumerState<JidoujishoApp> createState() => _JidoujishoAppState();
 }
 
-class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
-    with WidgetsBindingObserver {
-  final navigatorKey = GlobalKey<NavigatorState>();
-  bool _isMainIntent = false;
-
-  late final StreamSubscription _intentsSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addObserver(this);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      /// Receive all intents and parse them depending on which they are.
-      unawaited(intents.ReceiveIntent.getInitialIntent().then(
-        (intent) => handleIntent(
-          intent: intent,
-          isInitial: true,
-        ),
-      ));
-      // Attach a listener to the stream for receiving intents.
-      _intentsSubscription = intents.ReceiveIntent.receivedIntentStream.listen(
-        (intent) => handleIntent(
-          intent: intent,
-          isInitial: false,
-        ),
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _intentsSubscription.cancel();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  void handleIntent({
-    required intents.Intent? intent,
-    required bool isInitial,
-  }) {
-    if (intent == null) {
-      return;
-    }
-
-    debugPrint(jsonEncode(intent.toMap()));
-
-    switch (intent.action) {
-      case 'android.intent.action.MAIN':
-        setState(() {
-          _isMainIntent = true;
-        });
-        return;
-      case 'android.intent.action.SEND':
-        String? data = intent.extra!['android.intent.extra.TEXT'];
-        if (data != null) {
-          textShareIntentAction(data);
-        }
-
-      case 'android.intent.action.PROCESS_TEXT':
-        String data = intent.extra!['android.intent.extra.PROCESS_TEXT'];
-        textContextMenuAction(data);
-        return;
-      case 'android.intent.action.WEB_SEARCH':
-        String data = intent.extra!['query'];
-        textContextMenuAction(data);
-        return;
-    }
-  }
-
-  void textContextMenuAction(String data) {
-    if (data.trim().isNotEmpty) {
-      appModel.openRecursiveDictionarySearch(
-        searchTerm: data,
-        killOnPop: true,
-      );
-    }
-  }
-
-  void textShareIntentAction(String data) {
-    if (data.trim().isNotEmpty) {
-      appModel.openCreator(
-        creatorFieldValues: CreatorFieldValues(
-          textValues: {
-            SentenceField.instance: data,
-          },
-        ),
-        killOnPop: true,
-        ref: ref,
-      );
-    }
-  }
-
+class _JidoujishoAppState extends ConsumerState<JidoujishoApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorKey: appModel.navigatorKey,
-      home: home,
+      home: const HomePage(),
       localizationsDelegates: const [
         JidoujishoLocalizationsDelegate(),
       ],
@@ -201,12 +105,6 @@ class _JidoujishoAppState extends ConsumerState<JidoujishoApp>
 
   /// Responsible for managing global app-wide state.
   AppModel get appModel => ref.watch(appProvider);
-
-  /// Responsible for managing card creator state.
-  CreatorModel get creatorModel => ref.watch(creatorProvider);
-
-  /// The application will open to this page upon startup.
-  Widget get home => _isMainIntent ? const HomePage() : const Scaffold();
 
   /// The current theme mode: light, dark, e-ink or following the system.
   AppThemeMode get themeMode => appModel.themeMode;

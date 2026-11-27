@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import android.net.Uri;
 
@@ -36,6 +37,7 @@ import android.content.res.Configuration;
 public class MainActivity extends FlutterActivity {
     private static final String ANKIDROID_CHANNEL = "app.arianneorpilla.yuuna/anki";
     private static final String EINK_CHANNEL = "app.arianneorpilla.yuuna/eink";
+    private static final String TOAST_CHANNEL = "app.arianneorpilla.yuuna/toast";
     private static final int AD_PERM_REQUEST = 0;
 
     private Activity context;
@@ -255,6 +257,20 @@ public class MainActivity extends FlutterActivity {
                         default:
                             result.notImplemented();
                     }
+                }
+            );
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), TOAST_CHANNEL)
+            .setMethodCallHandler(
+                (call, result) -> {
+                    if (!call.method.equals("showToast")) {
+                        result.notImplemented();
+                        return;
+                    }
+                    Toast.makeText(context, (String) call.argument("message"),
+                        Boolean.TRUE.equals(call.argument("long"))
+                            ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+                    result.success(null);
                 }
             );
 

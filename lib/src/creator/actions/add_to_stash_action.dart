@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
@@ -43,8 +42,6 @@ class AddToStashAction extends QuickAction {
         mediaSource.currentPosition < 0) {
       showToast(
         msg: t.stash_unavailable,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
       return;
     }
@@ -74,8 +71,6 @@ class AddToStashAction extends QuickAction {
 
     showToast(
       msg: added ? t.stash_added : t.stash_already,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
     );
   }
 

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/media.dart';
@@ -56,8 +55,6 @@ class ExplainSentenceAction extends QuickAction {
         !canExplain(kind: kind, sentence: sentence)) {
       showToast(
         msg: t.explain_unavailable,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
       return;
     }

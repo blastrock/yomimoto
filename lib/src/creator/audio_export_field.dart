@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/utils.dart';
@@ -95,8 +94,6 @@ abstract class AudioExportField extends Field {
               field: label,
               secondField: fallbackField.label,
             ),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
           );
 
           return fallbackTerm;
@@ -106,8 +103,6 @@ abstract class AudioExportField extends Field {
 
     showToast(
       msg: t.no_text_to_search,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
     );
 
     return null;
@@ -166,8 +161,6 @@ abstract class AudioExportField extends Field {
         if (cause == EnhancementTriggerCause.manual) {
           showToast(
             msg: t.audio_unavailable,
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
           );
         }
       }

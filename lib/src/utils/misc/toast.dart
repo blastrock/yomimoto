@@ -1,22 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter/services.dart';
 
-/// Show a toast without waiting for it. [Fluttertoast.showToast] returns a
-/// [Future] that is never worth awaiting, so every toast goes through here.
+const MethodChannel _channel = MethodChannel('app.arianneorpilla.yuuna/toast');
+
+/// Show [msg] in an Android toast, for a long time if [long], without waiting
+/// for it. Being native, the toast shows above dialogs too.
 void showToast({
   required String msg,
-  Toast? toastLength,
-  ToastGravity? gravity,
-  Color? backgroundColor,
-  Color? textColor,
+  bool long = false,
 }) {
-  unawaited(Fluttertoast.showToast(
-    msg: msg,
-    toastLength: toastLength,
-    gravity: gravity,
-    backgroundColor: backgroundColor,
-    textColor: textColor,
+  unawaited(_channel.invokeMethod<void>(
+    'showToast',
+    <String, dynamic>{'message': msg, 'long': long},
   ));
 }

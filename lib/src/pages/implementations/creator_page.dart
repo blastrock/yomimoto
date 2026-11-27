@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/pages.dart';
@@ -1086,8 +1085,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
               msg: appModel.preferences.get(Preferences.closeCreatorOnExport)
                   ? t.close_on_export_on
                   : t.close_on_export_off,
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
             );
           },
         );

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/language.dart';
 import 'package:yuuna/models.dart';
@@ -36,8 +35,6 @@ class SentencePickerEnhancement extends Enhancement {
     if (sourceText.trim().isEmpty) {
       showToast(
         msg: t.no_text,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
       return;
     }

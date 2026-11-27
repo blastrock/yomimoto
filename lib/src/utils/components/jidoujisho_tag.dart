@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/utils.dart';
 
 /// A tag that can be clicked on for more information. Used in dictionary
@@ -54,11 +53,7 @@ class JidoujishoTag extends StatelessWidget {
         onTap: message != null
             ? () {
                 showToast(
-                  backgroundColor: background,
-                  textColor: foreground,
                   msg: message!,
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
                 );
               }
             : null,

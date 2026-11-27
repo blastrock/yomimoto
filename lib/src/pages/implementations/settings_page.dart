@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
@@ -407,7 +406,7 @@ class _SettingsPageState extends BasePageState<SettingsPage> {
     setState(() {
       _testingApiKey = false;
     });
-    showToast(msg: message, toastLength: Toast.LENGTH_LONG);
+    showToast(msg: message, long: true);
   }
 
   Widget buildTextField({

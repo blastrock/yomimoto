@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
 import 'package:yuuna/utils.dart';
@@ -40,8 +39,6 @@ class SearchDictionaryEnhancement extends Enhancement {
       if (searchTerm.isEmpty) {
         showToast(
           msg: t.no_text_to_search,
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
         );
         return;
       } else {
@@ -50,8 +47,6 @@ class SearchDictionaryEnhancement extends Enhancement {
             field: field.label,
             secondField: fallbackField.label,
           ),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
         );
       }
     }

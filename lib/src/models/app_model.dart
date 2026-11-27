@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:path/path.dart' as path;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -733,7 +732,7 @@ class AppModel with ChangeNotifier {
     alertReceivePort.listen((message) {
       showToast(
         msg: message.toString(),
-        toastLength: Toast.LENGTH_LONG,
+        long: true,
       );
     });
 
@@ -1131,8 +1130,6 @@ class AppModel with ChangeNotifier {
     if (mapping.isExportFieldsEmpty) {
       showToast(
         msg: t.export_profile_empty,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
       return;
     }
@@ -1206,8 +1203,6 @@ class AppModel with ChangeNotifier {
 
       showToast(
         msg: t.card_exported(deck: deck),
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
 
       onSuccess.call();
@@ -1216,8 +1211,6 @@ class AppModel with ChangeNotifier {
 
       showToast(
         msg: t.error_add_note,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
 
       rethrow;
@@ -1290,8 +1283,6 @@ class AppModel with ChangeNotifier {
     } on PlatformException {
       showToast(
         msg: t.error_export_media_ankidroid,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
 
       rethrow;
@@ -1787,8 +1778,6 @@ class AppModel with ChangeNotifier {
   void showFailedToCommunicateMessage() {
     showToast(
       msg: t.failed_online_service,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
     );
   }
 
@@ -1882,8 +1871,6 @@ class AppModel with ChangeNotifier {
     if (_androidDeviceInfo.version.sdkInt < 33) {
       showToast(
         msg: t.copied_to_clipboard,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
       );
     }
   }

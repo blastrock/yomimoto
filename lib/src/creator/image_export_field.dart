@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
@@ -190,8 +189,6 @@ abstract class ImageExportField extends Field with ChangeNotifier {
               field: label,
               secondField: fallbackField.label,
             ),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
           );
 
           return fallbackTerm;
@@ -201,8 +198,6 @@ abstract class ImageExportField extends Field with ChangeNotifier {
 
     showToast(
       msg: t.no_text_to_search,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
     );
 
     return null;

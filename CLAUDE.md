@@ -373,8 +373,9 @@ Haiku 5.5, each with its own thinking settings).
 - `analysis_options.yaml` enables a strict rule set, notably
   **`public_member_api_docs`**: every public class, member and getter needs a
   `///` doc comment.
-- Toasts go through `showToast` (`lib/src/utils/misc/toast.dart`), never
-  `Fluttertoast.showToast` directly.
+- Toasts go through `showToast` (`lib/src/utils/misc/toast.dart`): native
+  Android toasts, shown by `MainActivity` on the `app.arianneorpilla.yuuna/toast`
+  channel, so they show above dialogs.
 - Spelling in identifiers, comments and strings is **British/upstream style**
   (`initialise`, `localisation`, `customisation`). Match it.
 - Dependency and override entries in `pubspec.yaml` carry a comment explaining

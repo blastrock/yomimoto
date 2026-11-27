@@ -8,8 +8,9 @@ Japanese text with instant dictionary lookup and Anki card creation. It is a
 with first-class e-ink support**. Repository: github.com/blastrock/yomimoto.
 
 Everything else upstream had — YouTube, ChatGPT, the video player, the browser,
-clipboard/websocket/lyrics readers, image share intents — has been deleted. What
-remains is deliberately three things:
+clipboard/websocket/lyrics readers, the share and text-selection intents — has
+been deleted: the launcher icon is the only way into the app. What remains is
+deliberately three things:
 
 1. **Reading** — the embedded ッツ (ttu) EPUB reader and mokuro manga reader.
 2. **Dictionary** — Yomichan / Migaku imports, searched from SQLite.

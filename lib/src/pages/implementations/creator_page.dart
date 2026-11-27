@@ -18,7 +18,6 @@ class CreatorPage extends BasePage {
     required this.decks,
     required this.editEnhancements,
     required this.editFields,
-    required this.killOnPop,
     this.creatorContext,
     super.key,
   });
@@ -31,9 +30,6 @@ class CreatorPage extends BasePage {
 
   /// Whether or not the creator page allows editing of set fields.
   final bool editFields;
-
-  /// If true, popping will exit the application.
-  final bool killOnPop;
 
   /// Where the card's word was met, for the media's own image. Null takes
   /// the context of whatever is open.
@@ -49,20 +45,13 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
   /// Get the export details pertaining to the fields.
   CreatorFieldValues get exportDetails => creatorModel.getExportDetails(ref);
 
-  Future<bool> onWillPop() async {
+  void clearOnPop() {
     if (isCardEditing) {
       creatorModel.clearAll(
         overrideLocks: true,
         savedTags: appModel.preferences.get(Preferences.savedTags),
       );
     }
-
-    if (widget.killOnPop) {
-      unawaited(appModel.shutdown());
-      return false;
-    }
-
-    return true;
   }
 
   Color get activeButtonColor =>
@@ -162,26 +151,20 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!appModel.isDatabaseOpen) {
-      return const SizedBox.shrink();
-    }
-
     if (!_creatorInitialised && isCardEditing) {
       _creatorInitialised = true;
       initialiseCreator();
     }
 
     return PopScope(
-      // PopScope inverts WillPopScope: refuse the pop up front, run the
-      // same confirmation, and pop by hand if it is accepted.
+      // Refuse the pop up front, clear the card's fields, then pop by hand.
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return;
         }
-        if (await onWillPop() && context.mounted) {
-          Navigator.of(context).pop(result);
-        }
+        clearOnPop();
+        Navigator.of(context).pop(result);
       },
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -290,11 +273,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
             appModel.preferences.get(Preferences.savedTags);
 
         if (appModel.preferences.get(Preferences.closeCreatorOnExport)) {
-          if (widget.killOnPop) {
-            appModel.shutdown();
-          } else {
-            Navigator.pop(context);
-          }
+          Navigator.pop(context);
         }
       },
     );
@@ -606,11 +585,7 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       tooltip: t.back,
       icon: Icons.arrow_back,
       onTap: () {
-        if (widget.killOnPop) {
-          appModel.shutdown();
-        } else {
-          Navigator.pop(context);
-        }
+        Navigator.pop(context);
       },
     );
   }
@@ -915,7 +890,6 @@ class _CreatorPageState extends BasePageState<CreatorPage> {
       onUpdateQuery: (query) {
         afterSearchTerm = query;
       },
-      killOnPop: false,
     );
 
     await subscription.cancel();

@@ -28,7 +28,6 @@ dependencies:
     sdk: flutter
   flutter_archive: ^6.3.1
   flutter_cache_manager: ^3.3.0
-  flutter_exit_app: ^2.1.2
   flutter_html: ^3.0.0
   flutter_html_table: ^3.0.0
   flutter_image_compress: ^2.5.1

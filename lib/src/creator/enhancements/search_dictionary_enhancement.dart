@@ -58,7 +58,6 @@ class SearchDictionaryEnhancement extends Enhancement {
 
     unawaited(appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
     ));
   }
 }

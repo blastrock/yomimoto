@@ -59,7 +59,6 @@ class BasePageState<T extends BasePage> extends ConsumerState<T> {
   Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
     );
   }
 

@@ -124,7 +124,6 @@ class CardCreatorAction extends QuickAction {
 
       await appModel.openCreator(
         ref: ref,
-        killOnPop: false,
         creatorFieldValues: CreatorFieldValues(textValues: newTextFields),
         creatorContext: creatorContext,
       );

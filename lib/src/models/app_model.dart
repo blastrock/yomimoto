@@ -8,7 +8,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_exit_app/flutter_exit_app.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -152,9 +151,6 @@ class AppModel with ChangeNotifier {
   /// Used to notify toggling incognito. Updates the app logo to and from
   /// grayscale.
   final ChangeNotifier incognitoNotifier = ChangeNotifier();
-
-  /// Notifies app to stop showing any screens.
-  final ChangeNotifier databaseCloseNotifier = ChangeNotifier();
 
   /// These directories are prepared at startup in order to reduce redundancy
   /// in actual runtime.
@@ -1459,7 +1455,6 @@ class AppModel with ChangeNotifier {
   /// empty.
   Future<void> openCreator({
     required WidgetRef ref,
-    required bool killOnPop,
     CreatorFieldValues? creatorFieldValues,
     CreatorContext? creatorContext,
   }) async {
@@ -1486,7 +1481,6 @@ class AppModel with ChangeNotifier {
           decks: decks,
           editEnhancements: false,
           editFields: false,
-          killOnPop: killOnPop,
           creatorContext: creatorContext,
         ),
         transitionDuration: Duration.zero,
@@ -1499,21 +1493,13 @@ class AppModel with ChangeNotifier {
     _creatorActiveController.add(false);
   }
 
-  /// Whether or not the media item should be killed upon exit.
-  bool _shouldKillMediaOnPop = false;
-
   /// A helper function for launching a media source.
   Future<void> openMedia({
     required WidgetRef ref,
     required MediaSource mediaSource,
-    bool killOnPop = false,
     bool pushReplacement = false,
     MediaItem? item,
   }) async {
-    if (killOnPop) {
-      _shouldKillMediaOnPop = true;
-    }
-
     mediaSource.clearCurrentSentence();
     mediaSource.clearExtraData();
 
@@ -1566,10 +1552,6 @@ class AppModel with ChangeNotifier {
 
     mediaSource.refreshTab();
     DictionaryTab.instance.refreshTab();
-
-    if (_shouldKillMediaOnPop) {
-      await shutdown();
-    }
   }
 
   /// A helper function for opening the creator from any page in the
@@ -1584,7 +1566,6 @@ class AppModel with ChangeNotifier {
           decks: decks,
           editEnhancements: true,
           editFields: false,
-          killOnPop: false,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -1604,7 +1585,6 @@ class AppModel with ChangeNotifier {
           decks: decks,
           editEnhancements: false,
           editFields: true,
-          killOnPop: false,
         ),
         transitionDuration: Duration.zero,
         reverseTransitionDuration: Duration.zero,
@@ -1615,7 +1595,6 @@ class AppModel with ChangeNotifier {
   /// A helper function for doing a recursive dictionary search.
   Future<void> openRecursiveDictionarySearch({
     required String searchTerm,
-    required bool killOnPop,
     Function(String)? onUpdateQuery,
   }) async {
 
@@ -1629,7 +1608,6 @@ class AppModel with ChangeNotifier {
         pageBuilder: (context, animation1, animation2) =>
             RecursiveDictionaryPage(
           searchTerm: searchTerm,
-          killOnPop: killOnPop,
           onUpdateQuery: onUpdateQuery,
         ),
         transitionDuration: Duration.zero,
@@ -1943,18 +1921,5 @@ class AppModel with ChangeNotifier {
       searchWithWildcards: searchWithWildcards,
       maximum: maximumDictionaryHistoryItems,
     );
-  }
-
-  /// Check if the database is still open or has the app been flagged to be
-  /// shutdown.
-  bool get isDatabaseOpen => _isDatabaseOpen;
-  bool _isDatabaseOpen = true;
-
-  /// Safely shutdown and stop database operations.
-  Future<void> shutdown() async {
-    databaseCloseNotifier.notifyListeners();
-    _isDatabaseOpen = false;
-    await _db.close();
-    await FlutterExitApp.exitApp();
   }
 }

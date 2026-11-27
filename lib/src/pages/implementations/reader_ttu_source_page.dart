@@ -113,7 +113,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     }
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
     );
     if (appModel.isMediaOpen) {
       await Future.delayed(const Duration(milliseconds: 5), () {});
@@ -490,7 +489,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
     await Future.delayed(const Duration(milliseconds: 5), () {});
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
     );
     await Future.delayed(const Duration(milliseconds: 5), () {});
     await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
@@ -508,7 +506,6 @@ class _ReaderTtuSourcePageState extends BaseSourcePageState<ReaderTtuSourcePage>
 
     await appModel.openCreator(
       ref: ref,
-      killOnPop: false,
       creatorFieldValues: CreatorFieldValues(
         textValues: {
           SentenceField.instance: text,

@@ -452,7 +452,6 @@ class BaseSourcePageState<T extends BaseSourcePage> extends BasePageState<T> {
     }
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
     );
     if (appModel.isMediaOpen) {
       await Future.delayed(const Duration(milliseconds: 5), () {});

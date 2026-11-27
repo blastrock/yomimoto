@@ -45,9 +45,9 @@ all three**:
   plugin still uses the legacy variant API, as does
   `android/app/build.gradle`'s `applicationVariants.all`, which renames the
   APKs and sets their per-ABI version codes.
-- **`android.builtInKotlin=false`**, as in Flutter's template: three plugins
+- **`android.builtInKotlin=false`**, as in Flutter's template: two plugins
   still apply the Kotlin Gradle Plugin themselves (`flutter_archive`,
-  `flutter_exit_app`, `flutter_image_compress_common`),
+  `flutter_image_compress_common`),
   which AGP 9's built-in Kotlin rejects. Flutter prints a warning naming
   them on every build, and says a future release will refuse them. With
   the flag off, Flutter applies KGP to the plugins that have moved to

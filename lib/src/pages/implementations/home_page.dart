@@ -36,7 +36,6 @@ class _HomePageState extends BasePageState<HomePage>
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
-    appModelNoUpdate.databaseCloseNotifier.addListener(refresh);
 
     /// Populate and define the tabs and their respective content bodies based
     /// on the home tabs specified and ordered by [AppModel]. As [ref.watch]
@@ -60,14 +59,9 @@ class _HomePageState extends BasePageState<HomePage>
     });
   }
 
-  void refresh() {
-    setState(() {});
-  }
-
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    appModelNoUpdate.databaseCloseNotifier.removeListener(refresh);
     super.dispose();
   }
 
@@ -87,10 +81,6 @@ class _HomePageState extends BasePageState<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    if (!appModel.isDatabaseOpen) {
-      return const SizedBox.shrink();
-    }
-
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -203,7 +193,6 @@ class _HomePageState extends BasePageState<HomePage>
       icon: Icons.note_add_outlined,
       onTap: () => appModel.openCreator(
         ref: ref,
-        killOnPop: false,
       ),
     );
   }

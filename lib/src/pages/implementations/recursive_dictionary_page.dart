@@ -11,16 +11,12 @@ class RecursiveDictionaryPage extends BasePage {
   /// Create an instance of this page.
   const RecursiveDictionaryPage({
     required this.searchTerm,
-    required this.killOnPop,
     this.onUpdateQuery,
     super.key,
   });
 
   /// The initial search term that this page searches on initialisation.
   final String searchTerm;
-
-  /// If true, popping will exit the application.
-  final bool killOnPop;
 
   /// Used to track changes to the query.
   final Function(String)? onUpdateQuery;
@@ -70,10 +66,6 @@ class _RecursiveDictionaryPageState
 
   @override
   Widget build(BuildContext context) {
-    if (!appModel.isDatabaseOpen) {
-      return const SizedBox.shrink();
-    }
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: theme.colorScheme.surface,
@@ -109,11 +101,7 @@ class _RecursiveDictionaryPageState
       debounceDelay: searchDebounceDelay,
       onFocusChanged: (focused) {
         if (!focused) {
-          if (widget.killOnPop) {
-            appModel.shutdown();
-          } else {
-            Navigator.pop(context);
-          }
+          Navigator.pop(context);
         }
       },
       progress: _isSearching,
@@ -208,11 +196,7 @@ class _RecursiveDictionaryPageState
         tooltip: t.back,
         icon: Icons.arrow_back,
         onTap: () {
-          if (widget.killOnPop) {
-            appModel.shutdown();
-          } else {
-            Navigator.pop(context);
-          }
+          Navigator.pop(context);
         },
       ),
     );
@@ -257,7 +241,6 @@ class _RecursiveDictionaryPageState
   Future<void> onSearch(String searchTerm, {String? sentence = ''}) async {
     await appModel.openRecursiveDictionarySearch(
       searchTerm: searchTerm,
-      killOnPop: false,
       onUpdateQuery: widget.onUpdateQuery,
     );
   }
@@ -271,7 +254,6 @@ class _RecursiveDictionaryPageState
         icon: Icons.note_add,
         onTap: () {
           appModel.openCreator(
-            killOnPop: false,
             ref: ref,
             creatorFieldValues: CreatorFieldValues(
               textValues: {

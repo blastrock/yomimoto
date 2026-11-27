@@ -5,7 +5,6 @@ import 'dart:isolate';
 import 'package:cancelable_compute/cancelable_compute.dart' as cancelable;
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -984,10 +983,7 @@ class AppModel with ChangeNotifier {
             child: Text(t.dialog_launch_ankidroid),
             onPressed: () async {
               final navigator = Navigator.of(context);
-              await LaunchApp.openApp(
-                androidPackageName: 'com.ichi2.anki',
-                openStore: true,
-              );
+              await methodChannel.invokeMethod('openAnkiDroid');
               navigator.pop();
             },
           ),

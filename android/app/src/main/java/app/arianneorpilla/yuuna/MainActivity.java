@@ -3,6 +3,7 @@
 package app.arianneorpilla.yuuna;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -212,6 +213,22 @@ public class MainActivity extends FlutterActivity {
                             }
                             result.success(true);
                             break;
+                        case "openAnkiDroid": {
+                            // AnkiDroid if installed, else its store page.
+                            Intent intent = getPackageManager()
+                                .getLaunchIntentForPackage("com.ichi2.anki");
+                            if (intent == null) {
+                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                    "https://play.google.com/store/apps/details?id=com.ichi2.anki"));
+                            }
+                            try {
+                                startActivity(intent);
+                            } catch (ActivityNotFoundException e) {
+                                // Nothing can open the store page either.
+                            }
+                            result.success(null);
+                            break;
+                        }
                         case "addFileToMedia":
                             System.out.println(filename);
                             System.out.println(preferredName);

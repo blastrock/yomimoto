@@ -17,7 +17,6 @@ import 'package:intl/intl.dart' as intl;
 import 'package:path/path.dart' as path;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:remove_emoji/remove_emoji.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:yuuna/creator.dart';
@@ -139,8 +138,17 @@ class AppModel with ChangeNotifier {
     dictionaryMenuNotifier.notifyListeners();
   }
 
-  /// Used to strip emoji from search terms.
-  final _removeEmoji = RemoveEmoji();
+  /// Emoji, stripped from search terms: a keycap, or a run of emoji with the
+  /// joiners, variation selectors and tags of their sequences. Digits, `#`
+  /// and `*` have the Emoji property but are only emoji in a keycap.
+  static final RegExp _emoji = RegExp(
+    // The lint's validator lacks the emoji properties (`\p{Emoji}` and
+    // the like), which the runtime supports.
+    // ignore: valid_regexps
+    r'[#*0-9]\uFE0F?\u20E3'
+    r'|(?:(?![#*0-9])[\p{Emoji}\u200D\uFE0F\u{E0020}-\u{E007F}])+',
+    unicode: true,
+  );
 
   /// Used to notify toggling incognito. Updates the app logo to and from
   /// grayscale.
@@ -901,7 +909,7 @@ class AppModel with ChangeNotifier {
     bool useCache = true,
   }) async {
     String term = searchTerm.replaceAll('\n', ' ');
-    term = _removeEmoji.clean(term, ' ', false);
+    term = term.replaceAll(_emoji, ' ');
 
     /// Strip lone surrogates that may crash the search.
     RegExp loneSurrogate = RegExp(

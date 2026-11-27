@@ -70,7 +70,6 @@ dependencies:
   progress_indicators: ^1.0.0
   receive_intent: ^0.2.8
   record_mp3_plus: ^1.5.0
-  remove_emoji: ^0.0.7
   reorderables: ^0.6.0
   ruby_text:
     # Vendored jidoujisho fork: per-character styles and tap targets inside

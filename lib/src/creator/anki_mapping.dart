@@ -1,13 +1,9 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/models.dart';
-
-part 'anki_mapping.g.dart';
 
 /// A user-generated mapping to allow customisation of the fields exported from
 /// the application. A mapping is bound to a [model], which must have a length
 /// of fields equal or more than the length of [getExportFields].
-@JsonSerializable()
 class AnkiMapping {
   /// Initialise a model mapping with the given parameters.
   AnkiMapping({

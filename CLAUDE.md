@@ -42,7 +42,7 @@ remains is deliberately three things:
 tool/fetch_ttu.sh                                          # ebook-reader-lite build → assets/ttu-ebook-reader/ (--local <path> to build a checkout)
 tool/port_mokuro_layout.sh ../mokuro-reader                # mokuro-reader's line layout → assets/manga-reader/mokuro-layout.js
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # json, dart_mappable, Drift
+dart run build_runner build --delete-conflicting-outputs   # dart_mappable, Drift
 dart run drift_dev schema dump lib/src/database/app_database.dart drift_schemas/
 dart run drift_dev schema generate drift_schemas/ test/database/generated/
 dart run slang                                             # regenerate lib/i18n/strings.g.dart

@@ -1,9 +1,5 @@
-import 'dart:convert';
-
-import 'package:json_annotation/json_annotation.dart';
 import 'package:yuuna/media.dart';
 import 'package:yuuna/models.dart';
-part 'media_item.g.dart';
 
 /// An item representable in media history from which a media source may
 /// start playback with. This entity does not have any progress information,
@@ -12,7 +8,6 @@ part 'media_item.g.dart';
 /// the [MediaItem], and not included within it. This design is done to reduce
 /// the number and complexity of CRUD operations, as including all data in this
 /// entity is impractical to include when persisting a progress update.
-@JsonSerializable()
 class MediaItem {
   /// Initialise a media item with certain details.
   MediaItem({
@@ -29,13 +24,6 @@ class MediaItem {
     this.lastOpenedAt,
     this.overrideTitle,
   });
-
-  /// Create an instance of this class from a serialized format.
-  factory MediaItem.fromJson(Map<String, dynamic> json) =>
-      _$MediaItemFromJson(json);
-
-  /// Convert this into a serialized format.
-  Map<String, dynamic> toJson() => _$MediaItemToJson(this);
 
   /// A unique identifier for the purposes of database storage. Null until
   /// the item is saved.
@@ -93,13 +81,10 @@ class MediaItem {
       other is MediaItem && other.uniqueKey == uniqueKey;
 
   @override
-  int get hashCode => toJson().hashCode;
+  int get hashCode => uniqueKey.hashCode;
 
   @override
-  String toString() {
-    JsonEncoder encoder = const JsonEncoder.withIndent('  ');
-    return encoder.convert(this);
-  }
+  String toString() => 'MediaItem($uniqueKey)';
 
   /// Get the [MediaSource] from a [MediaItem] from its serialised identifier.
   MediaSource getMediaSource({required AppModel appModel}) {

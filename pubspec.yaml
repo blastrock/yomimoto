@@ -44,7 +44,6 @@ dependencies:
   http: ^1.5.0
   image_picker: ^1.2.3
   intl: ^0.20.3
-  json_annotation: ^4.9.0
   just_audio: ^0.10.6
   kana_kit: ^2.0.0
   list_counter: ^1.0.2
@@ -99,7 +98,6 @@ dev_dependencies:
   flutter_native_splash: ^2.2.8
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.6.1
 
 flutter_icons:
   android: "launcher_icon"

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:list_counter/list_counter.dart';
 import 'package:path/path.dart' as path;
-import 'package:recase/recase.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:yuuna/database.dart';
 import 'package:yuuna/dictionary.dart';
@@ -80,53 +79,6 @@ class YomichanFormat extends DictionaryFormat {
     final html = document.body?.innerHtml ?? '';
 
     return BeautifulSoup(html).getText(separator: '\n');
-  }
-
-  /// Recursively get HTML for a structured content definition.
-  static String getStructuredContentHtml(dynamic content) {
-    if (content is Map) {
-      return getNodeHtml(
-        tag: content['tag'],
-        content: getStructuredContentHtml(content['content']),
-        style: getStyle(
-          content['style'] ?? {},
-        ),
-      );
-    } else if (content is List) {
-      return content.map(getStructuredContentHtml).join();
-    }
-
-    return content;
-  }
-
-  /// Convert style to appropriate format.
-  static Map<String, String> getStyle(Map<String, dynamic> styleMap) {
-    return Map<String, String>.fromEntries(
-      styleMap.entries.map(
-        (e) => MapEntry(
-          ReCase(e.key).paramCase,
-          e.value.toString(),
-        ),
-      ),
-    );
-  }
-
-  /// Get the HTML for a certain node.
-  static String getNodeHtml({
-    required String content,
-    String? tag,
-    Map<String, String> style = const {},
-  }) {
-    if (tag == null) {
-      return content;
-    }
-
-    dom.Element element = dom.Element.tag(tag);
-    element.attributes.addAll(style);
-
-    element.innerHtml = content;
-
-    return element.outerHtml;
   }
 }
 

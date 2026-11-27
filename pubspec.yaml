@@ -86,7 +86,6 @@ dependencies:
   # and not needed.
   sqlite3: ^3.7.1
   stack_trace: ^1.11.1
-  transparent_image: ^2.0.1
   url_launcher: ^6.0.20
   visibility_detector: ^0.4.0+2
   wakelock_plus: ^1.7.0

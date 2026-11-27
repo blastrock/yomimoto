@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/pages.dart';
 import 'package:yuuna/utils.dart';

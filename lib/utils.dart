@@ -32,3 +32,4 @@ export 'src/utils/misc/eink_refresh.dart';
 export 'src/utils/misc/run_with_progress.dart';
 export 'src/utils/misc/spacing.dart';
 export 'src/utils/misc/toast.dart';
+export 'src/utils/misc/transparent_image.dart';

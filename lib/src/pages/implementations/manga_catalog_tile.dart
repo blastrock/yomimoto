@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:yuuna/media.dart';
+import 'package:yuuna/utils.dart';
 
 /// A cover in a catalog's grids, styled like the library's tiles: the cover
 /// downloaded when the tile is first built and kept in the image cache, its

@@ -67,7 +67,6 @@ dependencies:
   # deliberately 32, so buying into a preview platform for one plugin is not
   # worth it.
   permission_handler: ^12.0.3
-  progress_indicators: ^1.0.0
   receive_intent: ^0.2.8
   record_mp3_plus: ^1.5.0
   reorderables: ^0.6.0

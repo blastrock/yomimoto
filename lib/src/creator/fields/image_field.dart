@@ -1,7 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:progress_indicators/progress_indicators.dart';
 import 'package:yuuna/creator.dart';
 import 'package:yuuna/dictionary.dart';
 import 'package:yuuna/models.dart';
@@ -370,10 +369,15 @@ class ImageField extends ImageExportField {
               ),
             ),
           WidgetSpan(
-            child: SizedBox(
-              width: 10,
-              child: JumpingDotsProgressIndicator(
-                color: Theme.of(context).appBarTheme.foregroundColor!,
+            alignment: PlaceholderAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsets.only(left: Spacing.small),
+              child: SizedBox.square(
+                dimension: fontSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: Theme.of(context).appBarTheme.foregroundColor,
+                ),
               ),
             ),
           ),
